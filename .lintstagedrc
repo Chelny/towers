@@ -1,0 +1,10 @@
+{
+  "*.scss": [
+    "prettier --write",
+    "npm run lint:scss -- --fix"
+  ],
+  "*.{tsx,ts}": [
+    "prettier --write",
+    "npm run lint:ts -- --fix"
+  ]
+}

@@ -1,0 +1,6 @@
+export * from "@/interfaces/game"
+export * from "@/interfaces/room"
+export * from "@/interfaces/room-chat"
+export * from "@/interfaces/table"
+export * from "@/interfaces/table-chat"
+export * from "@/interfaces/towers-game-user"

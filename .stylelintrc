@@ -1,0 +1,66 @@
+{
+  "extends": [
+    "stylelint-config-standard-scss",
+    "stylelint-config-property-sort-order-smacss"
+  ],
+  "rules": {
+    "alpha-value-notation": "percentage",
+    "color-function-notation": "modern",
+    "declaration-empty-line-before": "never",
+    "function-no-unknown": null,
+    "media-feature-name-no-unknown": [
+      true,
+      {
+        "ignoreMediaFeatureNames": [
+          "min-device-pixel-ratio",
+          "max-device-pixel-ratio"
+        ]
+      }
+    ],
+    "media-feature-range-notation": "prefix",
+    "no-empty-source": null,
+    "no-invalid-double-slash-comments": true,
+    "no-invalid-position-at-import-rule": null,
+    "order/order": [
+      [
+        "dollar-variables",
+        "custom-properties",
+        "declarations",
+        {
+          "type": "at-rule",
+          "name": "supports"
+        },
+        {
+          "type": "at-rule",
+          "hasBlock": true
+        },
+        {
+          "type": "at-rule"
+        },
+        "rules",
+        "at-rules"
+      ]
+    ],
+    "scss/at-rule-no-unknown": [
+      true,
+      {
+        "ignoreAtRules": ["tailwind"]
+      }
+    ],
+    "scss/no-global-function-names": null,
+    "selector-class-pattern": "^.[A-Za-z0-9-]+(?:__[A-Za-z0-9-]+)?(?:--[A-Za-z0-9-]+)?(?=\\W|$)",
+    "selector-max-id": [1],
+    "selector-max-type": [3],
+    "selector-no-qualifying-type": null,
+    "selector-no-vendor-prefix": null,
+    "selector-pseudo-class-no-unknown": [
+      true,
+      {
+        "ignorePseudoClasses": [
+          "host"
+        ]
+      }
+    ],
+    "selector-type-no-unknown": null
+  }
+}

@@ -1,0 +1,60 @@
+# TODO List
+
+- [ ] Unit testing
+- [ ] Test in Firefox and Safari
+- [ ] Prevent mobile users from accessing rooms and tables
+
+## User
+
+- [ ] Add localization
+- [ ] Add dark theme
+- [ ] Add profile page
+- [ ] Redirects new OAuth users to new page where they can choose their username before signing in
+- [ ] Add predefined avatars or let users upload their picture
+- [ ] Set User's `inOnline` to `true` on sign up and when signed in
+- [ ] Update `lastActiveAt` on every request made
+
+## Rooms List
+
+- [ ] Users cannot join a room twice. Write "Joined" and disable button if the user is already in the room
+
+## Room
+
+### Invitation Request
+
+- [ ] Accept table invitation
+- [ ] Decline table invitation: Emit socket event + send decline reason to the other user
+
+### Create Table
+
+- [ ] Endpoint + socket event
+
+### Player Information
+
+- [ ] Send private message endpoint
+- [ ] Idle time (check User's `lastActiveAt` in database)
+
+## Table
+
+### Sidebar
+
+- [ ] Boot user endpoint + socket event
+- [ ] Invite user socket event + only show users not in the table
+
+### Game
+
+- [ ] Attacks should be sent to the opponents' board
+- [ ] Seated user from teams 2-4 must play their game from team 1's seat
+- [ ] Should conside other team player's board when placing pieces
+
+### Chat
+
+- [ ] \*\*\* [username]'s old rating: 2050; new rating: 2040
+- Cipher key:
+  - [ ] Cipher key text: for each Towers made on game board. Example: "\*\*\* V ==> M"
+  - [ ] Code after winning 25 games in the space of 2 hours: "2FKK 2OF W1VAM2FO 91MO 8EWOF2 NF9 7HW3FE" (no asterisks at the beginning)
+  - [ ] Hero text: Click on chat input, click on TAB then type. Shouldn't see it typed anywhere. Example: "\*\*\* [username] is a hero of Yahoo! Towers."
+- [ ] Host of the table text: "\*\*\* You are the host of the table. This gives you the power to invite to [or boot people from] your table. You may also limit other player's access to your table by selecting its "Table Type"."
+- Table type:
+  - [ ] Protected table text: "\*\*\* Only people you have invited may play now."
+  - [ ] Private table text: "\*\*\* Only people you have invited may play or watch your table now."

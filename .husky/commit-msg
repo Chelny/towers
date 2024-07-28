@@ -1,0 +1,33 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+red='\033[0;31m'
+green='\033[0;32m'
+yellow='\033[0;33m'
+no_color='\033[0m'
+
+commit_types="(build|chore|ci|docs|feat|fix|merge|perf|refactor|revert|style|test)"
+conventional_commit_regex="^${commit_types}(\([a-z \-]+\))?!?: .+$"
+
+# Get the commit message (the parameter we're given is just the path to the
+# temporary file which holds the message).
+commit_message=$(cat "$1")
+
+# Check the message. If it meets standards, it's all good.
+if [[ "$commit_message" =~ $conventional_commit_regex ]]; then
+   echo -e "${green}Commit message meets Conventional Commit standards...\n${no_color}"
+   exit 0
+fi
+
+# Uh-oh, this is not a conventional commit, show an example and link to the spec.
+echo "\n${red}The commit message does not meet the Conventional Commit standard\n"
+echo "An example of a valid message is: "
+echo "  feat(login): add the 'remember me' button\n"
+echo "More details at: https://www.conventionalcommits.org/en/v1.0.0/#summary \n"
+echo "***********************************************************************\n"
+echo "Here are the list of message types: ${commit_types}"
+echo "  <type>: <subject> (Max 72 char) ex: fix: invalid request for login api"
+echo "  <type(<scope>)>: <subject> (Max 72 char) - <scope> is optional ex: fix(user): email address is empty on profile api\n"
+echo "***********************************************************************${no_color}\n"
+
+exit 1

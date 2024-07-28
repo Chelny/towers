@@ -1,0 +1,30 @@
+import { NextResponse } from "next/server"
+import { PasswordResetToken, User } from "@prisma/client"
+import { ForgotPasswordData } from "@/app/(auth)/forgot-password/forgot-password.actions"
+import { getUserByEmail } from "@/data"
+import { generatePasswordResetToken, sendPasswordResetEmail } from "@/lib"
+
+export async function POST(body: ForgotPasswordData): Promise<NextResponse> {
+  const user: User | null = await getUserByEmail(body.email)
+
+  if (!user) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: "The email does not exist in the database."
+      },
+      { status: 404 }
+    )
+  }
+
+  const token: PasswordResetToken = await generatePasswordResetToken(user.email)
+  await sendPasswordResetEmail(user.name, token.email, token.token)
+
+  return NextResponse.json(
+    {
+      success: true,
+      message: "A reset password link has been sent in your inbox!"
+    },
+    { status: 200 }
+  )
+}

@@ -1,0 +1,37 @@
+import { ReactNode } from "react"
+import clsx from "clsx/lite"
+import DefenseBlock from "@/components/game/DefenseBlock"
+import RegularBlock from "@/components/game/RegularBlock"
+import { BoardBlock } from "@/interfaces"
+import { getClassNameForBlock, getClassNameForBlockPowerType, isPowerPieceBlock, isTowersBlock } from "@/utils"
+import styles from "./Block.module.scss"
+
+type GridCellProps = {
+  block: BoardBlock
+  isOpponentBoard?: boolean
+}
+
+export default function GridCell(props: GridCellProps): ReactNode {
+  return (
+    <div
+      className={clsx(
+        "flex items-center justify-center box-border",
+        props.isOpponentBoard ? "w-grid-cell-opponent h-grid-cell-opponent" : "w-grid-cell h-grid-cell",
+        styles[getClassNameForBlock(props.block)],
+        styles[getClassNameForBlockPowerType(props.block)],
+        !props.isOpponentBoard && props.block.isToBeRemoved && !props.block.brokenBlockNumber && styles.BlockBreak,
+        props.block.isToBeRemoved &&
+          props.block.brokenBlockNumber &&
+          styles[`BlockExplode-${props.block.brokenBlockNumber}`]
+      )}
+    >
+      {isTowersBlock(props.block) && props.block.powerType === "defense" ? (
+        <DefenseBlock letter={props.isOpponentBoard ? undefined : props.block.letter} />
+      ) : (
+        <RegularBlock
+          letter={isPowerPieceBlock(props.block) || props.isOpponentBoard ? undefined : props.block.letter}
+        />
+      )}
+    </div>
+  )
+}

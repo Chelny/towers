@@ -1,0 +1,54 @@
+{
+  "extends": "next/core-web-vitals",
+  "overrides": [
+    {
+      "files": ["*.ts", "*.tsx"],
+      "rules": {
+        "@next/next/no-html-link-for-pages": "off",
+        "@typescript-eslint/no-explicit-any": "off",
+        "comma-dangle": ["error", "never"],
+        "import/order": [
+          "error",
+          {
+            "groups": [["builtin", "external"], "internal", "parent", "sibling", "index", "object", "type"],
+            "pathGroups": [
+              { "pattern": "react", "group": "external", "position": "before" },
+              { "pattern": "react-dom", "group": "external", "position": "before" },
+              { "pattern": "next", "group": "external", "position": "before" },
+              { "pattern": "next/**", "group": "external", "position": "before" },
+              { "pattern": "i18next", "group": "external", "position": "before" },
+              { "pattern": "@/app/globals.scss", "group": "internal", "position": "after" },
+              { "pattern": "@/app/**", "group": "internal", "position": "before" },
+              { "pattern": "@/components/**", "group": "internal", "position": "before" },
+              { "pattern": "@/hooks/**", "group": "internal", "position": "before" },
+              { "pattern": "@/**", "group": "internal", "position": "after" },
+              { "pattern": "**/*.scss", "group": "internal", "position": "before" }
+            ],
+            "pathGroupsExcludedImportTypes": ["internal"],
+            "newlines-between": "never",
+            "alphabetize": {
+              "order": "asc",
+              "caseInsensitive": true
+            },
+            "warnOnUnassignedImports": true
+          }
+        ],
+        "no-undef": "off",
+        "no-unused-vars": "off",
+        "object-curly-spacing": ["error", "always", { "arraysInObjects": true, "objectsInObjects": true }],
+        "quotes": ["error", "double"],
+        "semi": ["error", "never"],
+        "sort-imports": [
+          "error",
+          {
+            "ignoreCase": true,
+            "ignoreDeclarationSort": true,
+            "ignoreMemberSort": false,
+            "memberSyntaxSortOrder": ["all", "multiple", "single", "none"]
+          }
+        ],
+        "react-hooks/exhaustive-deps": "off"
+      }
+    }
+  ]
+}

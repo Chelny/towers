@@ -1,0 +1,17 @@
+import { ReactNode } from "react"
+import { Metadata } from "next/types"
+import { SignUpForm } from "@/app/(auth)/sign-up/sign-up.form"
+import { ROUTE_SIGN_UP } from "@/constants"
+
+export const metadata: Metadata = {
+  title: ROUTE_SIGN_UP.TITLE
+}
+
+export default function SignUpPage(): ReactNode {
+  return (
+    <>
+      <h2 className="my-8 text-4xl">{ROUTE_SIGN_UP.TITLE}</h2>
+      <SignUpForm />
+    </>
+  )
+}
