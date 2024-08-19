@@ -8,13 +8,14 @@ import { v4 as uuidv4 } from "uuid"
 import CreateTable from "@/components/CreateTable"
 import ChatSkeleton from "@/components/skeleton/ChatSkeleton"
 import PlayersListSkeleton from "@/components/skeleton/PlayersListSkeleton"
+import RoomHeaderSkeleton from "@/components/skeleton/RoomHeaderSkeleton"
+import RoomTableSkeleton from "@/components/skeleton/RoomTableSkeleton"
 import TableInvitation, { TableInvitationData } from "@/components/TableInvitation"
 import AlertMessage from "@/components/ui/AlertMessage"
 import Button from "@/components/ui/Button"
 import { CHAT_MESSSAGE_MAX_LENGTH, ROUTE_ROOMS } from "@/constants"
 import { joinRoom, leaveRoom, sendMessageToRoomChat } from "@/features"
 import { useSessionData } from "@/hooks"
-import { TableWithHostAndTowersGameUsers } from "@/interfaces"
 import { fetchRoomChatData, fetchRoomData, fetchRoomUsersData } from "@/lib"
 import { AppDispatch, RootState } from "@/redux"
 
@@ -25,7 +26,7 @@ type RoomProps = {
 export default function Room({ roomId }: RoomProps): ReactNode {
   const router = useRouter()
   const { data: session } = useSessionData()
-  const { isConnected, socketRooms, rooms, roomsChat, roomsChatLoading, roomsUsers, error } = useSelector(
+  const { socketRooms, rooms, roomsLoading, roomsChat, roomsChatLoading, roomsUsers, error } = useSelector(
     (state: RootState) => state.socket
   )
   const dispatch: AppDispatch = useDispatch()
@@ -33,10 +34,6 @@ export default function Room({ roomId }: RoomProps): ReactNode {
   const chatEndRef = useRef<HTMLDivElement>(null)
   const [isCreateTableModalOpen, setIsCreateTableModalOpen] = useState<boolean>(false)
   const [invitationModals, setInvitationModals] = useState<{ id: string; data: TableInvitationData }[]>([])
-  const seatMapping: number[][] = [
-    [1, 3, 5, 7],
-    [2, 4, 6, 8]
-  ]
 
   useEffect(() => {
     dispatch(joinRoom({ room: roomId, isTable: false, username: session?.user.username }))
@@ -120,15 +117,7 @@ export default function Room({ roomId }: RoomProps): ReactNode {
   return (
     <>
       <div className="flex flex-col h-full bg-gray-100 text-black">
-        {/* Header */}
-        <div className="py-2">
-          <h2 className="p-4 text-4xl">{rooms[roomId]?.room?.name}</h2>
-
-          {/* TODO: Testing purpose */}
-          <div className="px-4 bg-amber-500">
-            <p>Socket status: {isConnected ? "connected" : "disconnected"}</p>
-          </div>
-        </div>
+        <RoomHeader room={rooms[roomId]} />
 
         <div className="flex-1 flex overflow-hidden">
           {/* Left sidebar */}
@@ -137,7 +126,7 @@ export default function Room({ roomId }: RoomProps): ReactNode {
               <Button className="w-full py-2 mb-2" disabled onClick={(event: MouseEvent<HTMLButtonElement>) => {}}>
                 Play Now
               </Button>
-              <Button className="w-full py-2 mb-2" onClick={handleOpenCreateTableModal}>
+              <Button className="w-full py-2 mb-2" disabled={roomsLoading} onClick={handleOpenCreateTableModal}>
                 Create Table
               </Button>
             </div>
@@ -193,67 +182,7 @@ export default function Room({ roomId }: RoomProps): ReactNode {
                 <div className="flex-1 px-2">Who is Watching</div>
               </div>
               <div className="flex-1 flex flex-col overflow-y-auto">
-                {rooms[roomId]?.room?.tables.map((table: TableWithHostAndTowersGameUsers) => (
-                  <div key={table.id} className="flex flex-col">
-                    <div className="flex items-center border-b-2 border-b-gray-300">
-                      <div className="basis-20 row-span-2 flex justify-center items-center h-full px-2 border-gray-300">
-                        #{table.tableNumber}
-                      </div>
-                      <div className="flex-1 flex flex-col gap-1 h-full px-2 border-l border-gray-300 divide-y divide-gray-200">
-                        <div className="flex flex-1 gap-1 pt-3 pb-2">
-                          <div className="basis-32 border-gray-300">
-                            <Button
-                              className="w-full h-full"
-                              onClick={() => router.push(`?room=${roomId}&table=${table.id}`)}
-                            >
-                              Watch
-                            </Button>
-                          </div>
-                          <div className="flex flex-col gap-1 border-gray-300">
-                            {seatMapping.map((row, rowIndex) => (
-                              <div key={rowIndex} className="flex flex-row gap-1">
-                                {row.map((seatNumber, colIndex) => {
-                                  const user = table.towersGameUsers.find((user) => user.seatNumber === seatNumber)
-                                  return user ? (
-                                    <div
-                                      key={colIndex}
-                                      className="flex items-center justify-center w-36 p-1 border border-gray-300 rounded"
-                                    >
-                                      <span className="truncate">{user.user.username}</span>
-                                    </div>
-                                  ) : (
-                                    <Button
-                                      key={colIndex}
-                                      className="w-36"
-                                      onClick={() => router.push(`?room=${roomId}&table=${table.id}`)}
-                                    >
-                                      Join
-                                    </Button>
-                                  )
-                                })}
-                              </div>
-                            ))}
-                          </div>
-                          <div className="flex-1 px-2 line-clamp-3">
-                            {/* List non-seated players by username, separated by commas */}
-                            {table.towersGameUsers
-                              .filter((towersGameUser) => !towersGameUser.seatNumber)
-                              .map((towersGameUser) => towersGameUser.user.username)
-                              .join(", ")}
-                          </div>
-                        </div>
-                        <div className="flex py-1 text-sm">
-                          {table.rated && (
-                            <>
-                              <span>Option: Rated</span>&nbsp;-&nbsp;
-                            </>
-                          )}
-                          <span>Host: {table.host.user.username}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+                <RoomTable roomId={roomId} tables={rooms[roomId]?.room?.tables} />
               </div>
             </div>
 
@@ -308,6 +237,14 @@ export default function Room({ roomId }: RoomProps): ReactNode {
     </>
   )
 }
+
+const RoomHeader = dynamic(() => import("@/components/RoomHeader"), {
+  loading: () => <RoomHeaderSkeleton />
+})
+
+const RoomTable = dynamic(() => import("@/components/RoomTable"), {
+  loading: () => <RoomTableSkeleton />
+})
 
 const Chat = dynamic(() => import("@/components/Chat"), {
   loading: () => <ChatSkeleton />

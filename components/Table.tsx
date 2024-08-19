@@ -10,6 +10,7 @@ import { v4 as uuidv4 } from "uuid"
 import PlayerBoard from "@/components/game/PlayerBoard"
 import ChatSkeleton from "@/components/skeleton/ChatSkeleton"
 import PlayersListSkeleton from "@/components/skeleton/PlayersListSkeleton"
+import TableHeaderSkeleton from "@/components/skeleton/TableHeaderSkeleton"
 import TableBootUser from "@/components/TableBootUser"
 import TableInviteUser from "@/components/TableInviteUser"
 import Button from "@/components/ui/Button"
@@ -52,7 +53,7 @@ type TableProps = {
 export default function Table({ roomId, tableId }: TableProps): ReactNode {
   const router = useRouter()
   const { data: session } = useSessionData()
-  const { socketRooms, roomsUsers, tables, tablesChat, tablesChatLoading, tablesUsers } = useSelector(
+  const { socketRooms, roomsUsers, tables, tablesLoading, tablesChat, tablesChatLoading, tablesUsers } = useSelector(
     (state: RootState) => state.socket
   )
   const dispatch: AppDispatch = useDispatch()
@@ -171,18 +172,12 @@ export default function Table({ roomId, tableId }: TableProps): ReactNode {
   return (
     <>
       <div className="grid grid-areas-table grid-rows-table grid-cols-table h-full bg-gray-100 text-black">
-        {/* Header */}
-        <div className="grid-in-banner py-2">
-          <h2 className="px-4 pt-4 text-4xl">
-            Table: {tables[tableId]?.tableNumber} - Host: {tables[tableId]?.host.user.username}
-          </h2>
-          <h3 className="px-4 text-lg">{tables[tableId]?.room.name}</h3>
-        </div>
+        <TableHeader table={tables[tableId]} />
 
         {/* Left sidebar */}
         <div className="grid-in-sidebar flex flex-col justify-between w-56 p-2 bg-gray-200">
           <div className="space-y-2">
-            <Button className="w-full" onClick={(event: MouseEvent<HTMLButtonElement>) => {}}>
+            <Button className="w-full" disabled={tablesLoading} onClick={(event: MouseEvent<HTMLButtonElement>) => {}}>
               Start
             </Button>
             <hr className="border-1 border-gray-400" />
@@ -193,7 +188,7 @@ export default function Table({ roomId, tableId }: TableProps): ReactNode {
               Demo
             </Button>
             <hr className="border-1 border-gray-400" />
-            <Button className="w-full" onClick={(event: MouseEvent<HTMLButtonElement>) => {}}>
+            <Button className="w-full" disabled={tablesLoading} onClick={(event: MouseEvent<HTMLButtonElement>) => {}}>
               Stand
             </Button>
             <div>
@@ -202,16 +197,17 @@ export default function Table({ roomId, tableId }: TableProps): ReactNode {
             <Select
               id="tableType"
               defaultValue={tables[tableId]?.tableType}
+              disabled={tablesLoading}
               onChange={(value: string) => console.log(value)}
             >
               <Select.Option value={TableType.PUBLIC}>Public</Select.Option>
               <Select.Option value={TableType.PROTECTED}>Protected</Select.Option>
               <Select.Option value={TableType.PRIVATE}>Private</Select.Option>
             </Select>
-            <Button className="w-full" onClick={handleOpenInviteUserModal}>
+            <Button className="w-full" disabled={tablesLoading} onClick={handleOpenInviteUserModal}>
               Invite
             </Button>
-            <Button className="w-full" onClick={handleOpenBootUserModal}>
+            <Button className="w-full" disabled={tablesLoading} onClick={handleOpenBootUserModal}>
               Boot
             </Button>
             <div>
@@ -221,6 +217,7 @@ export default function Table({ roomId, tableId }: TableProps): ReactNode {
               id="ratedGame"
               label="Rated Game"
               defaultChecked={tables[tableId]?.rated}
+              disabled={tablesLoading}
               onChange={(value: boolean) => console.log(value)}
             />
             <Checkbox id="sound" label="Sound" disabled onChange={(value: boolean) => console.log(value)} />
@@ -334,13 +331,13 @@ export default function Table({ roomId, tableId }: TableProps): ReactNode {
                 </div>
               </div> */}
 
-              <div className="row-span-1 flex flex-col justify-start items-center px-2 bg-neutral-200 font-mono">
+              <div className="row-span-1 flex flex-col justify-start w-[515px] px-2 bg-neutral-200 font-mono">
                 {/* Next power to be used by current player */}
-                <p className="w-full text-start line-clamp-1">You can send a midas piece</p>
+                <span className="w-full truncate">You can send a midas piece</span>
                 {/* Power used by other players */}
-                <p className="w-full text-gray-500 text-start line-clamp-1">
-                  the_player1 mega defused 000_crazy_player_8_000
-                </p>
+                <span className="w-full text-gray-500 truncate">
+                  the_player1 mega defused the_player1abcdefghijklmnopqrstuvwxyz
+                </span>
               </div>
             </div>
           </div>
@@ -387,6 +384,10 @@ export default function Table({ roomId, tableId }: TableProps): ReactNode {
     </>
   )
 }
+
+const TableHeader = dynamic(() => import("@/components/TableHeader"), {
+  loading: () => <TableHeaderSkeleton />
+})
 
 const Chat = dynamic(() => import("@/components/Chat"), {
   loading: () => <ChatSkeleton />
