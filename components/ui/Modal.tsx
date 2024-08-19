@@ -48,8 +48,8 @@ export default function Modal({
       className="fixed top-1/2 left-1/2 z-40 w-full max-w-md rounded shadow-lg -translate-x-1/2 -translate-y-1/2"
       onCancel={handleClose}
     >
-      <div className="flex justify-between items-center p-4 border-b border-gray-300">
-        <h3 className="text-2xl font-light">{title}</h3>
+      <div className="flex justify-between items-center px-4 py-3 border-b border-gray-300">
+        <h3 className="text-2xl">{title}</h3>
         <button
           className="self-start p-2 text-gray-400 hover:text-gray-500"
           aria-label="Close modal"

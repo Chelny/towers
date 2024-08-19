@@ -8,7 +8,6 @@ import { TiTick } from "react-icons/ti"
 type CheckboxProps = {
   id: string
   label: string
-  isTableCheckbox?: boolean
   defaultChecked?: boolean
   disabled?: boolean
   onChange?: (value: boolean) => void
@@ -17,7 +16,6 @@ type CheckboxProps = {
 export default function Checkbox({
   id,
   label,
-  isTableCheckbox = false,
   defaultChecked = false,
   disabled = false,
   onChange
@@ -38,10 +36,8 @@ export default function Checkbox({
         type="checkbox"
         id={id}
         className={clsx(
-          "peer relative shrink-0 appearance-none w-5 h-5 rounded-sm mt-1 cursor-pointer",
-          isTableCheckbox
-            ? "border border-custom-neutral-400 bg-custom-blue-200 ring-2 ring-custom-blue-200"
-            : "border-2 border-t-gray-600 border-e-gray-400 border-b-gray-400 border-s-gray-600 bg-white"
+          "peer relative shrink-0 appearance-none w-5 h-5 border-2 border-t-gray-600 border-e-gray-400 border-b-gray-400 border-s-gray-600 rounded-sm mt-1 bg-white cursor-pointer",
+          "disabled:bg-neutral-200"
         )}
         name={id}
         checked={checked}
@@ -50,8 +46,14 @@ export default function Checkbox({
         aria-disabled={disabled}
         onChange={handleChange}
       />
-      <TiTick className="absolute w-5 h-5 pointer-events-none hidden peer-checked:block stroke-custom-neutral-400 mt-1 outline-none" />
-      <label htmlFor={id} className={clsx("mt-1", disabled ? "cursor-not-allowed" : "cursor-pointer")}>
+      <TiTick className={clsx("absolute hidden w-5 h-5 mt-1 text-gray-600", "peer-checked:block")} />
+      <label
+        htmlFor={id}
+        className={clsx(
+          "mt-1",
+          "peer-enabled:cursor-pointer peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"
+        )}
+      >
         {label}
       </label>
     </div>

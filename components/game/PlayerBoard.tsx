@@ -36,13 +36,13 @@ export default function PlayerBoard(props: PlayerBoardProps): ReactNode {
           height={props.isOpponentBoard ? 16 : 24}
           alt=""
         />
-        <p className={clsx("text-custom-neutral-100 line-clamp-1", props.isOpponentBoard ? "text-sm" : "text-base")}>
+        <p className={clsx("line-clamp-1", props.isOpponentBoard ? "text-sm" : "text-base")}>
           the_player{props.seatNumber} ({score})
         </p>
       </div>
       <div
         className={clsx(
-          "grid gap-2 w-full border-y-8 border-y-custom-blue-900 bg-custom-blue-900 select-none",
+          "grid gap-2 w-full border-y-8 border-y-gray-300 bg-gray-300 select-none",
           props.isOpponentBoard
             ? "grid-areas-board-container-opponent"
             : props.isReversed
@@ -50,14 +50,14 @@ export default function PlayerBoard(props: PlayerBoardProps): ReactNode {
               : "grid-areas-board-container",
           props.isOpponentBoard ? "" : "grid-rows-[max-content_auto] grid-cols-[max-content_auto]",
           props.isReversed
-            ? "border-s-2 border-s-custom-blue-900 border-e-8 border-e-custom-blue-900"
-            : "border-s-8 border-s-custom-blue-900 border-e-2 border-e-custom-blue-900"
+            ? "border-s-2 border-s-gray-300 border-e-8 border-e-gray-300"
+            : "border-s-8 border-s-gray-300 border-e-2 border-e-gray-300"
         )}
       >
         <div
           className={clsx(
-            "relative grid grid-in-grid-container w-full text-black",
-            isGameOver ? "bg-black" : "bg-custom-neutral-200",
+            "relative grid grid-in-grid-container w-full text-neutral-300",
+            isGameOver ? "bg-neutral-500" : "bg-neutral-100",
             props.isOpponentBoard
               ? "grid-rows-grid-container-opponent w-grid-container-opponent"
               : "grid-rows-grid-container w-grid-container",
@@ -68,7 +68,7 @@ export default function PlayerBoard(props: PlayerBoardProps): ReactNode {
           {!isPlaying && (
             <div
               className={clsx(
-                "absolute left-1/2 -translate-x-1/2 z-20 flex flex-col gap-2 shadow-md bg-black text-center",
+                "absolute left-1/2 -translate-x-1/2 z-20 flex flex-col gap-2 shadow-md bg-neutral-800 text-center",
                 props.isOpponentBoard
                   ? "top-[90%] -translate-y-[90%] px-1 py-2 w-full"
                   : "top-1/2 -translate-y-1/2 px-3 py-2 w-11/12"
@@ -77,7 +77,7 @@ export default function PlayerBoard(props: PlayerBoardProps): ReactNode {
               {props.isSeatOccupied ? (
                 <p
                   className={clsx(
-                    "flex justify-center items-center text-custom-blue-100",
+                    "flex justify-center items-center text-neutral-50",
                     props.isOpponentBoard ? "h-8 text-sm line-clamp-2" : "h-16 text-xl"
                   )}
                 >
@@ -88,17 +88,11 @@ export default function PlayerBoard(props: PlayerBoardProps): ReactNode {
                 <>
                   {props.isSeated ? (
                     <>
-                      <Button
-                        isTableButton
-                        className="w-full"
-                        tabIndex={props.seatNumber}
-                        onClick={() => handleSeatChange(null)}
-                      >
+                      <Button className="w-full" tabIndex={props.seatNumber} onClick={() => handleSeatChange(null)}>
                         Stand
                       </Button>
                       <Button
-                        isTableButton
-                        className="w-full border-t-yellow-400 border-e-yellow-600 border-b-yellow-600 border-s-yellow-400"
+                        className="w-full border-t-yellow-400 border-e-yellow-600 border-b-yellow-600 border-s-yellow-400 bg-yellow-500 font-medium"
                         tabIndex={props.seatNumber}
                         onClick={startGame}
                       >
@@ -107,7 +101,6 @@ export default function PlayerBoard(props: PlayerBoardProps): ReactNode {
                     </>
                   ) : (
                     <Button
-                      isTableButton
                       className="w-full border-t-yellow-400 border-e-yellow-600 border-b-yellow-600 border-s-yellow-400"
                       tabIndex={props.seatNumber}
                       onClick={() => handleSeatChange(props.seatNumber)}
@@ -125,7 +118,7 @@ export default function PlayerBoard(props: PlayerBoardProps): ReactNode {
           <>
             <div
               className={clsx(
-                "grid-in-preview-block flex flex-col items-center justify-center h-preview-block px-2 py-2 bg-custom-neutral-200",
+                "grid-in-preview-block flex flex-col items-center justify-center h-preview-block px-2 py-2 bg-neutral-100",
                 props.isOpponentBoard ? "" : "w-preview-block"
               )}
             >
@@ -133,7 +126,7 @@ export default function PlayerBoard(props: PlayerBoardProps): ReactNode {
             </div>
             <div
               className={clsx(
-                "grid-in-power-bar flex flex-col items-center justify-end h-power-bar px-2 py-2 bg-custom-neutral-200",
+                "grid-in-power-bar flex flex-col items-center justify-end h-power-bar px-2 py-2 bg-neutral-100",
                 props.isOpponentBoard ? "" : "w-power-bar"
               )}
             >

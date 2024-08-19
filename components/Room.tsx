@@ -126,12 +126,12 @@ export default function Room({ roomId }: RoomProps): ReactNode {
 
           {/* TODO: Testing purpose */}
           <div className="px-4 bg-amber-500">
-            <p>Status: {isConnected ? "connected" : "disconnected"}</p>
+            <p>Socket status: {isConnected ? "connected" : "disconnected"}</p>
           </div>
         </div>
 
         <div className="flex-1 flex overflow-hidden">
-          {/* Left Sidebar */}
+          {/* Left sidebar */}
           <div className="flex flex-col justify-between w-52 p-4 bg-gray-200">
             <div className="mb-4">
               <Button className="w-full py-2 mb-2" disabled onClick={(event: MouseEvent<HTMLButtonElement>) => {}}>
@@ -143,7 +143,7 @@ export default function Room({ roomId }: RoomProps): ReactNode {
             </div>
             <div className="mt-4">
               <div>
-                <span className="p-1 rounded-tl rounded-tr bg-custom-blue-600 text-white text-sm">Ratings</span>
+                <span className="p-1 rounded-tl rounded-tr bg-sky-700 text-white text-sm">Ratings</span>
               </div>
               <div className="flex flex-col gap-4 p-2 bg-white text-gray-600 mb-4">
                 <div className="flex items-center gap-1">
@@ -258,7 +258,7 @@ export default function Room({ roomId }: RoomProps): ReactNode {
             </div>
 
             {/* Chat and users list */}
-            <div className="flex gap-2 h-72 p-2 bg-white border">
+            <div className="flex gap-2 h-72 p-2 border bg-white">
               <div className="flex-1 flex flex-col">
                 {/* Server messages */}
                 {error && <AlertMessage type="error">{error}</AlertMessage>}

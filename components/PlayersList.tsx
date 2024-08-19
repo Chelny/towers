@@ -33,11 +33,18 @@ export default function PlayersList({ users, full = false, onSelectedPlayer }: P
     if (!users) return []
 
     return users.slice().sort((a: TowersGameUserWithUserAndTables, b: TowersGameUserWithUserAndTables) => {
+      const isProvisionalA: boolean = a.gamesCompleted < PROVISIONAL_MAX_COMPLETED_GAMES
+      const isProvisionalB: boolean = b.gamesCompleted < PROVISIONAL_MAX_COMPLETED_GAMES
+
       if (sortKey === "name") {
         const nameA: string = a.user?.username || ""
         const nameB: string = b.user?.username || ""
         return sortOrder === "asc" ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA)
       } else if (sortKey === "rating") {
+        // Add provisional first in ASC order
+        if (isProvisionalA && !isProvisionalB) return sortOrder === "asc" ? -1 : 1
+        if (!isProvisionalA && isProvisionalB) return sortOrder === "asc" ? 1 : -1
+
         const ratingA: number = a.rating || 0
         const ratingB: number = b.rating || 0
         return sortOrder === "asc" ? ratingA - ratingB : ratingB - ratingA
@@ -59,11 +66,11 @@ export default function PlayersList({ users, full = false, onSelectedPlayer }: P
 
   return (
     <>
-      <div className="flex flex-col h-fill border">
+      <div className="flex flex-col h-fill border bg-white">
         {full && (
           <div className="flex border-b border-gray-200 divide-x-2 divide-gray-200 bg-gray-50">
             <div
-              className="flex items-center gap-2 w-1/2 p-2"
+              className="flex items-center gap-2 w-1/2 p-2 cursor-pointer"
               role="buton"
               tabIndex={0}
               onClick={() => handleSort("name")}
@@ -72,7 +79,7 @@ export default function PlayersList({ users, full = false, onSelectedPlayer }: P
               {sortKey === "name" && (sortOrder === "asc" ? <BsSortAlphaDown /> : <BsSortAlphaDownAlt />)}
             </div>
             <div
-              className="flex items-center gap-2 w-1/4 p-2"
+              className="flex items-center gap-2 w-1/4 p-2 cursor-pointer"
               role="buton"
               tabIndex={0}
               onClick={() => handleSort("rating")}
@@ -81,7 +88,7 @@ export default function PlayersList({ users, full = false, onSelectedPlayer }: P
               {sortKey === "rating" && (sortOrder === "asc" ? <BsSortNumericDown /> : <BsSortNumericDownAlt />)}
             </div>
             <div
-              className="flex items-center gap-2 w-1/4 p-2 me-4"
+              className="flex items-center gap-2 w-1/4 p-2 me-4 cursor-pointer"
               role="buton"
               tabIndex={0}
               onClick={() => handleSort("table")}
@@ -91,14 +98,14 @@ export default function PlayersList({ users, full = false, onSelectedPlayer }: P
             </div>
           </div>
         )}
-        <div className={clsx("overflow-y-scroll", full ? "flex-1 max-h-80" : "min-w-60 h-full px-2")}>
+        <div className={clsx("overflow-y-scroll", full ? "flex-1 max-h-80" : "min-w-60 h-full")}>
           {sortedPlayersList?.map((player: TowersGameUserWithUserAndTables) => (
             <div
               key={player.id}
               className={clsx(
-                "flex",
-                full ? "divide-x-2 divide-gray-200 select-none" : "divide-x divide-custom-neutral-100",
-                selectedPlayerId === player.id ? "bg-blue-200" : "bg-white"
+                "flex divide-gray-200",
+                full ? "divide-x-2 select-none" : "divide-x",
+                selectedPlayerId === player.id ? "bg-blue-100" : "bg-white"
               )}
               role="button"
               tabIndex={0}

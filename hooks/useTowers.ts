@@ -562,6 +562,7 @@ export function useTowers() {
     initializeNextPieces()
     setIsCommitting(false)
     setIsPlaying(true)
+    setIsGameOver(false)
     setTickSpeed(TickSpeed.NORMAL)
     setIsSpeedDropTriggered(false)
     setIsSpeedDropActive(false)

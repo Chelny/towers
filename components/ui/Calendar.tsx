@@ -169,7 +169,7 @@ export default function Calendar({
                       "flex-1 p-2 text-center border rounded-sm cursor-pointer",
                       !disabled && "hover:bg-gray-200",
                       day === null ? "text-gray-400" : "",
-                      isSelectedDay ? "bg-blue-200" : "",
+                      isSelectedDay ? "bg-blue-100" : "",
                       isDisabledDay ? "opacity-50 cursor-not-allowed" : ""
                     )}
                     disabled={isDisabledDay}

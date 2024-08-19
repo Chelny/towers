@@ -3,24 +3,6 @@
 @tailwind utilities;
 
 :root {
-  /* Colors */
-  --color-custom-neutral-100: #d5eff2;
-  --color-custom-neutral-200: #403e3e;
-  --color-custom-neutral-300: #03101c;
-  --color-custom-neutral-400: #02080d;
-  --color-custom-blue-100: #92b4b4;
-  --color-custom-blue-200: #45a3a2;
-  --color-custom-blue-300: #3c6a6b;
-  --color-custom-blue-400: #347e7e;
-  --color-custom-blue-500: #57767a;
-  --color-custom-blue-600: #1d618f;
-  --color-custom-blue-700: #4f6262;
-  --color-custom-blue-800: #1c6664;
-  --color-custom-blue-900: #105657;
-  --color-custom-blue-1000: #073838;
-  --color-custom-green-100: #7faf4e;
-  --color-custom-orange-100: #ec980b;
-
   /* Board */
   --grid-cell-size: 32;
   --grid-cell-size-opponent: 16;

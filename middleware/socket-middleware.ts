@@ -99,6 +99,7 @@ const socketMiddleware: Middleware = (store: MiddlewareAPI) => {
 
         socket.socket.on(SocketEvent.UserJoinedTableAnnouncement, async ({ tableId, username }) => {
           const message: string = `*** ${username} joined the table.`
+          // TODO: Uncomment
           // const response: Response = await fetch("/api/table-chat", {
           //   method: "POST",
           //   body: JSON.stringify({ tableId, message, type: TableChatMessageType.USER_ACTION })
@@ -112,6 +113,7 @@ const socketMiddleware: Middleware = (store: MiddlewareAPI) => {
 
         socket.socket.on(SocketEvent.UserLeaveTableAnnouncement, async ({ tableId, username }) => {
           const message: string = `*** ${username} left the table.`
+          // TODO: Uncomment
           // const response: Response = await fetch("/api/table-chat", {
           //   method: "POST",
           //   body: JSON.stringify({ tableId, message, type: TableChatMessageType.USER_ACTION })

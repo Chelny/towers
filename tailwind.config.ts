@@ -46,32 +46,6 @@ const config: Config = {
         "preview-block": "calc(var(--grid-cell-size) * 3px + 16px)",
         "power-bar": "calc(var(--grid-cell-size) * 8px + 16px)"
       },
-      colors: {
-        "custom-neutral": {
-          100: "var(--color-custom-neutral-100)",
-          200: "var(--color-custom-neutral-200)",
-          300: "var(--color-custom-neutral-300)",
-          400: "var(--color-custom-neutral-400)"
-        },
-        "custom-blue": {
-          100: "var(--color-custom-blue-100)",
-          200: "var(--color-custom-blue-200)",
-          300: "var(--color-custom-blue-300)",
-          400: "var(--color-custom-blue-400)",
-          500: "var(--color-custom-blue-500)",
-          600: "var(--color-custom-blue-600)",
-          700: "var(--color-custom-blue-700)",
-          800: "var(--color-custom-blue-800)",
-          900: "var(--color-custom-blue-900)",
-          1000: "var(--color-custom-blue-1000)"
-        },
-        "custom-green": {
-          100: "var(--color-custom-green-100)"
-        },
-        "custom-orange": {
-          100: "var(--color-custom-orange-100)"
-        }
-      },
       keyframes: {
         "move-up": {
           "0%": { transform: "translateY(100%)", opacity: "0" },

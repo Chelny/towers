@@ -9,7 +9,6 @@ type SelectProps = {
   id: string
   label?: string
   className?: string
-  isTableButton?: boolean
   placeholder?: string
   defaultValue?: string
   required?: boolean
@@ -24,7 +23,6 @@ export default function Select({
   id,
   label,
   className = "",
-  isTableButton = false,
   placeholder = "",
   defaultValue = "",
   required = false,
@@ -90,10 +88,7 @@ export default function Select({
       <div
         id={id}
         className={clsx(
-          "flex justify-between items-center w-full h-8 px-1 py-4 overflow-hidden border-2 rounded-sm ring-1 ring-custom-neutral-400 text-black line-clamp-1",
-          isTableButton
-            ? "border-t-custom-neutral-100 border-e-custom-blue-400 border-b-custom-blue-400 border-s-custom-neutral-100 bg-custom-blue-200 text-custom-blue-1000"
-            : "border-t-gray-200 border-e-gray-400 border-b-gray-400 border-s-gray-200 bg-gray-200",
+          "flex justify-between items-center w-full h-8 px-1 py-4 overflow-hidden border-2 border-t-gray-200 border-e-gray-400 border-b-gray-400 border-s-gray-200 rounded-sm ring-1 ring-black bg-gray-300 text-black line-clamp-1",
           className
         )}
         role="combobox"
@@ -125,10 +120,7 @@ export default function Select({
         <div
           ref={dropdownRef}
           id={`${id}Dropdown`}
-          className={clsx(
-            "absolute z-20 mt-1 py-1 overflow-y-auto w-full max-h-60 border shadow-lg rounded",
-            isTableButton ? "border-gray-700 bg-custom-blue-200" : "border-gray-300 bg-white"
-          )}
+          className="absolute z-20 mt-1 py-1 overflow-y-auto w-full max-h-60 border border-gray-300 shadow-lg rounded bg-white"
           aria-activedescendant={selectedValue ? `${id}-${selectedValue}` : undefined}
           role="listbox"
         >
@@ -138,10 +130,8 @@ export default function Select({
               id={`${id}-${option.props.value}`}
               className={clsx(
                 "block w-full px-2 py-2 text-left cursor-pointer",
-                isTableButton ? "hover:bg-custom-blue-100" : "hover:bg-gray-200",
-                isTableButton && option.props.value === selectedValue
-                  ? "bg-custom-blue-300"
-                  : !isTableButton && option.props.value === selectedValue && "bg-gray-300"
+                "hover:bg-gray-200",
+                option.props.value === selectedValue && "bg-blue-100"
               )}
               role="option"
               tabIndex={0}

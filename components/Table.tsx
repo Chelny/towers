@@ -170,38 +170,37 @@ export default function Table({ roomId, tableId }: TableProps): ReactNode {
 
   return (
     <>
-      <div className="grid grid-areas-table grid-rows-table grid-cols-table h-full bg-custom-blue-1000">
-        {/* Title */}
-        <div className="grid-in-banner h-24 p-4 text-custom-blue-200">
-          <h3 className="text-4xl">
+      <div className="grid grid-areas-table grid-rows-table grid-cols-table h-full bg-gray-100 text-black">
+        {/* Header */}
+        <div className="grid-in-banner py-2">
+          <h2 className="px-4 pt-4 text-4xl">
             Table: {tables[tableId]?.tableNumber} - Host: {tables[tableId]?.host.user.username}
-          </h3>
-          <h2>{tables[tableId]?.room.name}</h2>
+          </h2>
+          <h3 className="px-4 text-lg">{tables[tableId]?.room.name}</h3>
         </div>
 
         {/* Left sidebar */}
-        <div className="grid-in-sidebar flex flex-col justify-between w-56 p-2 bg-custom-blue-800">
+        <div className="grid-in-sidebar flex flex-col justify-between w-56 p-2 bg-gray-200">
           <div className="space-y-2">
-            <Button isTableButton className="w-full" onClick={(event: MouseEvent<HTMLButtonElement>) => {}}>
+            <Button className="w-full" onClick={(event: MouseEvent<HTMLButtonElement>) => {}}>
               Start
             </Button>
-            <hr className="border-1 border-custom-neutral-100" />
-            <Button isTableButton className="w-full" disabled onClick={(event: MouseEvent<HTMLButtonElement>) => {}}>
+            <hr className="border-1 border-gray-400" />
+            <Button className="w-full" disabled onClick={(event: MouseEvent<HTMLButtonElement>) => {}}>
               Change Keys
             </Button>
-            <Button isTableButton className="w-full" disabled onClick={(event: MouseEvent<HTMLButtonElement>) => {}}>
+            <Button className="w-full" disabled onClick={(event: MouseEvent<HTMLButtonElement>) => {}}>
               Demo
             </Button>
-            <hr className="border-1 border-custom-neutral-100" />
-            <Button isTableButton className="w-full" onClick={(event: MouseEvent<HTMLButtonElement>) => {}}>
+            <hr className="border-1 border-gray-400" />
+            <Button className="w-full" onClick={(event: MouseEvent<HTMLButtonElement>) => {}}>
               Stand
             </Button>
             <div>
-              <span className="p-1 rounded-tl rounded-tr bg-custom-blue-600 text-white text-sm">Table Type</span>
+              <span className="p-1 rounded-tl rounded-tr bg-sky-700 text-white text-sm">Table Type</span>
             </div>
             <Select
               id="tableType"
-              isTableButton
               defaultValue={tables[tableId]?.tableType}
               onChange={(value: string) => console.log(value)}
             >
@@ -209,159 +208,152 @@ export default function Table({ roomId, tableId }: TableProps): ReactNode {
               <Select.Option value={TableType.PROTECTED}>Protected</Select.Option>
               <Select.Option value={TableType.PRIVATE}>Private</Select.Option>
             </Select>
-            <Button isTableButton className="w-full" onClick={handleOpenInviteUserModal}>
+            <Button className="w-full" onClick={handleOpenInviteUserModal}>
               Invite
             </Button>
-            <Button isTableButton className="w-full" onClick={handleOpenBootUserModal}>
+            <Button className="w-full" onClick={handleOpenBootUserModal}>
               Boot
             </Button>
             <div>
-              <span className="p-1 rounded-tl rounded-tr bg-custom-blue-600 text-white text-sm">Options</span>
+              <span className="p-1 rounded-tl rounded-tr bg-sky-700 text-white text-sm">Options</span>
             </div>
             <Checkbox
               id="ratedGame"
               label="Rated Game"
-              isTableCheckbox
               defaultChecked={tables[tableId]?.rated}
               onChange={(value: boolean) => console.log(value)}
             />
-            <Checkbox
-              id="sound"
-              label="Sound"
-              isTableCheckbox
-              disabled
-              onChange={(value: boolean) => console.log(value)}
-            />
+            <Checkbox id="sound" label="Sound" disabled onChange={(value: boolean) => console.log(value)} />
           </div>
           <div className="flex gap-1">
-            <Button isTableButton className="w-full" disabled onClick={(event: MouseEvent<HTMLButtonElement>) => {}}>
+            <Button className="w-full" disabled onClick={(event: MouseEvent<HTMLButtonElement>) => {}}>
               Help
             </Button>
-            <Button isTableButton className="w-full" onClick={handleQuitTable}>
+            <Button className="w-full" onClick={handleQuitTable}>
               Quit
             </Button>
           </div>
         </div>
 
         {/* Center part */}
-        <div className="grid-in-game flex items-center w-full">
-          <div className="relative grid grid-rows-table-team grid-cols-table-team gap-2 w-fit p-2 mx-auto bg-custom-blue-1000 text-custom-blue-100">
-            {/* Game countdown */}
-            {isGameState === GameState.COUNTDOWN && (
-              <div className="absolute left-1/2 -translate-x-1/2 bottom-[8px] z-30 flex flex-col items-center w-[450px] h-48 p-1 border-2 border-custom-blue-200 bg-custom-blue-900 text-custom-neutral-100">
-                <div className="text-2xl">The next game is starting in</div>
-                <div className="flex-1 flex items-center text-7xl text-custom-orange-100 font-semibold normal-nums">
-                  14
+        <div className="grid-in-game flex items-center gap-2 w-full px-2 pb-2">
+          <div className="flex items-center w-full h-full border bg-neutral-50">
+            <div className="relative grid grid-rows-table-team grid-cols-table-team gap-2 w-fit p-2 mx-auto bg-neutral-50">
+              {/* Game countdown */}
+              {isGameState === GameState.COUNTDOWN && (
+                <div className="absolute left-1/2 -translate-x-1/2 bottom-[8px] z-30 flex flex-col items-center w-[450px] h-48 p-1 border-2 border-gray-400 bg-gray-200 shadow-lg">
+                  <div className="text-2xl">The next game is starting in</div>
+                  <div className="flex-1 flex items-center text-7xl text-orange-400 font-semibold normal-nums">14</div>
+                  <div className="text-2xl">seconds</div>
                 </div>
-                <div className="text-2xl">seconds</div>
-              </div>
-            )}
+              )}
 
-            {/* Game over */}
-            {isGameState === GameState.GAME_OVER && (
-              <div className="absolute left-0 top-0 gap-8 z-30 flex flex-col justify-start items-center w-full h-max p-1 mt-16 font-medium [text-shadow:_4px_4px_0_rgb(0_0_0)] animate-move-up">
-                <div className="text-8xl text-fuchsia-600">Game Over</div>
-                <div className="text-6xl text-yellow-400">You win!</div>
-                {/* <div className="flex flex-col gap-8 items-center text-6xl">
-                  <div className="text-yellow-400">You lose!</div>
-                  <div className="text-fuchsia-600">Congratulations</div>
-                  <div className="text-fuchsia-600">the_player1</div>
-                </div> */}
-              </div>
-            )}
+              {/* Game over */}
+              {isGameState === GameState.GAME_OVER && (
+                <div className="absolute left-0 top-0 gap-8 z-30 flex flex-col justify-start items-center w-full h-max p-1 mt-16 font-medium [text-shadow:_4px_4px_0_rgb(0_0_0)] animate-move-up">
+                  <div className="text-8xl text-fuchsia-600">Game Over</div>
+                  <div className="text-6xl text-yellow-400">You win!</div>
+                  {/* <div className="flex flex-col gap-8 items-center text-6xl">
+                    <div className="text-yellow-400">You lose!</div>
+                    <div className="text-fuchsia-600">Congratulations</div>
+                    <div className="text-fuchsia-600">the_player1</div>
+                  </div> */}
+                </div>
+              )}
 
-            {/* Controls and game timer */}
-            <div className="row-span-3 flex flex-col justify-between items-start px-2 py-1 text-lg">
-              <div>
-                <div className="flex flex-row gap-2">
-                  <div>Left:</div> <div className="text-custom-neutral-100">Left Arrow</div>
+              {/* Controls and game timer */}
+              <div className="row-span-3 flex flex-col justify-between items-start px-2 py-1 text-lg">
+                <div>
+                  <div className="flex flex-row gap-2">
+                    <div>Left:</div> <div className="text-gray-500">Left Arrow</div>
+                  </div>
+                  <div className="flex flex-row gap-2">
+                    <div>Right:</div> <div className="text-gray-500">Right Arrow</div>
+                  </div>
+                  <div className="flex flex-row gap-2">
+                    <div>Drop:</div> <div className="text-gray-500">Down Arrow</div>
+                  </div>
+                  <div className="flex flex-row gap-2">
+                    <div>Cycle Color:</div> <div className="text-gray-500">Up Arrow</div>
+                  </div>
+                  <div className="flex flex-row gap-2">
+                    <div>Use Item:</div> <div className="text-gray-500">Space Bar</div>
+                  </div>
                 </div>
-                <div className="flex flex-row gap-2">
-                  <div>Right:</div> <div className="text-custom-neutral-100">Right Arrow</div>
-                </div>
-                <div className="flex flex-row gap-2">
-                  <div>Drop:</div> <div className="text-custom-neutral-100">Down Arrow</div>
-                </div>
-                <div className="flex flex-row gap-2">
-                  <div>Cycle Color:</div> <div className="text-custom-neutral-100">Up Arrow</div>
-                </div>
-                <div className="flex flex-row gap-2">
-                  <div>Use Item:</div> <div className="text-custom-neutral-100">Space Bar</div>
+                <div className="w-full border-double border-8 border-neutral-300 font-mono text-gray-400 text-6xl text-center tabular-nums">
+                  --:--
                 </div>
               </div>
-              <div className="w-full border-double border-8 border-custom-blue-900 font-mono text-custom-blue-800 text-6xl text-center tabular-nums">
-                --:--
-              </div>
-            </div>
 
-            {/* Game */}
-            {seatsCss.map((group: SeatsCss, index: number) => (
-              <div
-                key={index}
-                className={clsx(
-                  `row-span-${group.rowSpan}`,
-                  index === 0 ? "flex flex-row justify-center items-center" : ""
-                )}
-              >
-                <div className={index === 0 ? "contents" : "flex flex-row justify-center items-center"}>
-                  {group.seatNumbers.map((seat: number) => (
-                    <PlayerBoard
-                      key={seat}
-                      seatNumber={seat}
-                      isOpponentBoard={group.team > 1}
-                      isReversed={seat % 2 === 0}
-                      isSeated={seatedSeats.has(seat)}
-                      isSeatOccupied={seatUnavailable}
-                      onChooseSeat={handleSeatClick}
-                    />
-                  ))}
+              {/* Game */}
+              {seatsCss.map((group: SeatsCss, index: number) => (
+                <div
+                  key={index}
+                  className={clsx(
+                    `row-span-${group.rowSpan}`,
+                    index === 0 ? "flex flex-row justify-center items-center" : ""
+                  )}
+                >
+                  <div className={index === 0 ? "contents" : "flex flex-row justify-center items-center"}>
+                    {group.seatNumbers.map((seat: number) => (
+                      <PlayerBoard
+                        key={seat}
+                        seatNumber={seat}
+                        isOpponentBoard={group.team > 1}
+                        isReversed={seat % 2 === 0}
+                        isSeated={seatedSeats.has(seat)}
+                        isSeatOccupied={seatUnavailable}
+                        onChooseSeat={handleSeatClick}
+                      />
+                    ))}
+                  </div>
+                </div>
+              ))}
+
+              {/* TODO: Remove */}
+              {/* <div className="row-span-5 flex flex-row justify-center items-center">
+                <PlayerBoard boardNumber={1} />
+                <PlayerBoard boardNumber={2} isReversed />
+              </div>
+              <div className="row-span-3">
+                <div className="flex flex-row justify-center items-center">
+                  <PlayerBoard boardNumber={5} isOpponentBoard />
+                  <PlayerBoard boardNumber={6} isOpponentBoard isReversed />
                 </div>
               </div>
-            ))}
+              <div className="row-span-3">
+                <div className="flex flex-row justify-center items-center">
+                  <PlayerBoard boardNumber={3} isOpponentBoard />
+                  <PlayerBoard boardNumber={4} isOpponentBoard isReversed />
+                </div>
+              </div>
+              <div className="row-span-3">
+                <div className="flex flex-row justify-center items-center">
+                  <PlayerBoard boardNumber={7} isOpponentBoard />
+                  <PlayerBoard boardNumber={8} isOpponentBoard isReversed />
+                </div>
+              </div> */}
 
-            {/* TODO: Remove */}
-            {/* <div className="row-span-5 flex flex-row justify-center items-center">
-              <PlayerBoard boardNumber={1} />
-              <PlayerBoard boardNumber={2} isReversed />
-            </div>
-            <div className="row-span-3">
-              <div className="flex flex-row justify-center items-center">
-                <PlayerBoard boardNumber={5} isOpponentBoard />
-                <PlayerBoard boardNumber={6} isOpponentBoard isReversed />
+              <div className="row-span-1 flex flex-col justify-start items-center px-2 bg-neutral-200 font-mono">
+                {/* Next power to be used by current player */}
+                <p className="w-full text-start line-clamp-1">You can send a midas piece</p>
+                {/* Power used by other players */}
+                <p className="w-full text-gray-500 text-start line-clamp-1">
+                  the_player1 mega defused 000_crazy_player_8_000
+                </p>
               </div>
-            </div>
-            <div className="row-span-3">
-              <div className="flex flex-row justify-center items-center">
-                <PlayerBoard boardNumber={3} isOpponentBoard />
-                <PlayerBoard boardNumber={4} isOpponentBoard isReversed />
-              </div>
-            </div>
-            <div className="row-span-3">
-              <div className="flex flex-row justify-center items-center">
-                <PlayerBoard boardNumber={7} isOpponentBoard />
-                <PlayerBoard boardNumber={8} isOpponentBoard isReversed />
-              </div>
-            </div> */}
-
-            <div className="row-span-1 flex flex-col justify-start items-center px-2 bg-custom-blue-800 font-mono">
-              {/* Next power to be used by current player */}
-              <p className="w-full text-custom-neutral-100 text-start line-clamp-1">You can send a midas piece</p>
-              {/* Power used by other players */}
-              <p className="w-full text-custom-green-100 text-start line-clamp-1">
-                the_player1 mega defused 000_crazy_player_8_000
-              </p>
             </div>
           </div>
         </div>
 
-        {/* Chat and players list */}
-        <div className="grid-in-chat flex divide-x divide-custom-neutral-100 text-custom-blue-100">
+        {/* Chat and users list */}
+        <div className="grid-in-chat flex gap-2 px-2 pb-2">
           {/* Chat */}
-          <div className="flex-1 flex flex-col">
+          <div className="flex-1 flex flex-col p-2 border bg-white">
             <input
               ref={messageInputRef}
               type="text"
-              className="p-2 border border-custom-neutral-100 bg-transparent"
+              className="w-full p-2 border"
               placeholder="Write something..."
               maxLength={CHAT_MESSSAGE_MAX_LENGTH}
               disabled={tablesChatLoading}

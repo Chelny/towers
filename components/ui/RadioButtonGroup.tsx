@@ -63,6 +63,7 @@ export default function RadioButtonGroup({
             label={option.props.label}
             value={option.props.value}
             checked={selectedValue === option.props.value}
+            disabled={option.props.disabled || disabled}
             onChange={handleChange}
           />
         ))}
@@ -85,8 +86,9 @@ type RadioButtonOptionProps = {
   id: string
   value: string
   label: string
+  disabled?: boolean
 }
 
-const Option = ({ id, value, label }: RadioButtonOptionProps): ReactNode => null
+const Option = ({ id, value, label, disabled = false }: RadioButtonOptionProps): ReactNode => null
 
 RadioButtonGroup.Option = Option
