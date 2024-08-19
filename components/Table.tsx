@@ -59,6 +59,8 @@ export default function Table({ roomId, tableId }: TableProps): ReactNode {
   const dispatch: AppDispatch = useDispatch()
   const messageInputRef = useRef<HTMLInputElement>(null)
   const chatEndRef = useRef<HTMLDivElement>(null)
+  const [tableType, setTableType] = useState<string>(TableType.PUBLIC)
+  const [isRated, setIsRated] = useState<boolean>(false)
   const [isInviteUserModalOpen, setIsInviteUserModalOpen] = useState<boolean>(false)
   const [isBootUserModalOpen, setIsBootUserModalOpen] = useState<boolean>(false)
   const [seatsCss, setSeatsCss] = useState<SeatsCss[]>(INITIAL_SEATS_CSS)
@@ -79,6 +81,13 @@ export default function Table({ roomId, tableId }: TableProps): ReactNode {
     dispatch(fetchTableChatData({ tableId, towersUserId: session?.user.towersUserId }))
     dispatch(fetchTableUsersData(tableId))
   }, [socketRooms[tableId]])
+
+  useEffect(() => {
+    if (tables[tableId]) {
+      setIsRated(tables[tableId].rated)
+      setTableType(tables[tableId].tableType)
+    }
+  }, [tables[tableId]])
 
   useEffect(() => {
     scrollChatToBottom()
@@ -196,18 +205,26 @@ export default function Table({ roomId, tableId }: TableProps): ReactNode {
             </div>
             <Select
               id="tableType"
-              defaultValue={tables[tableId]?.tableType}
-              disabled={tablesLoading}
-              onChange={(value: string) => console.log(value)}
+              defaultValue={tableType}
+              disabled={tablesLoading || session?.user.id !== tables[tableId]?.host.user.id}
+              onChange={setTableType}
             >
               <Select.Option value={TableType.PUBLIC}>Public</Select.Option>
               <Select.Option value={TableType.PROTECTED}>Protected</Select.Option>
               <Select.Option value={TableType.PRIVATE}>Private</Select.Option>
             </Select>
-            <Button className="w-full" disabled={tablesLoading} onClick={handleOpenInviteUserModal}>
+            <Button
+              className="w-full"
+              disabled={tablesLoading || session?.user.id !== tables[tableId]?.host.user.id}
+              onClick={handleOpenInviteUserModal}
+            >
               Invite
             </Button>
-            <Button className="w-full" disabled={tablesLoading} onClick={handleOpenBootUserModal}>
+            <Button
+              className="w-full"
+              disabled={tablesLoading || session?.user.id !== tables[tableId]?.host.user.id}
+              onClick={handleOpenBootUserModal}
+            >
               Boot
             </Button>
             <div>
@@ -216,9 +233,9 @@ export default function Table({ roomId, tableId }: TableProps): ReactNode {
             <Checkbox
               id="ratedGame"
               label="Rated Game"
-              defaultChecked={tables[tableId]?.rated}
-              disabled={tablesLoading}
-              onChange={(value: boolean) => console.log(value)}
+              defaultChecked={isRated}
+              disabled={tablesLoading || session?.user.id !== tables[tableId]?.host.user.id}
+              onChange={setIsRated}
             />
             <Checkbox id="sound" label="Sound" disabled onChange={(value: boolean) => console.log(value)} />
           </div>

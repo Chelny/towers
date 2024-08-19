@@ -110,6 +110,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       // console.log("CHELNY session newSession", newSession)
 
       if (token) {
+        session.user.id = token.sub
         session.user.username = token.username
         session.user.image = token.picture
         session.user.towersUserId = token.towersUserId

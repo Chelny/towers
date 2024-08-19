@@ -68,6 +68,10 @@ export default function Select({
     }
   }, [isDropdownOpen, selectedValue])
 
+  useEffect(() => {
+    setSelectedValue(defaultValue)
+  }, [defaultValue])
+
   const handleSelectChange = (value: string): void => {
     setSelectedValue(value)
 

@@ -2,6 +2,7 @@
 
 import { ReactNode } from "react"
 import { useRouter } from "next/navigation"
+import { TableType } from "@prisma/client"
 import { useSelector } from "react-redux"
 import Button from "@/components/ui/Button"
 import { TableWithHostAndTowersGameUsers, TowersGameUserWithUser } from "@/interfaces"
@@ -9,12 +10,11 @@ import { RootState } from "@/redux"
 
 type RoomTableProps = {
   roomId: string
-  tables: TableWithHostAndTowersGameUsers[] | undefined
 }
 
-export default function RoomTable({ roomId, tables }: RoomTableProps): ReactNode {
+export default function RoomTable({ roomId }: RoomTableProps): ReactNode {
   const router = useRouter()
-  const { tablesLoading } = useSelector((state: RootState) => state.socket)
+  const { rooms, tablesLoading } = useSelector((state: RootState) => state.socket)
   const seatMapping: number[][] = [
     [1, 3, 5, 7],
     [2, 4, 6, 8]
@@ -22,7 +22,7 @@ export default function RoomTable({ roomId, tables }: RoomTableProps): ReactNode
 
   return (
     <>
-      {tables?.map((table: TableWithHostAndTowersGameUsers) => (
+      {rooms[roomId]?.room?.tables?.map((table: TableWithHostAndTowersGameUsers) => (
         <div key={table.id} className="flex flex-col">
           <div className="flex items-center border-b-2 border-b-gray-300">
             <div className="basis-20 row-span-2 flex justify-center items-center h-full px-2 border-gray-300">
@@ -33,7 +33,7 @@ export default function RoomTable({ roomId, tables }: RoomTableProps): ReactNode
                 <div className="basis-32 border-gray-300">
                   <Button
                     className="w-full h-full"
-                    disabled={tablesLoading}
+                    disabled={tablesLoading || table.tableType === TableType.PRIVATE}
                     onClick={() => router.push(`?room=${roomId}&table=${table.id}`)}
                   >
                     Watch
@@ -57,7 +57,11 @@ export default function RoomTable({ roomId, tables }: RoomTableProps): ReactNode
                           <Button
                             key={colIndex}
                             className="w-36"
-                            disabled={tablesLoading}
+                            disabled={
+                              tablesLoading ||
+                              table.tableType === TableType.PROTECTED ||
+                              table.tableType === TableType.PRIVATE
+                            }
                             onClick={() => router.push(`?room=${roomId}&table=${table.id}`)}
                           >
                             Join
@@ -76,11 +80,7 @@ export default function RoomTable({ roomId, tables }: RoomTableProps): ReactNode
                 </div>
               </div>
               <div className="flex py-1 text-sm">
-                {table.rated && (
-                  <>
-                    <span>Option: Rated</span>&nbsp;-&nbsp;
-                  </>
-                )}
+                {table.rated && <span>Option: rated&nbsp;-&nbsp;</span>}
                 <span>Host: {table.host.user.username}</span>
               </div>
             </div>

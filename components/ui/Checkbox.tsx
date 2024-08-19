@@ -1,6 +1,6 @@
 "use client"
 
-import { ChangeEvent, ReactNode } from "react"
+import { ChangeEvent, ReactNode, useEffect } from "react"
 import { useState } from "react"
 import clsx from "clsx/lite"
 import { TiTick } from "react-icons/ti"
@@ -22,6 +22,10 @@ export default function Checkbox({
 }: CheckboxProps): ReactNode {
   const [checked, setChecked] = useState<boolean>(defaultChecked)
 
+  useEffect(() => {
+    setChecked(defaultChecked)
+  }, [defaultChecked])
+
   const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
     setChecked(event.target.checked)
 
@@ -37,7 +41,7 @@ export default function Checkbox({
         id={id}
         className={clsx(
           "peer relative shrink-0 appearance-none w-5 h-5 border-2 border-t-gray-600 border-e-gray-400 border-b-gray-400 border-s-gray-600 rounded-sm mt-1 bg-white cursor-pointer",
-          "disabled:bg-neutral-200"
+          "disabled:bg-neutral-200 disabled:cursor-not-allowed"
         )}
         name={id}
         checked={checked}

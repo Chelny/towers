@@ -182,7 +182,7 @@ export default function Room({ roomId }: RoomProps): ReactNode {
                 <div className="flex-1 px-2">Who is Watching</div>
               </div>
               <div className="flex-1 flex flex-col overflow-y-auto">
-                <RoomTable roomId={roomId} tables={rooms[roomId]?.room?.tables} />
+                <RoomTable roomId={roomId} />
               </div>
             </div>
 
