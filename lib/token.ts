@@ -1,7 +1,7 @@
 import { PasswordResetToken, User, VerificationToken } from "@prisma/client"
 import { v4 as uuidv4 } from "uuid"
 import { getUserByEmail, getVerificationTokenByEmail } from "@/data"
-import { prisma } from "@/lib"
+import prisma from "@/lib"
 
 export const generateVerificationToken = async (email: string): Promise<VerificationToken | null> => {
   const user: User | null = await getUserByEmail(email)

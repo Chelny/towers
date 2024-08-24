@@ -10,7 +10,7 @@ type RadioButtonProps = {
   value: string
   checked?: boolean
   disabled?: boolean
-  onChange?: (value: string) => void
+  onChange?: (event: ChangeEvent<HTMLInputElement>) => void
 }
 
 export default function RadioButton({
@@ -23,39 +23,37 @@ export default function RadioButton({
   onChange
 }: RadioButtonProps): ReactNode {
   const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
-    if (onChange) {
-      onChange(event.target.value)
-    }
+    onChange?.(event)
   }
 
   return (
-    <div className="w-full flex items-center gap-2">
-      <input
-        type="radio"
-        id={id}
-        className="peer opacity-0 absolute"
-        name={name}
-        value={value}
-        checked={checked}
-        disabled={disabled}
-        aria-checked={checked}
-        aria-disabled={disabled}
-        onChange={handleChange}
-      />
-      <label
-        htmlFor={id}
-        className={clsx("flex items-center gap-2", "peer-enabled:cursor-pointer peer-disabled:cursor-not-allowed")}
-        tabIndex={disabled ? -1 : 0}
-      >
-        <span
+    <div className="flex items-center gap-2">
+      <div className="grid place-items-center">
+        <input
+          type="radio"
+          id={id}
           className={clsx(
-            "relative flex justify-center items-center w-5 h-5 border-2 border-t-gray-600 border-e-gray-400 border-b-gray-400 border-s-gray-600 rounded-full",
-            disabled ? "bg-neutral-200 opacity-50 select-none" : "bg-white"
+            "peer appearance-none col-start-1 row-start-1 shrink-0 w-5 h-5 border-2 border-t-gray-600 border-e-gray-400 border-b-gray-400 border-s-gray-600 rounded-full bg-white",
+            "disabled:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
           )}
-        >
-          <span className={clsx("absolute block w-2 h-2 rounded-full", checked ? "bg-gray-600" : "hidden")}></span>
-        </span>
-        <span className="line-clamp-1">{label}</span>
+          name={name}
+          value={value}
+          checked={checked}
+          disabled={disabled}
+          aria-checked={checked}
+          aria-disabled={disabled}
+          onChange={handleChange}
+        />
+        <div
+          className={clsx(
+            "col-start-1 row-start-1 w-2 h-2 rounded-full pointer-events-none",
+            "peer-checked:bg-gray-600",
+            "peer-checked:peer-disabled:bg-gray-200 peer-checked:peer-disabled:cursor-not-allowed"
+          )}
+        />
+      </div>
+      <label htmlFor={id} className={clsx("line-clamp-1", disabled && "opacity-50 cursor-not-allowed")}>
+        {label}
       </label>
     </div>
   )

@@ -28,7 +28,7 @@ export default function Calendar({
   id,
   label,
   placeholder = "Select a date",
-  minDate = new Date(new Date().getFullYear() - 100, new Date().getMonth(), new Date().getDate()),
+  minDate = new Date(new Date().getUTCFullYear() - 100, new Date().getUTCMonth(), new Date().getUTCDate()),
   maxDate = new Date(),
   defaultValue = undefined,
   required = false,
@@ -44,7 +44,7 @@ export default function Calendar({
   const [daysInMonth, setDaysInMonth] = useState<number[]>([])
   const [isCalendarVisible, setCalendarVisible] = useState<boolean>(false)
   const [view, setView] = useState<"month" | "year">("month")
-  const [currentDecade, setCurrentDecade] = useState<number>(Math.floor(browsingDate.getFullYear() / 10) * 10)
+  const [currentDecade, setCurrentDecade] = useState<number>(Math.floor(browsingDate.getUTCFullYear() / 10) * 10)
   const calendarRef = useRef<HTMLDivElement>(null)
   const monthNames: string[] = [
     "January",
@@ -63,16 +63,17 @@ export default function Calendar({
   const daysOfWeek: string[] = ["S", "M", "T", "W", "T", "F", "S"]
 
   useEffect(() => {
-    const year: number = browsingDate.getFullYear()
-    const month: number = browsingDate.getMonth()
-    const daysInMonthCount: number = new Date(year, month + 1, 0).getDate()
+    const year: number = browsingDate.getUTCFullYear()
+    const month: number = browsingDate.getUTCMonth()
+    const daysInMonthCount: number = new Date(year, month + 1, 0).getUTCDate()
+
     setDaysInMonth(Array.from({ length: daysInMonthCount }, (_, index: number) => index + 1))
   }, [browsingDate])
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent): void => {
       if (calendarRef.current && !calendarRef.current.contains(event.target as Node)) {
-        setCalendarVisible(false)
+        handleCloseCalendar()
       }
     }
 
@@ -83,34 +84,37 @@ export default function Calendar({
     }
   }, [])
 
-  const openCalendar = (): void => {
-    const initialBrowsingDate: Date = selectedDate || (maxDate && maxDate < new Date() ? maxDate : new Date())
+  const handleOpenCalendar = (): void => {
+    const initialBrowsingDate: Date =
+      (defaultValue && new Date(defaultValue).getTime() && new Date(defaultValue)) || new Date(maxDate) || new Date()
 
     setBrowsingDate(initialBrowsingDate)
-    setCalendarVisible(!isCalendarVisible)
+    setCalendarVisible(true)
+  }
+
+  const handleCloseCalendar = (): void => {
+    setView("month")
+    setCalendarVisible(false)
   }
 
   const handleSelectDay = (day: number): void => {
     if (disabled) return
 
-    const newDate: Date = new Date(browsingDate.getFullYear(), browsingDate.getMonth(), day)
+    const newDate: Date = new Date(browsingDate.getUTCFullYear(), browsingDate.getUTCMonth(), day, 12, 0, 0, 0)
+
     setSelectedDate(newDate)
-
-    if (onChange) {
-      onChange(newDate.toISOString().split("T")[0])
-    }
-
-    setCalendarVisible(false)
+    onChange?.(newDate.toISOString().split("T")[0])
+    handleCloseCalendar()
   }
 
   const handleYearChange = (direction: number): void => {
-    const newYear: number = browsingDate.getFullYear() + direction
+    const newYear: number = browsingDate.getUTCFullYear() + direction
     const newBrowsingDate: Date = new Date(
       newYear,
-      browsingDate.getMonth(),
+      browsingDate.getUTCMonth(),
       Math.min(
-        selectedDate ? selectedDate.getDate() : new Date().getDate(),
-        new Date(newYear, browsingDate.getMonth() + 1, 0).getDate()
+        selectedDate ? selectedDate.getUTCDate() : new Date().getUTCDate(),
+        new Date(newYear, browsingDate.getUTCMonth() + 1, 0).getUTCDate()
       )
     )
 
@@ -118,8 +122,8 @@ export default function Calendar({
   }
 
   const handleMonthChange = (direction: number): void => {
-    const newMonth: number = browsingDate.getMonth() + direction
-    const newYear: number = browsingDate.getFullYear() + Math.floor(newMonth / 12)
+    const newMonth: number = browsingDate.getUTCMonth() + direction
+    const newYear: number = browsingDate.getUTCFullYear() + Math.floor(newMonth / 12)
     const adjustedMonth: number = newMonth % 12
     const newBrowsingDate: Date = new Date(newYear, adjustedMonth)
 
@@ -127,13 +131,15 @@ export default function Calendar({
   }
 
   const renderDayPicker = (): ReactNode => {
-    const firstDayOfMonth: number = new Date(browsingDate.getFullYear(), browsingDate.getMonth(), 1).getDay()
+    const firstDayOfMonth: number = new Date(browsingDate.getUTCFullYear(), browsingDate.getUTCMonth(), 1).getDay()
     const daysArray: (number | null)[] = new Array(firstDayOfMonth).fill(null).concat(daysInMonth)
     const rows: (number | null)[][] = []
-    const currentYear: number = browsingDate.getFullYear()
-    const currentMonth: number = browsingDate.getMonth()
-    const isCurrentMonthMinYear: boolean = currentYear === minDate.getFullYear() && currentMonth === minDate.getMonth()
-    const isCurrentMonthMaxYear: boolean = currentYear === maxDate.getFullYear() && currentMonth === maxDate.getMonth()
+    const currentYear: number = browsingDate.getUTCFullYear()
+    const currentMonth: number = browsingDate.getUTCMonth()
+    const isCurrentMonthMinYear: boolean =
+      currentYear === minDate.getUTCFullYear() && currentMonth === minDate.getUTCMonth()
+    const isCurrentMonthMaxYear: boolean =
+      currentYear === maxDate.getUTCFullYear() && currentMonth === maxDate.getUTCMonth()
 
     for (let i = 0; i < daysArray.length; i += 7) {
       rows.push(daysArray.slice(i, i + 7))
@@ -153,13 +159,15 @@ export default function Calendar({
             <div className="grid grid-cols-7 gap-1">
               {week.map((day: number | null, dayIndex: number) => {
                 const displayDay: number | string = day !== null ? day : ""
+                const defaultSelectedDate: Date =
+                  (selectedDate && selectedDate.getTime() && selectedDate) || maxDate || new Date()
                 const isSelectedDay: boolean =
-                  day === selectedDate?.getDate() &&
-                  browsingDate.getMonth() === selectedDate?.getMonth() &&
-                  browsingDate.getFullYear() === selectedDate?.getFullYear()
+                  day === defaultSelectedDate?.getUTCDate() &&
+                  browsingDate.getUTCMonth() === defaultSelectedDate?.getUTCMonth() &&
+                  browsingDate.getUTCFullYear() === defaultSelectedDate?.getUTCFullYear()
                 const isDisabledDay: boolean =
-                  (isCurrentMonthMinYear && day !== null && day <= maxDate.getDate()) ||
-                  (isCurrentMonthMaxYear && day !== null && day > maxDate.getDate())
+                  (isCurrentMonthMinYear && day !== null && day <= maxDate.getUTCDate()) ||
+                  (isCurrentMonthMaxYear && day !== null && day > maxDate.getUTCDate())
 
                 return (
                   <button
@@ -168,9 +176,9 @@ export default function Calendar({
                     className={clsx(
                       "flex-1 p-2 text-center border rounded-sm cursor-pointer",
                       !disabled && "hover:bg-gray-200",
-                      day === null ? "text-gray-400" : "",
-                      isSelectedDay ? "bg-blue-100" : "",
-                      isDisabledDay ? "opacity-50 cursor-not-allowed" : ""
+                      day === null && "text-gray-400",
+                      isSelectedDay && "bg-blue-100",
+                      isDisabledDay && "opacity-50 cursor-not-allowed"
                     )}
                     disabled={isDisabledDay}
                     role="gridcell"
@@ -194,33 +202,35 @@ export default function Calendar({
 
     return (
       <div>
-        <div className="flex justify-between mt-2">
-          <button
+        <div className="flex justify-evenly gap-2 mt-2">
+          <Button
             type="button"
-            disabled={currentDecade <= minDate.getFullYear()}
+            className="w-full"
+            disabled={currentDecade <= minDate.getUTCFullYear()}
             onClick={() => setCurrentDecade(currentDecade - 10)}
           >
             Previous Decade
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
-            disabled={currentDecade + 10 > maxDate.getFullYear()}
+            className="w-full"
+            disabled={currentDecade + 10 > maxDate.getUTCFullYear()}
             onClick={() => setCurrentDecade(currentDecade + 10)}
           >
             Next Decade
-          </button>
+          </Button>
         </div>
         <div className="grid grid-cols-4 gap-2 mt-2">
           {yearsInDecade.map(
             (year: number) =>
-              year <= maxDate.getFullYear() && (
+              year <= maxDate.getUTCFullYear() && (
                 <button
                   key={year}
                   type="button"
                   className="p-2 text-center border rounded-sm hover:bg-gray-200"
-                  disabled={year > maxDate.getFullYear() || year < minDate.getFullYear()}
+                  disabled={year > maxDate.getUTCFullYear() || year < minDate.getUTCFullYear()}
                   onClick={() => {
-                    setBrowsingDate(new Date(year, browsingDate.getMonth()))
+                    setBrowsingDate(new Date(year, browsingDate.getUTCMonth()))
                     setView("month")
                   }}
                 >
@@ -233,12 +243,12 @@ export default function Calendar({
     )
   }
 
-  const isPreviousYearDisabled: boolean = browsingDate.getFullYear() <= minDate.getFullYear()
-  const isNextYearDisabled: boolean = browsingDate.getFullYear() >= maxDate.getFullYear()
+  const isPreviousYearDisabled: boolean = browsingDate.getUTCFullYear() <= minDate.getUTCFullYear()
+  const isNextYearDisabled: boolean = browsingDate.getUTCFullYear() >= maxDate.getUTCFullYear()
   const isPreviousMonthDisabled: boolean =
-    browsingDate.getFullYear() === minDate.getFullYear() && browsingDate.getMonth() <= minDate.getMonth()
+    browsingDate.getUTCFullYear() === minDate.getUTCFullYear() && browsingDate.getUTCMonth() <= minDate.getUTCMonth()
   const isNextMonthDisabled: boolean =
-    browsingDate.getFullYear() === maxDate.getFullYear() && browsingDate.getMonth() >= maxDate.getMonth()
+    browsingDate.getUTCFullYear() === maxDate.getUTCFullYear() && browsingDate.getUTCMonth() >= maxDate.getUTCMonth()
 
   return (
     <div className="relative mb-4">
@@ -246,6 +256,7 @@ export default function Calendar({
         {label} {!required && <span className="text-neutral-500">(optional)</span>}
       </label>
       <Button
+        id={id}
         className="w-full"
         disabled={disabled}
         aria-haspopup="true"
@@ -253,9 +264,16 @@ export default function Calendar({
         aria-label={label}
         aria-describedby={description ? `${id}Description` : undefined}
         aria-disabled={disabled}
-        onClick={openCalendar}
+        onClick={handleOpenCalendar}
       >
-        {selectedDate ? selectedDate.toISOString().split("T")[0] : placeholder}
+        {selectedDate && selectedDate.getTime()
+          ? selectedDate.toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+              timeZone: "UTC"
+            })
+          : placeholder}
       </Button>
       {description && (
         <p id={`${id}Description`} className="text-neutral-500">
@@ -283,52 +301,56 @@ export default function Calendar({
           role="dialog"
           aria-modal="true"
         >
-          <div className="flex justify-center items-center gap-2 mb-2">
-            <button
+          <div className="flex justify-center items-center gap-2 mb-4">
+            <Button
               type="button"
               disabled={isPreviousYearDisabled}
               aria-label="Previous Year"
               onClick={() => handleYearChange(-1)}
             >
               <PiCaretDoubleLeftDuotone className="w-5 h-5" />
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
               disabled={isPreviousMonthDisabled}
               aria-label="Previous Month"
               onClick={() => handleMonthChange(-1)}
             >
               <PiCaretLeftDuotone className="w-5 h-5" />
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
-              className="flex-1 text-lg"
+              className="flex-1"
               aria-live="polite"
               onClick={() => setView(view === "month" ? "year" : "month")}
             >
               {view === "month"
-                ? `${monthNames[browsingDate.getMonth()]} ${browsingDate.getFullYear()}`
+                ? `${monthNames[browsingDate.getUTCMonth()]} ${browsingDate.getUTCFullYear()}`
                 : "Select Year"}
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
               disabled={isNextMonthDisabled}
               aria-label="Next Month"
               onClick={() => handleMonthChange(1)}
             >
               <PiCaretRightDuotone className="w-5 h-5" />
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
               disabled={isNextYearDisabled}
               aria-label="Next Year"
               onClick={() => handleYearChange(1)}
             >
               <PiCaretDoubleRightDuotone className="w-5 h-5" />
-            </button>
+            </Button>
           </div>
 
           {view === "month" ? renderDayPicker() : renderYearPicker()}
+
+          <Button className="mt-4 ms-auto" onClick={handleCloseCalendar}>
+            Close
+          </Button>
         </div>
       )}
     </div>

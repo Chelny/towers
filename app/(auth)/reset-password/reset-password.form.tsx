@@ -24,12 +24,12 @@ export function ResetPasswordForm(): ReactNode {
   const [state, formAction] = useFormState(resetPassword, initialState)
 
   return (
-    <form action={formAction} noValidate className="w-full">
+    <form className="w-full" action={formAction} noValidate>
       <Input
         type="password"
         id="password"
         label="Password"
-        autoComplete="new-password"
+        autoComplete="off"
         required
         description="Password must be at least 8 characters long, must contain at least one digit, one uppercase letter, and at least one special character."
         errorMessage={state.errors?.password}
@@ -38,7 +38,7 @@ export function ResetPasswordForm(): ReactNode {
         type="password"
         id="confirmPassword"
         label="Confirm Password"
-        autoComplete="new-password"
+        autoComplete="off"
         required
         errorMessage={state.errors?.confirmPassword}
       />

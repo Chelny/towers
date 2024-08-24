@@ -21,7 +21,7 @@ export function ForgotPasswordForm(): ReactNode {
   const [state, formAction] = useFormState(forgotPassword, initialState)
 
   return (
-    <form action={formAction} noValidate className="w-full">
+    <form className="w-full" action={formAction} noValidate>
       <Input id="email" label="Email" required errorMessage={state.errors?.email} />
       <Button type="submit" className="w-full" disabled={pending}>
         Send Email

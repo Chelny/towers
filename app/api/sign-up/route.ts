@@ -3,7 +3,7 @@ import { User, VerificationToken } from "@prisma/client"
 import { hash } from "bcryptjs"
 import { SignUpData } from "@/app/(auth)/sign-up/sign-up.actions"
 import { getUserByEmail } from "@/data"
-import { generateVerificationToken, prisma, sendVerificationEmail } from "@/lib"
+import prisma, { generateVerificationToken, sendVerificationEmail } from "@/lib"
 
 export async function POST(body: SignUpData): Promise<NextResponse> {
   const user: User | null = await getUserByEmail(body.email)

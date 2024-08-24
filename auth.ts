@@ -9,10 +9,10 @@ import Passkey from "next-auth/providers/passkey"
 import Resend from "next-auth/providers/resend"
 import { POST } from "@/app/api/sign-in/route"
 import { ROUTE_AUTH_ERROR, ROUTE_SIGN_IN } from "@/constants"
-import { prisma, sendVerificationRequest } from "@/lib"
+import prisma, { sendVerificationRequest } from "@/lib"
+import { generateRandomUsername } from "@/utils"
 
-export const { handlers, signIn, signOut, auth } = NextAuth({
-  secret: process.env.AUTH_SECRET,
+export const { auth, handlers, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
   providers: [
     GitHub({
@@ -47,20 +47,18 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
     })
   ],
+  secret: process.env.AUTH_SECRET,
   session: {
     strategy: "jwt",
-    maxAge: 24 * 60 * 60 // 1 Day
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+    updateAge: 24 * 60 * 60 // 24 hours
   },
   callbacks: {
     async authorized({ auth }) {
-      // console.log("CHELNY authorized auth", auth)
       // Logged in users are authenticated, otherwise redirect to login page
       return !!auth
     },
     async jwt({ token, user, trigger }) {
-      // console.log("CHELNY jwt token", token)
-      // console.log("CHELNY jwt user", user)
-
       if (user) {
         token.username = user.username
         token.picture = user.image
@@ -86,60 +84,46 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         }
       }
 
-      // if (trigger === "update" && token.sub) {
-      //   const updatedUser: User | null = await prisma.user.findUnique({
-      //     where: {
-      //       id: token.sub
-      //     }
-      //   })
+      if (trigger === "update" && token.sub) {
+        const updatedUser: User | null = await prisma.user.findUnique({
+          where: {
+            id: token.sub
+          }
+        })
 
-      //   if (updatedUser) {
-      //     user.name = updatedUser.name
-      //     user.email = updatedUser.email
-      //     user.username = updatedUser.username
-      //     user.image = updatedUser.image
-      //   }
-      // }
+        if (updatedUser) {
+          token.name = updatedUser.name
+          token.email = updatedUser.email
 
-      // console.log("CHELNY token=", token)
+          if (updatedUser.username) {
+            token.username = updatedUser.username
+          }
+
+          token.picture = updatedUser.image
+        }
+      }
+
       return token
     },
-    async session({ session, token, trigger, newSession }) {
-      // console.log("CHELNY session session", session)
-      // console.log("CHELNY session token", token)
-      // console.log("CHELNY session newSession", newSession)
-
+    async session({ session, token }) {
       if (token) {
         session.user.id = token.sub
+        session.user.name = token.name
+        session.user.email = token.email
         session.user.username = token.username
         session.user.image = token.picture
         session.user.towersUserId = token.towersUserId
       }
 
-      // TODO:
-      // if (trigger === "update" && newSession?.user.name) {
-      //   // You can update the session in the database if it's not already updated.
-      //   // await adapter.updateUser(session.user.id, { name: newSession.name })
-
-      //   // Make sure the updated value is reflected on the client
-      //   session.user.name = newSession.user.name
-      // }
-
-      // console.log("CHELNY session=", session)
       return session
     }
   },
   events: {
     async linkAccount({ user }) {
-      // console.log("CHELNY events linkAccount user", user)
-      // console.log("CHELNY events linkAccount account", account)
-
-      // Set random username for OAuth accounts
+      // Set random username for OAuth accounts (can be changed after)
       if (!user.username) {
         const emailPrefix: string = user.email?.split("@")[0] as string
-        const randomSuffix: number = Math.floor(1000 + Math.random() * 9000)
-        const generatedUsername = `${emailPrefix}${randomSuffix}`
-        user.username = generatedUsername
+        user.username = generateRandomUsername(emailPrefix)
       }
 
       const updatedUser: User = await prisma.user.update({
@@ -153,6 +137,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         }
       })
 
+      // Create Towers table entry
       const towersGameUser: TowersGameUser = await prisma.towersGameUser.create({
         data: {
           userId: updatedUser.id
@@ -166,5 +151,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     signIn: ROUTE_SIGN_IN.PATH,
     error: ROUTE_AUTH_ERROR.PATH
   }
-  // experimental: { enableWebAuthn: true }
+  // experimental: { enableWebAuthn: true },
+  // debug: process.env.NODE_ENV !== "production"
 })

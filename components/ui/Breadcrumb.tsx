@@ -10,7 +10,7 @@ export default function Breadcrumb() {
 
   return (
     <nav aria-label="breadcrumb">
-      <ol className="flex mt-4">
+      <ol className="flex pt-4">
         {/* Home link */}
         <li>
           <Link href={ROUTE_HOME.PATH} className="text-blue-500 hover:underline">
@@ -41,7 +41,7 @@ export default function Breadcrumb() {
               ) : (
                 <span className="text-black font-medium">{formattedSegment}</span>
               )}
-              {!isLast && <span className="text-gray-400">/</span>}
+              {!isLast && <span className="mx-2 text-gray-400">/</span>}
             </li>
           )
         })}

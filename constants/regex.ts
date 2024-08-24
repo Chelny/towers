@@ -18,12 +18,12 @@ export const EMAIL_PATTERN =
 
 /**
  * Username Pattern
- * - Username must be between 5 and 16 characters long
+ * - Username must be between 4 and 32 characters long
  * - Allowed characters: letters, digits, periods and underscores
  * - No _ or . at the beginning or at the end
  * - No __ or _. or ._ or ..
  */
-export const USERNAME_PATTERN = /^(?=[a-zA-Z0-9._]{5,16}$)(?!.*[_.]{2})[^_.].*[^_.]$/
+export const USERNAME_PATTERN = /^(?=[a-zA-Z0-9._]{4,32}$)(?!.*[_.]{2})[^_.].*[^_.]$/
 
 /**
  * Password Pattern

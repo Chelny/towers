@@ -1,6 +1,6 @@
 "use client"
 
-import { ReactNode, useState } from "react"
+import { ChangeEvent, ReactNode, useState } from "react"
 import { TableType } from "@prisma/client"
 import Checkbox from "@/components/ui/Checkbox"
 import Modal from "@/components/ui/Modal"
@@ -37,7 +37,12 @@ export default function CreateTable({ isOpen, onClose, onSubmitSuccess }: Create
           <Select.Option value={TableType.PRIVATE}>Private</Select.Option>
         </Select>
 
-        <Checkbox id="ratedGame" label="Rated Game" defaultChecked={ratedGame} onChange={setRatedGame} />
+        <Checkbox
+          id="ratedGame"
+          label="Rated Game"
+          defaultChecked={ratedGame}
+          onChange={(event: ChangeEvent<HTMLInputElement>) => setRatedGame(event.target.checked)}
+        />
       </div>
     </Modal>
   )

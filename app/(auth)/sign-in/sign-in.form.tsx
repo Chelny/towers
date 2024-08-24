@@ -30,7 +30,7 @@ export function SignInForm(): ReactNode {
   }
 
   return (
-    <form action={formAction} noValidate className="w-full">
+    <form className="w-full" action={formAction} noValidate>
       {!state.success && state.message && <AlertMessage type="error">{state.message}</AlertMessage>}
       <Input
         id="email"

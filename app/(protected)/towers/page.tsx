@@ -4,7 +4,7 @@ import { Room, Table } from "@prisma/client"
 import TowersPageContent from "@/components/TowersPageContent"
 import { ROUTE_TOWERS } from "@/constants"
 import { TowersGameUserWithUser } from "@/interfaces"
-import { prisma } from "@/lib"
+import prisma from "@/lib"
 
 type PageProps = {
   params: { id: string }

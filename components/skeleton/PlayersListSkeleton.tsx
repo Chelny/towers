@@ -25,7 +25,7 @@ export default function PlayersListSkeleton({ full = false }: PlayersListSkeleto
         </div>
       )}
       <div className={clsx("overflow-y-scroll", full ? "flex-1 max-h-80" : "min-w-60 h-full")}>
-        {Array.from({ length: 10 }).map((_, index) => (
+        {Array.from({ length: 10 }).map((_, index: number) => (
           <div key={index} className={clsx("flex divide-gray-200", full ? "divide-x-2 select-none" : "divide-x")}>
             <div className={clsx(full ? "w-1/2 p-2" : "w-3/4 p-1")}>
               <div className="flex items-center gap-1">

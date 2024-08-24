@@ -2,14 +2,13 @@ import { NextResponse } from "next/server"
 import { TowersGameUser, User, UserStatus } from "@prisma/client"
 import { compare } from "bcryptjs"
 import { getUserByEmail } from "@/data"
-import { prisma } from "@/lib"
+import prisma from "@/lib"
 
 export async function POST(body: { email: string; password: string }): Promise<NextResponse> {
   const user: User | null = await getUserByEmail(body.email)
   if (!user) throw new Error("The email or the password is invalid.")
 
   if (body.password && user.password) {
-    // Check if the password matches the hashed one we already have
     const isPasswordsMatch: boolean = await compare(body.password, user.password)
     if (!isPasswordsMatch) throw new Error("The email or the password is invalid.")
   }
@@ -19,19 +18,12 @@ export async function POST(body: { email: string; password: string }): Promise<N
     throw new Error("The account is inactive. Please contact customer support.")
   }
 
-  const towersGameUser: TowersGameUser | null = await prisma.towersGameUser.findUnique({
-    where: { userId: user.id }
+  // Get or create Towers table entry
+  const towersGameUser: TowersGameUser | null = await prisma.towersGameUser.upsert({
+    where: { userId: user.id },
+    update: {},
+    create: { userId: user.id }
   })
-
-  if (!towersGameUser) {
-    return NextResponse.json(
-      {
-        success: false,
-        message: "An error occurred. Please try again later."
-      },
-      { status: 500 }
-    )
-  }
 
   return NextResponse.json(
     {

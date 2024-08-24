@@ -12,6 +12,7 @@ import { PiSignOut } from "react-icons/pi"
 import { RiExpandLeftLine, RiExpandRightLine } from "react-icons/ri"
 import { useDispatch } from "react-redux"
 import UserAvatar from "@/components/UserAvatar"
+import { ROUTE_PROFILE, ROUTE_TOWERS } from "@/constants"
 import { destroySocket } from "@/features"
 import { useSessionData } from "@/hooks"
 
@@ -54,10 +55,10 @@ export default function RoomSidebar(): ReactNode {
 
       {/* User image + collapse icon */}
       <div className={clsx("flex items-center gap-2", isExpanded ? "w-full" : "w-auto")}>
-        <div className="flex-1 flex items-center gap-2">
+        <Link className="flex-1 flex items-center gap-2" href={ROUTE_PROFILE.PATH}>
           <UserAvatar />
           <span className={clsx(isExpanded ? "block" : "hidden")}>{session?.user.username}</span>
-        </div>
+        </Link>
         <div className={isExpanded ? "flex" : "hidden"}>
           <button type="button" aria-label="Collapse sidebar" onClick={() => setIsExpanded(false)}>
             <RiExpandLeftLine className="w-8 h-8" aria-hidden="true" />
@@ -69,13 +70,13 @@ export default function RoomSidebar(): ReactNode {
 
       {/* Joined rooms and tables */}
       <div className="flex-1 flex flex-col items-center gap-2 w-full">
-        <Link
+        {/* <Link
           className={clsx(
             "flex items-center gap-2 px-1 py-2 rounded",
             isExpanded ? "w-full" : "w-auto",
             "hover:bg-gray-600"
           )}
-          href={`/towers?room=${1}`}
+          href={`${ROUTE_TOWERS.PATH}?room=${1}`}
         >
           <LiaUsersSolid className="w-8 h-8" aria-hidden="true" />
           <span
@@ -87,14 +88,14 @@ export default function RoomSidebar(): ReactNode {
           >
             Empire State Building
           </span>
-        </Link>
-        <Link
+        </Link> */}
+        {/* <Link
           className={clsx(
             "flex items-center gap-2 px-1 py-2 rounded",
             isExpanded ? "w-full" : "w-auto",
             "hover:bg-gray-600"
           )}
-          href={`/towers?room=${1}&table=${1}`}
+          href={`${ROUTE_TOWERS.PATH}?room=${1}&table=${1}`}
         >
           <LuGamepad2 className="w-8 h-8" aria-hidden="true" />
           <span
@@ -106,7 +107,7 @@ export default function RoomSidebar(): ReactNode {
           >
             Empire State Building - Table 1
           </span>
-        </Link>
+        </Link> */}
       </div>
 
       <hr className="w-full border-t border-t-slate-500" />
@@ -120,7 +121,12 @@ export default function RoomSidebar(): ReactNode {
             "has-[button:not(:disabled)]:hover:bg-gray-600"
           )}
         >
-          <button className="flex items-center gap-2 w-full" type="button" disabled aria-label="Set language">
+          <button
+            type="button"
+            className={clsx("flex items-center gap-2 w-full", "disabled:opacity-50 disabled:cursor-not-allowed")}
+            disabled
+            aria-label="Set language"
+          >
             <IoLanguage className="w-7 h-7" aria-hidden="true" />
             <span
               className={clsx(
@@ -140,7 +146,12 @@ export default function RoomSidebar(): ReactNode {
             "has-[button:not(:disabled)]:hover:bg-gray-600"
           )}
         >
-          <button className="flex items-center gap-2 w-full" type="button" disabled aria-label="Toggle theme">
+          <button
+            type="button"
+            className={clsx("flex items-center gap-2 w-full", "disabled:opacity-50 disabled:cursor-not-allowed")}
+            disabled
+            aria-label="Toggle theme"
+          >
             <FiMoon className="w-7 h-7" aria-hidden="true" />
             {/* <FiSun className="w-7 h-7" aria-hidden="true" /> */}
             <span

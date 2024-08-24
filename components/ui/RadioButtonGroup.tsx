@@ -1,6 +1,6 @@
 "use client"
 
-import { ReactElement, ReactNode, useState } from "react"
+import { ChangeEvent, ReactElement, ReactNode, useState } from "react"
 import React from "react"
 import clsx from "clsx/lite"
 import RadioButton from "./RadioButton"
@@ -10,11 +10,12 @@ type RadioButtonGroupProps = {
   id: string
   label: string
   inline?: boolean
+  defaultValue?: string
   required?: boolean
   disabled?: boolean
   description?: string
   errorMessage?: string
-  onChange?: (value: string) => void
+  onChange?: (event: ChangeEvent<HTMLInputElement>) => void
 }
 
 export default function RadioButtonGroup({
@@ -22,21 +23,19 @@ export default function RadioButtonGroup({
   id,
   label,
   inline = false,
+  defaultValue = "",
   required = false,
   disabled = false,
   description = "",
   errorMessage = "",
   onChange
 }: RadioButtonGroupProps): ReactNode {
-  const [selectedValue, setSelectedValue] = useState<string>("")
+  const [selectedValue, setSelectedValue] = useState<string>(defaultValue)
   const options = React.Children.toArray(children) as ReactElement<RadioButtonOptionProps>[]
 
-  const handleChange = (value: string): void => {
-    setSelectedValue(value)
-
-    if (onChange) {
-      onChange(value)
-    }
+  const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
+    setSelectedValue(event.target.value)
+    onChange?.(event)
   }
 
   return (
@@ -84,11 +83,11 @@ export default function RadioButtonGroup({
 
 type RadioButtonOptionProps = {
   id: string
-  value: string
   label: string
+  value: string
   disabled?: boolean
 }
 
-const Option = ({ id, value, label, disabled = false }: RadioButtonOptionProps): ReactNode => null
+const Option = ({ id, label, value, disabled = false }: RadioButtonOptionProps): ReactNode => null
 
 RadioButtonGroup.Option = Option

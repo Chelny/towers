@@ -1,6 +1,6 @@
 "use client"
 
-import { ReactNode, useState } from "react"
+import { ChangeEvent, ReactNode, useState } from "react"
 import { Table, User } from "@prisma/client"
 import Checkbox from "@/components/ui/Checkbox"
 import Input from "@/components/ui/Input"
@@ -54,12 +54,17 @@ export default function TableInvitation({
         <div>Game option: {data.table?.rated ? "Rated" : "Not rated"}</div>
         <div>Would you like to join?</div>
         <div>
-          <Input id="reason" label="Reason" defaultValue={reason} onInput={setReason} />
+          <Input
+            id="reason"
+            label="Reason"
+            defaultValue={reason}
+            onInput={(event: ChangeEvent<HTMLInputElement>) => setReason(event.target.value)}
+          />
           <Checkbox
             id="declineAll"
             label="Decline All Invitations"
             defaultChecked={declineAll}
-            onChange={setDeclineAll}
+            onChange={(event: ChangeEvent<HTMLInputElement>) => setDeclineAll(event.target.checked)}
           />
         </div>
       </div>

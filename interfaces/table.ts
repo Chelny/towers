@@ -7,7 +7,7 @@ export interface TableResponseData {
 }
 
 export interface TableWithHostAndTowersGameUsers extends Table {
-  room: Room
+  room?: Room
   host: TowersGameUserWithUser
   towersGameUsers: TowersGameUserWithUser[]
 }

@@ -6,6 +6,9 @@ export const ROUTE_RESET_PASSWORD = { TITLE: "Reset Password", PATH: "/reset-pas
 export const ROUTE_SIGN_IN = { TITLE: "Sign In", PATH: "/sign-in" }
 export const ROUTE_SIGN_IN_WITH_MAGIC_LINK = { TITLE: "Sign In With Email", PATH: "/sign-in-with-magic-link" }
 export const ROUTE_AUTH_ERROR = { TITLE: "Error", PATH: "/error" }
+export const ROUTE_ACCOUNT = { TITLE: "Account", PATH: "/account" }
+export const ROUTE_PROFILE = { TITLE: "Profile", PATH: `${ROUTE_ACCOUNT.PATH}/profile` }
+export const ROUTE_UPDATE_PASSWORD = { TITLE: "Update Password", PATH: `${ROUTE_ACCOUNT.PATH}/update-password` }
 export const ROUTE_ROOMS = { TITLE: "Rooms", PATH: "/rooms" }
 export const ROUTE_TOWERS = { TITLE: "Towers", PATH: "/towers" }
 
@@ -22,6 +25,13 @@ export const PUBLIC_ROUTES = [
   ROUTE_AUTH_ERROR.PATH
 ]
 
-export const PROTECTED_ROUTES = [ROUTE_HOME.PATH, ROUTE_ROOMS.PATH, ROUTE_TOWERS.PATH]
+export const PROTECTED_ROUTES = [
+  ROUTE_HOME.PATH,
+  ROUTE_ACCOUNT.PATH,
+  ROUTE_PROFILE.PATH,
+  ROUTE_UPDATE_PASSWORD.PATH,
+  ROUTE_ROOMS.PATH,
+  ROUTE_TOWERS.PATH
+]
 
 export const SIGN_IN_REDIRECT = ROUTE_ROOMS.PATH

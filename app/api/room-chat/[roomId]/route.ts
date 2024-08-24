@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { RoomChatWithTowersGameUser } from "@/interfaces"
-import { prisma } from "@/lib"
+import prisma from "@/lib"
 
 export async function GET(_: NextRequest, context: { params: { roomId: string } }): Promise<NextResponse> {
   const { roomId } = context.params

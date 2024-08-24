@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { Room } from "@prisma/client"
-import { prisma } from "@/lib"
+import prisma from "@/lib"
 
 export interface RoomWithCount extends Room {
   _count: {

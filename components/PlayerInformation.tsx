@@ -1,6 +1,6 @@
 "use client"
 
-import { ReactNode, useState } from "react"
+import { ChangeEvent, ReactNode, useState } from "react"
 import Input from "@/components/ui/Input"
 import Modal from "@/components/ui/Modal"
 import { TowersGameUserWithUserAndTables } from "@/interfaces"
@@ -36,7 +36,12 @@ export default function PlayerInformation({ isOpen, player, onClose }: PlayerInf
           Loses: {player?.loses} <br />
           Streak: {player?.streak} <br />
         </div>
-        <Input id="reason" label="Send instant message" defaultValue={reason} onInput={setReason} />
+        <Input
+          id="reason"
+          label="Send instant message"
+          defaultValue={reason}
+          onInput={(event: ChangeEvent<HTMLInputElement>) => setReason(event.target.value)}
+        />
         {/* TODO: Idle time */}
         {/* <div>Idle Time: 52.05 seconds</div> */}
       </div>

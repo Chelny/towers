@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { TableChat } from "@prisma/client"
 import { TableChatWithTowersGameUser } from "@/interfaces"
-import { prisma } from "@/lib"
+import prisma from "@/lib"
 import { removeNullUndefined } from "@/utils"
 
 export async function GET(request: NextRequest): Promise<NextResponse> {

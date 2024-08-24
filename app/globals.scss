@@ -55,13 +55,6 @@ dialog::backdrop {
   background: rgb(0 0 0 / 25%);
 }
 
-:disabled,
-[aria-disabled="true"] {
-  opacity: 50%;
-  cursor: not-allowed;
-  user-select: none;
-}
-
 .small-screen-warning {
   display: flex;
 }

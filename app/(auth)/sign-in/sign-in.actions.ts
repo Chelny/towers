@@ -35,7 +35,7 @@ export async function signIn(prevState: any, formData: FormData) {
         errorMessages.password = "Password is invalid."
         break
       default:
-        console.error(`Sign Up Action: Unknown error at ${error.path}`)
+        console.error(`Sign In Action: Unknown error at ${error.path}`)
         break
     }
   }

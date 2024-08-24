@@ -1,6 +1,6 @@
 "use client"
 
-import { ChangeEvent, FocusEvent, ReactNode, useState } from "react"
+import { ChangeEvent, FocusEvent, ForwardedRef, forwardRef, ReactNode, useState } from "react"
 import clsx from "clsx/lite"
 
 type InputProps = {
@@ -10,36 +10,38 @@ type InputProps = {
   className?: string
   placeholder?: string
   autoComplete?: string
-  defaultValue?: string
+  defaultValue?: string | null | undefined
   required?: boolean
+  readOnly?: boolean
   disabled?: boolean
   description?: string
   errorMessage?: string
-  onInput?: (value: string) => void
+  onInput?: (event: ChangeEvent<HTMLInputElement>) => void
 }
 
-export default function Input({
-  id,
-  label,
-  type = "text",
-  className = "",
-  placeholder = "",
-  autoComplete = undefined,
-  defaultValue = "",
-  required = false,
-  disabled = false,
-  description = "",
-  errorMessage = "",
-  onInput
-}: InputProps): ReactNode {
-  const [value, setValue] = useState<string>(defaultValue)
+export default forwardRef<HTMLInputElement, InputProps>(function Input(
+  {
+    id,
+    label,
+    type = "text",
+    className = "",
+    placeholder = "",
+    autoComplete = undefined,
+    defaultValue = "",
+    required = false,
+    readOnly = false,
+    disabled = false,
+    description = "",
+    errorMessage = "",
+    onInput
+  }: InputProps,
+  ref: ForwardedRef<HTMLInputElement>
+): ReactNode {
+  const [value, setValue] = useState<string | null | undefined>(defaultValue)
 
   const handleInput = (event: ChangeEvent<HTMLInputElement>): void => {
     setValue(event.target.value)
-
-    if (onInput) {
-      onInput(event.target.value)
-    }
+    onInput?.(event)
   }
 
   return (
@@ -48,17 +50,21 @@ export default function Input({
         {label} {!required && <span className="text-neutral-500">(optional)</span>}
       </label>
       <input
+        ref={ref}
         type={type}
         id={id}
         name={id}
         className={clsx(
-          "overflow-hidden w-full p-1 border-2 border-t-gray-600 border-e-gray-400 border-b-gray-400 border-s-gray-600 rounded-sm text-black line-clamp-1",
+          "overflow-hidden w-full p-1 border-2 border-t-gray-600 border-e-gray-400 border-b-gray-400 border-s-gray-600 rounded-sm bg-white text-black line-clamp-1",
+          "read-only:bg-gray-200",
+          "disabled:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed",
           className
         )}
         placeholder={placeholder}
         autoComplete={autoComplete}
-        value={value}
+        value={String(value)}
         required={required}
+        readOnly={readOnly}
         disabled={disabled}
         aria-labelledby={`${id}Label`}
         aria-describedby={description ? `${id}Description` : undefined}
@@ -82,4 +88,4 @@ export default function Input({
       )}
     </div>
   )
-}
+})

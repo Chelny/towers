@@ -2,7 +2,7 @@ import { NextResponse } from "next/server"
 import { UserStatus, VerificationToken } from "@prisma/client"
 import { VerifyEmailData } from "@/app/(auth)/verify-email/verify-email.actions"
 import { getUserByEmail, getVerificationTokenByToken } from "@/data"
-import { prisma } from "@/lib"
+import prisma from "@/lib"
 
 export async function POST(body: VerifyEmailData): Promise<NextResponse> {
   // Check token validity

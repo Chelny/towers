@@ -1,6 +1,6 @@
 "use client"
 
-import { KeyboardEvent, MouseEvent, ReactNode, useEffect, useRef, useState } from "react"
+import { ChangeEvent, KeyboardEvent, MouseEvent, ReactNode, useEffect, useRef, useState } from "react"
 import dynamic from "next/dynamic"
 import { useRouter } from "next/navigation"
 import { TableType } from "@prisma/client"
@@ -235,9 +235,14 @@ export default function Table({ roomId, tableId }: TableProps): ReactNode {
               label="Rated Game"
               defaultChecked={isRated}
               disabled={tablesLoading || session?.user.id !== tables[tableId]?.host.user.id}
-              onChange={setIsRated}
+              onChange={(event: ChangeEvent<HTMLInputElement>) => setIsRated(event.target.checked)}
             />
-            <Checkbox id="sound" label="Sound" disabled onChange={(value: boolean) => console.log(value)} />
+            <Checkbox
+              id="sound"
+              label="Sound"
+              disabled
+              onChange={(event: ChangeEvent<HTMLInputElement>) => console.log(event.target.checked)}
+            />
           </div>
           <div className="flex gap-1">
             <Button className="w-full" disabled onClick={(event: MouseEvent<HTMLButtonElement>) => {}}>
