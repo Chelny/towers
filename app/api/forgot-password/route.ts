@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { PasswordResetToken, User } from "@prisma/client"
+import { PasswordResetToken, User, UserStatus } from "@prisma/client"
 import { ForgotPasswordData } from "@/app/(auth)/forgot-password/forgot-password.actions"
 import { getUserByEmail } from "@/data"
 import { generatePasswordResetToken, sendPasswordResetEmail } from "@/lib"
@@ -11,10 +11,22 @@ export async function POST(body: ForgotPasswordData): Promise<NextResponse> {
     return NextResponse.json(
       {
         success: false,
-        message: "The email does not exist in the database."
+        message: "We couldn’t find an account with that email. Please check the address and try again."
       },
       { status: 404 }
     )
+  }
+
+  // Check user status
+  switch (user.status) {
+    case UserStatus.PENDING_EMAIL_VERIFICATION:
+      throw new Error(
+        "Your email verification is pending. Please check your inbox and verify your email to activate your account."
+      )
+    case UserStatus.BANNED:
+      throw new Error("The account has been banned. Please contact customer support for assistance.")
+    default:
+      break
   }
 
   const token: PasswordResetToken = await generatePasswordResetToken(user.email)

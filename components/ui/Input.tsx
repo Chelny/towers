@@ -1,6 +1,6 @@
 "use client"
 
-import { ChangeEvent, FocusEvent, ForwardedRef, forwardRef, ReactNode, useState } from "react"
+import { ChangeEvent, ClipboardEvent, FocusEvent, ForwardedRef, forwardRef, ReactNode, useState } from "react"
 import clsx from "clsx/lite"
 
 type InputProps = {
@@ -17,6 +17,7 @@ type InputProps = {
   description?: string
   errorMessage?: string
   onInput?: (event: ChangeEvent<HTMLInputElement>) => void
+  onPaste?: (event: ClipboardEvent<HTMLInputElement>) => void
 }
 
 export default forwardRef<HTMLInputElement, InputProps>(function Input(
@@ -33,7 +34,8 @@ export default forwardRef<HTMLInputElement, InputProps>(function Input(
     disabled = false,
     description = "",
     errorMessage = "",
-    onInput
+    onInput,
+    onPaste
   }: InputProps,
   ref: ForwardedRef<HTMLInputElement>
 ): ReactNode {
@@ -42,6 +44,10 @@ export default forwardRef<HTMLInputElement, InputProps>(function Input(
   const handleInput = (event: ChangeEvent<HTMLInputElement>): void => {
     setValue(event.target.value)
     onInput?.(event)
+  }
+
+  const handlePaste = (event: ClipboardEvent<HTMLInputElement>): void => {
+    onPaste?.(event)
   }
 
   return (
@@ -74,6 +80,7 @@ export default forwardRef<HTMLInputElement, InputProps>(function Input(
         aria-errormessage={errorMessage ? `${id}ErrorMessage` : undefined}
         aria-disabled={disabled}
         onInput={handleInput}
+        onPaste={handlePaste}
         onFocus={(event: FocusEvent<HTMLInputElement>) => event.stopPropagation()}
       />
       {description && (

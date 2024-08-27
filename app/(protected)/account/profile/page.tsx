@@ -17,7 +17,7 @@ export default async function Profile(): Promise<ReactNode> {
 
   return (
     <>
-      <h2 className="my-8 text-4xl">{ROUTE_PROFILE.TITLE}</h2>
+      <h2 className="mb-4 text-3xl">{ROUTE_PROFILE.TITLE}</h2>
       <ProfileForm user={user} />
     </>
   )

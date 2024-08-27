@@ -12,21 +12,21 @@ const passwordSchema = Type.Object({
   confirmNewPassword: Type.RegExp(PASSWORD_PATTERN)
 })
 
-export type PasswordData = Static<typeof passwordSchema>
+export type UpdatePasswordData = Static<typeof passwordSchema>
 
-export type PasswordErrorMessages<T extends string> = {
+export type UpdatePasswordErrorMessages<T extends string> = {
   [K in T]?: string
 }
 
 export async function password(prevState: any, formData: FormData) {
-  const rawFormData: PasswordData = {
+  const rawFormData: UpdatePasswordData = {
     currentPassword: formData.get("currentPassword") as string,
     newPassword: formData.get("newPassword") as string,
     confirmNewPassword: formData.get("confirmNewPassword") as string
   }
 
   const errors: ValueError[] = Array.from(Value.Errors(passwordSchema, rawFormData))
-  const errorMessages: PasswordErrorMessages<keyof PasswordData> = {}
+  const errorMessages: UpdatePasswordErrorMessages<keyof UpdatePasswordData> = {}
 
   for (const error of errors) {
     switch (error.path.replace("/", "")) {
@@ -40,13 +40,13 @@ export async function password(prevState: any, formData: FormData) {
         errorMessages.confirmNewPassword = "Confirm new password is invalid."
         break
       default:
-        console.error(`Password Action: Unknown error at ${error.path}`)
+        console.error(`UpdatePassword Action: Unknown error at ${error.path}`)
         break
     }
   }
 
   if (rawFormData.newPassword !== rawFormData.confirmNewPassword) {
-    errorMessages.confirmNewPassword = "New Password and Confirm New Password do not match."
+    errorMessages.confirmNewPassword = "New UpdatePassword and Confirm New UpdatePassword do not match."
   }
 
   if (Object.keys(errorMessages).length === 0) {

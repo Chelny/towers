@@ -1,4 +1,3 @@
-export * from "@/lib/auth-send-request"
 export * from "@/lib/email"
 export * from "@/lib/prisma"
 export { default } from "@/lib/prisma"

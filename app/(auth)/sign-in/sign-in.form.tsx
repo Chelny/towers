@@ -32,21 +32,8 @@ export function SignInForm(): ReactNode {
   return (
     <form className="w-full" action={formAction} noValidate>
       {!state.success && state.message && <AlertMessage type="error">{state.message}</AlertMessage>}
-      <Input
-        id="email"
-        label="Email"
-        autoComplete="email"
-        required
-        // errorMessage={state.errors?.email}
-      />
-      <Input
-        type="password"
-        id="password"
-        label="Password"
-        autoComplete="current-password"
-        required
-        // errorMessage={state.errors?.password}
-      />
+      <Input id="email" label="Email" autoComplete="email" required />
+      <Input type="password" id="password" label="Password" autoComplete="current-password" required />
       <div className="flex justify-end mb-2">
         <Link href="/forgot-password">Forgot Password?</Link>
       </div>

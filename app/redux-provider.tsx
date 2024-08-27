@@ -8,6 +8,6 @@ type ReduxProviderProps = {
   children: ReactNode
 }
 
-export function ReduxProvider({ children }: ReduxProviderProps) {
+export const ReduxProvider = ({ children }: ReduxProviderProps): ReactNode => {
   return <Provider store={store}>{children}</Provider>
 }

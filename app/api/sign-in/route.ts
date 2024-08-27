@@ -13,10 +13,37 @@ export async function POST(body: { email: string; password: string }): Promise<N
     if (!isPasswordsMatch) throw new Error("The email or the password is invalid.")
   }
 
-  // Check if the user is active
-  if (user.status !== UserStatus.ACTIVE) {
-    throw new Error("The account is inactive. Please contact customer support.")
+  // Check user status
+  switch (user.status) {
+    case UserStatus.PENDING_EMAIL_VERIFICATION:
+      throw new Error(
+        "Your email verification is pending. Please check your inbox and verify your email to activate your account."
+      )
+    case UserStatus.BANNED:
+      throw new Error("The account has been banned. Please contact customer support for assistance.")
+    case UserStatus.PENDING_DELETION:
+      await prisma.user.update({
+        where: {
+          id: user.id
+        },
+        data: {
+          status: UserStatus.ACTIVE,
+          deletionScheduledAt: null
+        }
+      })
+      break
+    default:
+      break
   }
+
+  // Update online status
+  await prisma.user.update({
+    where: { id: user.id },
+    data: {
+      isOnline: true,
+      lastActiveAt: new Date()
+    }
+  })
 
   // Get or create Towers table entry
   const towersGameUser: TowersGameUser | null = await prisma.towersGameUser.upsert({

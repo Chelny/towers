@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 export default function VerifyEmailPage(): ReactNode {
   return (
     <>
-      <h2 className="my-8 text-4xl">{ROUTE_VERIFY_EMAIL.TITLE}</h2>
+      <h2 className="mb-4 text-3xl">{ROUTE_VERIFY_EMAIL.TITLE}</h2>
       <VerifyEmailForm />
     </>
   )

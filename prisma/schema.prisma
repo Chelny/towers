@@ -27,6 +27,8 @@ model User {
   isOnline               Boolean         @default(false)
   lastActiveAt           DateTime        @default(now())
   status                 UserStatus      @default(PENDING_EMAIL_VERIFICATION)
+  bannedAt               DateTime?
+  deletionScheduledAt    DateTime?
   createdAt              DateTime        @default(now())
   updatedAt              DateTime        @updatedAt
   accounts               Account[]
@@ -271,6 +273,7 @@ enum UserStatus {
   PENDING_EMAIL_VERIFICATION
   ACTIVE
   BANNED
+  PENDING_DELETION
 }
 
 enum FriendshipStatus {

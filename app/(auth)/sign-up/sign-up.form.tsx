@@ -71,7 +71,7 @@ export function SignUpForm(): ReactNode {
         required
         errorMessage={state.errors?.confirmPassword}
       />
-      <Button type="submit" className="w-full" disabled={pending}>
+      <Button type="submit" className="w-full" disabled={pending || state.success}>
         Sign Up
       </Button>
     </form>

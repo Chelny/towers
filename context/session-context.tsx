@@ -1,6 +1,6 @@
 "use client"
 
-import React, { Context, createContext, type PropsWithChildren, useEffect, useMemo, useState } from "react"
+import React, { Context, createContext, type PropsWithChildren, ReactNode, useEffect, useMemo, useState } from "react"
 import { usePathname } from "next/navigation"
 import { getCsrfToken } from "next-auth/react"
 import type { Session } from "next-auth"
@@ -26,7 +26,7 @@ export const SessionContext: Context<TSessionContextValue | undefined> = createC
   TSessionContextValue | undefined
 >(undefined)
 
-export function SessionDataProvider({ session: initialSession = null, children }: TSessionProviderProps) {
+export const SessionDataProvider = ({ session: initialSession = null, children }: TSessionProviderProps): ReactNode => {
   const pathname: string = usePathname()
   const [session, setSession] = useState<Session | null>(initialSession)
   const [loading, setLoading] = useState<boolean>(!initialSession)

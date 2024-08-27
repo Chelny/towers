@@ -2,7 +2,11 @@
 
 import { ReactNode, useEffect, useRef } from "react"
 import { useFormState, useFormStatus } from "react-dom"
-import { password, PasswordData, PasswordErrorMessages } from "@/app/(protected)/account/password/password.actions"
+import {
+  password,
+  UpdatePasswordData,
+  UpdatePasswordErrorMessages
+} from "@/app/(protected)/account/update-password/update-password.actions"
 import AlertMessage from "@/components/ui/AlertMessage"
 import Button from "@/components/ui/Button"
 import Input from "@/components/ui/Input"
@@ -10,10 +14,10 @@ import Input from "@/components/ui/Input"
 const initialState = {
   success: false,
   message: "",
-  errors: {} as PasswordErrorMessages<keyof PasswordData>
+  errors: {} as UpdatePasswordErrorMessages<keyof UpdatePasswordData>
 }
 
-export function PasswordForm(): ReactNode {
+export function UpdatePasswordForm(): ReactNode {
   const { pending } = useFormStatus()
   const [state, formAction] = useFormState(password, initialState)
   const currentPasswordRef = useRef<HTMLInputElement>(null)
@@ -70,7 +74,7 @@ export function PasswordForm(): ReactNode {
         />
       </>
       <Button type="submit" className="w-full" disabled={pending}>
-        Update
+        Update Password
       </Button>
     </form>
   )

@@ -8,7 +8,8 @@ type AuthLayoutProps = {
 
 export default function AuthLayout({ children }: AuthLayoutProps): ReactNode {
   return (
-    <div className="container h-full bg-white">
+    <div className="h-full bg-white">
+      <h1 className="p-4 bg-amber-400 text-4xl">Towers Game</h1>
       <div
         className={clsx(
           "flex flex-col px-4 pb-8 mx-auto bg-white",

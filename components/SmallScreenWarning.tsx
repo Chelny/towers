@@ -25,7 +25,7 @@ export default function SmallScreenWarning(): ReactNode {
         "fixed inset-0 z-50 flex flex-col justify-center items-center gap-2 p-4 bg-white text-center"
       )}
     >
-      <h1 className="text-2xl font-bold mb-2">Screen Too Small</h1>
+      <h2 className="text-2xl font-bold mb-2">Screen Too Small</h2>
       <p className="text-lg">
         Resize the window (recommended size: 1350px by 768px)
         <br />

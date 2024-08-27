@@ -1,18 +1,19 @@
 import { NextResponse } from "next/server"
 import { User } from "@prisma/client"
+import { Session } from "next-auth"
 import { ProfileData } from "@/app/(protected)/account/profile/profile.actions"
 import { auth } from "@/auth"
 import { getUserById, getUserByUsername } from "@/data"
 import prisma from "@/lib"
 
 export async function GET(): Promise<NextResponse> {
-  const session = await auth()
+  const session: Session | null = await auth()
 
   if (!session || !session.user) {
     return NextResponse.json(
       {
         success: false,
-        message: "User not authenticated."
+        message: "Please sign in to access your account."
       },
       { status: 401 }
     )
@@ -41,7 +42,7 @@ export async function GET(): Promise<NextResponse> {
     return NextResponse.json(
       {
         success: false,
-        message: "User not found."
+        message: "We couldn’t find an account with that information. Please check your details and try again."
       },
       { status: 404 }
     )
@@ -57,13 +58,13 @@ export async function GET(): Promise<NextResponse> {
 }
 
 export async function POST(body: ProfileData): Promise<NextResponse> {
-  const session = await auth()
+  const session: Session | null = await auth()
 
   if (!session || !session.user) {
     return NextResponse.json(
       {
         success: false,
-        message: "User not authenticated."
+        message: "Please sign in to access your account."
       },
       { status: 401 }
     )
@@ -75,7 +76,7 @@ export async function POST(body: ProfileData): Promise<NextResponse> {
     return NextResponse.json(
       {
         success: false,
-        message: "User not found."
+        message: "We couldn’t find an account with that information. Please check your details and try again."
       },
       { status: 404 }
     )
@@ -87,7 +88,7 @@ export async function POST(body: ProfileData): Promise<NextResponse> {
     return NextResponse.json(
       {
         success: false,
-        message: "Username is already taken."
+        message: "That username is already in use. Please choose a different one."
       },
       { status: 409 }
     )

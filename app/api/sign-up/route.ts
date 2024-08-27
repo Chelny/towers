@@ -12,7 +12,7 @@ export async function POST(body: SignUpData): Promise<NextResponse> {
     return NextResponse.json(
       {
         success: false,
-        message: "An account associated with this email already exists."
+        message: "An account with this email already exists. Please use a different email to create a new account."
       },
       { status: 409 }
     )

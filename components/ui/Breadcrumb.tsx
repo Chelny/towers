@@ -9,8 +9,8 @@ export default function Breadcrumb() {
   const pathSegments: string[] = pathname.split("/").filter((path: string) => path)
 
   return (
-    <nav aria-label="breadcrumb">
-      <ol className="flex pt-4">
+    <nav className="mt-4 mb-8" aria-label="breadcrumb">
+      <ol className="flex">
         {/* Home link */}
         <li>
           <Link href={ROUTE_HOME.PATH} className="text-blue-500 hover:underline">

@@ -12,7 +12,7 @@ import { PiSignOut } from "react-icons/pi"
 import { RiExpandLeftLine, RiExpandRightLine } from "react-icons/ri"
 import { useDispatch } from "react-redux"
 import UserAvatar from "@/components/UserAvatar"
-import { ROUTE_PROFILE, ROUTE_TOWERS } from "@/constants"
+import { ROUTE_ACCOUNT, ROUTE_TOWERS } from "@/constants"
 import { destroySocket } from "@/features"
 import { useSessionData } from "@/hooks"
 
@@ -55,7 +55,7 @@ export default function RoomSidebar(): ReactNode {
 
       {/* User image + collapse icon */}
       <div className={clsx("flex items-center gap-2", isExpanded ? "w-full" : "w-auto")}>
-        <Link className="flex-1 flex items-center gap-2" href={ROUTE_PROFILE.PATH}>
+        <Link className="flex-1 flex items-center gap-2" href={ROUTE_ACCOUNT.PATH}>
           <UserAvatar />
           <span className={clsx(isExpanded ? "block" : "hidden")}>{session?.user.username}</span>
         </Link>

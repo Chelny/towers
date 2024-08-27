@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 export default function ForgotPasswordPage(): ReactNode {
   return (
     <>
-      <h2 className="my-8 text-4xl">{ROUTE_FORGOT_PASSWORD.TITLE}</h2>
+      <h2 className="mb-4 text-3xl">{ROUTE_FORGOT_PASSWORD.TITLE}</h2>
       <ForgotPasswordForm />
     </>
   )

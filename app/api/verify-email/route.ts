@@ -27,7 +27,7 @@ export async function POST(body: VerifyEmailData): Promise<NextResponse> {
         success: false,
         message: "The token is expired."
       },
-      { status: 410 }
+      { status: 403 }
     )
   }
 
@@ -38,7 +38,7 @@ export async function POST(body: VerifyEmailData): Promise<NextResponse> {
     return NextResponse.json(
       {
         success: false,
-        message: "The email does not exist."
+        message: "We couldn’t find an account with that email. Please check the address and try again."
       },
       { status: 404 }
     )

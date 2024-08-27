@@ -11,7 +11,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     return NextResponse.json(
       {
         success: false,
-        error: "roomId or tableId must be provided"
+        error: "Please provide either a room ID or a table ID to proceed."
       },
       { status: 400 }
     )

@@ -11,7 +11,7 @@ export default async function Rooms(): Promise<ReactNode> {
 
   return (
     <div className="p-4">
-      <h2 className="mb-8 text-4xl">{ROUTE_ROOMS.TITLE}</h2>
+      <h2 className="mb-8 text-3xl">{ROUTE_ROOMS.TITLE}</h2>
       <RoomsList rooms={rooms} />
     </div>
   )

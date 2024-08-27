@@ -20,7 +20,7 @@ import type { Session } from "next-auth"
  *
  * @returns {TSessionContextValue} - The session data obtained from the SessionContext.
  */
-export function useSessionData(): TSessionContextValue {
+export const useSessionData = (): TSessionContextValue => {
   if (!SessionContext) {
     throw new Error("React Context is unavailable in Server Components")
   }

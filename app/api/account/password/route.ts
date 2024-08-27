@@ -1,19 +1,20 @@
 import { NextResponse } from "next/server"
 import { User } from "@prisma/client"
 import { compare, hash } from "bcryptjs"
-import { PasswordData } from "@/app/(protected)/account/password/password.actions"
+import { Session } from "next-auth"
+import { UpdatePasswordData } from "@/app/(protected)/account/update-password/update-password.actions"
 import { auth } from "@/auth"
-import { getUserById } from "@/data"
+import { getAccountsByUserId, getUserById } from "@/data"
 import prisma from "@/lib"
 
-export async function POST(body: PasswordData): Promise<NextResponse> {
-  const session = await auth()
+export async function POST(body: UpdatePasswordData): Promise<NextResponse> {
+  const session: Session | null = await auth()
 
   if (!session || !session.user) {
     return NextResponse.json(
       {
         success: false,
-        message: "User not authenticated."
+        message: "Please sign in to access your account."
       },
       { status: 401 }
     )
@@ -25,17 +26,13 @@ export async function POST(body: PasswordData): Promise<NextResponse> {
     return NextResponse.json(
       {
         success: false,
-        message: "User not found."
+        message: "We couldn’t find an account with that information. Please check your details and try again."
       },
       { status: 404 }
     )
   }
 
-  const accounts = await prisma.account.findMany({
-    where: {
-      userId: session.user.id
-    }
-  })
+  const accounts = await getAccountsByUserId(session.user.id)
 
   if (accounts.length > 0) {
     return NextResponse.json(

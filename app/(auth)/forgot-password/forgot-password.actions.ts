@@ -4,10 +4,9 @@ import { NextResponse } from "next/server"
 import { type Static, Type } from "@sinclair/typebox"
 import { Value, ValueError } from "@sinclair/typebox/value"
 import { POST } from "@/app/api/forgot-password/route"
-import { EMAIL_PATTERN } from "@/constants"
 
 const forgotPasswordSchema = Type.Object({
-  email: Type.RegExp(EMAIL_PATTERN)
+  email: Type.String({ minLength: 1 })
 })
 
 export type ForgotPasswordData = Static<typeof forgotPasswordSchema>

@@ -1,6 +1,7 @@
 import next from "next";
 import {createServer} from "node:http";
 import {Server} from "socket.io";
+import axios from 'axios';
 
 const dev = process.env.NODE_ENV !== "production";
 const hostname = "localhost";
@@ -103,12 +104,29 @@ app.prepare().then(() => {
     console.info(`Room ${room} was deleted`);
   });
 
+  // Scheduler
+  const runScheduler = async () => {
+    try {
+      await axios.post(
+        `http://${hostname}:${port}/api/services/scheduler`,
+        {
+          headers: {
+            "Content-Type": "application/json"
+          }
+        }
+      )
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
   httpServer
-    .once("error", (err) => {
-      console.error(err);
+    .once("error", (error) => {
+      console.error(error);
       process.exit(1);
     })
     .listen(port, () => {
       console.log(`> Ready on http://${hostname}:${port}`);
+      runScheduler();
     });
 });
