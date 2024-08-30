@@ -1,9 +1,45 @@
-import { NextResponse } from "next/server"
-import { User } from "@prisma/client"
+import { NextRequest, NextResponse } from "next/server"
+import { PasswordResetToken, User } from "@prisma/client"
 import { hash } from "bcryptjs"
 import { ResetPasswordData } from "@/app/(auth)/reset-password/reset-password.actions"
 import { getPasswordResetTokenByToken, getUserByEmail } from "@/data"
 import prisma from "@/lib"
+
+export async function GET(request: NextRequest): Promise<NextResponse> {
+  const searchParams: URLSearchParams = request.nextUrl.searchParams
+  const token: string | null = searchParams.get("token")
+
+  if (!token) {
+    return NextResponse.json(
+      {
+        success: false,
+        error: "The token is invalid."
+      },
+      { status: 401 }
+    )
+  }
+
+  const passwordResetToken: PasswordResetToken | null = await prisma.passwordResetToken.findUnique({
+    where: { token }
+  })
+
+  if (!passwordResetToken || new Date() > passwordResetToken.expires) {
+    return NextResponse.json(
+      {
+        success: false,
+        error: "The token is invalid."
+      },
+      { status: 401 }
+    )
+  }
+
+  return NextResponse.json(
+    {
+      success: true
+    },
+    { status: 200 }
+  )
+}
 
 export async function POST(body: ResetPasswordData): Promise<NextResponse> {
   // Check token validity
@@ -39,7 +75,7 @@ export async function POST(body: ResetPasswordData): Promise<NextResponse> {
     return NextResponse.json(
       {
         success: false,
-        message: "We couldn’t find an account with that email. Please check the address and try again."
+        message: "We couldn’t find an account with that email. Please check the email address and try again."
       },
       { status: 404 }
     )

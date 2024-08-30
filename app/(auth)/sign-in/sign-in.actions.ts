@@ -29,10 +29,10 @@ export async function signIn(prevState: any, formData: FormData) {
   for (const error of errors) {
     switch (error.path.replace("/", "")) {
       case "email":
-        errorMessages.email = "Email is invalid."
+        errorMessages.email = "The email is invalid."
         break
       case "password":
-        errorMessages.password = "Password is invalid."
+        errorMessages.password = "The password is invalid."
         break
       default:
         console.error(`Sign In Action: Unknown error at ${error.path}`)
@@ -68,7 +68,7 @@ export async function signIn(prevState: any, formData: FormData) {
 
   return {
     success: false,
-    message: "Email or password is invalid",
+    message: "The email or the password is invalid.",
     errors: errorMessages
   }
 }

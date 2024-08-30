@@ -10,6 +10,7 @@ type RadioButtonProps = {
   value: string
   checked?: boolean
   disabled?: boolean
+  dataTestId?: string
   onChange?: (event: ChangeEvent<HTMLInputElement>) => void
 }
 
@@ -20,6 +21,7 @@ export default function RadioButton({
   value,
   checked = false,
   disabled = false,
+  dataTestId = undefined,
   onChange
 }: RadioButtonProps): ReactNode {
   const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
@@ -42,6 +44,7 @@ export default function RadioButton({
           disabled={disabled}
           aria-checked={checked}
           aria-disabled={disabled}
+          data-testid={`${dataTestId}-${value}`}
           onChange={handleChange}
         />
         <div

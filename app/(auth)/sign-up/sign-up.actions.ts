@@ -42,29 +42,29 @@ export async function signUp(prevState: any, formData: FormData) {
   for (const error of errors) {
     switch (error.path.replace("/", "")) {
       case "name":
-        errorMessages.name = "Name is invalid."
+        errorMessages.name = "The name is invalid."
         break
       case "gender":
         if (rawFormData.gender) {
-          errorMessages.gender = "Gender is invalid."
+          errorMessages.gender = "The gender is invalid."
         }
         break
       case "birthdate":
         if (rawFormData.birthdate) {
-          errorMessages.birthdate = "Birthdate is invalid."
+          errorMessages.birthdate = "The birthdate is invalid."
         }
         break
       case "email":
-        errorMessages.email = "Email is invalid."
+        errorMessages.email = "The email is invalid."
         break
       case "username":
-        errorMessages.username = "Username is invalid."
+        errorMessages.username = "The username is invalid."
         break
       case "password":
-        errorMessages.password = "Password is invalid."
+        errorMessages.password = "The password is invalid."
         break
       case "confirmPassword":
-        errorMessages.confirmPassword = "Confirm password is invalid."
+        errorMessages.confirmPassword = "The password confirmation is invalid."
         break
       default:
         console.error(`Sign Up Action: Unknown error at ${error.path}`)
@@ -73,7 +73,7 @@ export async function signUp(prevState: any, formData: FormData) {
   }
 
   if (rawFormData.password !== rawFormData.confirmPassword) {
-    errorMessages.confirmPassword = "Password and Confirm Password do not match."
+    errorMessages.confirmPassword = "The password and password confirmation do not match."
   }
 
   if (Object.keys(errorMessages).length === 0) {

@@ -1,6 +1,6 @@
 "use client"
 
-import { ReactNode, useEffect, useRef } from "react"
+import { FormEvent, ReactNode, useEffect, useRef } from "react"
 import { useFormState, useFormStatus } from "react-dom"
 import {
   password,
@@ -40,8 +40,14 @@ export function UpdatePasswordForm(): ReactNode {
     }
   }, [state])
 
+  const handleUpdatePassword = (event: FormEvent<HTMLFormElement>): void => {
+    event.preventDefault()
+    const formData: FormData = new FormData(event.currentTarget)
+    formAction(formData)
+  }
+
   return (
-    <form className="w-full" action={formAction} noValidate>
+    <form className="w-full" noValidate onSubmit={handleUpdatePassword}>
       {state.message && <AlertMessage type={state.success ? "success" : "error"}>{state.message}</AlertMessage>}
       <>
         <Input
@@ -51,6 +57,7 @@ export function UpdatePasswordForm(): ReactNode {
           label="Current Password"
           autoComplete="off"
           required
+          dataTestId="update-password-current-password-input"
           errorMessage={state.errors?.currentPassword}
         />
         <Input
@@ -60,6 +67,7 @@ export function UpdatePasswordForm(): ReactNode {
           label="New Password"
           autoComplete="off"
           required
+          dataTestId="update-password-new-password-input"
           description="Password must be at least 8 characters long, must contain at least one digit, one uppercase letter, and at least one special character."
           errorMessage={state.errors?.newPassword}
         />
@@ -70,10 +78,11 @@ export function UpdatePasswordForm(): ReactNode {
           label="Confirm New Password"
           autoComplete="off"
           required
+          dataTestId="update-password-confirm-new-password-input"
           errorMessage={state.errors?.confirmNewPassword}
         />
       </>
-      <Button type="submit" className="w-full" disabled={pending}>
+      <Button type="submit" className="w-full" disabled={pending} dataTestId="update-password-submit-button">
         Update Password
       </Button>
     </form>

@@ -95,7 +95,7 @@ export async function POST(body: UpdatePasswordData): Promise<NextResponse> {
   return NextResponse.json(
     {
       success: true,
-      message: "Your password has been successfully updated!"
+      message: "The password has been successfully updated!"
     },
     { status: 200 }
   )

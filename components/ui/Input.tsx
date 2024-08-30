@@ -14,6 +14,7 @@ type InputProps = {
   required?: boolean
   readOnly?: boolean
   disabled?: boolean
+  dataTestId?: string
   description?: string
   errorMessage?: string
   onInput?: (event: ChangeEvent<HTMLInputElement>) => void
@@ -32,6 +33,7 @@ export default forwardRef<HTMLInputElement, InputProps>(function Input(
     required = false,
     readOnly = false,
     disabled = false,
+    dataTestId = undefined,
     description = "",
     errorMessage = "",
     onInput,
@@ -79,6 +81,7 @@ export default forwardRef<HTMLInputElement, InputProps>(function Input(
         aria-invalid={errorMessage ? "true" : "false"}
         aria-errormessage={errorMessage ? `${id}ErrorMessage` : undefined}
         aria-disabled={disabled}
+        data-testid={dataTestId}
         onInput={handleInput}
         onPaste={handlePaste}
         onFocus={(event: FocusEvent<HTMLInputElement>) => event.stopPropagation()}

@@ -1,3 +1,8 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
+
+# Run linting
 npx lint-staged
+
+# Run tests
+npx vitest --run

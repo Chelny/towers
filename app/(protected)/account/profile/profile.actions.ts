@@ -53,7 +53,7 @@ export async function profile(prevState: any, formData: FormData) {
         }
         break
       case "email":
-        errorMessages.email = "Email is invalid."
+        errorMessages.email = "The email is invalid."
         break
       case "username":
         errorMessages.username = "Username is invalid."

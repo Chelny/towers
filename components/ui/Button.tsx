@@ -10,6 +10,7 @@ type ButtonProps = {
   className?: string
   disabled?: boolean
   tabIndex?: number
+  dataTestId?: string
   onClick?: (event: MouseEvent<HTMLButtonElement>) => void
 }
 
@@ -20,6 +21,7 @@ export default function Button({
   className = "",
   disabled = false,
   tabIndex = 0,
+  dataTestId = undefined,
   onClick
 }: ButtonProps): ReactNode {
   return (
@@ -35,6 +37,7 @@ export default function Button({
       disabled={disabled}
       tabIndex={tabIndex}
       aria-disabled={disabled}
+      data-testid={dataTestId}
       onClick={(event: MouseEvent<HTMLButtonElement>) => onClick?.(event)}
     >
       {children}

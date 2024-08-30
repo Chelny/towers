@@ -28,6 +28,8 @@ export async function verifyEmail(prevState: any, formData: FormData) {
   for (const error of errors) {
     switch (error.path.replace("/", "")) {
       case "email":
+        errorMessages.email = "The email is missing."
+        break
       case "token":
         errorMessages.token = "The token is missing or invalid."
         break
@@ -44,6 +46,7 @@ export async function verifyEmail(prevState: any, formData: FormData) {
 
   return {
     success: false,
+    message: "The verification link is invalid.",
     errors: errorMessages
   }
 }

@@ -25,6 +25,7 @@ export function SocialLoginButtons({ disabled }: SocialLoginButtonsProps): React
         type="button"
         className="flex justify-center items-center w-full gap-x-2"
         disabled={disabled}
+        dataTestId="sign-in-google-button"
         onClick={() => handleClick("google")}
       >
         <FcGoogle className="w-5 h-5" />
@@ -34,6 +35,7 @@ export function SocialLoginButtons({ disabled }: SocialLoginButtonsProps): React
         type="button"
         className="flex justify-center items-center w-full gap-x-2"
         disabled={disabled}
+        dataTestId="sign-in-github-button"
         onClick={() => handleClick("github")}
       >
         <FaGithub className="w-5 h-5" />

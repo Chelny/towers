@@ -1,6 +1,6 @@
 "use client"
 
-import { ReactNode, useRef } from "react"
+import { FormEvent, ReactNode } from "react"
 import { useFormState, useFormStatus } from "react-dom"
 import { Gender } from "@prisma/client"
 import { signUp, SignUpData, SignUpErrorMessages } from "@/app/(auth)/sign-up/sign-up.actions"
@@ -20,11 +20,30 @@ export function SignUpForm(): ReactNode {
   const { pending } = useFormStatus()
   const [state, formAction] = useFormState(signUp, initialState)
 
+  const handleSignUp = (event: FormEvent<HTMLFormElement>): void => {
+    event.preventDefault()
+    const formData: FormData = new FormData(event.currentTarget)
+    formAction(formData)
+  }
+
   return (
-    <form className="w-full" action={formAction} noValidate>
+    <form className="w-full" noValidate onSubmit={handleSignUp}>
       {state.message && <AlertMessage type={state.success ? "success" : "error"}>{state.message}</AlertMessage>}
-      <Input id="name" label="Name" placeholder="Enter your name" required errorMessage={state.errors?.name} />
-      <RadioButtonGroup id="gender" label="Gender" inline errorMessage={state.errors?.gender}>
+      <Input
+        id="name"
+        label="Name"
+        placeholder="Enter your name"
+        required
+        dataTestId="sign-up-name-input"
+        errorMessage={state.errors?.name}
+      />
+      <RadioButtonGroup
+        id="gender"
+        label="Gender"
+        inline
+        dataTestId="sign-up-gender-radio-group"
+        errorMessage={state.errors?.gender}
+      >
         <RadioButtonGroup.Option id="male" value={Gender.M} label="Male" />
         <RadioButtonGroup.Option id="female" value={Gender.F} label="Female" />
         <RadioButtonGroup.Option id="other" value={Gender.X} label="Other" />
@@ -33,6 +52,7 @@ export function SignUpForm(): ReactNode {
         id="birthdate"
         label="Birthdate"
         maxDate={new Date(new Date().getFullYear() - 12, new Date().getMonth(), new Date().getDate())}
+        dataTestId="sign-up-birthdate-calendar"
         description="You must be at least 12 years old."
         errorMessage={state.errors?.birthdate}
       />
@@ -42,6 +62,7 @@ export function SignUpForm(): ReactNode {
         label="Email"
         placeholder="Enter your email"
         required
+        dataTestId="sign-up-email-input"
         errorMessage={state.errors?.email}
       />
       <hr className="mt-6 mb-4" />
@@ -51,6 +72,7 @@ export function SignUpForm(): ReactNode {
         placeholder="Enter your username"
         autoComplete="off"
         required
+        dataTestId="sign-up-username-input"
         description="Username must be between 5 and 16 characters long and can contain digits, periods, and underscores."
         errorMessage={state.errors?.username}
       />
@@ -60,6 +82,7 @@ export function SignUpForm(): ReactNode {
         label="Password"
         autoComplete="off"
         required
+        dataTestId="sign-up-password-input"
         description="Password must be at least 8 characters long, must contain at least one digit, one uppercase letter, and at least one special character."
         errorMessage={state.errors?.password}
       />
@@ -69,9 +92,10 @@ export function SignUpForm(): ReactNode {
         label="Confirm Password"
         autoComplete="off"
         required
+        dataTestId="sign-up-confirm-password-input"
         errorMessage={state.errors?.confirmPassword}
       />
-      <Button type="submit" className="w-full" disabled={pending || state.success}>
+      <Button type="submit" className="w-full" disabled={pending || state.success} dataTestId="sign-up-submit-button">
         Sign Up
       </Button>
     </form>

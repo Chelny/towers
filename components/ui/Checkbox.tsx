@@ -10,6 +10,7 @@ type CheckboxProps = {
   label: string
   defaultChecked?: boolean
   disabled?: boolean
+  dataTestId?: string
   onChange?: (event: ChangeEvent<HTMLInputElement>) => void
 }
 
@@ -18,6 +19,7 @@ export default function Checkbox({
   label,
   defaultChecked = false,
   disabled = false,
+  dataTestId = undefined,
   onChange
 }: CheckboxProps): ReactNode {
   const [checked, setChecked] = useState<boolean>(defaultChecked)
@@ -45,6 +47,7 @@ export default function Checkbox({
         disabled={disabled}
         aria-checked={checked}
         aria-disabled={disabled}
+        data-testid={dataTestId}
         onChange={handleChange}
       />
       <TiTick className={clsx("absolute hidden w-5 h-5 mt-1 text-gray-600", "peer-checked:block")} />

@@ -38,7 +38,7 @@ export async function POST(body: VerifyEmailData): Promise<NextResponse> {
     return NextResponse.json(
       {
         success: false,
-        message: "We couldn’t find an account with that email. Please check the address and try again."
+        message: "We couldn’t find an account with that email. Please check the email address and try again."
       },
       { status: 404 }
     )

@@ -19,6 +19,7 @@ type CalendarProps = {
   defaultValue?: string
   required?: boolean
   disabled?: boolean
+  dataTestId?: string
   description?: string
   errorMessage?: string
   onChange?: (date: string) => void
@@ -33,6 +34,7 @@ export default function Calendar({
   defaultValue = undefined,
   required = false,
   disabled = false,
+  dataTestId = undefined,
   description = "",
   errorMessage = "",
   onChange
@@ -264,6 +266,7 @@ export default function Calendar({
         aria-label={label}
         aria-describedby={description ? `${id}Description` : undefined}
         aria-disabled={disabled}
+        dataTestId={dataTestId}
         onClick={handleOpenCalendar}
       >
         {selectedDate && selectedDate.getTime()

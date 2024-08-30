@@ -1,7 +1,7 @@
 "use client"
 
-import { ClipboardEvent, ReactNode, useEffect, useState } from "react"
-import { useFormState } from "react-dom"
+import { ClipboardEvent, FormEvent, ReactNode, useEffect, useState } from "react"
+import { useFormState, useFormStatus } from "react-dom"
 import { useRouter } from "next/navigation"
 import clsx from "clsx/lite"
 import { signOut } from "next-auth/react"
@@ -19,6 +19,7 @@ const initialState = {
 
 export function AccountForm(): ReactNode {
   const router = useRouter()
+  const { pending } = useFormStatus()
   const [state, formAction] = useFormState(account, initialState)
   const [isExpanded, setIsExpanded] = useState<boolean>(false)
 
@@ -41,8 +42,14 @@ export function AccountForm(): ReactNode {
     setIsExpanded(event.currentTarget.open)
   }
 
+  const handleAccountDeletion = (event: FormEvent<HTMLFormElement>): void => {
+    event.preventDefault()
+    const formData: FormData = new FormData(event.currentTarget)
+    formAction(formData)
+  }
+
   return (
-    <form className="w-full" action={formAction} noValidate>
+    <form className="w-full" noValidate onSubmit={handleAccountDeletion}>
       <details onToggle={handleToggle}>
         <summary className="flex justify-between items-center">
           <span className={clsx("w-full text-red-500", "hover:underline")}>Cancel Account</span>
@@ -60,12 +67,18 @@ export function AccountForm(): ReactNode {
             label="Please enter your email to confirm account deletion"
             autoComplete="off"
             required
-            onPaste={(event: ClipboardEvent<HTMLInputElement>) => event.preventDefault()}
+            dataTestId="account-delete-email-input"
             placeholder="Enter your email"
             errorMessage={state.errors?.email}
+            onPaste={(event: ClipboardEvent<HTMLInputElement>) => event.preventDefault()}
           />
 
-          <Button type="submit" className="mt-4 bg-red-500 text-white">
+          <Button
+            type="submit"
+            className="mt-4 bg-red-500 text-white"
+            disabled={pending}
+            dataTestId="account-delete-submit-button"
+          >
             Confirm Deletion
           </Button>
         </div>

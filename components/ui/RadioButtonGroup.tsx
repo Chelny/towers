@@ -13,6 +13,7 @@ type RadioButtonGroupProps = {
   defaultValue?: string
   required?: boolean
   disabled?: boolean
+  dataTestId?: string
   description?: string
   errorMessage?: string
   onChange?: (event: ChangeEvent<HTMLInputElement>) => void
@@ -26,6 +27,7 @@ export default function RadioButtonGroup({
   defaultValue = "",
   required = false,
   disabled = false,
+  dataTestId = undefined,
   description = "",
   errorMessage = "",
   onChange
@@ -49,6 +51,7 @@ export default function RadioButtonGroup({
       aria-invalid={errorMessage ? "true" : "false"}
       aria-disabled={disabled}
       aria-errormessage={errorMessage ? `${id}ErrorMessage` : undefined}
+      data-testid={dataTestId}
     >
       <legend id={`${id}Label`} className="mb-1 font-medium">
         {label} {!required && <span className="text-neutral-500">(optional)</span>}
@@ -63,6 +66,7 @@ export default function RadioButtonGroup({
             value={option.props.value}
             checked={selectedValue === option.props.value}
             disabled={option.props.disabled || disabled}
+            dataTestId={dataTestId}
             onChange={handleChange}
           />
         ))}

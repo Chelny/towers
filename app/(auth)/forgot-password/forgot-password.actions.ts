@@ -26,7 +26,7 @@ export async function forgotPassword(prevState: any, formData: FormData) {
   for (const error of errors) {
     switch (error.path.replace("/", "")) {
       case "email":
-        errorMessages.email = "Email is invalid."
+        errorMessages.email = "The email is required."
         break
       default:
         console.error(`Forgot Password Action: Unknown error at ${error.path}`)

@@ -1,6 +1,6 @@
 "use client"
 
-import { ReactNode, useCallback, useEffect, useRef } from "react"
+import { FormEvent, ReactNode, useCallback, useEffect, useRef } from "react"
 import { useFormState } from "react-dom"
 import { useSearchParams } from "next/navigation"
 import { useRouter } from "next/navigation"
@@ -24,31 +24,49 @@ export function VerifyEmailForm(): ReactNode {
   const formRef = useRef<HTMLFormElement>(null)
   const [state, formAction] = useFormState(verifyEmail, initialState)
 
-  useEffect(() => {
-    handleSubmit()
-  }, [])
-
   const handleSubmit = useCallback(() => {
     if (state.success) return
     formRef.current?.requestSubmit()
   }, [state])
 
+  useEffect(() => {
+    handleSubmit()
+  }, [])
+
   const handleSignIn = (): void => {
     router.push(ROUTE_SIGN_IN.PATH)
   }
 
+  const handleVerifyEmail = (event: FormEvent<HTMLFormElement>): void => {
+    event.preventDefault()
+    const formData: FormData = new FormData(event.currentTarget)
+    formAction(formData)
+  }
+
   return (
-    <form ref={formRef} className="w-full" action={formAction} noValidate>
+    <form ref={formRef} className="w-full" noValidate onSubmit={handleVerifyEmail}>
       {state.message ? (
-        <AlertMessage type={state.success ? "success" : "error"}>{state.message}</AlertMessage>
+        <>
+          <AlertMessage type={state.success ? "success" : "error"}>{state.message}</AlertMessage>
+          {state.success && (
+            <div className="flex justify-center mt-8">
+              <Button dataTestId="verify-email-sign-in-button" onClick={handleSignIn}>
+                Sign In
+              </Button>
+            </div>
+          )}
+        </>
       ) : (
-        <CgSpinner className="w-12 h-12 mx-auto animate-spin" />
+        <CgSpinner className="w-12 h-12 mx-auto animate-spin" data-testid="verify-email-spinner-icon" />
       )}
-      <input type="hidden" id="email" name="email" value={email ? decodeURIComponent(email) : undefined} />
-      <input type="hidden" id="token" name="token" value={token ?? undefined} />
-      <div className="flex justify-center mt-8">
-        <Button onClick={handleSignIn}>Sign In</Button>
-      </div>
+      <input
+        type="hidden"
+        id="email"
+        name="email"
+        value={email ? decodeURIComponent(email) : undefined}
+        data-testid="verify-email-email-input"
+      />
+      <input type="hidden" id="token" name="token" value={token ?? undefined} data-testid="verify-email-token-input" />
     </form>
   )
 }

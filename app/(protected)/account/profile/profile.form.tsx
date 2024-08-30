@@ -1,6 +1,6 @@
 "use client"
 
-import { ReactNode, useEffect } from "react"
+import { FormEvent, ReactNode, useEffect } from "react"
 import { useFormState, useFormStatus } from "react-dom"
 import { Account, Gender, User } from "@prisma/client"
 import { profile, ProfileData, ProfileErrorMessages } from "@/app/(protected)/account/profile/profile.actions"
@@ -37,8 +37,14 @@ export function ProfileForm({ user }: ProfileProps): ReactNode {
     }
   }, [state])
 
+  const handleUpdateProfile = (event: FormEvent<HTMLFormElement>): void => {
+    event.preventDefault()
+    const formData: FormData = new FormData(event.currentTarget)
+    formAction(formData)
+  }
+
   return (
-    <form className="w-full" action={formAction} noValidate>
+    <form className="w-full" noValidate onSubmit={handleUpdateProfile}>
       {state.message && <AlertMessage type={state.success ? "success" : "error"}>{state.message}</AlertMessage>}
       <Input
         id="name"
@@ -46,6 +52,7 @@ export function ProfileForm({ user }: ProfileProps): ReactNode {
         placeholder="Enter your name"
         defaultValue={user?.name}
         required
+        dataTestId="profile-name-input"
         errorMessage={state.errors?.name}
       />
       <RadioButtonGroup
@@ -53,6 +60,7 @@ export function ProfileForm({ user }: ProfileProps): ReactNode {
         label="Gender"
         inline
         defaultValue={String(user?.gender)}
+        dataTestId="profile-gender-radio-group"
         errorMessage={state.errors?.gender}
       >
         <RadioButtonGroup.Option id="male" value={Gender.M} label="Male" />
@@ -64,6 +72,7 @@ export function ProfileForm({ user }: ProfileProps): ReactNode {
         label="Birthdate"
         maxDate={new Date(new Date().getFullYear() - 12, new Date().getMonth(), new Date().getDate())}
         defaultValue={new Date(user?.birthdate!).toString()}
+        dataTestId="profile-birthdate-calendar"
         description="You must be at least 12 years old."
         errorMessage={state.errors?.birthdate}
       />
@@ -75,6 +84,7 @@ export function ProfileForm({ user }: ProfileProps): ReactNode {
         defaultValue={user?.email}
         required
         readOnly={typeof user?.accounts !== "undefined" && user?.accounts?.length > 0}
+        dataTestId="profile-email-input"
         description={
           typeof user?.accounts !== "undefined" && user?.accounts?.length > 0
             ? `Email linked to your account can only be updated through ${user?.accounts[0]?.provider}.`
@@ -90,11 +100,12 @@ export function ProfileForm({ user }: ProfileProps): ReactNode {
         autoComplete="off"
         defaultValue={user?.username}
         required
+        dataTestId="profile-username-input"
         description="Username must be between 5 and 16 characters long and can contain digits, periods, and underscores."
         errorMessage={state.errors?.username}
       />
-      <Button type="submit" className="w-full" disabled={pending}>
-        Update
+      <Button type="submit" className="w-full" disabled={pending} dataTestId="profile-submit-button">
+        Update Profile
       </Button>
     </form>
   )

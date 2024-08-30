@@ -13,6 +13,7 @@ type SelectProps = {
   defaultValue?: string
   required?: boolean
   disabled?: boolean
+  dataTestId?: string
   description?: string
   errorMessage?: string
   onChange?: (value: string) => void
@@ -27,6 +28,7 @@ export default function Select({
   defaultValue = "",
   required = false,
   disabled = false,
+  dataTestId = undefined,
   description = "",
   errorMessage = "",
   onChange
@@ -103,6 +105,7 @@ export default function Select({
         aria-disabled={disabled}
         aria-invalid={errorMessage ? "true" : "false"}
         aria-errormessage={errorMessage ? `${id}ErrorMessage` : undefined}
+        data-testid={dataTestId}
         onClick={() => !disabled && setIsDropdownOpen(!isDropdownOpen)}
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === " ") {

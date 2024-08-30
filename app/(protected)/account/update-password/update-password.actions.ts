@@ -31,13 +31,13 @@ export async function password(prevState: any, formData: FormData) {
   for (const error of errors) {
     switch (error.path.replace("/", "")) {
       case "currentPassword":
-        errorMessages.currentPassword = "Current password is invalid."
+        errorMessages.currentPassword = "The current password is invalid."
         break
       case "newPassword":
-        errorMessages.newPassword = "New password is invalid."
+        errorMessages.newPassword = "The new password is invalid."
         break
       case "confirmNewPassword":
-        errorMessages.confirmNewPassword = "Confirm new password is invalid."
+        errorMessages.confirmNewPassword = "The new password confirmation is invalid."
         break
       default:
         console.error(`UpdatePassword Action: Unknown error at ${error.path}`)
@@ -46,7 +46,7 @@ export async function password(prevState: any, formData: FormData) {
   }
 
   if (rawFormData.newPassword !== rawFormData.confirmNewPassword) {
-    errorMessages.confirmNewPassword = "New UpdatePassword and Confirm New UpdatePassword do not match."
+    errorMessages.confirmNewPassword = "The new password and new password confirmation do not match."
   }
 
   if (Object.keys(errorMessages).length === 0) {

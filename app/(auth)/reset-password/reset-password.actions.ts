@@ -31,10 +31,10 @@ export async function resetPassword(prevState: any, formData: FormData) {
   for (const error of errors) {
     switch (error.path.replace("/", "")) {
       case "password":
-        errorMessages.password = "Password is invalid."
+        errorMessages.password = "The password is invalid."
         break
       case "confirmPassword":
-        errorMessages.confirmPassword = "Confirm password is invalid."
+        errorMessages.confirmPassword = "The password confirmation is invalid."
         break
       default:
         console.error(`Reset Password Action: Unknown error at ${error.path}`)
@@ -43,7 +43,7 @@ export async function resetPassword(prevState: any, formData: FormData) {
   }
 
   if (rawFormData.password !== rawFormData.confirmPassword) {
-    errorMessages.confirmPassword = "Password and Confirm Password do not match."
+    errorMessages.confirmPassword = "The password and password confirmation do not match."
   }
 
   if (Object.keys(errorMessages).length === 0) {
