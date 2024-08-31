@@ -40,27 +40,27 @@ export async function profile(prevState: any, formData: FormData) {
   for (const error of errors) {
     switch (error.path.replace("/", "")) {
       case "name":
-        errorMessages.name = "Name is invalid."
+        errorMessages.name = "The name is invalid."
         break
       case "gender":
         if (rawFormData.gender) {
-          errorMessages.gender = "Gender is invalid."
+          errorMessages.gender = "The gender is invalid."
         }
         break
       case "birthdate":
         if (rawFormData.birthdate) {
-          errorMessages.birthdate = "Birthdate is invalid."
+          errorMessages.birthdate = "The birthdate is invalid."
         }
         break
       case "email":
         errorMessages.email = "The email is invalid."
         break
       case "username":
-        errorMessages.username = "Username is invalid."
+        errorMessages.username = "The username is invalid."
         break
       case "image":
         if (errorMessages.image) {
-          errorMessages.image = "Image is invalid."
+          errorMessages.image = "The image is invalid."
         }
         break
       default:

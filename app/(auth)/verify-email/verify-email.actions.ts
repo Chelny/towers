@@ -4,10 +4,11 @@ import { NextResponse } from "next/server"
 import { type Static, Type } from "@sinclair/typebox"
 import { Value, ValueError } from "@sinclair/typebox/value"
 import { POST } from "@/app/api/verify-email/route"
+import { EMAIL_PATTERN } from "@/constants"
 
 const verifyEmailSchema = Type.Object({
-  email: Type.String(),
-  token: Type.String()
+  email: Type.RegExp(EMAIL_PATTERN),
+  token: Type.String({ minLength: 1 })
 })
 
 export type VerifyEmailData = Static<typeof verifyEmailSchema>

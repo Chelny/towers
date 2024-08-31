@@ -113,14 +113,6 @@ describe("Sign Up Form", () => {
 
     render(<SignUpForm />)
 
-    // fireEvent.change(screen.getByTestId("name"), { target: { value: "John Doe" } })
-    // fireEvent.change(screen.getByTestId("gender-M"), { target: { value: "M" } })
-    // fireEvent.change(screen.getByTestId("birthdate"), { target: { value: "2000-01-01" } })
-    // fireEvent.change(screen.getByTestId("email"), { target: { value: "john.doe@example.com" } })
-    // fireEvent.change(screen.getByTestId("username"), { target: { value: "john.doe" } })
-    // fireEvent.change(screen.getByTestId("password"), { target: { value: "Password123!" } })
-    // fireEvent.change(screen.getByTestId("confirmPassword"), { target: { value: "Password123!" } })
-
     expect(screen.getByText(/A confirmation email has been sent to john\.doe@example\.com/i)).toBeInTheDocument()
   })
 })

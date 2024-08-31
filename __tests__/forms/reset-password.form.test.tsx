@@ -4,6 +4,14 @@ import { render, screen } from "@testing-library/react"
 import { ResetPasswordForm } from "@/app/(auth)/reset-password/reset-password.form"
 import { mockUseSearchParams } from "@/vitest.setup"
 
+vi.mock("resend", () => {
+  return {
+    Resend: vi.fn().mockImplementation(() => ({
+      send: vi.fn().mockResolvedValue({})
+    }))
+  }
+})
+
 describe("Reset Password Form", () => {
   it("should render the form with all elements", () => {
     render(<ResetPasswordForm />)
@@ -48,13 +56,13 @@ describe("Reset Password Form", () => {
 
   it("should display a success message on form submission success", () => {
     vi.mocked(useFormState).mockReturnValue([
-      { success: true, message: "The password has been successfully updated!" },
+      { success: true, message: "The password has been updated!" },
       vi.fn(),
       false
     ])
 
     render(<ResetPasswordForm />)
 
-    expect(screen.getByText(/The password has been successfully updated/i)).toBeInTheDocument()
+    expect(screen.getByText(/The password has been updated/i)).toBeInTheDocument()
   })
 })

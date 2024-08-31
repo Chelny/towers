@@ -7,7 +7,7 @@ import { POST } from "@/app/api/account/password/route"
 import { PASSWORD_PATTERN } from "@/constants"
 
 const passwordSchema = Type.Object({
-  currentPassword: Type.RegExp(PASSWORD_PATTERN),
+  currentPassword: Type.String({ minLength: 8 }),
   newPassword: Type.RegExp(PASSWORD_PATTERN),
   confirmNewPassword: Type.RegExp(PASSWORD_PATTERN)
 })

@@ -115,7 +115,7 @@ describe("Sign Up Form", () => {
     vi.mocked(useFormState).mockReturnValue([
       {
         success: true,
-        message: "Your profile has been successfully updated!",
+        message: "Your profile has been updated!",
         data: {
           ...user,
           name: "Jane Doe",
@@ -130,7 +130,7 @@ describe("Sign Up Form", () => {
 
     render(<ProfileForm user={user} />)
 
-    expect(screen.getByText(/Your profile has been successfully updated/i)).toBeInTheDocument()
+    expect(screen.getByText(/Your profile has been updated/i)).toBeInTheDocument()
     expect(update).toHaveBeenCalledWith({
       name: "Jane Doe",
       email: "jane.doe@example.com",

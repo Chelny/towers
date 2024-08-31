@@ -73,13 +73,13 @@ describe("Update Password Form", () => {
 
   it("should display a success message on form submission success", () => {
     vi.mocked(useFormState).mockReturnValue([
-      { success: true, message: "The password has been successfully updated!" },
+      { success: true, message: "The password has been updated!" },
       vi.fn(),
       false
     ])
 
     render(<UpdatePasswordForm />)
 
-    expect(screen.getByText(/The password has been successfully updated/i)).toBeInTheDocument()
+    expect(screen.getByText(/The password has been updated/i)).toBeInTheDocument()
   })
 })

@@ -4,10 +4,10 @@ import { type Static, Type } from "@sinclair/typebox"
 import { Value, ValueError } from "@sinclair/typebox/value"
 import { AuthError } from "next-auth"
 import { signIn as authSignIn } from "@/auth"
-import { SIGN_IN_REDIRECT } from "@/constants"
+import { EMAIL_PATTERN, SIGN_IN_REDIRECT } from "@/constants"
 
 const signInSchema = Type.Object({
-  email: Type.String({ minLength: 1 }),
+  email: Type.RegExp(EMAIL_PATTERN),
   password: Type.String({ minLength: 1 })
 })
 
@@ -46,6 +46,11 @@ export async function signIn(prevState: any, formData: FormData) {
         ...rawFormData,
         redirectTo: SIGN_IN_REDIRECT
       })
+
+      return {
+        success: true,
+        message: "You’re successfully signed in. Welcome back!"
+      }
     } catch (error) {
       if (error instanceof AuthError) {
         switch (error.type) {

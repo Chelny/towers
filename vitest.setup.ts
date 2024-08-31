@@ -1,6 +1,7 @@
 import { useFormState, useFormStatus } from "react-dom"
 import { ReadonlyURLSearchParams, useRouter, useSearchParams } from "next/navigation"
 import "@testing-library/jest-dom"
+import { Resend } from "resend"
 import { useSessionData } from "@/hooks"
 
 export const mockUseSearchParams = (params: Record<string, string | string[]>): ReadonlyURLSearchParams => {
@@ -80,5 +81,5 @@ beforeEach(() => {
 })
 
 afterEach(() => {
-  vi.clearAllMocks()
+  vi.restoreAllMocks()
 })

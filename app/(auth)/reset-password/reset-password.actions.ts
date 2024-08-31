@@ -7,7 +7,7 @@ import { POST } from "@/app/api/reset-password/route"
 import { PASSWORD_PATTERN } from "@/constants"
 
 const resetPasswordSchema = Type.Object({
-  token: Type.String(),
+  token: Type.String({ minLength: 1 }),
   password: Type.RegExp(PASSWORD_PATTERN),
   confirmPassword: Type.RegExp(PASSWORD_PATTERN)
 })
@@ -30,6 +30,9 @@ export async function resetPassword(prevState: any, formData: FormData) {
 
   for (const error of errors) {
     switch (error.path.replace("/", "")) {
+      case "token":
+        errorMessages.token = "The token is missing or invalid."
+        break
       case "password":
         errorMessages.password = "The password is invalid."
         break

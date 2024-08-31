@@ -121,7 +121,7 @@ export async function POST(body: ProfileData): Promise<NextResponse> {
   return NextResponse.json(
     {
       success: true,
-      message: "Your profile has been successfully updated!",
+      message: "Your profile has been updated!",
       data: {
         name: updatedUser.name,
         gender: updatedUser.gender,
