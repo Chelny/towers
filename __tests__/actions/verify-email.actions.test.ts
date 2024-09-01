@@ -7,6 +7,10 @@ vi.mock("@/app/api/verify-email/route", () => ({
 }))
 
 describe("Verify Email Actions", () => {
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
   it("should return errors if payload is incomplete", async () => {
     const formData = new FormData()
     formData.append("email", "")

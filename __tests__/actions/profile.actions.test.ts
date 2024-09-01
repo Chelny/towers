@@ -8,6 +8,10 @@ vi.mock("@/app/api/account/profile/route", () => ({
 }))
 
 describe("Profile Actions", () => {
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
   it("should return errors if required fields are empty", async () => {
     const formData = new FormData()
     formData.append("name", "")

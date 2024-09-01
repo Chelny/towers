@@ -4,6 +4,15 @@ import { render, screen } from "@testing-library/react"
 import { ProfileForm } from "@/app/(protected)/account/profile/profile.form"
 import { useSessionData } from "@/hooks"
 
+vi.mock("react-dom", () => ({
+  useFormState: vi.fn(),
+  useFormStatus: vi.fn()
+}))
+
+vi.mock("@/hooks", () => ({
+  useSessionData: vi.fn()
+}))
+
 vi.mock("@/app/(protected)/account/profile/profile.actions", () => ({
   profile: vi.fn()
 }))
@@ -26,6 +35,27 @@ describe("Sign Up Form", () => {
       }
     ]
   }
+
+  beforeEach(() => {
+    vi.mocked(useFormState).mockReturnValue([{ success: false, message: "", errors: {} }, vi.fn(), false])
+
+    vi.mocked(useFormStatus).mockReturnValue({
+      pending: false,
+      data: null,
+      method: null,
+      action: null
+    })
+
+    vi.mocked(useSessionData).mockReturnValue({
+      status: "unauthenticated",
+      data: null,
+      update: vi.fn()
+    })
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
 
   it("should render the form with all elements", () => {
     render(<ProfileForm user={user} />)

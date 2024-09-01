@@ -2,7 +2,27 @@ import { useFormState, useFormStatus } from "react-dom"
 import { render, screen } from "@testing-library/react"
 import { ForgotPasswordForm } from "@/app/(auth)/forgot-password/forgot-password.form"
 
+vi.mock("react-dom", () => ({
+  useFormState: vi.fn(),
+  useFormStatus: vi.fn()
+}))
+
 describe("Forgot Password Form", () => {
+  beforeEach(() => {
+    vi.mocked(useFormState).mockReturnValue([{ success: false, message: "", errors: {} }, vi.fn(), false])
+
+    vi.mocked(useFormStatus).mockReturnValue({
+      pending: false,
+      data: null,
+      method: null,
+      action: null
+    })
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
   it("should render the form with all elements", () => {
     render(<ForgotPasswordForm />)
 

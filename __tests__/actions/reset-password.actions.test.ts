@@ -6,7 +6,11 @@ vi.mock("@/app/api/reset-password/route", () => ({
   POST: vi.fn()
 }))
 
-describe("Reset Password Form Actions", () => {
+describe("Reset Password Actions", () => {
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
   it("should return errors if required fields are empty", async () => {
     const formData = new FormData()
     formData.append("token", "")

@@ -8,7 +8,11 @@ vi.mock("@/auth", () => ({
   signIn: vi.fn()
 }))
 
-describe("Sign In Form Actions", () => {
+describe("Sign In Actions", () => {
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
   it("should return errors if payload is incomplete", async () => {
     const formData = new FormData()
     formData.append("email", "")
@@ -53,7 +57,6 @@ describe("Sign In Form Actions", () => {
     const formData = new FormData()
     formData.append("email", "john.doe@example.com")
     formData.append("password", "Password123!")
-
     ;(authSignIn as Mock).mockResolvedValueOnce({})
 
     const result = await signIn({}, formData)

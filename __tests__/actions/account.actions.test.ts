@@ -6,7 +6,11 @@ vi.mock("@/app/api/account/route", () => ({
   DELETE: vi.fn()
 }))
 
-describe("Account Form Actions", () => {
+describe("Account Actions", () => {
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
   it("should return errors if the email field is empty", async () => {
     const formData = new FormData()
     formData.append("email", "")

@@ -3,12 +3,15 @@ import { Mock } from "vitest"
 import { signUp } from "@/app/(auth)/sign-up/sign-up.actions"
 import { POST } from "@/app/api/sign-up/route"
 
-// Mock the POST function from the route
 vi.mock("@/app/api/sign-up/route", () => ({
   POST: vi.fn()
 }))
 
 describe("Sign Up Actions", () => {
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
   it("should return errors if payload is incomplete", async () => {
     const formData = new FormData()
     formData.append("name", "")

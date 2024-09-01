@@ -1,9 +1,42 @@
 import { useFormState, useFormStatus } from "react-dom"
+import { useRouter } from "next/navigation"
 import { fireEvent, render, screen } from "@testing-library/react"
 import { SignInForm } from "@/app/(auth)/sign-in/sign-in.form"
 import { ROUTE_FORGOT_PASSWORD, ROUTE_SIGN_IN_WITH_MAGIC_LINK, ROUTE_SIGN_UP } from "@/constants"
 
+vi.mock("next/navigation")
+
+vi.mock("react-dom", () => ({
+  useFormState: vi.fn(),
+  useFormStatus: vi.fn()
+}))
+
 describe("Sign In Form", () => {
+  beforeEach(() => {
+    const mockRouter = {
+      back: vi.fn(),
+      forward: vi.fn(),
+      refresh: vi.fn(),
+      push: vi.fn(),
+      replace: vi.fn(),
+      prefetch: vi.fn()
+    }
+    vi.mocked(useRouter).mockReturnValue(mockRouter)
+
+    vi.mocked(useFormState).mockReturnValue([{ success: false, message: "", errors: {} }, vi.fn(), false])
+
+    vi.mocked(useFormStatus).mockReturnValue({
+      pending: false,
+      data: null,
+      method: null,
+      action: null
+    })
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
   it("should render the form with all elements", () => {
     render(<SignInForm />)
 

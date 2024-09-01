@@ -7,6 +7,10 @@ import { ROUTE_ROOMS } from "@/constants"
 vi.mock("@/auth")
 
 describe("Sign In With Magic Link Actions", () => {
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
   it("should return errors if payload is incomplete", async () => {
     const formData = new FormData()
     formData.append("email", "")
@@ -61,7 +65,6 @@ describe("Sign In With Magic Link Actions", () => {
   it("should call authSignInWithMagicLink and return success when payload is valid", async () => {
     const formData = new FormData()
     formData.append("email", "john.doe@example.com")
-
     ;(authSignInWithMagicLink as Mock).mockResolvedValueOnce({})
 
     const result = await signInWithMagicLink({}, formData)

@@ -2,7 +2,27 @@ import { useFormState, useFormStatus } from "react-dom"
 import { render, screen } from "@testing-library/react"
 import { SignInWithMagicLinkForm } from "@/app/(auth)/sign-in-with-magic-link/sign-in-with-magic-link.form"
 
+vi.mock("react-dom", () => ({
+  useFormState: vi.fn(),
+  useFormStatus: vi.fn()
+}))
+
 describe("Sign In With Magic Link Form", () => {
+  beforeEach(() => {
+    vi.mocked(useFormState).mockReturnValue([{ success: false, message: "", errors: {} }, vi.fn(), false])
+
+    vi.mocked(useFormStatus).mockReturnValue({
+      pending: false,
+      data: null,
+      method: null,
+      action: null
+    })
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
   it("should render the form with all elements", () => {
     render(<SignInWithMagicLinkForm />)
 

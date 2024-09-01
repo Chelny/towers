@@ -4,6 +4,13 @@ import { render, screen } from "@testing-library/react"
 import { ResetPasswordForm } from "@/app/(auth)/reset-password/reset-password.form"
 import { mockUseSearchParams } from "@/vitest.setup"
 
+vi.mock("next/navigation")
+
+vi.mock("react-dom", () => ({
+  useFormState: vi.fn(),
+  useFormStatus: vi.fn()
+}))
+
 vi.mock("resend", () => {
   return {
     Resend: vi.fn().mockImplementation(() => ({
@@ -13,6 +20,23 @@ vi.mock("resend", () => {
 })
 
 describe("Reset Password Form", () => {
+  beforeEach(() => {
+    vi.mocked(useSearchParams).mockReturnValue(mockUseSearchParams({}))
+
+    vi.mocked(useFormState).mockReturnValue([{ success: false, message: "", errors: {} }, vi.fn(), false])
+
+    vi.mocked(useFormStatus).mockReturnValue({
+      pending: false,
+      data: null,
+      method: null,
+      action: null
+    })
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
   it("should render the form with all elements", () => {
     render(<ResetPasswordForm />)
 

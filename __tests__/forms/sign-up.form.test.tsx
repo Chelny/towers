@@ -2,7 +2,27 @@ import { useFormState, useFormStatus } from "react-dom"
 import { render, screen } from "@testing-library/react"
 import { SignUpForm } from "@/app/(auth)/sign-up/sign-up.form"
 
+vi.mock("react-dom", () => ({
+  useFormState: vi.fn(),
+  useFormStatus: vi.fn()
+}))
+
 describe("Sign Up Form", () => {
+  beforeEach(() => {
+    vi.mocked(useFormState).mockReturnValue([{ success: false, message: "", errors: {} }, vi.fn(), false])
+
+    vi.mocked(useFormStatus).mockReturnValue({
+      pending: false,
+      data: null,
+      method: null,
+      action: null
+    })
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
   it("should render the form with all elements", () => {
     render(<SignUpForm />)
 
