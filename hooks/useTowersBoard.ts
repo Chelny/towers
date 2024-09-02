@@ -238,7 +238,7 @@ export function isInBounds(row: number, col: number): boolean {
  * @param action - BoardAction dispatched to modify the board state.
  * @returns New state of the game board after applying the action.
  */
-function boardReducer(state: BoardState, action: BoardAction): BoardState {
+export function boardReducer(state: BoardState, action: BoardAction): BoardState {
   const newState: BoardState = { ...state }
 
   switch (action.type) {
