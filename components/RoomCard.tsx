@@ -1,5 +1,7 @@
+"use client"
+
 import { ReactNode } from "react"
-import router from "next/router"
+import { useRouter } from "next/navigation"
 import clsx from "clsx/lite"
 import { RoomWithCount } from "@/app/api/rooms/route"
 import Button from "@/components/ui/Button"
@@ -10,6 +12,8 @@ type RoomCardProps = {
 }
 
 export default function RoomCard({ room }: RoomCardProps): ReactNode {
+  const router = useRouter()
+
   return (
     <li
       key={room.id}

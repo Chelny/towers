@@ -4,7 +4,7 @@ import { isEmptyCell, isMedusaBlock } from "@/utils"
 
 /**
  * Checks if swapping two blocks on the board will create adjacent blocks of the same color and letter.
- * Adjacency includes horizontal, vertical, and diagonal directions.
+ * Adjacency includes horizontal and vertical directions.
  *
  * @param board - The current state of the board.
  * @param row1 - The row index of the first block to swap.
@@ -25,14 +25,9 @@ export const areAdjacentBlocksSame = (
   board[row1][col1] = board[row2][col2]
   board[row2][col2] = temp
 
-  // Function to check if two blocks are the same in color and letter
+  // Function to check if two blocks are the same type
   const blocksAreSame = (r1: number, c1: number, r2: number, c2: number): boolean => {
-    return board[r1][c1].letter === board[r2][c2].letter && board[r1][c1].letter === board[r2][c2].letter
-  }
-
-  // Check adjacent blocks for same color and letter
-  const checkAdjacent = (r1: number, c1: number, r2: number, c2: number): boolean => {
-    return (
+    if (
       r1 >= 0 &&
       r1 < BOARD_ROWS &&
       c1 >= 0 &&
@@ -40,27 +35,46 @@ export const areAdjacentBlocksSame = (
       r2 >= 0 &&
       r2 < BOARD_ROWS &&
       c2 >= 0 &&
-      c2 < BOARD_COLS &&
-      blocksAreSame(r1, c1, r2, c2)
+      c2 < BOARD_COLS
+    ) {
+      console.log("blocksAreSame", board[r1][c1]?.letter, board[r2][c2]?.letter)
+      return board[r1][c1]?.letter === board[r2][c2]?.letter
+    }
+
+    return false // Return false if any block is out of bounds
+  }
+
+  // Function to check horizontal adjacency for a block
+  const checkHorizontal = (r: number, c: number): boolean => {
+    // Check left and right blocks horizontally
+    return (
+      (c > 0 && blocksAreSame(r, c, r, c - 1)) || // Left of (r, c)
+      (c < BOARD_COLS - 1 && blocksAreSame(r, c, r, c + 1)) // Right of (r, c)
     )
   }
 
-  // Check horizontally, vertically, and diagonally adjacent blocks
-  const isSameColorAndLetter: boolean =
-    checkAdjacent(row1, col1 - 1, row1, col1 + 1) || // Horizontal
-    checkAdjacent(row1 - 1, col1, row1 + 1, col1) || // Vertical
-    checkAdjacent(row1 - 1, col1 - 1, row1 + 1, col1 + 1) || // Diagonal top-left to bottom-right
-    checkAdjacent(row1 - 1, col1 + 1, row1 + 1, col1 - 1) || // Diagonal bottom-left to top-right
-    checkAdjacent(row2, col2 - 1, row2, col2 + 1) || // Horizontal for second block
-    checkAdjacent(row2 - 1, col2, row2 + 1, col2) || // Vertical for second block
-    checkAdjacent(row2 - 1, col2 - 1, row2 + 1, col2 + 1) || // Diagonal top-left to bottom-right for second block
-    checkAdjacent(row2 - 1, col2 + 1, row2 + 1, col2 - 1) // Diagonal bottom-left to top-right for second block
+  // Function to check vertical adjacency for a block
+  const checkVertical = (r: number, c: number): boolean => {
+    // Check directly below and above the current block (r, c)
+    const below: boolean = r < BOARD_ROWS - 1 && blocksAreSame(r, c, r + 1, c)
+    const above: boolean = r > 0 && blocksAreSame(r, c, r - 1, c)
+
+    return below || above
+  }
+
+  // Function to check all relevant adjacencies for a block
+  const checkAllAdjacent = (r: number, c: number): boolean => {
+    return checkHorizontal(r, c) || checkVertical(r, c)
+  }
+
+  // Check if either of the swapped blocks create adjacent blocks with the same letter
+  const result: boolean = checkAllAdjacent(row1, col1) || checkAllAdjacent(row2, col2)
 
   // Swap the blocks back to their original positions
   board[row2][col2] = board[row1][col1]
   board[row1][col1] = temp
 
-  return isSameColorAndLetter
+  return result
 }
 
 /**
@@ -86,11 +100,12 @@ export const isSettingUpThreeInRow = (
     let count: number = 1
 
     // Check left
-    for (let i = col - 1; i >= 0 && board[row][i] === block; i--) {
+    for (let i = col - 1; i >= 0 && board[row][i]?.letter === block.letter; i--) {
       count++
     }
+
     // Check right
-    for (let i = col + 1; i < BOARD_COLS && board[row][i] === block; i++) {
+    for (let i = col + 1; i < BOARD_COLS && board[row][i]?.letter === block.letter; i++) {
       count++
     }
 
@@ -102,11 +117,12 @@ export const isSettingUpThreeInRow = (
     let count: number = 1
 
     // Check up
-    for (let i = row - 1; i >= 0 && board[i][col] === block; i--) {
+    for (let i = row - 1; i >= 0 && board[i][col]?.letter === block.letter; i--) {
       count++
     }
+
     // Check down
-    for (let i = row + 1; i < BOARD_ROWS && board[i][col] === block; i++) {
+    for (let i = row + 1; i < BOARD_ROWS && board[i][col]?.letter === block.letter; i++) {
       count++
     }
 
@@ -119,19 +135,24 @@ export const isSettingUpThreeInRow = (
     let count2: number = 1
 
     // Check bottom-right to top-left
-    for (let i = 1; row - i >= 0 && col + i < BOARD_COLS && board[row - i][col + i] === block; i++) {
+    for (let i = 1; row - i >= 0 && col + i < BOARD_COLS && board[row - i][col + i]?.letter === block.letter; i++) {
       count1++
     }
-    for (let i = 1; row + i < BOARD_ROWS && col - i >= 0 && board[row + i][col - i] === block; i++) {
+
+    for (let i = 1; row + i < BOARD_ROWS && col - i >= 0 && board[row + i][col - i]?.letter === block.letter; i++) {
       count1++
     }
 
     // Check top-left to bottom-right
-    for (let i = 1; row - i >= 0 && col - i >= 0 && board[row - i][col - i] === block; i++) {
+    for (let i = 1; row - i >= 0 && col - i >= 0 && board[row - i][col - i]?.letter === block.letter; i++) {
       count2++
     }
 
-    for (let i = 1; row + i < BOARD_ROWS && col + i < BOARD_COLS && board[row + i][col + i] === block; i++) {
+    for (
+      let i = 1;
+      row + i < BOARD_ROWS && col + i < BOARD_COLS && board[row + i][col + i]?.letter === block.letter;
+      i++
+    ) {
       count2++
     }
 
@@ -144,7 +165,7 @@ export const isSettingUpThreeInRow = (
   board[row2][col2] = temp
 
   // Check if the swap creates three in a row
-  const isCreatesThreeInRow =
+  const isCreatesThreeInRow: boolean =
     checkHorizontal(row1, col1) ||
     checkVertical(row1, col1) ||
     checkHorizontal(row2, col2) ||
@@ -170,7 +191,7 @@ export const isSettingUpThreeInRow = (
  * @returns The number of blocks to rearrange based on the power level.
  */
 export const getNumBlocksToRearrange = (board: Board, powerLevel: PowerLevel, totalBlocks?: number): number => {
-  if (!totalBlocks) {
+  if (typeof totalBlocks === "undefined") {
     totalBlocks = board.reduce(
       (count: number, row: BoardRow) =>
         count + row.filter((cell: BoardBlock) => !isEmptyCell(cell) && !isMedusaBlock(cell)).length,

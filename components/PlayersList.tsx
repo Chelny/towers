@@ -133,7 +133,8 @@ export default function PlayersList({ users, full = false, onSelectedPlayer }: P
               <div className={clsx("w-1/4 text-end truncate", full ? "p-2" : "p-1")}>
                 {player.gamesCompleted >= PROVISIONAL_MAX_COMPLETED_GAMES ? player.rating : "provisional"}
               </div>
-              {full && <div className="w-1/4 p-2 text-end truncate">{player.tables[0].tableNumber}</div>}
+              {/* FIXME: Table nubmer not showing in room */}
+              {full && <div className="w-1/4 p-2 text-end truncate">{player.tables[0]?.tableNumber}</div>}
             </div>
           ))}
         </div>
