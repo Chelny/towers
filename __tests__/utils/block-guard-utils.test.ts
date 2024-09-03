@@ -10,9 +10,9 @@ import {
   isTowersBlock
 } from "@/utils"
 
-vi.mock("@/utils", async () => {
-  const originalModule = await vi.importActual("@/utils")
-  return originalModule
+vi.mock(import("@/utils"), async (importOriginal) => {
+  const actual = await importOriginal()
+  return actual
 })
 
 const defaultTowersBlockProps = {

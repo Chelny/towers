@@ -1,4 +1,5 @@
-import { act, renderHook } from "@testing-library/react-hooks"
+import { act } from "react"
+import { renderHook } from "@testing-library/react-hooks"
 import { BOARD_ROWS, HIDDEN_ROWS_COUNT, PIECE_LENGTH, PIECE_STARTING_COL, PIECE_STARTING_ROW } from "@/constants"
 import {
   boardReducer,

@@ -15,6 +15,7 @@
 - Sign in with passkey
 - Sign in with magic link
 - Double check account deletion date (timezone) in email
+- Send confirmation email on email change in profile page. Do not change email in database as long as user hasn't confirm their email.
 
 ## Rooms List
 
