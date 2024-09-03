@@ -12,4 +12,4 @@ export interface TableUsersResponseData {
 
 export type TowersGameUserWithUser = TowersGameUser & { user: User }
 
-export type TowersGameUserWithUserAndTables = TowersGameUser & { user: User; tables: Table[] }
+export type TowersGameUserWithUserAndTables = TowersGameUser & { user: User; table: Table | null }

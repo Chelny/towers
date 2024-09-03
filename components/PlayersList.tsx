@@ -49,8 +49,8 @@ export default function PlayersList({ users, full = false, onSelectedPlayer }: P
         const ratingB: number = b.rating || 0
         return sortOrder === "asc" ? ratingA - ratingB : ratingB - ratingA
       } else {
-        const tableNumberA: number = a.tables[0]?.tableNumber || 0
-        const tableNumberB: number = b.tables[0]?.tableNumber || 0
+        const tableNumberA: number = a.table?.tableNumber || 0
+        const tableNumberB: number = b.table?.tableNumber || 0
         return sortOrder === "asc" ? tableNumberA - tableNumberB : tableNumberB - tableNumberA
       }
     })
@@ -133,8 +133,7 @@ export default function PlayersList({ users, full = false, onSelectedPlayer }: P
               <div className={clsx("w-1/4 text-end truncate", full ? "p-2" : "p-1")}>
                 {player.gamesCompleted >= PROVISIONAL_MAX_COMPLETED_GAMES ? player.rating : "provisional"}
               </div>
-              {/* FIXME: Table nubmer not showing in room */}
-              {full && <div className="w-1/4 p-2 text-end truncate">{player.tables[0]?.tableNumber}</div>}
+              {full && <div className="w-1/4 p-2 text-end truncate">{player.table?.tableNumber}</div>}
             </div>
           ))}
         </div>

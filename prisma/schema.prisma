@@ -159,7 +159,7 @@ model TowersGameUser {
   user              User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   room              Room?           @relation(fields: [roomId], references: [id])
   roomChatMessages  RoomChat[]
-  tables            Table[]
+  table             Table?          @relation(fields: [tableId], references: [id])
   tableSettings     TableSettings[]
   tableChatMessages TableChat[]
   hostedTables      Table[]         @relation("TableHost")

@@ -23,7 +23,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     where: whereClause,
     include: {
       user: true,
-      tables: true
+      table: true
     },
     orderBy: {
       updatedAt: "asc"

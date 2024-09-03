@@ -37,7 +37,6 @@ export const areAdjacentBlocksSame = (
       c2 >= 0 &&
       c2 < BOARD_COLS
     ) {
-      console.log("blocksAreSame", board[r1][c1]?.letter, board[r2][c2]?.letter)
       return board[r1][c1]?.letter === board[r2][c2]?.letter
     }
 
