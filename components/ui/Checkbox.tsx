@@ -45,6 +45,7 @@ export default function Checkbox({
         name={id}
         checked={checked}
         disabled={disabled}
+        aria-labelledby={`${id}Label`}
         aria-checked={checked}
         aria-disabled={disabled}
         data-testid={dataTestId}
@@ -52,6 +53,7 @@ export default function Checkbox({
       />
       <TiTick className={clsx("absolute hidden w-5 h-5 mt-1 text-gray-600", "peer-checked:block")} />
       <label
+        id={`${id}Label`}
         htmlFor={id}
         className={clsx(
           "mt-1",

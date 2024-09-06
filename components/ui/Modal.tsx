@@ -9,6 +9,7 @@ type ModalProps = {
   isOpen: boolean
   closeText?: string
   confirmText?: string
+  dataTestId?: string
   onClose?: () => void
   onConfirm?: () => void
 }
@@ -19,6 +20,7 @@ export default function Modal({
   isOpen,
   closeText = "Close",
   confirmText = "Confirm",
+  dataTestId = undefined,
   onClose,
   onConfirm
 }: ModalProps) {
@@ -27,14 +29,26 @@ export default function Modal({
   useEffect(() => {
     if (isOpen) {
       dialogRef.current?.showModal()
+
+      if (dialogRef.current) {
+        dialogRef.current.focus()
+      }
     } else {
       dialogRef.current?.close()
     }
+
+    const handleKeyDown = (event: KeyboardEvent): void => {
+      if (event.key === "Escape") {
+        handleClose()
+      }
+    }
+
+    dialogRef.current?.addEventListener("keydown", handleKeyDown)
+    return () => dialogRef.current?.removeEventListener("keydown", handleKeyDown)
   }, [isOpen])
 
   const handleConfirm = (): void => {
     onConfirm?.()
-    handleClose()
   }
 
   const handleClose = (): void => {
@@ -42,10 +56,13 @@ export default function Modal({
     dialogRef.current?.close()
   }
 
+  if (!isOpen) return null
+
   return (
     <dialog
       ref={dialogRef}
       className="fixed top-1/2 left-1/2 z-40 w-full max-w-md rounded shadow-lg -translate-x-1/2 -translate-y-1/2"
+      data-testid={dataTestId}
       onCancel={handleClose}
     >
       <div className="flex justify-between items-center px-4 py-3 border-b border-gray-300">

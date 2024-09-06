@@ -22,7 +22,8 @@ export default function Button({
   disabled = false,
   tabIndex = 0,
   dataTestId = undefined,
-  onClick
+  onClick,
+  ...props
 }: ButtonProps): ReactNode {
   return (
     <button
@@ -38,6 +39,7 @@ export default function Button({
       tabIndex={tabIndex}
       aria-disabled={disabled}
       data-testid={dataTestId}
+      {...props}
       onClick={(event: MouseEvent<HTMLButtonElement>) => onClick?.(event)}
     >
       {children}

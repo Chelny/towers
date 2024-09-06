@@ -32,7 +32,7 @@ export default function SmallScreenWarning(): ReactNode {
         or use a computer for a better experience.
       </p>
       {session && (
-        <Button className="mt-2" type="button" aria-label="Sign out" onClick={handleSignOut}>
+        <Button className="mt-2" type="button" onClick={handleSignOut}>
           <span>Sign out</span>
         </Button>
       )}

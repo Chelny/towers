@@ -265,7 +265,6 @@ export default function Calendar({
         aria-expanded={isCalendarVisible}
         aria-label={label}
         aria-describedby={description ? `${id}Description` : undefined}
-        aria-disabled={disabled}
         dataTestId={dataTestId}
         onClick={handleOpenCalendar}
       >

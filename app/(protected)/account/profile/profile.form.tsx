@@ -71,7 +71,7 @@ export function ProfileForm({ user }: ProfileProps): ReactNode {
         id="birthdate"
         label="Birthdate"
         maxDate={new Date(new Date().getFullYear() - 12, new Date().getMonth(), new Date().getDate())}
-        defaultValue={new Date(user?.birthdate!).toString()}
+        defaultValue={String(new Date(user?.birthdate!))}
         dataTestId="profile-birthdate-calendar"
         description="You must be at least 12 years old."
         errorMessage={state.errors?.birthdate}

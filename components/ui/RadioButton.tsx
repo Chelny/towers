@@ -42,9 +42,10 @@ export default function RadioButton({
           value={value}
           checked={checked}
           disabled={disabled}
+          aria-labelledby={`${id}Label`}
           aria-checked={checked}
           aria-disabled={disabled}
-          data-testid={`${dataTestId}-${value}`}
+          data-testid={dataTestId ? `${dataTestId}-${value}` : undefined}
           onChange={handleChange}
         />
         <div
@@ -55,7 +56,11 @@ export default function RadioButton({
           )}
         />
       </div>
-      <label htmlFor={id} className={clsx("line-clamp-1", disabled && "opacity-50 cursor-not-allowed")}>
+      <label
+        id={`${id}Label`}
+        htmlFor={id}
+        className={clsx("line-clamp-1", disabled && "opacity-50 cursor-not-allowed")}
+      >
         {label}
       </label>
     </div>
