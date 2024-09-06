@@ -180,11 +180,11 @@ export default function Table({ roomId, tableId }: TableProps): ReactNode {
 
   return (
     <>
-      <div className="grid grid-areas-table grid-rows-table grid-cols-table h-full bg-gray-100 text-black">
+      <div className="grid [grid-template-areas:'banner_banner_banner''sidebar_game_game''sidebar_chat_chat'] grid-rows-table grid-cols-table h-full bg-gray-100 text-black">
         <TableHeader table={tables[tableId]} />
 
         {/* Left sidebar */}
-        <div className="grid-in-sidebar flex flex-col justify-between w-56 p-2 bg-gray-200">
+        <div className="[grid-area:sidebar] flex flex-col justify-between w-56 p-2 bg-gray-200">
           <div className="space-y-2">
             <Button className="w-full" disabled={tablesLoading} onClick={(event: MouseEvent<HTMLButtonElement>) => {}}>
               Start
@@ -255,7 +255,7 @@ export default function Table({ roomId, tableId }: TableProps): ReactNode {
         </div>
 
         {/* Center part */}
-        <div className="grid-in-game flex items-center gap-2 w-full px-2 pb-2">
+        <div className="[grid-area:game] flex items-center gap-2 w-full px-2 pb-2">
           <div className="flex items-center w-full h-full border bg-neutral-50">
             <div className="relative grid grid-rows-table-team grid-cols-table-team gap-2 w-fit p-2 mx-auto bg-neutral-50">
               {/* Game countdown */}
@@ -366,7 +366,7 @@ export default function Table({ roomId, tableId }: TableProps): ReactNode {
         </div>
 
         {/* Chat and users list */}
-        <div className="grid-in-chat flex gap-2 px-2 pb-2">
+        <div className="[grid-area:chat] flex gap-2 px-2 pb-2">
           {/* Chat */}
           <div className="flex-1 flex flex-col p-2 border bg-white">
             <input

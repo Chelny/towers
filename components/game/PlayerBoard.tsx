@@ -44,10 +44,10 @@ export default function PlayerBoard(props: PlayerBoardProps): ReactNode {
         className={clsx(
           "grid gap-2 w-full border-y-8 border-y-gray-300 bg-gray-300 select-none",
           props.isOpponentBoard
-            ? "grid-areas-board-container-opponent"
+            ? "[grid-template-areas:'board-grid-container''board-grid-container']"
             : props.isReversed
-              ? "grid-areas-board-container-reversed"
-              : "grid-areas-board-container",
+              ? "[grid-template-areas:'board-grid-container_preview-piece''board-grid-container_power-bar']"
+              : "[grid-template-areas:'preview-piece_board-grid-container''power-bar_board-grid-container']",
           props.isOpponentBoard ? "" : "grid-rows-[max-content_auto] grid-cols-[max-content_auto]",
           props.isReversed
             ? "border-s-2 border-s-gray-300 border-e-8 border-e-gray-300"
@@ -56,7 +56,7 @@ export default function PlayerBoard(props: PlayerBoardProps): ReactNode {
       >
         <div
           className={clsx(
-            "relative grid grid-in-grid-container w-full text-neutral-300",
+            "[grid-area:board-grid-container] relative grid w-full text-neutral-300",
             isGameOver ? "bg-neutral-500" : "bg-neutral-100",
             props.isOpponentBoard
               ? "grid-rows-grid-container-opponent w-grid-container-opponent"
@@ -118,15 +118,15 @@ export default function PlayerBoard(props: PlayerBoardProps): ReactNode {
           <>
             <div
               className={clsx(
-                "grid-in-preview-block flex flex-col items-center justify-center h-preview-block px-2 py-2 bg-neutral-100",
-                props.isOpponentBoard ? "" : "w-preview-block"
+                "[grid-area:preview-piece] flex flex-col items-center justify-center h-preview-piece px-2 py-2 bg-neutral-100",
+                props.isOpponentBoard ? "" : "w-preview-piece"
               )}
             >
               <NextPiece nextPiece={nextPieces[0]} />
             </div>
             <div
               className={clsx(
-                "grid-in-power-bar flex flex-col items-center justify-end h-power-bar px-2 py-2 bg-neutral-100",
+                "[grid-area:power-bar] flex flex-col items-center justify-end h-power-bar px-2 py-2 bg-neutral-100",
                 props.isOpponentBoard ? "" : "w-power-bar"
               )}
             >

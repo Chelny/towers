@@ -23,12 +23,6 @@ const config: Config = {
         "grid-row": "repeat(var(--grid-cols), calc(var(--grid-cell-size) * 1px))",
         "grid-row-opponent": "repeat(var(--grid-cols), calc(var(--grid-cell-size-opponent) * 1px))"
       },
-      gridTemplateAreas: {
-        table: ["banner banner banner", "sidebar game game", "sidebar chat chat"],
-        "board-container": ["preview-piece grid-container", "power-bar grid-container"],
-        "board-container-reversed": ["grid-container preview-piece", "grid-container power-bar"],
-        "board-container-opponent": ["grid-container", "grid-container"]
-      },
       width: {
         fill: "-webkit-fill-available",
         "player-board-opponent": "calc((var(--grid-cell-size-opponent) * var(--grid-cols) * 1px) + 8px + 2px)", // 8px and 2px are border thickness
@@ -36,14 +30,14 @@ const config: Config = {
         "grid-container-opponent": "calc(var(--grid-cols) * var(--grid-cell-size-opponent) * 1px)",
         "grid-cell": "calc(var(--grid-cell-size) * 1px)",
         "grid-cell-opponent": "calc(var(--grid-cell-size-opponent) * 1px)",
-        "preview-block": "calc(var(--grid-cell-size) * 1px + 16px)",
+        "preview-piece": "calc(var(--grid-cell-size) * 1px + 16px)",
         "power-bar": "calc(var(--grid-cell-size) * 1px + 16px)"
       },
       height: {
         fill: "-webkit-fill-available",
         "grid-cell": "calc(var(--grid-cell-size) * 1px)",
         "grid-cell-opponent": "calc(var(--grid-cell-size-opponent) * 1px)",
-        "preview-block": "calc(var(--grid-cell-size) * 3px + 16px)",
+        "preview-piece": "calc(var(--grid-cell-size) * 3px + 16px)",
         "power-bar": "calc(var(--grid-cell-size) * 8px + 16px)"
       },
       keyframes: {
@@ -56,7 +50,6 @@ const config: Config = {
         "move-up": "move-up 1.5s ease-in-out forwards"
       }
     }
-  },
-  plugins: [require("@savvywombat/tailwindcss-grid-areas")]
+  }
 }
 export default config
