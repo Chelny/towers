@@ -8,22 +8,28 @@ import Select from "@/components/ui/Select"
 
 type CreateTableProps = {
   isOpen: boolean
-  onClose: () => void
   onSubmitSuccess: (tableId: string) => void
+  onCancel: () => void
 }
 
-export default function CreateTable({ isOpen, onClose, onSubmitSuccess }: CreateTableProps): ReactNode {
+export default function CreateTable({ isOpen, onSubmitSuccess, onCancel }: CreateTableProps): ReactNode {
   const [tableType, setTableType] = useState<TableType>(TableType.PUBLIC)
   const [ratedGame, setRatedGame] = useState<boolean>(true)
 
   const handleCreateTable = (): void => {
     // TODO: Call api here then pass table id to room to refresh tables
-    console.log("handleCreateTable", tableType, ratedGame)
     onSubmitSuccess("test-2")
   }
 
   return (
-    <Modal title="Create Table" isOpen={isOpen} onClose={onClose} confirmText="Create" onConfirm={handleCreateTable}>
+    <Modal
+      title="Create Table"
+      isOpen={isOpen}
+      confirmText="Create"
+      dataTestId="create-table-modal"
+      onConfirm={handleCreateTable}
+      onCancel={onCancel}
+    >
       <div className="h-full mb-2">
         <Select
           id="tableType"

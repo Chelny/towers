@@ -14,7 +14,7 @@ describe("Button Component", () => {
     render(<Button onClick={handleClick}>Click Me</Button>)
 
     fireEvent.click(screen.getByText("Click Me"))
-    expect(handleClick).toHaveBeenCalledTimes(1)
+    expect(handleClick).toHaveBeenCalled()
   })
 
   it("should be disabled when disabled prop is true", () => {

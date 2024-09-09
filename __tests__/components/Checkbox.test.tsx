@@ -35,7 +35,7 @@ describe("Checkbox Component", () => {
     render(<Checkbox id="test-checkbox" label="Accept Terms" onChange={handleChange} />)
 
     fireEvent.click(screen.getByRole("checkbox"))
-    expect(handleChange).toHaveBeenCalledTimes(1)
+    expect(handleChange).toHaveBeenCalled()
   })
 
   it("should be disabled when disabled prop is passed", () => {

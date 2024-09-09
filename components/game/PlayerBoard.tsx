@@ -64,6 +64,7 @@ export default function PlayerBoard(props: PlayerBoardProps): ReactNode {
             styles.BoardContainer
           )}
           data-seat-number={props.seatNumber}
+          data-testid="player-board-grid-container"
         >
           {!isPlaying && (
             <div
@@ -129,6 +130,7 @@ export default function PlayerBoard(props: PlayerBoardProps): ReactNode {
                 "[grid-area:power-bar] flex flex-col items-center justify-end h-power-bar px-2 py-2 bg-neutral-100",
                 props.isOpponentBoard ? "" : "w-power-bar"
               )}
+              data-testid="player-board-power-bar-container"
             >
               <PowerBar blocks={powerBar} />
             </div>

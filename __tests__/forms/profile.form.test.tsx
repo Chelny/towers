@@ -1,8 +1,9 @@
 import { useFormState, useFormStatus } from "react-dom"
-import { Gender } from "@prisma/client"
+import { Account, Gender, User } from "@prisma/client"
 import { render, screen } from "@testing-library/react"
 import { ProfileForm } from "@/app/(protected)/account/profile/profile.form"
 import { useSessionData } from "@/hooks"
+import { mockedUnauthenticatedSession, mockedUser1 } from "@/vitest.setup"
 
 vi.mock("react-dom", () => ({
   useFormState: vi.fn(),
@@ -18,12 +19,8 @@ vi.mock("@/app/(protected)/account/profile/profile.actions", () => ({
 }))
 
 describe("Sign Up Form", () => {
-  const user = {
-    name: "John Doe",
-    gender: Gender.M,
-    birthdate: new Date("2000-01-01"),
-    email: "john.doe@example.com",
-    username: "john.doe",
+  const user: User & { accounts: Account[] } = {
+    ...mockedUser1,
     accounts: []
   }
 
@@ -46,11 +43,7 @@ describe("Sign Up Form", () => {
       action: null
     })
 
-    vi.mocked(useSessionData).mockReturnValue({
-      status: "unauthenticated",
-      data: null,
-      update: vi.fn()
-    })
+    vi.mocked(useSessionData).mockReturnValue(mockedUnauthenticatedSession)
   })
 
   afterEach(() => {
@@ -165,7 +158,7 @@ describe("Sign Up Form", () => {
       name: "Jane Doe",
       email: "jane.doe@example.com",
       username: "jane.doe",
-      image: undefined
+      image: "https://example.com/avatar.jpg"
     })
   })
 })

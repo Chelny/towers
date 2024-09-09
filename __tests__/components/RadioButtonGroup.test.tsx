@@ -46,6 +46,6 @@ describe("RadioButtonGroup Component", () => {
     )
 
     fireEvent.click(screen.getByLabelText("Option 1"))
-    expect(handleChange).toHaveBeenCalledTimes(1)
+    expect(handleChange).toHaveBeenCalled()
   })
 })

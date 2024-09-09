@@ -143,7 +143,7 @@ export default function PlayersList({ users, full = false, onSelectedPlayer }: P
         key={uuidv4()}
         isOpen={isPlayerInfoModalOpen}
         player={sortedPlayersList?.find((player: TowersGameUserWithUserAndTables) => player.id === selectedPlayerId)}
-        onClose={handleClosePlayerInfoModal}
+        onCancel={handleClosePlayerInfoModal}
       />
     </>
   )

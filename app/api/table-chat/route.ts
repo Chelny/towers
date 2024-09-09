@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { TableChat } from "@prisma/client"
+import DOMPurify from "isomorphic-dompurify"
 import { TableChatWithTowersGameUser } from "@/interfaces"
 import prisma from "@/lib"
 import { removeNullUndefined } from "@/utils"
@@ -57,7 +58,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
   const chatData = {
     tableId: data.tableId,
-    message: data.message,
+    message: DOMPurify.sanitize(data.message),
     towersUserId: data.towersUserId,
     type: data.type
   }

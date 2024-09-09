@@ -1,3 +1,5 @@
+"use client"
+
 import { RoomChatWithTowersGameUser, TableChatWithTowersGameUser } from "@/interfaces"
 
 type ChatProps = {

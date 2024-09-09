@@ -1,8 +1,10 @@
 import { ReactNode } from "react"
+import dynamic from "next/dynamic"
 import { NextResponse } from "next/server"
-import { GET, RoomWithCount } from "@/app/api/rooms/route"
-import RoomsList from "@/components/RoomsList"
+import { GET } from "@/app/api/rooms/route"
+import RoomsListSkeleton from "@/components/skeleton/RoomsListSkeleton"
 import { ROUTE_ROOMS } from "@/constants"
+import { RoomWithCount } from "@/interfaces"
 
 export default async function Rooms(): Promise<ReactNode> {
   const response: NextResponse = await GET()
@@ -16,3 +18,7 @@ export default async function Rooms(): Promise<ReactNode> {
     </div>
   )
 }
+
+const RoomsList = dynamic(() => import("@/components/RoomsList"), {
+  loading: () => <RoomsListSkeleton />
+})

@@ -7,21 +7,21 @@ type ModalProps = {
   children: ReactNode
   title: string
   isOpen: boolean
-  closeText?: string
   confirmText?: string
+  cancelText?: string
   dataTestId?: string
-  onClose?: () => void
   onConfirm?: () => void
+  onCancel?: () => void
 }
 
 export default function Modal({
   children,
   title,
   isOpen,
-  closeText = "Close",
+  cancelText = "Cancel",
   confirmText = "Confirm",
   dataTestId = undefined,
-  onClose,
+  onCancel,
   onConfirm
 }: ModalProps) {
   const dialogRef = useRef<HTMLDialogElement>(null)
@@ -39,7 +39,7 @@ export default function Modal({
 
     const handleKeyDown = (event: KeyboardEvent): void => {
       if (event.key === "Escape") {
-        handleClose()
+        handleCancel()
       }
     }
 
@@ -51,8 +51,8 @@ export default function Modal({
     onConfirm?.()
   }
 
-  const handleClose = (): void => {
-    onClose?.()
+  const handleCancel = (): void => {
+    onCancel?.()
     dialogRef.current?.close()
   }
 
@@ -63,14 +63,14 @@ export default function Modal({
       ref={dialogRef}
       className="fixed top-1/2 left-1/2 z-40 w-full max-w-md rounded shadow-lg -translate-x-1/2 -translate-y-1/2"
       data-testid={dataTestId}
-      onCancel={handleClose}
+      onCancel={handleCancel}
     >
       <div className="flex justify-between items-center px-4 py-3 border-b border-gray-300">
         <h3 className="text-2xl">{title}</h3>
         <button
           className="self-start p-2 text-gray-400 hover:text-gray-500"
           aria-label="Close modal"
-          onClick={handleClose}
+          onClick={handleCancel}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -90,8 +90,8 @@ export default function Modal({
             {confirmText}
           </Button>
         )}
-        <Button type="button" className="w-full !ring-0" onClick={handleClose}>
-          {closeText}
+        <Button type="button" className="w-full !ring-0" onClick={handleCancel}>
+          {cancelText}
         </Button>
       </div>
     </dialog>

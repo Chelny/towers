@@ -8,25 +8,25 @@ import { TowersGameUserWithUserAndTables } from "@/interfaces"
 type PlayerInformationProps = {
   isOpen: boolean
   player: TowersGameUserWithUserAndTables | undefined
-  onClose: () => void
+  onCancel: () => void
 }
 
-export default function PlayerInformation({ isOpen, player, onClose }: PlayerInformationProps): ReactNode {
+export default function PlayerInformation({ isOpen, player, onCancel }: PlayerInformationProps): ReactNode {
   const [reason, setReason] = useState<string>("")
 
   const handleSendMessage = (): void => {
     // TODO: Send message by socket user id + reason
-    console.log("handleSendMessage", reason)
-    onClose()
+    onCancel()
   }
 
   return (
     <Modal
       title={`Player information for ${player?.user.username}`}
       isOpen={isOpen}
-      onClose={onClose}
       confirmText="Send"
+      dataTestId="player-information-modal"
       onConfirm={handleSendMessage}
+      onCancel={onCancel}
     >
       <div className="flex flex-col gap-4">
         <div>

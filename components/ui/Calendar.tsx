@@ -176,9 +176,9 @@ export default function Calendar({
                     key={dayIndex}
                     type="button"
                     className={clsx(
-                      "flex-1 p-2 text-center border rounded-sm cursor-pointer",
-                      !disabled && "hover:bg-gray-200",
-                      day === null && "text-gray-400",
+                      "flex-1 p-2 text-center border rounded-sm",
+                      !disabled && day !== null && !isDisabledDay && "cursor-pointer hover:bg-gray-200",
+                      day === null && "opacity-50 cursor-default",
                       isSelectedDay && "bg-blue-100",
                       isDisabledDay && "opacity-50 cursor-not-allowed"
                     )}

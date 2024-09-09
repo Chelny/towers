@@ -63,10 +63,7 @@ export default function Select({
   useEffect(() => {
     if (isDropdownOpen && dropdownRef.current) {
       const selectedOption: Element | null = dropdownRef.current.querySelector(`[id="${id}-${selectedValue}"]`)
-
-      if (selectedOption) {
-        selectedOption.scrollIntoView({ behavior: "auto", block: "nearest" })
-      }
+      selectedOption?.scrollIntoView({ behavior: "auto", block: "nearest" })
     }
   }, [isDropdownOpen, selectedValue])
 
@@ -83,7 +80,7 @@ export default function Select({
   return (
     <div className="relative w-full mb-4">
       {label && (
-        <label id={`${id}Label`} htmlFor={id} className="mb-1 font-medium">
+        <label id={`${id}Label`} className="mb-1 font-medium">
           {label} {!required && <span className="text-neutral-500">(optional)</span>}
         </label>
       )}
@@ -99,7 +96,7 @@ export default function Select({
         aria-haspopup="listbox"
         aria-controls={`${id}Dropdown`}
         aria-expanded={isDropdownOpen}
-        aria-labelledby={id ? `${id}Select` : undefined}
+        aria-labelledby={`${id}Label`}
         aria-describedby={description ? `${id}Description` : undefined}
         aria-required={required}
         aria-disabled={disabled}

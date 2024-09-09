@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { RoomChat } from "@prisma/client"
+import DOMPurify from "isomorphic-dompurify"
 import prisma from "@/lib"
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
@@ -8,7 +9,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     data: {
       roomId: data.roomId,
       towersUserId: data.towersUserId,
-      message: data.message
+      message: DOMPurify.sanitize(data.message)
     },
     include: {
       towersGameUser: {

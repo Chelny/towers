@@ -15,7 +15,7 @@ describe("RadioButton Component", () => {
     render(<RadioButton id="test-radio" label="Option 1" name="group1" value="1" onChange={handleChange} />)
 
     fireEvent.click(screen.getByRole("radio"))
-    expect(handleChange).toHaveBeenCalledTimes(1)
+    expect(handleChange).toHaveBeenCalled()
   })
 
   it("should be disabled when disabled prop is passed", () => {

@@ -1,6 +1,5 @@
 import { usePathname } from "next/navigation"
 import { render, screen } from "@testing-library/react"
-import { Mock } from "vitest"
 import Breadcrumb from "@/components/ui/Breadcrumb"
 
 vi.mock("next/navigation", () => ({
@@ -9,7 +8,7 @@ vi.mock("next/navigation", () => ({
 
 describe("Breadcrumb Component", () => {
   it("should render Home link correctly", () => {
-    ;(usePathname as Mock).mockReturnValue("/")
+    vi.mocked(usePathname).mockReturnValue("/")
 
     render(<Breadcrumb />)
 
@@ -18,7 +17,7 @@ describe("Breadcrumb Component", () => {
   })
 
   it("should render breadcrumb links correctly based on the path", () => {
-    ;(usePathname as Mock).mockReturnValue("/account/profile")
+    vi.mocked(usePathname).mockReturnValue("/account/profile")
 
     render(<Breadcrumb />)
 
@@ -29,7 +28,7 @@ describe("Breadcrumb Component", () => {
   })
 
   it("should format breadcrumb links correctly with hyphenated names", () => {
-    ;(usePathname as Mock).mockReturnValue("/account/update-password")
+    vi.mocked(usePathname).mockReturnValue("/account/update-password")
 
     render(<Breadcrumb />)
 

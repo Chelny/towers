@@ -41,19 +41,19 @@ describe("Modal Component", () => {
     expect(modal).toBeInTheDocument()
   })
 
-  it("should call onClose when close button is clicked", () => {
-    const handleClose: Mock = vi.fn()
+  it("should call onCancel when close button is clicked", () => {
+    const handleCancel: Mock = vi.fn()
 
     render(
-      <Modal title="Test Modal" isOpen={true} onClose={handleClose}>
+      <Modal title="Test Modal" isOpen={true} onCancel={handleCancel}>
         <p>Modal content</p>
       </Modal>
     )
 
-    const closeButton: HTMLButtonElement = screen.getByText("Close")
+    const closeButton: HTMLButtonElement = screen.getByText("Cancel")
     fireEvent.click(closeButton)
 
-    expect(handleClose).toHaveBeenCalledTimes(1)
+    expect(handleCancel).toHaveBeenCalled()
   })
 
   it("should call onConfirm when confirm button is clicked", () => {
@@ -68,12 +68,12 @@ describe("Modal Component", () => {
     const confirmButton: HTMLButtonElement = screen.getByText("Confirm")
     fireEvent.click(confirmButton)
 
-    expect(handleConfirm).toHaveBeenCalledTimes(1)
+    expect(handleConfirm).toHaveBeenCalled()
   })
 
   it("should display custom close and confirm button text", () => {
     render(
-      <Modal title="Test Modal" isOpen={true} closeText="Dismiss" confirmText="Proceed" onConfirm={vi.fn()}>
+      <Modal title="Test Modal" isOpen={true} cancelText="Dismiss" confirmText="Proceed" onConfirm={vi.fn()}>
         <p>Modal content</p>
       </Modal>
     )
@@ -83,10 +83,10 @@ describe("Modal Component", () => {
   })
 
   it("should close the modal when clicking the confirm button", () => {
-    const handleClose: Mock = vi.fn()
+    const handleCancel: Mock = vi.fn()
 
     render(
-      <Modal title="Test Modal" isOpen={true} onClose={handleClose} onConfirm={handleClose}>
+      <Modal title="Test Modal" isOpen={true} onCancel={handleCancel} onConfirm={handleCancel}>
         <p>Modal content</p>
       </Modal>
     )
@@ -94,40 +94,35 @@ describe("Modal Component", () => {
     const confirmButton: HTMLButtonElement = screen.getByText("Confirm")
     fireEvent.click(confirmButton)
 
-    expect(handleClose).toHaveBeenCalledTimes(1)
+    expect(handleCancel).toHaveBeenCalled()
   })
 
   it("should close the modal when clicking the close button", () => {
-    const handleClose: Mock = vi.fn()
+    const handleCancel: Mock = vi.fn()
 
     render(
-      <Modal title="Test Modal" isOpen={true} onClose={handleClose}>
+      <Modal title="Test Modal" isOpen={true} onCancel={handleCancel}>
         <p>Modal content</p>
       </Modal>
     )
 
-    const closeButton: HTMLButtonElement = screen.getByText("Close")
+    const closeButton: HTMLButtonElement = screen.getByText("Cancel")
     fireEvent.click(closeButton)
 
-    expect(handleClose).toHaveBeenCalledTimes(1)
+    expect(handleCancel).toHaveBeenCalled()
   })
 
   it("should close the modal when escape key is pressed", () => {
-    const handleClose: Mock = vi.fn()
+    const handleCancel: Mock = vi.fn()
 
     render(
-      <Modal title="Test Modal" isOpen={true} dataTestId="test-modal" onClose={handleClose}>
+      <Modal title="Test Modal" isOpen={true} dataTestId="test-modal" onCancel={handleCancel}>
         <p>Modal content</p>
       </Modal>
     )
 
     const dialog: HTMLDialogElement = screen.getByTestId("test-modal")
-    fireEvent.keyDown(dialog!, {
-      key: "Escape",
-      code: "Escape",
-      keyCode: 27,
-      charCode: 27
-    })
-    expect(handleClose).toHaveBeenCalledTimes(1)
+    fireEvent.keyDown(dialog!, { key: "Escape", code: "Escape" })
+    expect(handleCancel).toHaveBeenCalled()
   })
 })

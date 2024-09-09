@@ -74,13 +74,10 @@ export default function Table({ roomId, tableId }: TableProps): ReactNode {
 
   useEffect(() => {
     dispatch(fetchRoomUsersData(roomId))
-  }, [socketRooms[roomId]])
-
-  useEffect(() => {
     dispatch(fetchTableData(tableId))
     dispatch(fetchTableChatData({ tableId, towersUserId: session?.user.towersUserId }))
     dispatch(fetchTableUsersData(tableId))
-  }, [socketRooms[tableId]])
+  }, [socketRooms[roomId]])
 
   useEffect(() => {
     if (tables[tableId]) {
@@ -394,14 +391,14 @@ export default function Table({ roomId, tableId }: TableProps): ReactNode {
         users={roomsUsers[roomId]?.filter(
           (roomsUser: TowersGameUserWithUserAndTables) => roomsUser.tableId !== tableId
         )}
-        onClose={handleCloseInviteUserModal}
+        onCancel={handleCloseInviteUserModal}
       />
 
       <TableBootUser
         key={uuidv4()}
         isOpen={isBootUserModalOpen}
         users={tablesUsers[tableId]}
-        onClose={handleCloseBootUserModal}
+        onCancel={handleCloseBootUserModal}
       />
     </>
   )

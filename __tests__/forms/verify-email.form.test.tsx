@@ -1,10 +1,43 @@
 import { useFormState, useFormStatus } from "react-dom"
-import { useRouter, useSearchParams } from "next/navigation"
 import { render, screen } from "@testing-library/react"
+import { Mock } from "vitest"
 import { VerifyEmailForm } from "@/app/(auth)/verify-email/verify-email.form"
-import { mockUseSearchParams } from "@/vitest.setup"
 
-vi.mock("next/navigation")
+const { useRouter, mockedRouterPush, useSearchParams, mockedSearchParams } = vi.hoisted(() => {
+  const mockedRouterPush: Mock = vi.fn()
+  const mockedSearchParams = {
+    get: vi.fn(),
+    getAll: vi.fn(),
+    has: vi.fn(),
+    toString: vi.fn(),
+    keys: vi.fn(),
+    values: vi.fn(),
+    entries: vi.fn(),
+    forEach: vi.fn(),
+    append: vi.fn(),
+    delete: vi.fn(),
+    set: vi.fn(),
+    sort: vi.fn(),
+    [Symbol.iterator]: vi.fn()
+  }
+
+  return {
+    useRouter: () => ({ push: mockedRouterPush }),
+    mockedRouterPush,
+    useSearchParams: () => mockedSearchParams,
+    mockedSearchParams
+  }
+})
+
+vi.mock("next/navigation", async () => {
+  const actual = await vi.importActual("next/navigation")
+
+  return {
+    ...actual,
+    useRouter,
+    useSearchParams
+  }
+})
 
 vi.mock("react-dom", () => ({
   useFormState: vi.fn(),
@@ -13,18 +46,6 @@ vi.mock("react-dom", () => ({
 
 describe("Verify Email Form", () => {
   beforeEach(() => {
-    const mockRouter = {
-      back: vi.fn(),
-      forward: vi.fn(),
-      refresh: vi.fn(),
-      push: vi.fn(),
-      replace: vi.fn(),
-      prefetch: vi.fn()
-    }
-    vi.mocked(useRouter).mockReturnValue(mockRouter)
-
-    vi.mocked(useSearchParams).mockReturnValue(mockUseSearchParams({}))
-
     vi.mocked(useFormState).mockReturnValue([{ success: false, message: "", errors: {} }, vi.fn(), false])
 
     vi.mocked(useFormStatus).mockReturnValue({
@@ -48,19 +69,22 @@ describe("Verify Email Form", () => {
   })
 
   it("should pass the email and token from URL params to the hidden input fields", () => {
-    const encodedEmail = encodeURIComponent("john.doe@example.com")
+    const encodedEmail: string = encodeURIComponent("john.doe@example.com")
+    const token: string = "2d9d7b17-98a6-463c-9531-4de8e8a0e3c8"
 
-    vi.mocked(useSearchParams).mockReturnValue(
-      mockUseSearchParams({
-        email: encodedEmail,
-        token: "2d9d7b17-98a6-463c-9531-4de8e8a0e3c8"
-      })
-    )
+    mockedSearchParams.get.mockImplementation((key: string) => {
+      if (key === "email") return encodedEmail
+      if (key === "token") return token
+      return null
+    })
 
     render(<VerifyEmailForm />)
 
-    expect(screen.getByTestId("verify-email-email-input")).toHaveValue(decodeURIComponent(encodedEmail))
-    expect(screen.getByTestId("verify-email-token-input")).toHaveValue("2d9d7b17-98a6-463c-9531-4de8e8a0e3c8")
+    const emailInput: HTMLInputElement = screen.getByTestId("verify-email-email-input")
+    expect(emailInput).toHaveValue(decodeURIComponent(encodedEmail))
+
+    const tokenInput: HTMLInputElement = screen.getByTestId("verify-email-token-input")
+    expect(tokenInput).toHaveValue(token)
   })
 
   it("should show error message if the verification link is invalid", () => {

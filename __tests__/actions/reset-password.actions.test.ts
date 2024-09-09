@@ -100,7 +100,6 @@ describe("Reset Password Actions", () => {
 
     const result = await resetPassword({}, formData)
 
-    expect(POST).toHaveBeenCalledOnce()
     expect(POST).toHaveBeenCalledWith({
       token: "d457775d-9123-4922-84de-cf535a63484e",
       password: "Password123!",

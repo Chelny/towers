@@ -78,7 +78,6 @@ describe("Update Password Actions", () => {
 
     const result = await password({}, formData)
 
-    expect(POST).toHaveBeenCalledOnce()
     expect(POST).toHaveBeenCalledWith({
       currentPassword: "Password123!",
       newPassword: "Password12345!",

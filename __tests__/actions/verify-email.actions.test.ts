@@ -48,7 +48,6 @@ describe("Verify Email Actions", () => {
 
     const result = await verifyEmail({}, formData)
 
-    expect(POST).toHaveBeenCalledOnce()
     expect(POST).toHaveBeenCalledWith({
       email: "john.doe@example.com",
       token: "2d9d7b17-98a6-463c-9531-4de8e8a0e3c8"

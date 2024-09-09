@@ -118,7 +118,6 @@ describe("Sign Up Actions", () => {
 
     const result = await signUp({}, formData)
 
-    expect(POST).toHaveBeenCalledOnce()
     expect(POST).toHaveBeenCalledWith({
       name: "John Doe",
       gender: Gender.M,

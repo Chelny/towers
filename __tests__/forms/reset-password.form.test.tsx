@@ -1,10 +1,38 @@
 import { useFormState, useFormStatus } from "react-dom"
-import { useSearchParams } from "next/navigation"
 import { render, screen } from "@testing-library/react"
 import { ResetPasswordForm } from "@/app/(auth)/reset-password/reset-password.form"
-import { mockUseSearchParams } from "@/vitest.setup"
 
-vi.mock("next/navigation")
+const { useSearchParams, mockedSearchParams } = vi.hoisted(() => {
+  const mockedSearchParams = {
+    get: vi.fn(),
+    getAll: vi.fn(),
+    has: vi.fn(),
+    toString: vi.fn(),
+    keys: vi.fn(),
+    values: vi.fn(),
+    entries: vi.fn(),
+    forEach: vi.fn(),
+    append: vi.fn(),
+    delete: vi.fn(),
+    set: vi.fn(),
+    sort: vi.fn(),
+    [Symbol.iterator]: vi.fn()
+  }
+
+  return {
+    useSearchParams: () => mockedSearchParams,
+    mockedSearchParams
+  }
+})
+
+vi.mock("next/navigation", async () => {
+  const actual = await vi.importActual("next/navigation")
+
+  return {
+    ...actual,
+    useSearchParams
+  }
+})
 
 vi.mock("react-dom", () => ({
   useFormState: vi.fn(),
@@ -21,8 +49,6 @@ vi.mock("resend", () => {
 
 describe("Reset Password Form", () => {
   beforeEach(() => {
-    vi.mocked(useSearchParams).mockReturnValue(mockUseSearchParams({}))
-
     vi.mocked(useFormState).mockReturnValue([{ success: false, message: "", errors: {} }, vi.fn(), false])
 
     vi.mocked(useFormStatus).mockReturnValue({
@@ -46,7 +72,12 @@ describe("Reset Password Form", () => {
   })
 
   it("should pass the token from URL params to the hidden input field", () => {
-    vi.mocked(useSearchParams).mockReturnValue(mockUseSearchParams({ token: "d457775d-9123-4922-84de-cf535a63484e" }))
+    const token: string = "d457775d-9123-4922-84de-cf535a63484e"
+
+    mockedSearchParams.get.mockImplementation((key: string) => {
+      if (key === "token") return token
+      return null
+    })
 
     render(<ResetPasswordForm />)
 

@@ -24,6 +24,7 @@ export default function GridCell(props: GridCellProps): ReactNode {
           props.block.brokenBlockNumber &&
           styles[`BlockExplode-${props.block.brokenBlockNumber}`]
       )}
+      role="gridcell"
     >
       {isTowersBlock(props.block) && props.block.powerType === "defense" ? (
         <DefenseBlock letter={props.isOpponentBoard ? undefined : props.block.letter} />

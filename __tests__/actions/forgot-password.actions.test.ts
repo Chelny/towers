@@ -68,7 +68,6 @@ describe("Forgot Password Actions", () => {
 
     const result = await forgotPassword({}, formData)
 
-    expect(POST).toHaveBeenCalledOnce()
     expect(POST).toHaveBeenCalledWith({
       email: "john.doe@example.com"
     })

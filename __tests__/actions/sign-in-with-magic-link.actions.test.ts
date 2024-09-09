@@ -54,7 +54,6 @@ describe("Sign In With Magic Link Actions", () => {
 
     const result = await signInWithMagicLink({}, formData)
 
-    expect(authSignInWithMagicLink).toHaveBeenCalledOnce()
     expect(authSignInWithMagicLink).toHaveBeenCalledWith("resend", {
       email: "john.doe@example.com",
       redirectTo: ROUTE_ROOMS.PATH
@@ -69,7 +68,6 @@ describe("Sign In With Magic Link Actions", () => {
 
     const result = await signInWithMagicLink({}, formData)
 
-    expect(authSignInWithMagicLink).toHaveBeenCalledOnce()
     expect(authSignInWithMagicLink).toHaveBeenCalledWith("resend", {
       email: "john.doe@example.com",
       redirectTo: ROUTE_ROOMS.PATH

@@ -4,10 +4,10 @@ import {
   RoomChatWithTowersGameUser,
   RoomWithTablesCount,
   TableChatMessageInput,
+  TableChatWithTowersGameUser,
   TableWithHostAndTowersGameUsers,
   TowersGameUserWithUserAndTables
 } from "@/interfaces"
-import { TableChatWithTowersGameUser } from "@/interfaces/table-chat"
 import {
   fetchRoomChatData,
   fetchRoomData,
@@ -265,4 +265,5 @@ export const {
   sendMessageToTableChat,
   getTableChatMessage
 } = socketSlice.actions
+
 export default socketSlice.reducer

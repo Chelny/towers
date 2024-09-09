@@ -57,7 +57,7 @@ export default function RoomSidebar(): ReactNode {
       <div className={clsx("flex items-center gap-2", isExpanded ? "w-full" : "w-auto")}>
         <Link className="flex-1 flex items-center gap-2" href={ROUTE_ACCOUNT.PATH}>
           <UserAvatar />
-          <span className={clsx(isExpanded ? "block" : "hidden")}>{session?.user.username}</span>
+          {isExpanded && <span>{session?.user.username}</span>}
         </Link>
         <div className={isExpanded ? "flex" : "hidden"}>
           <button type="button" aria-label="Collapse sidebar" onClick={() => setIsExpanded(false)}>

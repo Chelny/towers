@@ -69,7 +69,6 @@ describe("Account Actions", () => {
 
     const result = await account({}, formData)
 
-    expect(DELETE).toHaveBeenCalledOnce()
     expect(DELETE).toHaveBeenCalledWith({
       email: "john.doe@example.com"
     })

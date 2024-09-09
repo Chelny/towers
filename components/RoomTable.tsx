@@ -81,7 +81,7 @@ export default function RoomTable({ roomId }: RoomTableProps): ReactNode {
               </div>
               <div className="flex py-1 text-sm">
                 {table.rated && <span>Option: rated&nbsp;-&nbsp;</span>}
-                <span>Host: {table.host.user.username}</span>
+                <span>Host: {table.host?.user.username}</span>
               </div>
             </div>
           </div>

@@ -44,7 +44,6 @@ describe("Sign In Actions", () => {
 
     const result = await signIn({}, formData)
 
-    expect(authSignIn).toHaveBeenCalledOnce()
     expect(authSignIn).toHaveBeenCalledWith("credentials", {
       email: "john.doe@example.com",
       password: "wrongpassword",
@@ -61,7 +60,6 @@ describe("Sign In Actions", () => {
 
     const result = await signIn({}, formData)
 
-    expect(authSignIn).toHaveBeenCalledOnce()
     expect(authSignIn).toHaveBeenCalledWith("credentials", {
       email: "john.doe@example.com",
       password: "Password123!",

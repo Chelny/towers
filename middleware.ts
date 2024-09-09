@@ -17,9 +17,37 @@ const validateToken = async (token: string): Promise<boolean> => {
   return data.valid
 }
 
-export default auth(async (request) => {
+export default auth(async (request): Promise<NextResponse> => {
+  // Content Security Policy (CSP)
+  const isDevelopment: boolean = process.env.NODE_ENV === "development"
+  const nonce: string = Buffer.from(crypto.randomUUID()).toString("base64")
+  const cspHeader: string = `
+    default-src 'self';
+    script-src 'self' ${isDevelopment ? "'unsafe-eval' 'unsafe-inline'" : `'nonce-${nonce}' 'strict-dynamic'`};
+    style-src 'self' ${isDevelopment ? "'unsafe-inline'" : `'nonce-${nonce}'`};
+    img-src 'self' blob: data:;
+    font-src 'self';
+    object-src 'none';
+    base-uri 'self';
+    form-action 'self';
+    frame-ancestors 'none';
+    upgrade-insecure-requests;
+  `
+
+  const requestHeaders: Headers = new Headers(request.headers)
+  requestHeaders.set("x-nonce", nonce)
+  requestHeaders.set("Content-Security-Policy", cspHeader.replace(/\s{2,}/g, " ").trim())
+
+  const response: NextResponse = NextResponse.next({
+    headers: requestHeaders,
+    request: {
+      headers: requestHeaders
+    }
+  })
+
+  // Allow next-auth paths
   if (request.nextUrl.pathname.startsWith(API_AUTH_PREFIX)) {
-    return NextResponse.next()
+    return response
   }
 
   // Allow access to reset password page only if token is valid
@@ -56,9 +84,24 @@ export default auth(async (request) => {
     return NextResponse.redirect(newUrl)
   }
 
-  return NextResponse.next()
+  return response
 })
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"]
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
+    {
+      source: "/((?!api|_next/static|_next/image|favicon.ico).*)",
+      missing: [
+        { type: "header", key: "next-router-prefetch" },
+        { type: "header", key: "purpose", value: "prefetch" }
+      ]
+    }
+  ]
 }

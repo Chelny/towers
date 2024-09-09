@@ -15,7 +15,7 @@ export default function Grid(props: GridProps): ReactNode {
   }, [])
 
   return (
-    <div ref={boardRef} className="static z-10">
+    <div ref={boardRef} className="static z-10" role="grid" tabIndex={0}>
       {props.board.map((row: BoardRow, rowIndex: number) => (
         <GridRow key={rowIndex} rowIndex={rowIndex} row={row} isOpponentBoard={props.isOpponentBoard} />
       ))}

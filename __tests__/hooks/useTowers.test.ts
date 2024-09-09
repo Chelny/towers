@@ -1,13 +1,12 @@
 import { act } from "react"
 import { renderHook } from "@testing-library/react-hooks"
-import { Mock } from "vitest"
 import { NUM_NEXT_PIECES } from "@/constants"
 import { getRandomPiece } from "@/hooks"
 import { useTowers } from "@/hooks/useTowers"
 import { BoardBlock, BoardRow, Piece } from "@/interfaces"
 
-vi.mock(import("@/hooks"), async (importOriginal) => {
-  const actual = await importOriginal()
+vi.mock("@/hooks", async () => {
+  const actual = await vi.importActual("@/hooks")
 
   return {
     ...actual,
@@ -34,13 +33,13 @@ describe("useTowers Hook", () => {
   })
 
   it("should initialize next pieces with random pieces", () => {
-    const mockPiece: Piece = [
+    const mockedPiece: Piece = [
       { letter: "T", powerType: null, powerLevel: null, isToBeRemoved: false, brokenBlockNumber: null },
       { letter: "T", powerType: null, powerLevel: null, isToBeRemoved: false, brokenBlockNumber: null },
       { letter: "T", powerType: null, powerLevel: null, isToBeRemoved: false, brokenBlockNumber: null }
     ]
 
-    ;(getRandomPiece as Mock).mockReturnValue(mockPiece)
+    vi.mocked(getRandomPiece).mockReturnValue(mockedPiece)
 
     const { result } = renderHook(() => useTowers())
 
@@ -51,25 +50,25 @@ describe("useTowers Hook", () => {
     expect(result.current.nextPieces.length).toBe(NUM_NEXT_PIECES)
 
     result.current.nextPieces.forEach((piece: Piece) => {
-      expect(piece.length).toBe(mockPiece.length)
+      expect(piece.length).toBe(mockedPiece.length)
 
       piece.forEach((block: BoardBlock, index: number) => {
-        expect(block.powerType).toBe(mockPiece[index].powerType)
-        expect(block.powerLevel).toBe(mockPiece[index].powerLevel)
-        expect(block.isToBeRemoved).toBe(mockPiece[index].isToBeRemoved)
-        expect(block.brokenBlockNumber).toBe(mockPiece[index].brokenBlockNumber)
+        expect(block.powerType).toBe(mockedPiece[index].powerType)
+        expect(block.powerLevel).toBe(mockedPiece[index].powerLevel)
+        expect(block.isToBeRemoved).toBe(mockedPiece[index].isToBeRemoved)
+        expect(block.brokenBlockNumber).toBe(mockedPiece[index].brokenBlockNumber)
       })
     })
   })
 
   it("should add a new piece to the next pieces array when the game progresses", () => {
-    const mockPiece: Piece = [
+    const mockedPiece: Piece = [
       { letter: "T", powerType: null, powerLevel: null, isToBeRemoved: false, brokenBlockNumber: null },
       { letter: "T", powerType: null, powerLevel: null, isToBeRemoved: false, brokenBlockNumber: null },
       { letter: "T", powerType: null, powerLevel: null, isToBeRemoved: false, brokenBlockNumber: null }
     ]
 
-    ;(getRandomPiece as Mock).mockReturnValue(mockPiece)
+    vi.mocked(getRandomPiece).mockReturnValue(mockedPiece)
 
     const { result } = renderHook(() => useTowers())
 
@@ -78,12 +77,12 @@ describe("useTowers Hook", () => {
     })
 
     act(() => {
-      result.current.nextPieces.push(mockPiece)
+      result.current.nextPieces.push(mockedPiece)
       result.current.nextPieces.shift()
     })
 
     expect(result.current.nextPieces.length).toBe(NUM_NEXT_PIECES)
-    expect(result.current.nextPieces[NUM_NEXT_PIECES - 1]).toBe(mockPiece)
+    expect(result.current.nextPieces[NUM_NEXT_PIECES - 1]).toBe(mockedPiece)
   })
 
   it("should mark blocks for deletion and update the score correctly", () => {

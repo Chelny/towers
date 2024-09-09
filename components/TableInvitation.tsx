@@ -14,14 +14,14 @@ export interface TableInvitationData {
 type TableInvitationProps = {
   isOpen: boolean
   data: TableInvitationData
-  onClose: () => void
+  onCancel: () => void
   onAcceptInvitation: (tableId: string) => void
 }
 
 export default function TableInvitation({
   isOpen,
   data,
-  onClose,
+  onCancel,
   onAcceptInvitation
 }: TableInvitationProps): ReactNode {
   const [reason, setReason] = useState<string>("")
@@ -29,8 +29,7 @@ export default function TableInvitation({
 
   const handleDeclineInvitation = (): void => {
     // TODO: Emit socket event + decline reason to the other user's socket id
-    console.log("handleDeclineInvitation", reason, declineAll)
-    onClose()
+    onCancel()
   }
 
   const handleAcceptInvitation = (): void => {
@@ -42,10 +41,11 @@ export default function TableInvitation({
     <Modal
       title="Invited"
       isOpen={isOpen}
-      closeText="Decline"
-      onClose={handleDeclineInvitation}
       confirmText="Accept"
+      cancelText="Decline"
+      dataTestId="table-invitation-modal"
       onConfirm={handleAcceptInvitation}
+      onCancel={handleDeclineInvitation}
     >
       <div className="flex flex-col gap-4">
         <div>

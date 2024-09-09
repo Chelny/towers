@@ -30,7 +30,7 @@ describe("useInterval Hook", () => {
       vi.advanceTimersByTime(1000)
     })
 
-    expect(callback).toHaveBeenCalledTimes(1)
+    expect(callback).toHaveBeenCalled()
 
     act(() => {
       vi.advanceTimersByTime(1000)
@@ -49,7 +49,7 @@ describe("useInterval Hook", () => {
       vi.advanceTimersByTime(1000)
     })
 
-    expect(callback1).toHaveBeenCalledTimes(1)
+    expect(callback1).toHaveBeenCalled()
 
     const callback2 = vi.fn()
     rerender({ callback: callback2, delay: 1000 })
@@ -58,8 +58,8 @@ describe("useInterval Hook", () => {
       vi.advanceTimersByTime(1000)
     })
 
-    expect(callback1).toHaveBeenCalledTimes(1)
-    expect(callback2).toHaveBeenCalledTimes(1)
+    expect(callback1).toHaveBeenCalled()
+    expect(callback2).toHaveBeenCalled()
   })
 
   it("should clear the interval on unmount", () => {

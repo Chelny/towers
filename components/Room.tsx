@@ -221,8 +221,8 @@ export default function Room({ roomId }: RoomProps): ReactNode {
       <CreateTable
         key={uuidv4()}
         isOpen={isCreateTableModalOpen}
-        onClose={handleCloseCreateTableModal}
         onSubmitSuccess={handleCreateTable}
+        onCancel={handleCloseCreateTableModal}
       />
 
       {invitationModals.map((modal: { id: string; data: TableInvitationData }) => (
@@ -230,8 +230,8 @@ export default function Room({ roomId }: RoomProps): ReactNode {
           key={modal.id}
           isOpen={true}
           data={modal.data}
-          onClose={() => handleCloseInvitationModal(modal.id)}
           onAcceptInvitation={(tableId: string) => handleAcceptInvitationModal(modal.id, tableId)}
+          onCancel={() => handleCloseInvitationModal(modal.id)}
         />
       ))}
     </>

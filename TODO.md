@@ -1,6 +1,5 @@
 # TODO List
 
-- Unit testing
 - Test in Firefox and Safari
 
 ## User

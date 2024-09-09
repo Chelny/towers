@@ -2,6 +2,7 @@
 const nextConfig = {
   reactStrictMode: false,
   env: {
+    BASE_URL: process.env.BASE_URL,
     DATABASE_URL: process.env.DATABASE_URL,
     AUTH_SECRET: process.env.AUTH_SECRET,
     AUTH_GITHUB_ID: process.env.AUTH_GITHUB_ID,
@@ -10,9 +11,7 @@ const nextConfig = {
     AUTH_GOOGLE_SECRET: process.env.AUTH_GOOGLE_SECRET,
     AUTH_RESEND_KEY: process.env.AUTH_RESEND_KEY,
     EMAIL_FROM: process.env.EMAIL_FROM,
-    EMAIL_TO: process.env.EMAIL_TO,
-    ACCESS_TOKEN_SECRET: process.env.ACCESS_TOKEN_SECRET,
-    REFRESH_TOKEN_SECRET: process.env.REFRESH_TOKEN_SECRET
+    EMAIL_TO: process.env.EMAIL_TO
   },
   images: {
     remotePatterns: [

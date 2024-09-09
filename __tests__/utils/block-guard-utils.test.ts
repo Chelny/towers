@@ -10,11 +10,6 @@ import {
   isTowersBlock
 } from "@/utils"
 
-vi.mock(import("@/utils"), async (importOriginal) => {
-  const actual = await importOriginal()
-  return actual
-})
-
 const defaultTowersBlockProps = {
   powerType: null,
   powerLevel: null,

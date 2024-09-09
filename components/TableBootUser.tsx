@@ -9,20 +9,26 @@ import { TowersGameUserWithUserAndTables } from "@/interfaces"
 type TableBootUserProps = {
   isOpen: boolean
   users: TowersGameUserWithUserAndTables[]
-  onClose: () => void
+  onCancel: () => void
 }
 
-export default function TableBootUser({ isOpen, users, onClose }: TableBootUserProps): ReactNode {
+export default function TableBootUser({ isOpen, users, onCancel }: TableBootUserProps): ReactNode {
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null)
 
   const handleSelectedPlayer = (): void => {
     // TODO: Emit socket event
-    console.log("handleSelectedPlayer", selectedPlayerId)
-    onClose()
+    onCancel()
   }
 
   return (
-    <Modal title="Boot User" isOpen={isOpen} onClose={onClose} confirmText="Boot" onConfirm={handleSelectedPlayer}>
+    <Modal
+      title="Boot User"
+      isOpen={isOpen}
+      confirmText="Boot"
+      dataTestId="table-boot-user-modal"
+      onConfirm={handleSelectedPlayer}
+      onCancel={onCancel}
+    >
       <div className="overflow-y-auto h-52">
         <PlayersList users={users} onSelectedPlayer={setSelectedPlayerId} />
       </div>

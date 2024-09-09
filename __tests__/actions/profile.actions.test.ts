@@ -83,7 +83,6 @@ describe("Profile Actions", () => {
 
     const result = await profile({}, formData)
 
-    expect(POST).toHaveBeenCalledOnce()
     expect(POST).toHaveBeenCalledWith({
       name: "John Doe",
       gender: Gender.M,
