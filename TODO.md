@@ -1,7 +1,5 @@
 # TODO List
 
-- Test in Firefox and Safari
-
 ## User
 
 - Add localization

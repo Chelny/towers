@@ -31,7 +31,7 @@ export default auth(async (request): Promise<NextResponse> => {
     base-uri 'self';
     form-action 'self';
     frame-ancestors 'none';
-    upgrade-insecure-requests;
+    ${isDevelopment ? "" : "upgrade-insecure-requests"};
   `
 
   const requestHeaders: Headers = new Headers(request.headers)
