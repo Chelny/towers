@@ -1,5 +1,6 @@
 import { NextURL } from "next/dist/server/web/next-url"
-import { NextResponse } from "next/server"
+import { NextResponse, userAgent } from "next/server"
+import { Session } from "next-auth"
 import { auth } from "@/auth"
 import {
   API_AUTH_PREFIX,
@@ -10,6 +11,7 @@ import {
   ROUTE_SIGN_IN,
   ROUTE_TOWERS
 } from "@/constants"
+import prisma from "@/lib"
 
 const validateToken = async (token: string): Promise<boolean> => {
   const response: Response = await fetch(`${process.env.BASE_URL}/api/reset-password?token=${token}`)
@@ -44,6 +46,13 @@ export default auth(async (request): Promise<NextResponse> => {
       headers: requestHeaders
     }
   })
+
+  // User agent
+  const ipAddress: string = request.headers.get("x-forwarded-for") || request.ip || "[unknown]"
+  const { ua } = userAgent(request)
+
+  response.cookies.set("user-ip", ipAddress, { httpOnly: true })
+  response.cookies.set("user-agent", ua, { httpOnly: true })
 
   // Allow next-auth paths
   if (request.nextUrl.pathname.startsWith(API_AUTH_PREFIX)) {
@@ -82,6 +91,15 @@ export default auth(async (request): Promise<NextResponse> => {
   if (request.nextUrl.pathname === ROUTE_TOWERS.PATH && request.nextUrl.search === "") {
     const newUrl: URL = new URL(ROUTE_ROOMS.PATH, request.nextUrl.origin)
     return NextResponse.redirect(newUrl)
+  }
+
+  // Update lastActiveAt on POST, PUT, DELETE requests
+  const session: Session | null = await auth()
+  if (session && request.method !== "GET") {
+    await prisma.user.update({
+      where: { id: session.user.id, isOnline: true },
+      data: { lastActiveAt: new Date() }
+    })
   }
 
   return response

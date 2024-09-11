@@ -1,3 +1,6 @@
+import { NextRequest } from "next/server"
+import { JWT } from "next-auth/jwt"
+
 declare module "next-auth" {
   /**
    * The shape of the user object returned in the OAuth providers' `profile` callback,
@@ -28,11 +31,14 @@ declare module "next-auth" {
        * you need to add them back into the newly declared interface.
        */
     } & DefaultSession["user"]
+    account: Account | null
+    isNewUser: boolean
+  }
+
+  interface NextAuthRequest extends NextRequest {
+    auth: Session | null
   }
 }
-
-// The `JWT` interface can be found in the `next-auth/jwt` submodule
-import { JWT } from "next-auth/jwt"
 
 declare module "next-auth/jwt" {
   /** Returned by the `jwt` callback and `auth`, when using JWT sessions */
@@ -41,6 +47,8 @@ declare module "next-auth/jwt" {
     idToken?: string
     username: string
     towersUserId: string
+    account: Account | null
+    isNewUser: boolean
   }
 }
 

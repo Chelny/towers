@@ -1,6 +1,7 @@
 "use client"
 
-import { ChangeEvent, ReactNode, useState } from "react"
+import { ChangeEvent, ReactNode, useEffect, useState } from "react"
+import { formatDistanceToNow } from "date-fns"
 import Input from "@/components/ui/Input"
 import Modal from "@/components/ui/Modal"
 import { TowersGameUserWithUserAndTables } from "@/interfaces"
@@ -13,6 +14,15 @@ type PlayerInformationProps = {
 
 export default function PlayerInformation({ isOpen, player, onCancel }: PlayerInformationProps): ReactNode {
   const [reason, setReason] = useState<string>("")
+  const [idleTime, setIdleTime] = useState<string>("")
+
+  useEffect(() => {
+    if (player?.user.lastActiveAt) {
+      const lastActiveAt: Date = new Date(player.user.lastActiveAt)
+      const relativeTime: string = formatDistanceToNow(lastActiveAt, { addSuffix: true })
+      setIdleTime(relativeTime)
+    }
+  }, [player?.user.lastActiveAt])
 
   const handleSendMessage = (): void => {
     // TODO: Send message by socket user id + reason
@@ -28,7 +38,7 @@ export default function PlayerInformation({ isOpen, player, onCancel }: PlayerIn
       onConfirm={handleSendMessage}
       onCancel={onCancel}
     >
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-2">
         <div>
           Rating: {player?.rating} <br />
           Games Completed: {player?.gamesCompleted} <br />
@@ -42,8 +52,7 @@ export default function PlayerInformation({ isOpen, player, onCancel }: PlayerIn
           defaultValue={reason}
           onInput={(event: ChangeEvent<HTMLInputElement>) => setReason(event.target.value)}
         />
-        {/* TODO: Idle time */}
-        {/* <div>Idle Time: 52.05 seconds</div> */}
+        <div>Idle Time: {idleTime || "Calculating..."}</div>
       </div>
     </Modal>
   )

@@ -33,6 +33,8 @@ export const mockedAuthenticatedSession: TSessionContextValue = {
       image: "https://example.com/avatar.jpg",
       towersUserId: "233507f9-7f92-45fa-bf34-4eb98944b461"
     },
+    account: null,
+    isNewUser: false,
     expires: "2024-09-01T00:00:00Z"
   },
   status: "authenticated",

@@ -6,9 +6,6 @@
 - Add dark theme (?)
 - Redirects new OAuth users to new page where they can choose their username before redirecting to /rooms
 - Add predefined avatars or let users upload their picture
-- Update `isOnline` on sign up, on manual sign out and on expired session
-- Update `lastActiveAt` on every POST, PUT, DELETE request made
-- Retreive user's info such ip address, user agent, etc on sign in
 - Sign in with passkey
 - Sign in with magic link
 - Double check account deletion date (timezone) in email
@@ -32,7 +29,6 @@
 ### Player Information
 
 - Send private message endpoint
-- Idle time (check User's `lastActiveAt` in database)
 
 ## Table
 

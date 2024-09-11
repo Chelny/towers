@@ -1,4 +1,5 @@
 export * from "@/lib/email"
+export * from "@/lib/geolocation"
 export * from "@/lib/prisma"
 export { default } from "@/lib/prisma"
 export * from "@/lib/room-async-thunk"

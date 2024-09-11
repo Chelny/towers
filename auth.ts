@@ -1,6 +1,8 @@
+import { ReadonlyRequestCookies } from "next/dist/server/web/spec-extension/adapters/request-cookies"
+import { cookies } from "next/headers"
 import { NextResponse } from "next/server"
 import { PrismaAdapter } from "@auth/prisma-adapter"
-import { TowersGameUser, User, UserStatus } from "@prisma/client"
+import { LoginMethod, TowersGameUser, User, UserStatus } from "@prisma/client"
 import NextAuth from "next-auth"
 import Credentials from "next-auth/providers/credentials"
 import GitHub from "next-auth/providers/github"
@@ -9,7 +11,7 @@ import Passkey from "next-auth/providers/passkey"
 import Resend from "next-auth/providers/resend"
 import { POST } from "@/app/api/sign-in/route"
 import { ROUTE_AUTH_ERROR, ROUTE_SIGN_IN } from "@/constants"
-import prisma, { sendVerificationRequest } from "@/lib"
+import prisma, { getLocation, sendVerificationRequest } from "@/lib"
 import { generateRandomUsername } from "@/utils"
 
 export const { auth, handlers, signIn, signOut } = NextAuth({
@@ -56,12 +58,24 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
   callbacks: {
     async authorized({ auth }) {
       // Logged in users are authenticated, otherwise redirect to login page
-      return !!auth
+      if (auth) {
+        if (new Date(auth.expires) >= new Date()) {
+          return true
+        } else {
+          await prisma.user.update({
+            where: { id: auth?.user.id },
+            data: { isOnline: false }
+          })
+        }
+      }
+
+      return false
     },
-    async jwt({ token, user, trigger }) {
+    async jwt({ token, user, account, trigger }) {
       if (user) {
         token.username = user.username
         token.picture = user.image
+        token.account = account
 
         if (user.id && !user.towersUserId) {
           const towersGameUser: TowersGameUser | null = await prisma.towersGameUser.findUnique({
@@ -82,6 +96,10 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         } else {
           token.towersUserId = user.towersUserId
         }
+      }
+
+      if (trigger === "signUp") {
+        token.isNewUser = true
       }
 
       if (trigger === "update" && token.sub) {
@@ -113,6 +131,13 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         session.user.username = token.username
         session.user.image = token.picture
         session.user.towersUserId = token.towersUserId
+        session.account = token.account
+        session.isNewUser = token.isNewUser
+      } else {
+        await prisma.user.update({
+          where: { id: session.user.id },
+          data: { isOnline: false }
+        })
       }
 
       return session
@@ -145,6 +170,36 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       })
 
       user.towersUserId = towersGameUser.id
+    },
+    async signIn({ user, account }) {
+      if (user.id) {
+        const cookieStore: ReadonlyRequestCookies = cookies()
+        const ipAddress: string | null = cookieStore.get("user-ip")?.value || "[unknown]"
+        const userAgent: string | null = cookieStore.get("user-agent")?.value || "[unknown]"
+        const location: string | null = await getLocation(ipAddress)
+        const loginMethod: LoginMethod = account?.provider
+          ? (account?.provider.toUpperCase() as LoginMethod)
+          : LoginMethod.CREDENTIALS
+
+        await prisma.loginHistory.create({
+          data: {
+            userId: user.id,
+            ipAddress,
+            userAgent,
+            location,
+            loginMethod
+          }
+        })
+      }
+    },
+    // @ts-ignore
+    async signOut({ token }) {
+      if (token) {
+        await prisma.user.update({
+          where: { id: token.sub },
+          data: { isOnline: false }
+        })
+      }
     }
   },
   pages: {
