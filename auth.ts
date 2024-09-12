@@ -181,15 +181,16 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
           ? (account?.provider.toUpperCase() as LoginMethod)
           : LoginMethod.CREDENTIALS
 
-        await prisma.loginHistory.create({
-          data: {
-            userId: user.id,
-            ipAddress,
-            userAgent,
-            location,
-            loginMethod
-          }
-        })
+        // TODO: Uncomment for production
+        // await prisma.loginHistory.create({
+        //   data: {
+        //     userId: user.id,
+        //     ipAddress,
+        //     userAgent,
+        //     location,
+        //     loginMethod
+        //   }
+        // })
       }
     },
     // @ts-ignore

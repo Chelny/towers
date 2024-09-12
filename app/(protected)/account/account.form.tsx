@@ -2,6 +2,7 @@
 
 import { ClipboardEvent, FormEvent, ReactNode, useEffect, useState } from "react"
 import { useFormState, useFormStatus } from "react-dom"
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime"
 import { useRouter } from "next/navigation"
 import clsx from "clsx/lite"
 import { signOut } from "next-auth/react"
@@ -18,9 +19,9 @@ const initialState = {
 }
 
 export function AccountForm(): ReactNode {
-  const router = useRouter()
+  const router: AppRouterInstance = useRouter()
   const { pending } = useFormStatus()
-  const [state, formAction] = useFormState(account, initialState)
+  const [state, formAction] = useFormState<any, FormData>(account, initialState)
   const [isExpanded, setIsExpanded] = useState<boolean>(false)
 
   useEffect(() => {

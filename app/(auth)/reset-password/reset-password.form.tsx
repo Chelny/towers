@@ -2,7 +2,7 @@
 
 import { FormEvent, ReactNode } from "react"
 import { useFormState, useFormStatus } from "react-dom"
-import { useSearchParams } from "next/navigation"
+import { ReadonlyURLSearchParams, useSearchParams } from "next/navigation"
 import {
   resetPassword,
   ResetPasswordData,
@@ -19,10 +19,10 @@ const initialState = {
 }
 
 export function ResetPasswordForm(): ReactNode {
-  const searchParams = useSearchParams()
+  const searchParams: ReadonlyURLSearchParams = useSearchParams()
   const token: string | null = searchParams.get("token")
   const { pending } = useFormStatus()
-  const [state, formAction] = useFormState(resetPassword, initialState)
+  const [state, formAction] = useFormState<any, FormData>(resetPassword, initialState)
 
   const handleResetPassword = (event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault()

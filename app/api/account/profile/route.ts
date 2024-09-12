@@ -9,7 +9,7 @@ import prisma from "@/lib"
 export async function GET(): Promise<NextResponse> {
   const session: Session | null = await auth()
 
-  if (!session || !session.user) {
+  if (!session?.user) {
     return NextResponse.json(
       {
         success: false,
@@ -60,7 +60,7 @@ export async function GET(): Promise<NextResponse> {
 export async function POST(body: ProfileData): Promise<NextResponse> {
   const session: Session | null = await auth()
 
-  if (!session || !session.user) {
+  if (!session?.user) {
     return NextResponse.json(
       {
         success: false,

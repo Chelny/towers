@@ -3,8 +3,8 @@ import { signOut } from "next-auth/react"
 import { useDispatch } from "react-redux"
 import { Mock } from "vitest"
 import SmallScreenWarning from "@/components/SmallScreenWarning"
-import { destroySocket } from "@/features"
 import { useSessionData } from "@/hooks"
+import { destroySocket } from "@/redux/features"
 import { mockedAuthenticatedSession } from "@/vitest.setup"
 
 vi.mock("next-auth/react", () => ({

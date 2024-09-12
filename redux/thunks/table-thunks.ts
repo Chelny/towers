@@ -1,15 +1,11 @@
 import { createAsyncThunk } from "@reduxjs/toolkit"
-import { TABLE_CACHE_TAG, TABLE_CHAT_CACHE_TAG, TABLE_USERS_CACHE_TAG } from "@/constants"
 import { TableChatResponseData, TableResponseData, TableUsersResponseData } from "@/interfaces"
 
 export const fetchTableData = createAsyncThunk<TableResponseData, string, { rejectValue: string }>(
   "table/fetchTableData",
   async (tableId, { rejectWithValue }) => {
     try {
-      const response: Response = await fetch(`/api/tables/${tableId}`, {
-        cache: "no-store",
-        next: { tags: [TABLE_CACHE_TAG] }
-      })
+      const response: Response = await fetch(`/api/tables/${tableId}`)
 
       if (!response.ok) throw new Error("Failed to fetch table data")
 
@@ -28,10 +24,7 @@ export const fetchTableChatData = createAsyncThunk<
   { rejectValue: string }
 >("table/fetchTableChatData", async ({ tableId, towersUserId }, { rejectWithValue }) => {
   try {
-    const response: Response = await fetch(`/api/table-chat?tableId=${tableId}&currentTowersUserId=${towersUserId}`, {
-      cache: "no-store",
-      next: { tags: [TABLE_CHAT_CACHE_TAG] }
-    })
+    const response: Response = await fetch(`/api/table-chat?tableId=${tableId}&currentTowersUserId=${towersUserId}`)
 
     if (!response.ok) throw new Error("Failed to fetch table chat data")
 
@@ -47,10 +40,7 @@ export const fetchTableUsersData = createAsyncThunk<TableUsersResponseData, stri
   "table/fetchTableUsersData",
   async (tableId, { rejectWithValue }) => {
     try {
-      const response: Response = await fetch(`/api/towers-users?tableId=${tableId}`, {
-        cache: "no-store",
-        next: { tags: [TABLE_USERS_CACHE_TAG] }
-      })
+      const response: Response = await fetch(`/api/towers-users?tableId=${tableId}`)
 
       if (!response.ok) throw new Error("Failed to fetch table users data")
 

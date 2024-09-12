@@ -19,7 +19,7 @@ const initialState = {
 
 export function UpdatePasswordForm(): ReactNode {
   const { pending } = useFormStatus()
-  const [state, formAction] = useFormState(password, initialState)
+  const [state, formAction] = useFormState<any, FormData>(password, initialState)
   const currentPasswordRef = useRef<HTMLInputElement>(null)
   const newPasswordRef = useRef<HTMLInputElement>(null)
   const confirmNewPasswordRef = useRef<HTMLInputElement>(null)

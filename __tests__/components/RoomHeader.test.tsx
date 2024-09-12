@@ -2,13 +2,14 @@ import { configureStore } from "@reduxjs/toolkit"
 import { render, screen } from "@testing-library/react"
 import { Provider } from "react-redux"
 import RoomHeader from "@/components/RoomHeader"
-import socketReducer, { SocketState } from "@/features"
+import { socketReducer, SocketState } from "@/redux/features"
 import { mockedRoomWithTablesCount } from "@/vitest.setup"
 
 describe("RoomHeader Component", () => {
   it("should render room name and socket status", () => {
     const initialState: SocketState = {
       isConnected: true,
+      socketRooms: {},
       rooms: {},
       roomsLoading: false,
       roomsChat: {},

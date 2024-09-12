@@ -2,6 +2,7 @@
 
 import { FormEvent, ReactNode } from "react"
 import { useFormState, useFormStatus } from "react-dom"
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { signIn, SignInData, SignInErrorMessages } from "@/app/(auth)/sign-in/sign-in.actions"
@@ -20,10 +21,10 @@ const initialState = {
 }
 
 export function SignInForm(): ReactNode {
-  const router = useRouter()
+  const router: AppRouterInstance = useRouter()
   const { status } = useSessionData()
   const { pending } = useFormStatus()
-  const [state, formAction] = useFormState(signIn, initialState)
+  const [state, formAction] = useFormState<any, FormData>(signIn, initialState)
 
   const handleSignIn = (event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault()

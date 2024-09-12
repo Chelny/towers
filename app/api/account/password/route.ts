@@ -10,7 +10,7 @@ import prisma from "@/lib"
 export async function POST(body: UpdatePasswordData): Promise<NextResponse> {
   const session: Session | null = await auth()
 
-  if (!session || !session.user) {
+  if (!session?.user) {
     return NextResponse.json(
       {
         success: false,

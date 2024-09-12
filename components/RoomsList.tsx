@@ -1,22 +1,23 @@
 "use client"
 
 import { ReactNode, useEffect } from "react"
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime"
 import { useRouter } from "next/navigation"
 import clsx from "clsx/lite"
 import { useDispatch, useSelector } from "react-redux"
 import Button from "@/components/ui/Button"
 import { ROUTE_TOWERS } from "@/constants"
-import { initSocket } from "@/features"
 import { useSessionData } from "@/hooks"
 import { RoomWithCount } from "@/interfaces"
-import { AppDispatch, RootState } from "@/redux"
+import { initSocket } from "@/redux/features"
+import { AppDispatch, RootState } from "@/redux/store"
 
 type RoomsListProps = {
   rooms: RoomWithCount[]
 }
 
 export default function RoomsList({ rooms }: RoomsListProps): ReactNode {
-  const router = useRouter()
+  const router: AppRouterInstance = useRouter()
   const { status } = useSessionData()
   const { isConnected } = useSelector((state: RootState) => state.socket)
   const dispatch: AppDispatch = useDispatch()

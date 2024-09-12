@@ -19,7 +19,7 @@ const initialState = {
 
 export function SignInWithMagicLinkForm(): ReactNode {
   const { pending } = useFormStatus()
-  const [state, formAction] = useFormState(signInWithMagicLink, initialState)
+  const [state, formAction] = useFormState<any, FormData>(signInWithMagicLink, initialState)
 
   const handleSignInWithMagicLink = (event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault()

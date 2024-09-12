@@ -10,7 +10,7 @@ import prisma from "@/lib/prisma"
 export async function DELETE(body: AccountData): Promise<NextResponse> {
   const session: Session | null = await auth()
 
-  if (!session || !session.user) {
+  if (!session?.user) {
     return NextResponse.json(
       {
         success: false,

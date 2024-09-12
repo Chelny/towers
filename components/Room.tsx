@@ -1,6 +1,7 @@
 "use client"
 
-import { KeyboardEvent, MouseEvent, ReactNode, useEffect, useRef, useState } from "react"
+import { KeyboardEvent, MouseEvent, ReactNode, useCallback, useEffect, useRef, useState } from "react"
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime"
 import dynamic from "next/dynamic"
 import { useRouter } from "next/navigation"
 import { useDispatch, useSelector } from "react-redux"
@@ -14,17 +15,18 @@ import TableInvitation, { TableInvitationData } from "@/components/TableInvitati
 import AlertMessage from "@/components/ui/AlertMessage"
 import Button from "@/components/ui/Button"
 import { CHAT_MESSSAGE_MAX_LENGTH, ROUTE_ROOMS } from "@/constants"
-import { joinRoom, leaveRoom, sendMessageToRoomChat } from "@/features"
 import { useSessionData } from "@/hooks"
-import { fetchRoomChatData, fetchRoomData, fetchRoomUsersData } from "@/lib"
-import { AppDispatch, RootState } from "@/redux"
+import { beforeLeaveSocketRoom, joinSocketRoom, leaveSocketRoom, sendMessageToRoomChat } from "@/redux/features"
+import { AppDispatch, RootState } from "@/redux/store"
+import { fetchRoomChatData, fetchRoomData, fetchRoomUsersData, joinRoom, leaveRoom } from "@/redux/thunks"
+import { debounce } from "@/utils"
 
 type RoomProps = {
   roomId: string
 }
 
 export default function Room({ roomId }: RoomProps): ReactNode {
-  const router = useRouter()
+  const router: AppRouterInstance = useRouter()
   const { data: session } = useSessionData()
   const { socketRooms, rooms, roomsLoading, roomsChat, roomsChatLoading, roomsUsers, error } = useSelector(
     (state: RootState) => state.socket
@@ -41,9 +43,13 @@ export default function Room({ roomId }: RoomProps): ReactNode {
   }, [])
 
   useEffect(() => {
-    dispatch(fetchRoomData(roomId))
-    dispatch(fetchRoomChatData(roomId))
-    dispatch(fetchRoomUsersData(roomId))
+    const debouncedFetchData: Debounce = debounce(() => {
+      dispatch(fetchRoomData(roomId))
+      dispatch(fetchRoomChatData(roomId))
+      dispatch(fetchRoomUsersData(roomId))
+    }, 500)
+
+    debouncedFetchData()
   }, [socketRooms[roomId]])
 
   useEffect(() => {
@@ -106,7 +112,7 @@ export default function Room({ roomId }: RoomProps): ReactNode {
   }
 
   const scrollChatToBottom = (): void => {
-    chatEndRef.current?.scrollIntoView({ behavior: "instant" })
+    chatEndRef.current?.scrollIntoView({ behavior: "instant", block: "end" })
   }
 
   const handleExitRoom = (): void => {

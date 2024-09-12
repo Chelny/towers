@@ -2,8 +2,8 @@ import { render, screen } from "@testing-library/react"
 import { useDispatch, useSelector } from "react-redux"
 import { Mock } from "vitest"
 import TowersPageContent from "@/components/TowersPageContent"
-import { destroySocket, initSocket, SocketState } from "@/features"
 import { useSessionData } from "@/hooks"
+import { destroySocket, initSocket, SocketState } from "@/redux/features"
 import {
   mockedAuthenticatedSession,
   mockedRoom1,

@@ -23,7 +23,7 @@ const initialState = {
 
 export function ProfileForm({ user }: ProfileProps): ReactNode {
   const { pending } = useFormStatus()
-  const [state, formAction] = useFormState(profile, initialState)
+  const [state, formAction] = useFormState<any, FormData>(profile, initialState)
   const { update } = useSessionData()
 
   useEffect(() => {

@@ -1,6 +1,8 @@
 import { TableChatMessageType } from "@prisma/client"
 import { Middleware, MiddlewareAPI } from "redux"
+import { SocketFactory, SocketInterface } from "@/lib"
 import {
+  beforeLeaveSocketRoom,
   connectionEstablished,
   connectionLost,
   // createTable,
@@ -10,12 +12,11 @@ import {
   getTableChatMessage,
   // getTables,
   initSocket,
-  joinRoom,
-  leaveRoom,
+  joinSocketRoom,
+  leaveSocketRoom,
   sendMessageToRoomChat,
   sendMessageToTableChat
-} from "@/features"
-import { SocketFactory, SocketInterface } from "@/lib"
+} from "@/redux/features"
 
 enum SocketEvent {
   Connect = "connect",
@@ -28,21 +29,22 @@ enum SocketEvent {
   LeaveRoom = "room:leave",
   JoinTable = "table:join",
   UserJoinedTableAnnouncement = "table:user-joined-announcement",
-  LeaveTable = "table:leave",
+  BeforeLeaveTable = "table:before-leave",
   UserLeaveTableAnnouncement = "table:user-left-announcement",
+  LeaveTable = "table:leave",
   CreateTable = "create-table",
   DeleteTable = "delete-table",
   GetTables = "get-tables",
-  SendToRoomChat = "send-message-to-room-chat",
-  GetRoomChatMessage = "get-room-chat-message",
-  SendToTableChat = "send-message-to-table-chat",
-  GetTableChatMessage = "get-table-chat-message",
+  SendToRoomChat = "room:send-message",
+  GetRoomChatMessage = "room:get-message",
+  SendToTableChat = "table:send-message",
+  GetTableChatMessage = "table:get-message",
   SignOut = "sign-out",
   SignOutSuccess = "sign-out-success",
   Error = "err",
 }
 
-const socketMiddleware: Middleware = (store: MiddlewareAPI) => {
+export const socketMiddleware: Middleware = (store: MiddlewareAPI) => {
   let socket: SocketInterface
 
   return (next) => async (action: unknown) => {
@@ -98,31 +100,40 @@ const socketMiddleware: Middleware = (store: MiddlewareAPI) => {
         })
 
         socket.socket.on(SocketEvent.UserJoinedTableAnnouncement, async ({ tableId, username }) => {
-          const message: string = `*** ${username} joined the table.`
-          // TODO: Uncomment
-          // const response: Response = await fetch("/api/table-chat", {
-          //   method: "POST",
-          //   body: JSON.stringify({ tableId, message, type: TableChatMessageType.USER_ACTION })
-          // })
-
-          // if (response.ok) {
-          //   const data = await response.json()
-          //   store.dispatch(getTableChatMessage(data.data))
-          // }
+          try {
+            // TODO: Uncomment for production
+            // const message: string = `*** ${username} joined the table.`
+            // const response: Response = await fetch("/api/table-chat", {
+            //   method: "POST",
+            //   body: JSON.stringify({ tableId, message, type: TableChatMessageType.USER_ACTION })
+            // })
+            // if (response.ok) {
+            //   const data = await response.json()
+            //   store.dispatch(getTableChatMessage(data.data))
+            // }
+          } catch (error) {
+            console.error(error)
+          }
         })
 
         socket.socket.on(SocketEvent.UserLeaveTableAnnouncement, async ({ tableId, username }) => {
-          const message: string = `*** ${username} left the table.`
-          // TODO: Uncomment
-          // const response: Response = await fetch("/api/table-chat", {
-          //   method: "POST",
-          //   body: JSON.stringify({ tableId, message, type: TableChatMessageType.USER_ACTION })
-          // })
+          try {
+            // TODO: Uncomment for production
+            // const message: string = `*** ${username} left the table.`
+            // const response: Response = await fetch("/api/table-chat", {
+            //   method: "POST",
+            //   body: JSON.stringify({ tableId, message, type: TableChatMessageType.USER_ACTION })
+            // })
 
-          // if (response.ok) {
-          //   const data = await response.json()
-          //   store.dispatch(getTableChatMessage(data.data))
-          // }
+            // if (response.ok) {
+            //   const data = await response.json()
+            //   store.dispatch(getTableChatMessage(data.data))
+            // }
+
+            store.dispatch(leaveSocketRoom({ room: tableId, isTable: true, username }))
+          } catch (error) {
+            console.error(error)
+          }
         })
 
         socket.socket.on(SocketEvent.GetTableChatMessage, async ({ tableId, towersUserId, message }) => {
@@ -144,14 +155,14 @@ const socketMiddleware: Middleware = (store: MiddlewareAPI) => {
     }
 
     if (socket) {
-      if (joinRoom.match(action)) {
+      if (joinSocketRoom.match(action)) {
         const { room, isTable, username } = action.payload
         socket.socket.emit(isTable ? SocketEvent.JoinTable : SocketEvent.JoinRoom, { room, username })
       }
 
-      if (leaveRoom.match(action)) {
+      if (beforeLeaveSocketRoom.match(action)) {
         const { room, isTable, username } = action.payload
-        socket.socket.emit(isTable ? SocketEvent.LeaveTable : SocketEvent.LeaveRoom, { room, username })
+        socket.socket.emit(isTable ? SocketEvent.BeforeLeaveTable : SocketEvent.LeaveRoom, { room, username })
       }
 
       // if (createTable.match(action)) {
@@ -182,5 +193,3 @@ const socketMiddleware: Middleware = (store: MiddlewareAPI) => {
     next(action)
   }
 }
-
-export default socketMiddleware

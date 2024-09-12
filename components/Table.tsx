@@ -1,6 +1,7 @@
 "use client"
 
-import { ChangeEvent, KeyboardEvent, MouseEvent, ReactNode, useEffect, useRef, useState } from "react"
+import { ChangeEvent, KeyboardEvent, MouseEvent, ReactNode, useCallback, useEffect, useRef, useState } from "react"
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime"
 import dynamic from "next/dynamic"
 import { useRouter } from "next/navigation"
 import { TableType } from "@prisma/client"
@@ -17,11 +18,19 @@ import Button from "@/components/ui/Button"
 import Checkbox from "@/components/ui/Checkbox"
 import Select from "@/components/ui/Select"
 import { CHAT_MESSSAGE_MAX_LENGTH } from "@/constants"
-import { joinRoom, leaveRoom, sendMessageToTableChat } from "@/features"
 import { useSessionData } from "@/hooks"
 import { TowersGameUserWithUserAndTables } from "@/interfaces"
-import { fetchRoomUsersData, fetchTableChatData, fetchTableData, fetchTableUsersData } from "@/lib"
-import { AppDispatch, RootState } from "@/redux"
+import { beforeLeaveSocketRoom, joinSocketRoom, leaveSocketRoom, sendMessageToTableChat } from "@/redux/features"
+import { AppDispatch, RootState } from "@/redux/store"
+import {
+  fetchRoomUsersData,
+  fetchTableChatData,
+  fetchTableData,
+  fetchTableUsersData,
+  joinRoom,
+  leaveRoom
+} from "@/redux/thunks"
+import { debounce } from "@/utils"
 
 enum GameState {
   WAITING_FOR_PLAYERS = 0,
@@ -51,7 +60,7 @@ type TableProps = {
 }
 
 export default function Table({ roomId, tableId }: TableProps): ReactNode {
-  const router = useRouter()
+  const router: AppRouterInstance = useRouter()
   const { data: session } = useSessionData()
   const { socketRooms, roomsUsers, tables, tablesLoading, tablesChat, tablesChatLoading, tablesUsers } = useSelector(
     (state: RootState) => state.socket
@@ -73,10 +82,14 @@ export default function Table({ roomId, tableId }: TableProps): ReactNode {
   }, [])
 
   useEffect(() => {
-    dispatch(fetchRoomUsersData(roomId))
-    dispatch(fetchTableData(tableId))
-    dispatch(fetchTableChatData({ tableId, towersUserId: session?.user.towersUserId }))
-    dispatch(fetchTableUsersData(tableId))
+    const debouncedFetchData: Debounce = debounce(() => {
+      dispatch(fetchRoomUsersData(roomId))
+      dispatch(fetchTableData(tableId))
+      dispatch(fetchTableChatData({ tableId, towersUserId: session?.user.towersUserId }))
+      dispatch(fetchTableUsersData(tableId))
+    }, 500)
+
+    debouncedFetchData()
   }, [socketRooms[roomId]])
 
   useEffect(() => {
@@ -167,7 +180,7 @@ export default function Table({ roomId, tableId }: TableProps): ReactNode {
   }
 
   const scrollChatToBottom = (): void => {
-    chatEndRef.current?.scrollIntoView({ behavior: "instant" })
+    chatEndRef.current?.scrollIntoView({ behavior: "instant", block: "end" })
   }
 
   const handleQuitTable = (): void => {

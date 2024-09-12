@@ -6,7 +6,6 @@ import axios from 'axios';
 const dev = process.env.NODE_ENV !== "production";
 const hostname = "localhost";
 const port = 3000;
-// when using middleware `hostname` and `port` must be provided below
 const app = next({dev, hostname, port});
 const handler = app.getRequestHandler();
 
@@ -65,20 +64,23 @@ app.prepare().then(() => {
 
     socket.on('table:join', ({room, username}) => {
       socket.join(room);
-      io.to(room).emit("table:user-joined-announcement", {tableId: room, username});
+      socket.broadcast.to(room).emit("table:user-joined-announcement", {tableId: room, username});
     });
 
-    socket.on("table:leave", ({room, username}) => {
+    socket.on("table:before-leave", ({room, username}) => {
       io.to(room).emit("table:user-left-announcement", {tableId: room, username});
+    });
+
+    socket.on("table:leave", ({room}) => {
       socket.leave(room);
     });
 
-    socket.on("send-message-to-room-chat", ({roomId, towersUserId, message}) => {
-      io.to(roomId).emit("get-room-chat-message", {roomId, towersUserId, message});
+    socket.on("room:send-message", ({roomId, towersUserId, message}) => {
+      io.to(roomId).emit("room:get-message", {roomId, towersUserId, message});
     });
 
-    socket.on("send-message-to-table-chat", ({tableId, towersUserId, message}) => {
-      io.to(tableId).emit("get-table-chat-message", {tableId, towersUserId, message});
+    socket.on("table:send-message", ({tableId, towersUserId, message}) => {
+      io.to(tableId).emit("table:get-message", {tableId, towersUserId, message});
     });
 
     socket.on("sign-out", () => {

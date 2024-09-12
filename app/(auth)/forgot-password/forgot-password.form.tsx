@@ -19,7 +19,7 @@ const initialState = {
 
 export function ForgotPasswordForm(): ReactNode {
   const { pending } = useFormStatus()
-  const [state, formAction] = useFormState(forgotPassword, initialState)
+  const [state, formAction] = useFormState<any, FormData>(forgotPassword, initialState)
 
   const handleSendEmail = (event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault()

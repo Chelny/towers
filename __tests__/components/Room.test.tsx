@@ -3,8 +3,8 @@ import { useDispatch, useSelector } from "react-redux"
 import { Mock } from "vitest"
 import Room from "@/components/Room"
 import { ROUTE_ROOMS } from "@/constants"
-import { SocketState } from "@/features"
 import { useSessionData } from "@/hooks/useSessionData"
+import { SocketState } from "@/redux/features"
 import { mockedAuthenticatedSession, mockedRoom1, mockedSocketStateRooms } from "@/vitest.setup"
 
 const { useRouter, mockedRouterPush } = vi.hoisted(() => {

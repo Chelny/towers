@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: ROUTE_UPDATE_PASSWORD.TITLE
 }
 
-export default async function UpdatePassword(): Promise<ReactNode> {
+export default function UpdatePassword(): ReactNode {
   return (
     <>
       <h2 className="mb-4 text-3xl">{ROUTE_UPDATE_PASSWORD.TITLE}</h2>

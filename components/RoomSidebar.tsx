@@ -13,8 +13,8 @@ import { RiExpandLeftLine, RiExpandRightLine } from "react-icons/ri"
 import { useDispatch } from "react-redux"
 import UserAvatar from "@/components/UserAvatar"
 import { ROUTE_ACCOUNT, ROUTE_TOWERS } from "@/constants"
-import { destroySocket } from "@/features"
 import { useSessionData } from "@/hooks"
+import { destroySocket } from "@/redux/features"
 
 export default function RoomSidebar(): ReactNode {
   const [isExpanded, setIsExpanded] = useState<boolean>(false)

@@ -1,19 +1,20 @@
 "use client"
 
 import { ReactNode } from "react"
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime"
 import { useRouter } from "next/navigation"
 import { TableType } from "@prisma/client"
 import { useSelector } from "react-redux"
 import Button from "@/components/ui/Button"
 import { TableWithHostAndTowersGameUsers, TowersGameUserWithUser } from "@/interfaces"
-import { RootState } from "@/redux"
+import { RootState } from "@/redux/store"
 
 type RoomTableProps = {
   roomId: string
 }
 
 export default function RoomTable({ roomId }: RoomTableProps): ReactNode {
-  const router = useRouter()
+  const router: AppRouterInstance = useRouter()
   const { rooms, tablesLoading } = useSelector((state: RootState) => state.socket)
   const seatMapping: number[][] = [
     [1, 3, 5, 7],

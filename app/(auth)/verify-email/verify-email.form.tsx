@@ -1,8 +1,9 @@
 "use client"
 
-import { FormEvent, ReactNode, useCallback, useEffect, useRef } from "react"
+import { FormEvent, ReactNode, RefObject, useCallback, useEffect, useRef } from "react"
 import { useFormState } from "react-dom"
-import { useSearchParams } from "next/navigation"
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime"
+import { ReadonlyURLSearchParams, useSearchParams } from "next/navigation"
 import { useRouter } from "next/navigation"
 import { CgSpinner } from "react-icons/cg"
 import { verifyEmail, VerifyEmailData, VerifyEmailErrorMessages } from "@/app/(auth)/verify-email/verify-email.actions"
@@ -17,12 +18,12 @@ const initialState = {
 }
 
 export function VerifyEmailForm(): ReactNode {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const email = searchParams.get("email")
-  const token = searchParams.get("token")
-  const formRef = useRef<HTMLFormElement>(null)
-  const [state, formAction] = useFormState(verifyEmail, initialState)
+  const router: AppRouterInstance = useRouter()
+  const searchParams: ReadonlyURLSearchParams = useSearchParams()
+  const email: string | null = searchParams.get("email")
+  const token: string | null = searchParams.get("token")
+  const formRef: RefObject<HTMLFormElement> = useRef<HTMLFormElement>(null)
+  const [state, formAction] = useFormState<any, FormData>(verifyEmail, initialState)
 
   const handleSubmit = useCallback(() => {
     if (state.success) return

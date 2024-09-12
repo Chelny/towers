@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server"
-import { Room } from "@prisma/client"
 import { RoomWithCount } from "@/interfaces"
 import prisma from "@/lib"
 

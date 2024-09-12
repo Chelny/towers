@@ -3,7 +3,7 @@
 import { ReactNode } from "react"
 import { useSelector } from "react-redux"
 import { RoomWithTablesCount } from "@/interfaces"
-import { RootState } from "@/redux"
+import { RootState } from "@/redux/store"
 
 type RoomHeaderProps = {
   room: RoomWithTablesCount | null

@@ -4,9 +4,9 @@ import { ReactNode, useEffect } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import Room from "@/components/Room"
 import Table from "@/components/Table"
-import { destroySocket, initSocket } from "@/features"
 import { useSessionData } from "@/hooks"
-import { AppDispatch, RootState } from "@/redux"
+import { destroySocket, initSocket } from "@/redux/features"
+import { AppDispatch, RootState } from "@/redux/store"
 
 type TowersPageContentProps = {
   roomId: string

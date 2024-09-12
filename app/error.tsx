@@ -1,6 +1,7 @@
 "use client" // Error components must be Client Components
 
 import { ReactNode, useEffect } from "react"
+import Button from "@/components/ui/Button"
 
 type RootErrorProps = {
   error: Error & { digest?: string }
@@ -14,16 +15,19 @@ export default function Error({ error, reset }: RootErrorProps): ReactNode {
   }, [error])
 
   return (
-    <div className="text-center">
-      <h2>Something went wrong!</h2>
-      <button
-        onClick={
-          // Attempt to recover by trying to re-render the segment
-          () => reset()
-        }
-      >
-        Try again
-      </button>
+    <div className="flex flex-col items-center justify-center w-full h-screen">
+      <div className="flex flex-col items-center justify-center max-w-sm text-center">
+        <h5 className="mb-4 text-3xl">Something went wrong</h5>
+        <Button
+          className="mt-6"
+          onClick={
+            // Attempt to recover by trying to re-render the segment
+            () => reset()
+          }
+        >
+          Try again
+        </Button>
+      </div>
     </div>
   )
 }

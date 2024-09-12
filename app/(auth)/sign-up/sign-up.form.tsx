@@ -18,7 +18,7 @@ const initialState = {
 
 export function SignUpForm(): ReactNode {
   const { pending } = useFormStatus()
-  const [state, formAction] = useFormState(signUp, initialState)
+  const [state, formAction] = useFormState<any, FormData>(signUp, initialState)
 
   const handleSignUp = (event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault()
