@@ -64,11 +64,11 @@ app.prepare().then(() => {
 
     socket.on('table:join', ({room, username}) => {
       socket.join(room);
-      socket.broadcast.to(room).emit("table:user-joined-announcement", {tableId: room, username});
+      socket.broadcast.to(room).emit("table:send-user-joined-message", {tableId: room, username});
     });
 
     socket.on("table:before-leave", ({room, username}) => {
-      io.to(room).emit("table:user-left-announcement", {tableId: room, username});
+      io.to(room).emit("table:send-user-left-message", {tableId: room, username});
     });
 
     socket.on("table:leave", ({room}) => {
@@ -83,9 +83,9 @@ app.prepare().then(() => {
       io.to(tableId).emit("table:get-message", {tableId, towersUserId, message});
     });
 
-    socket.on("sign-out", () => {
+    socket.on("user:sign-out", () => {
       console.info(`User with socket ID ${socket.id} signed out.`);
-      socket.emit("sign-out-success");
+      socket.emit("user:sign-out-success");
       socket.disconnect();
     });
   });

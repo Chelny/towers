@@ -53,7 +53,6 @@ type RoomAction = PayloadAction<{
   isTable: boolean
   username?: string
 }>
-type TableAction = PayloadAction<RoomWithTablesCount>
 type RoomChatMessageInputAction = PayloadAction<RoomChatMessageInput>
 type RoomChatMessageAction = PayloadAction<RoomChatWithTowersGameUser>
 type TableChatMessageInputAction = PayloadAction<TableChatMessageInput>
@@ -110,22 +109,6 @@ const socketSlice = createSlice({
 
       delete state.socketRooms[room]
     },
-    // createTable: (state: SocketState, action: TableAction) => {
-    //   const { room, tableId, roomId, hostId, tableType, rated } = action.payload
-    //   if (room) {
-    //     if (!state.tables[room]) state.tables[room] = []
-    //     state.tables[room].push({ tableId, roomId, hostId, tableType, rated })
-    //   }
-    // },
-    // getTables: (state: SocketState, action: TableAction) => {
-    //   console.log("getTables", state.room, action.payload)
-    // },
-    // deleteTable: (state: SocketState, action: TableAction) => {
-    //   const { room, tableId } = action.payload
-    //   if (room && state.tables[room]) {
-    //     state.tables[room] = state.tables[room].filter((table: Table) => table.tableId !== tableId)
-    //   }
-    // },
     sendMessageToRoomChat: (state: SocketState, action: RoomChatMessageInputAction) => {},
     getRoomChatMessage: (state: SocketState, action: RoomChatMessageAction) => {
       const { roomId: room } = action.payload
@@ -162,9 +145,6 @@ export const {
   leaveSocketRoom,
   sendMessageToRoomChat,
   getRoomChatMessage,
-  // createTable,
-  // deleteTable,
-  // getTables,
   sendMessageToTableChat,
   getTableChatMessage
 } = socketSlice.actions

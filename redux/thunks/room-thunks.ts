@@ -26,7 +26,7 @@ export const fetchRoomChatData = createAsyncThunk<RoomChatResponseData, string, 
     const errorMessage: string = "Failed to fetch room chat data"
 
     try {
-      const response: Response = await fetch(`/api/room-chat/${roomId}`)
+      const response: Response = await fetch(`/api/rooms/${roomId}/chat`)
 
       if (!response.ok) throw new Error(errorMessage)
 
@@ -45,7 +45,7 @@ export const fetchRoomUsersData = createAsyncThunk<RoomUsersResponseData, string
     const errorMessage: string = "Failed to fetch room users data"
 
     try {
-      const response: Response = await fetch(`/api/towers-users?roomId=${roomId}`)
+      const response: Response = await fetch(`/api/rooms/${roomId}/users`)
 
       if (!response.ok) throw new Error(errorMessage)
 

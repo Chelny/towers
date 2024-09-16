@@ -31,7 +31,7 @@ class SocketConnection implements SocketInterface {
     }
   }
 
-  public destroy() {
+  public destroy(): void {
     if (this.socket) {
       this.socket.disconnect()
     }
@@ -50,7 +50,7 @@ export class SocketFactory {
     return socketConnection
   }
 
-  public static destroy() {
+  public static destroy(): void {
     if (socketConnection) {
       socketConnection.destroy()
       socketConnection = undefined

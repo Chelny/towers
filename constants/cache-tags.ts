@@ -1,6 +1,0 @@
-export const ROOM_CACHE_TAG = "room"
-export const ROOM_CHAT_CACHE_TAG = "room-chat"
-export const ROOM_USERS_CACHE_TAG = "room-users"
-export const TABLE_CACHE_TAG = "table"
-export const TABLE_CHAT_CACHE_TAG = "table-chat"
-export const TABLE_USERS_CACHE_TAG = "table-users"

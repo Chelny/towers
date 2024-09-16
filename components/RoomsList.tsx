@@ -23,10 +23,8 @@ export default function RoomsList({ rooms }: RoomsListProps): ReactNode {
   const dispatch: AppDispatch = useDispatch()
 
   useEffect(() => {
-    if (status === "authenticated") {
-      if (!isConnected) {
-        dispatch(initSocket())
-      }
+    if (status === "authenticated" && !isConnected) {
+      dispatch(initSocket())
     }
   }, [status, isConnected, dispatch])
 

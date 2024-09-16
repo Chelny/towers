@@ -5,12 +5,9 @@ import {
   beforeLeaveSocketRoom,
   connectionEstablished,
   connectionLost,
-  // createTable,
-  // deleteTable,
   destroySocket,
   getRoomChatMessage,
   getTableChatMessage,
-  // getTables,
   initSocket,
   joinSocketRoom,
   leaveSocketRoom,
@@ -28,19 +25,16 @@ enum SocketEvent {
   JoinRoom = "room:join",
   LeaveRoom = "room:leave",
   JoinTable = "table:join",
-  UserJoinedTableAnnouncement = "table:user-joined-announcement",
+  SendUserJoinedTableMessage = "table:send-user-joined-message",
   BeforeLeaveTable = "table:before-leave",
-  UserLeaveTableAnnouncement = "table:user-left-announcement",
+  SendUserLeftTableMessage = "table:send-user-left-message",
   LeaveTable = "table:leave",
-  CreateTable = "create-table",
-  DeleteTable = "delete-table",
-  GetTables = "get-tables",
-  SendToRoomChat = "room:send-message",
-  GetRoomChatMessage = "room:get-message",
-  SendToTableChat = "table:send-message",
-  GetTableChatMessage = "table:get-message",
-  SignOut = "sign-out",
-  SignOutSuccess = "sign-out-success",
+  SendRoomMessage = "room:send-message",
+  SetRoomChatMessage = "room:set-message",
+  SendTableMessage = "table:send-message",
+  SetTableChatMessage = "table:set-message",
+  SignOut = "user:sign-out",
+  SignOutSuccess = "user:sign-out-success",
   Error = "err",
 }
 
@@ -82,13 +76,8 @@ export const socketMiddleware: Middleware = (store: MiddlewareAPI) => {
           console.error(message)
         })
 
-        // socket.socket.on(SocketEvent.GetTables, ({ room }) => {
-        //   console.log("GetTables", room)
-        //   store.dispatch(getTables({ room }))
-        // })
-
-        socket.socket.on(SocketEvent.GetRoomChatMessage, async ({ roomId, towersUserId, message }) => {
-          const response: Response = await fetch("/api/room-chat", {
+        socket.socket.on(SocketEvent.SetRoomChatMessage, async ({ roomId, towersUserId, message }) => {
+          const response: Response = await fetch(`/api/rooms/${roomId}/chat`, {
             method: "POST",
             body: JSON.stringify({ roomId, towersUserId, message })
           })
@@ -99,11 +88,11 @@ export const socketMiddleware: Middleware = (store: MiddlewareAPI) => {
           }
         })
 
-        socket.socket.on(SocketEvent.UserJoinedTableAnnouncement, async ({ tableId, username }) => {
+        socket.socket.on(SocketEvent.SendUserJoinedTableMessage, async ({ tableId, username }) => {
           try {
             // TODO: Uncomment for production
             // const message: string = `*** ${username} joined the table.`
-            // const response: Response = await fetch("/api/table-chat", {
+            // const response: Response = await fetch(`/api/tables/${tableId}/chat`, {
             //   method: "POST",
             //   body: JSON.stringify({ tableId, message, type: TableChatMessageType.USER_ACTION })
             // })
@@ -116,11 +105,11 @@ export const socketMiddleware: Middleware = (store: MiddlewareAPI) => {
           }
         })
 
-        socket.socket.on(SocketEvent.UserLeaveTableAnnouncement, async ({ tableId, username }) => {
+        socket.socket.on(SocketEvent.SendUserLeftTableMessage, async ({ tableId, username }) => {
           try {
             // TODO: Uncomment for production
             // const message: string = `*** ${username} left the table.`
-            // const response: Response = await fetch("/api/table-chat", {
+            // const response: Response = await fetch(`/api/tables/${tableId}/chat`, {
             //   method: "POST",
             //   body: JSON.stringify({ tableId, message, type: TableChatMessageType.USER_ACTION })
             // })
@@ -136,8 +125,8 @@ export const socketMiddleware: Middleware = (store: MiddlewareAPI) => {
           }
         })
 
-        socket.socket.on(SocketEvent.GetTableChatMessage, async ({ tableId, towersUserId, message }) => {
-          const response: Response = await fetch("/api/table-chat", {
+        socket.socket.on(SocketEvent.SetTableChatMessage, async ({ tableId, towersUserId, message }) => {
+          const response: Response = await fetch(`/api/tables/${tableId}/chat`, {
             method: "POST",
             body: JSON.stringify({ tableId, towersUserId, message })
           })
@@ -165,24 +154,14 @@ export const socketMiddleware: Middleware = (store: MiddlewareAPI) => {
         socket.socket.emit(isTable ? SocketEvent.BeforeLeaveTable : SocketEvent.LeaveRoom, { room, username })
       }
 
-      // if (createTable.match(action)) {
-      //   const { room, tableId, roomId, hostId, tableType, rated } = action.payload
-      //   socket.socket.emit(SocketEvent.CreateTable, { room, tableId, roomId, hostId, tableType, rated })
-      // }
-
-      // if (deleteTable.match(action)) {
-      //   const { room, tableId } = action.payload
-      //   socket.socket.emit(SocketEvent.DeleteTable, { room, tableId })
-      // }
-
       if (sendMessageToRoomChat.match(action)) {
         const { roomId, towersUserId, message } = action.payload
-        socket.socket.emit(SocketEvent.SendToRoomChat, { roomId, towersUserId, message })
+        socket.socket.emit(SocketEvent.SendRoomMessage, { roomId, towersUserId, message })
       }
 
       if (sendMessageToTableChat.match(action)) {
         const { tableId, towersUserId, message } = action.payload
-        socket.socket.emit(SocketEvent.SendToTableChat, { tableId, towersUserId, message })
+        socket.socket.emit(SocketEvent.SendTableMessage, { tableId, towersUserId, message })
       }
 
       if (destroySocket.match(action)) {

@@ -70,10 +70,8 @@ export default function TowersPageContent({ roomId, tableId }: TowersPageContent
   }, [status, isConnected, dispatch])
 
   const connectToSocket = (): void => {
-    if (status === "authenticated") {
-      if (!isConnected) {
-        dispatch(initSocket())
-      }
+    if (status === "authenticated" && !isConnected) {
+      dispatch(initSocket())
     }
   }
 
