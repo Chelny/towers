@@ -15,7 +15,7 @@ type TowersPageContentProps = {
 
 export default function TowersPageContent({ roomId, tableId }: TowersPageContentProps): ReactNode {
   const { status, update } = useSessionData()
-  const { isConnected } = useSelector((state: RootState) => state.socket)
+  const isConnected: boolean = useSelector((state: RootState) => state.socket.isConnected)
   const dispatch: AppDispatch = useDispatch()
 
   // Polling the session every 1 hour
@@ -47,7 +47,7 @@ export default function TowersPageContent({ roomId, tableId }: TowersPageContent
       window.removeEventListener("online", handleOnline)
       window.removeEventListener("offline", handleOffline)
     }
-  }, [update, status, isConnected, dispatch])
+  }, [update, status, isConnected])
 
   /**
    * Listen for when the page is visible, if the user switches tabs
@@ -67,11 +67,13 @@ export default function TowersPageContent({ roomId, tableId }: TowersPageContent
 
   useEffect(() => {
     connectToSocket()
-  }, [status, isConnected, dispatch])
+  }, [status, isConnected])
 
   const connectToSocket = (): void => {
-    if (status === "authenticated" && !isConnected) {
-      dispatch(initSocket())
+    if (status === "authenticated") {
+      if (!isConnected) {
+        dispatch(initSocket())
+      }
     }
   }
 

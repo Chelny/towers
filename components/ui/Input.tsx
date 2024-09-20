@@ -17,8 +17,8 @@ type InputProps = {
   dataTestId?: string
   description?: string
   errorMessage?: string
-  onInput?: (event: ChangeEvent<HTMLInputElement>) => void
-  onPaste?: (event: ClipboardEvent<HTMLInputElement>) => void
+  onInput?: (_: ChangeEvent<HTMLInputElement>) => void
+  onPaste?: (_: ClipboardEvent<HTMLInputElement>) => void
 }
 
 export default forwardRef<HTMLInputElement, InputProps>(function Input(

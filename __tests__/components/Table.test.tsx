@@ -3,12 +3,15 @@ import { useDispatch, useSelector } from "react-redux"
 import { Mock } from "vitest"
 import Table from "@/components/Table"
 import { useSessionData } from "@/hooks"
+import { SocketState } from "@/redux/features"
 import {
   mockedAuthenticatedSession,
   mockedRoom1,
   mockedRoom1Table1,
-  mockedSocketStateRooms,
-  mockedSocketStateTables
+  mockedRoom1Table1Chat,
+  mockedRoom1Table1Info,
+  mockedRoom1Table1Users,
+  mockedRoom1Users
 } from "@/vitest.setup"
 
 const { useRouter } = vi.hoisted(() => {
@@ -48,19 +51,29 @@ describe("Table Component", () => {
   beforeEach(() => {
     vi.mocked(useDispatch).mockReturnValue(mockedDispatch)
     vi.mocked(useSessionData).mockReturnValue(mockedAuthenticatedSession)
-    vi.mocked(useSelector).mockReturnValue({
-      socketRooms: {},
-      rooms: mockedSocketStateRooms,
-      roomsLoading: false,
-      roomsChat: {},
-      roomsChatLoading: false,
-      roomsUsers: {},
-      roomsUsersLoading: false,
-      tables: mockedSocketStateTables,
-      tablesLoading: false,
-      tablesChat: {},
-      tablesChatLoading: false,
-      tablesUsers: {}
+    vi.mocked(useSelector).mockImplementation((selectorFn: (_: SocketState) => unknown) => {
+      if (selectorFn.toString().includes("state.socket.rooms[roomId]?.users")) {
+        return mockedRoom1Users
+      }
+      if (selectorFn.toString().includes("state.socket.tables")) {
+        return mockedRoom1Table1
+      }
+      if (selectorFn.toString().includes("state.socket.tables[tableId]?.tableInfo")) {
+        return mockedRoom1Table1Info
+      }
+      if (selectorFn.toString().includes("state.socket.tables[tableId]?.isTableInfoLoading")) {
+        return false
+      }
+      if (selectorFn.toString().includes("state.socket.tables[tableId]?.chat")) {
+        return mockedRoom1Table1Chat
+      }
+      if (selectorFn.toString().includes("state.socket.tables[tableId]?.isChatLoading")) {
+        return false
+      }
+      if (selectorFn.toString().includes("state.socket.tables[tableId]?.users")) {
+        return mockedRoom1Table1Users
+      }
+      return undefined
     })
   })
 

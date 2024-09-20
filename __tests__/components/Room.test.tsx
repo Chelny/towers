@@ -5,7 +5,13 @@ import Room from "@/components/Room"
 import { ROUTE_ROOMS } from "@/constants"
 import { useSessionData } from "@/hooks/useSessionData"
 import { SocketState } from "@/redux/features"
-import { mockedAuthenticatedSession, mockedRoom1, mockedSocketStateRooms } from "@/vitest.setup"
+import {
+  mockedAuthenticatedSession,
+  mockedRoom1,
+  mockedRoom1Chat,
+  mockedRoom1Info,
+  mockedRoom1Users
+} from "@/vitest.setup"
 
 const { useRouter, mockedRouterPush } = vi.hoisted(() => {
   const mockedRouterPush: Mock = vi.fn()
@@ -36,16 +42,6 @@ vi.mock("@/hooks/useSessionData", () => ({
 
 describe("Room Component", () => {
   const mockedDispatch: Mock = vi.fn()
-  const mockedSocketState: Partial<SocketState> = {
-    socketRooms: {},
-    rooms: mockedSocketStateRooms,
-    roomsLoading: false,
-    roomsChat: {},
-    roomsChatLoading: false,
-    roomsUsers: {},
-    roomsUsersLoading: false,
-    error: ""
-  }
 
   beforeAll(() => {
     Element.prototype.scrollIntoView = vi.fn()
@@ -53,8 +49,28 @@ describe("Room Component", () => {
 
   beforeEach(() => {
     vi.mocked(useDispatch).mockReturnValue(mockedDispatch)
-    vi.mocked(useSelector).mockReturnValue(mockedSocketState)
     vi.mocked(useSessionData).mockReturnValue(mockedAuthenticatedSession)
+    vi.mocked(useSelector).mockImplementation((selectorFn: (_: SocketState) => unknown) => {
+      if (selectorFn.toString().includes("state.socket.rooms[roomId]?.roomInfo")) {
+        return mockedRoom1Info
+      }
+      if (selectorFn.toString().includes("state.socket.rooms[roomId]?.isRoomInfoLoading")) {
+        return false
+      }
+      if (selectorFn.toString().includes("state.socket.rooms[roomId]?.chat")) {
+        return mockedRoom1Chat
+      }
+      if (selectorFn.toString().includes("state.socket.rooms[roomId]?.isChatLoading")) {
+        return false
+      }
+      if (selectorFn.toString().includes("state.socket.rooms[roomId]?.users")) {
+        return mockedRoom1Users
+      }
+      if (selectorFn.toString().includes("state.socket.errorMessage")) {
+        return undefined
+      }
+      return undefined
+    })
   })
 
   afterEach(() => {

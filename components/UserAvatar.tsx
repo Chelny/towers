@@ -10,7 +10,13 @@ export default function UserAvatar(): ReactNode {
   if (!session?.user || status === "loading") {
     return (
       <div className="w-10 h-10 rounded bg-zinc-400">
-        <Image src="https://placehold.co/40x40.png?text=?" width={40} height={40} alt="User avatar placeholder" />
+        <Image
+          src="https://placehold.co/40x40.png?text=?"
+          width={40}
+          height={40}
+          priority
+          alt="User avatar placeholder"
+        />
       </div>
     )
   }
@@ -21,6 +27,7 @@ export default function UserAvatar(): ReactNode {
         src={session?.user?.image ?? "https://placehold.co/40x40.png?text=?"}
         width={40}
         height={40}
+        priority
         alt={session?.user?.image ? `${session?.user?.username}'s avatar` : "User avatar placeholder"}
       />
     </div>

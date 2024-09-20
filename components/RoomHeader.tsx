@@ -10,7 +10,7 @@ type RoomHeaderProps = {
 }
 
 export default function RoomHeader({ room }: RoomHeaderProps): ReactNode {
-  const { isConnected } = useSelector((state: RootState) => state.socket)
+  const isConnected: boolean = useSelector((state: RootState) => state.socket.isConnected)
 
   return (
     <div className="py-2">

@@ -11,7 +11,7 @@ import { TowersGameUserWithUserAndTables } from "@/interfaces"
 type PlayersListProps = {
   users: TowersGameUserWithUserAndTables[]
   full?: boolean
-  onSelectedPlayer?: (userId: string) => void
+  onSelectedPlayer?: (_userId: string) => void
 }
 
 export default function PlayersList({ users, full = false, onSelectedPlayer }: PlayersListProps): ReactNode {

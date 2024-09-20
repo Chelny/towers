@@ -7,11 +7,6 @@ export interface RoomWithCount extends Room {
   }
 }
 
-export interface RoomResponseData {
-  roomId: string
-  roomData: RoomWithTablesCount
-}
-
 export interface RoomWithTablesCount {
   room: RoomWithTables | null
   tablesCount: number

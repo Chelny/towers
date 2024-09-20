@@ -1,8 +1,12 @@
 import { createAsyncThunk } from "@reduxjs/toolkit"
-import { TableChatResponseData, TableResponseData, TableUsersResponseData } from "@/interfaces"
+import {
+  TableChatWithTowersGameUser,
+  TableWithHostAndTowersGameUsers,
+  TowersGameUserWithUserAndTables
+} from "@/interfaces"
 
-export const fetchTableData = createAsyncThunk<TableResponseData, string, { rejectValue: string }>(
-  "table/fetchTableData",
+export const fetchTableInfo = createAsyncThunk<TableWithHostAndTowersGameUsers, string, { rejectValue: string }>(
+  "table/fetchTableInfo",
   async (tableId, { rejectWithValue }) => {
     const errorMesage: string = "Failed to fetch table data"
 
@@ -20,11 +24,11 @@ export const fetchTableData = createAsyncThunk<TableResponseData, string, { reje
   }
 )
 
-export const fetchTableChatData = createAsyncThunk<
-  TableChatResponseData,
+export const fetchTableChat = createAsyncThunk<
+  TableChatWithTowersGameUser[],
   { tableId: string; towersUserId: string },
   { rejectValue: string }
->("table/fetchTableChatData", async ({ tableId, towersUserId }, { rejectWithValue }) => {
+>("table/fetchTableChat", async ({ tableId, towersUserId }, { rejectWithValue }) => {
   const errorMesage: string = "Failed to fetch table chat data"
 
   try {
@@ -40,8 +44,8 @@ export const fetchTableChatData = createAsyncThunk<
   }
 })
 
-export const fetchTableUsersData = createAsyncThunk<TableUsersResponseData, string, { rejectValue: string }>(
-  "table/fetchTableUsersData",
+export const fetchTableUsers = createAsyncThunk<TowersGameUserWithUserAndTables[], string, { rejectValue: string }>(
+  "table/fetchTableUsers",
   async (tableId, { rejectWithValue }) => {
     const errorMesage: string = "Failed to fetch table users data"
 

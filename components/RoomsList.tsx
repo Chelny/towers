@@ -19,14 +19,16 @@ type RoomsListProps = {
 export default function RoomsList({ rooms }: RoomsListProps): ReactNode {
   const router: AppRouterInstance = useRouter()
   const { status } = useSessionData()
-  const { isConnected } = useSelector((state: RootState) => state.socket)
+  const isConnected: boolean = useSelector((state: RootState) => state.socket.isConnected)
   const dispatch: AppDispatch = useDispatch()
 
   useEffect(() => {
-    if (status === "authenticated" && !isConnected) {
-      dispatch(initSocket())
+    if (status === "authenticated") {
+      if (!isConnected) {
+        dispatch(initSocket())
+      }
     }
-  }, [status, isConnected, dispatch])
+  }, [status, isConnected])
 
   return (
     <ul className="grid grid-cols-[repeat(auto-fill,_minmax(14rem,_1fr))] gap-8">
@@ -46,7 +48,7 @@ export default function RoomsList({ rooms }: RoomsListProps): ReactNode {
             <Button
               type="button"
               className="w-full"
-              disabled={room.full}
+              disabled={room.full || status !== "authenticated"}
               onClick={() => router.push(`${ROUTE_TOWERS.PATH}?room=${room.id}`)}
             >
               Join

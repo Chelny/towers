@@ -35,13 +35,27 @@ export async function GET(_: NextRequest, context: { params: { roomId: string } 
   )
 }
 
-export async function POST(request: NextRequest): Promise<NextResponse> {
+export async function POST(request: NextRequest, context: { params: { roomId: string } }): Promise<NextResponse> {
+  const { roomId } = context.params
   const data = await request.json()
+
+  let message: string = DOMPurify.sanitize(data.message)
+
+  if (message.trim().length === 0) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Invalid input. XSS attack detected."
+      },
+      { status: 400 }
+    )
+  }
+
   const chatMessage: RoomChat = await prisma.roomChat.create({
     data: {
-      roomId: data.roomId,
+      roomId: roomId,
       towersUserId: data.towersUserId,
-      message: DOMPurify.sanitize(data.message)
+      message
     },
     include: {
       towersGameUser: {

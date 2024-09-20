@@ -1,6 +1,6 @@
 "use client"
 
-import { KeyboardEvent, MouseEvent, ReactNode, useCallback, useEffect, useRef, useState } from "react"
+import { KeyboardEvent, MouseEvent, ReactNode, useEffect, useRef, useState } from "react"
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime"
 import dynamic from "next/dynamic"
 import { useRouter } from "next/navigation"
@@ -16,9 +16,10 @@ import AlertMessage from "@/components/ui/AlertMessage"
 import Button from "@/components/ui/Button"
 import { CHAT_MESSSAGE_MAX_LENGTH, ROUTE_ROOMS } from "@/constants"
 import { useSessionData } from "@/hooks"
-import { beforeLeaveSocketRoom, joinSocketRoom, leaveSocketRoom, sendMessageToRoomChat } from "@/redux/features"
+import { RoomChatWithTowersGameUser, RoomWithTablesCount, TowersGameUserWithUserAndTables } from "@/interfaces"
+import { sendMessageToRoomChat } from "@/redux/features"
 import { AppDispatch, RootState } from "@/redux/store"
-import { fetchRoomChatData, fetchRoomData, fetchRoomUsersData, joinRoom, leaveRoom } from "@/redux/thunks"
+import { fetchRoomChat, fetchRoomInfo, fetchRoomUsers, joinRoom, leaveRoom } from "@/redux/thunks"
 import { debounce } from "@/utils"
 
 type RoomProps = {
@@ -28,9 +29,12 @@ type RoomProps = {
 export default function Room({ roomId }: RoomProps): ReactNode {
   const router: AppRouterInstance = useRouter()
   const { data: session } = useSessionData()
-  const { socketRooms, rooms, roomsLoading, roomsChat, roomsChatLoading, roomsUsers, error } = useSelector(
-    (state: RootState) => state.socket
-  )
+  const roomInfo: RoomWithTablesCount | null = useSelector((state: RootState) => state.socket.rooms[roomId]?.roomInfo)
+  const isRoomInfoLoading: boolean = useSelector((state: RootState) => state.socket.rooms[roomId]?.isRoomInfoLoading)
+  const chat: RoomChatWithTowersGameUser[] = useSelector((state: RootState) => state.socket.rooms[roomId]?.chat)
+  const isChatLoading: boolean = useSelector((state: RootState) => state.socket.rooms[roomId]?.isChatLoading)
+  const users: TowersGameUserWithUserAndTables[] = useSelector((state: RootState) => state.socket.rooms[roomId]?.users)
+  const errorMessage = useSelector((state: RootState) => state.socket.errorMessage)
   const dispatch: AppDispatch = useDispatch()
   const messageInputRef = useRef<HTMLInputElement>(null)
   const chatEndRef = useRef<HTMLDivElement>(null)
@@ -44,17 +48,17 @@ export default function Room({ roomId }: RoomProps): ReactNode {
 
   useEffect(() => {
     const debouncedFetchData: Debounce = debounce(() => {
-      dispatch(fetchRoomData(roomId))
-      dispatch(fetchRoomChatData(roomId))
-      dispatch(fetchRoomUsersData(roomId))
+      dispatch(fetchRoomInfo(roomId))
+      dispatch(fetchRoomChat(roomId))
+      dispatch(fetchRoomUsers(roomId))
     }, 500)
 
     debouncedFetchData()
-  }, [socketRooms[roomId]])
+  }, [])
 
   useEffect(() => {
     scrollChatToBottom()
-  }, [roomsChat[roomId]])
+  }, [chat])
 
   const openInvitationModal = (id: string, data: TableInvitationData): void => {
     setInvitationModals((prev: { id: string; data: TableInvitationData }[]) => [...prev, { id, data }])
@@ -75,21 +79,7 @@ export default function Room({ roomId }: RoomProps): ReactNode {
   const handleCloseCreateTableModal = (): void => setIsCreateTableModalOpen(false)
 
   const handleCreateTable = (tableId: string): void => {
-    // dispatch(
-    //   createTable({
-    //     room: roomId,
-    //     // tableNumber: 67, // Is it necessary?
-    //     roomId
-    //   })
-    // )
-
-    // try {
-    //   await dispatch(createTable({ room: roomId, tableData }));
-    //   handleCloseCreateTableModal();
-    // } catch (error) {
-    //   dispatch(setError("Failed to create table."));
-    // }
-
+    // TODO: Complete
     handleCloseCreateTableModal()
   }
 
@@ -123,7 +113,7 @@ export default function Room({ roomId }: RoomProps): ReactNode {
   return (
     <>
       <div className="flex flex-col h-full bg-gray-100 text-black">
-        <RoomHeader room={rooms[roomId]} />
+        <RoomHeader room={roomInfo} />
 
         <div className="flex-1 flex overflow-hidden">
           {/* Left sidebar */}
@@ -132,7 +122,7 @@ export default function Room({ roomId }: RoomProps): ReactNode {
               <Button className="w-full py-2 mb-2" disabled onClick={(event: MouseEvent<HTMLButtonElement>) => {}}>
                 Play Now
               </Button>
-              <Button className="w-full py-2 mb-2" disabled={roomsLoading} onClick={handleOpenCreateTableModal}>
+              <Button className="w-full py-2 mb-2" disabled={isRoomInfoLoading} onClick={handleOpenCreateTableModal}>
                 Create Table
               </Button>
             </div>
@@ -196,7 +186,7 @@ export default function Room({ roomId }: RoomProps): ReactNode {
             <div className="flex gap-2 h-72 p-2 border bg-white">
               <div className="flex-1 flex flex-col">
                 {/* Server messages */}
-                {error && <AlertMessage type="error">{error}</AlertMessage>}
+                {errorMessage && <AlertMessage type="error">{errorMessage}</AlertMessage>}
 
                 {/* Chat */}
                 <div className="flex-1 flex flex-col overflow-hidden">
@@ -206,18 +196,18 @@ export default function Room({ roomId }: RoomProps): ReactNode {
                     className="w-full p-2 border"
                     placeholder="Write something..."
                     maxLength={CHAT_MESSSAGE_MAX_LENGTH}
-                    disabled={roomsChatLoading}
+                    disabled={isChatLoading}
                     onKeyDown={handleSendMessage}
                   />
                   <div className="flex-1 overflow-y-auto p-1 my-1">
-                    <Chat messages={roomsChat[roomId]} />
+                    <Chat messages={chat} />
                     <div ref={chatEndRef} />
                   </div>
                 </div>
               </div>
 
               <div className="w-1/4 lg:w-96 overflow-hidden">
-                <PlayersList users={roomsUsers[roomId]} full />
+                <PlayersList users={users} full />
               </div>
             </div>
           </div>

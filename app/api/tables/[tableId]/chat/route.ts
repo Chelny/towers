@@ -50,16 +50,28 @@ export async function GET(request: NextRequest, context: { params: { tableId: st
   )
 }
 
-export async function POST(request: NextRequest): Promise<NextResponse> {
+export async function POST(request: NextRequest, context: { params: { tableId: string } }): Promise<NextResponse> {
+  const { tableId } = context.params
   const data = await request.json()
 
-  const chatData = {
-    tableId: data.tableId,
-    message: DOMPurify.sanitize(data.message),
-    towersUserId: data.towersUserId,
-    type: data.type
+  let message: string = DOMPurify.sanitize(data.message)
+
+  if (message.trim().length === 0) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Invalid input. XSS attack detected."
+      },
+      { status: 400 }
+    )
   }
 
+  const chatData = {
+    tableId: tableId,
+    towersUserId: data.towersUserId,
+    message,
+    type: data.type
+  }
   const chatMessage: TableChat = await prisma.tableChat.create({
     data: removeNullUndefined(chatData),
     include: {

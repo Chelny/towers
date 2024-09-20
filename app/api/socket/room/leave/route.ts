@@ -22,6 +22,6 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     return NextResponse.json({ success: true }, { status: 200 })
   } catch (error) {
-    return NextResponse.json({ success: false }, { status: 500 })
+    return NextResponse.json({ success: false, message: error }, { status: 500 })
   }
 }

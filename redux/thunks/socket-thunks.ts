@@ -10,7 +10,7 @@ export const joinRoom = createAsyncThunk<SocketRoom, SocketRoom, { rejectValue: 
     const errorMessage: string = "Failed to join room"
 
     try {
-      const response: Response = await fetch("/api/room/join", {
+      const response: Response = await fetch("/api/socket/room/join", {
         method: "POST",
         body: JSON.stringify({ room, isTable, username })
       })
@@ -33,7 +33,7 @@ export const leaveRoom = createAsyncThunk<SocketRoom, SocketRoom, { rejectValue:
     const errorMessage: string = "Failed to leave room"
 
     try {
-      const response: Response = await fetch("/api/room/leave", {
+      const response: Response = await fetch("/api/socket/room/leave", {
         method: "POST",
         body: JSON.stringify({ room, isTable, username })
       })

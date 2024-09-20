@@ -1,8 +1,8 @@
 import { createAsyncThunk } from "@reduxjs/toolkit"
-import { RoomChatResponseData, RoomResponseData, RoomUsersResponseData } from "@/interfaces"
+import { RoomChatWithTowersGameUser, RoomWithTablesCount, TowersGameUserWithUserAndTables } from "@/interfaces"
 
-export const fetchRoomData = createAsyncThunk<RoomResponseData, string, { rejectValue: string }>(
-  "socket/fetchRoomData",
+export const fetchRoomInfo = createAsyncThunk<RoomWithTablesCount, string, { rejectValue: string }>(
+  "socket/fetchRoomInfo",
   async (roomId, { rejectWithValue }) => {
     const errorMessage: string = "Failed to fetch room data"
 
@@ -20,8 +20,8 @@ export const fetchRoomData = createAsyncThunk<RoomResponseData, string, { reject
   }
 )
 
-export const fetchRoomChatData = createAsyncThunk<RoomChatResponseData, string, { rejectValue: string }>(
-  "socket/fetchRoomChatData",
+export const fetchRoomChat = createAsyncThunk<RoomChatWithTowersGameUser[], string, { rejectValue: string }>(
+  "socket/fetchRoomChat",
   async (roomId, { rejectWithValue }) => {
     const errorMessage: string = "Failed to fetch room chat data"
 
@@ -39,8 +39,8 @@ export const fetchRoomChatData = createAsyncThunk<RoomChatResponseData, string, 
   }
 )
 
-export const fetchRoomUsersData = createAsyncThunk<RoomUsersResponseData, string, { rejectValue: string }>(
-  "socket/fetchRoomUsersData",
+export const fetchRoomUsers = createAsyncThunk<TowersGameUserWithUserAndTables[], string, { rejectValue: string }>(
+  "socket/fetchRoomUsers",
   async (roomId, { rejectWithValue }) => {
     const errorMessage: string = "Failed to fetch room users data"
 

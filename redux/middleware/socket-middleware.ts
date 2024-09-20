@@ -1,4 +1,3 @@
-import { TableChatMessageType } from "@prisma/client"
 import { Middleware, MiddlewareAPI } from "redux"
 import { SocketFactory, SocketInterface } from "@/lib"
 import {
@@ -6,13 +5,12 @@ import {
   connectionEstablished,
   connectionLost,
   destroySocket,
-  getRoomChatMessage,
-  getTableChatMessage,
   initSocket,
   joinSocketRoom,
-  leaveSocketRoom,
   sendMessageToRoomChat,
-  sendMessageToTableChat
+  sendMessageToTableChat,
+  setRoomChatMessage,
+  setTableChatMessage
 } from "@/redux/features"
 
 enum SocketEvent {
@@ -22,23 +20,24 @@ enum SocketEvent {
   ReconnectError = "reconnect_error",
   ReconnectFailed = "reconnect_failed",
   Disconnect = "disconnect",
+  // Emit events
   JoinRoom = "room:join",
   LeaveRoom = "room:leave",
   JoinTable = "table:join",
-  SendUserJoinedTableMessage = "table:send-user-joined-message",
-  BeforeLeaveTable = "table:before-leave",
-  SendUserLeftTableMessage = "table:send-user-left-message",
   LeaveTable = "table:leave",
   SendRoomMessage = "room:send-message",
-  SetRoomChatMessage = "room:set-message",
   SendTableMessage = "table:send-message",
+  // On events
+  SetRoomChatMessage = "room:set-message",
   SetTableChatMessage = "table:set-message",
+  SendUserJoinedTableMessage = "table:send-user-joined-message",
+  SendUserLeftTableMessage = "table:send-user-left-message",
   SignOut = "user:sign-out",
   SignOutSuccess = "user:sign-out-success",
   Error = "err",
 }
 
-export const socketMiddleware: Middleware = (store: MiddlewareAPI) => {
+const socketMiddleware: Middleware = (store: MiddlewareAPI) => {
   let socket: SocketInterface
 
   return (next) => async (action: unknown) => {
@@ -76,65 +75,20 @@ export const socketMiddleware: Middleware = (store: MiddlewareAPI) => {
           console.error(message)
         })
 
-        socket.socket.on(SocketEvent.SetRoomChatMessage, async ({ roomId, towersUserId, message }) => {
-          const response: Response = await fetch(`/api/rooms/${roomId}/chat`, {
-            method: "POST",
-            body: JSON.stringify({ roomId, towersUserId, message })
-          })
-
-          if (response.ok) {
-            const data = await response.json()
-            store.dispatch(getRoomChatMessage(data.data))
-          }
+        socket.socket.on(SocketEvent.SetRoomChatMessage, async ({ roomId, data }) => {
+          store.dispatch(setRoomChatMessage({ roomId, data }))
         })
 
-        socket.socket.on(SocketEvent.SendUserJoinedTableMessage, async ({ tableId, username }) => {
-          try {
-            // TODO: Uncomment for production
-            // const message: string = `*** ${username} joined the table.`
-            // const response: Response = await fetch(`/api/tables/${tableId}/chat`, {
-            //   method: "POST",
-            //   body: JSON.stringify({ tableId, message, type: TableChatMessageType.USER_ACTION })
-            // })
-            // if (response.ok) {
-            //   const data = await response.json()
-            //   store.dispatch(getTableChatMessage(data.data))
-            // }
-          } catch (error) {
-            console.error(error)
-          }
+        socket.socket.on(SocketEvent.SetTableChatMessage, async ({ tableId, data }) => {
+          store.dispatch(setTableChatMessage({ tableId, data }))
         })
 
-        socket.socket.on(SocketEvent.SendUserLeftTableMessage, async ({ tableId, username }) => {
-          try {
-            // TODO: Uncomment for production
-            // const message: string = `*** ${username} left the table.`
-            // const response: Response = await fetch(`/api/tables/${tableId}/chat`, {
-            //   method: "POST",
-            //   body: JSON.stringify({ tableId, message, type: TableChatMessageType.USER_ACTION })
-            // })
-
-            // if (response.ok) {
-            //   const data = await response.json()
-            //   store.dispatch(getTableChatMessage(data.data))
-            // }
-
-            store.dispatch(leaveSocketRoom({ room: tableId, isTable: true, username }))
-          } catch (error) {
-            console.error(error)
-          }
+        socket.socket.on(SocketEvent.SendUserJoinedTableMessage, async ({ tableId, data }) => {
+          store.dispatch(setTableChatMessage({ tableId, data }))
         })
 
-        socket.socket.on(SocketEvent.SetTableChatMessage, async ({ tableId, towersUserId, message }) => {
-          const response: Response = await fetch(`/api/tables/${tableId}/chat`, {
-            method: "POST",
-            body: JSON.stringify({ tableId, towersUserId, message })
-          })
-
-          if (response.ok) {
-            const data = await response.json()
-            store.dispatch(getTableChatMessage(data.data))
-          }
+        socket.socket.on(SocketEvent.SendUserLeftTableMessage, async ({ tableId, data }) => {
+          store.dispatch(setTableChatMessage({ tableId, data }))
         })
 
         socket.socket.on(SocketEvent.SignOutSuccess, () => {
@@ -151,7 +105,7 @@ export const socketMiddleware: Middleware = (store: MiddlewareAPI) => {
 
       if (beforeLeaveSocketRoom.match(action)) {
         const { room, isTable, username } = action.payload
-        socket.socket.emit(isTable ? SocketEvent.BeforeLeaveTable : SocketEvent.LeaveRoom, { room, username })
+        socket.socket.emit(isTable ? SocketEvent.LeaveTable : SocketEvent.LeaveRoom, { room, username })
       }
 
       if (sendMessageToRoomChat.match(action)) {
@@ -172,3 +126,5 @@ export const socketMiddleware: Middleware = (store: MiddlewareAPI) => {
     next(action)
   }
 }
+
+export default socketMiddleware

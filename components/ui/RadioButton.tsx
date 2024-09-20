@@ -11,7 +11,7 @@ type RadioButtonProps = {
   checked?: boolean
   disabled?: boolean
   dataTestId?: string
-  onChange?: (event: ChangeEvent<HTMLInputElement>) => void
+  onChange?: (_: ChangeEvent<HTMLInputElement>) => void
 }
 
 export default function RadioButton({

@@ -2,6 +2,7 @@ import next from "next";
 import {createServer} from "node:http";
 import {Server} from "socket.io";
 import axios from 'axios';
+import {TableChatMessageType} from "@prisma/client";
 
 const dev = process.env.NODE_ENV !== "production";
 const hostname = "localhost";
@@ -44,43 +45,61 @@ app.prepare().then(() => {
       console.info(`Disconnected from server due to ${reason}.`);
     });
 
-    socket.on("room:join", ({room}) => {
-      socket.join(room);
+    socket.on("room:join", ({room: roomId}) => {
+      socket.join(roomId);
     });
 
-    // socket.on("create-table", ({room}) => {
-    //   console.log("create table", room)
-    //   socket.to(room).emit("get-tables", {room});
-    // });
-
-    // socket.on("delete-table", ({room}) => {
-    //   console.log("delete table", room)
-    //   socket.to(room).emit("get-tables", {room});
-    // });
-
-    socket.on("room:leave", ({room}) => {
-      socket.leave(room);
+    socket.on("room:leave", ({room: roomId}) => {
+      socket.leave(roomId);
     });
 
-    socket.on('table:join', ({room, username}) => {
-      socket.join(room);
-      socket.broadcast.to(room).emit("table:send-user-joined-message", {tableId: room, username});
+    socket.on('table:join', async ({room: tableId, username}) => {
+      socket.join(tableId);
+
+      const message = `*** ${username} joined the table.`
+      const response = await axios.post(`${process.env.BASE_URL}/api/tables/${tableId}/chat`, {
+        message,
+        type: TableChatMessageType.USER_ACTION
+      });
+
+      if (response.status === 201) {
+        io.to(tableId).emit("table:send-user-joined-message", {tableId, data: response.data.data});
+      }
     });
 
-    socket.on("table:before-leave", ({room, username}) => {
-      io.to(room).emit("table:send-user-left-message", {tableId: room, username});
+    socket.on("table:leave", async ({room: tableId, username}) => {
+      const message = `*** ${username} left the table.`
+      const response = await axios.post(`${process.env.BASE_URL}/api/tables/${tableId}/chat`, {
+        message,
+        type: TableChatMessageType.USER_ACTION
+      });
+
+      if (response.status === 201) {
+        socket.broadcast.to(tableId).emit("table:send-user-left-message", {tableId, data: response.data.data});
+        socket.leave(tableId);
+      }
     });
 
-    socket.on("table:leave", ({room}) => {
-      socket.leave(room);
+    socket.on("room:send-message", async ({roomId, towersUserId, message}) => {
+      const response = await axios.post(`${process.env.BASE_URL}/api/rooms/${roomId}/chat`, {
+        towersUserId,
+        message,
+      });
+
+      if (response.status === 201) {
+        io.to(roomId).emit("room:set-message", {roomId, data: response.data.data});
+      }
     });
 
-    socket.on("room:send-message", ({roomId, towersUserId, message}) => {
-      io.to(roomId).emit("room:get-message", {roomId, towersUserId, message});
-    });
+    socket.on("table:send-message", async ({tableId, towersUserId, message}) => {
+      const response = await axios.post(`${process.env.BASE_URL}/api/tables/${tableId}/chat`, {
+        towersUserId,
+        message,
+      });
 
-    socket.on("table:send-message", ({tableId, towersUserId, message}) => {
-      io.to(tableId).emit("table:get-message", {tableId, towersUserId, message});
+      if (response.status === 201) {
+        io.to(tableId).emit("table:set-message", {tableId, data: response.data.data});
+      }
     });
 
     socket.on("user:sign-out", () => {
@@ -110,7 +129,7 @@ app.prepare().then(() => {
   const runScheduler = async () => {
     try {
       await axios.post(
-        `http://${hostname}:${port}/api/services/scheduler`,
+        `${process.env.BASE_URL}/api/services/scheduler`,
         {
           headers: {
             "Content-Type": "application/json"

@@ -11,7 +11,7 @@ type ButtonProps = {
   disabled?: boolean
   tabIndex?: number
   dataTestId?: string
-  onClick?: (event: MouseEvent<HTMLButtonElement>) => void
+  onClick?: (_: MouseEvent<HTMLButtonElement>) => void
 }
 
 export default function Button({

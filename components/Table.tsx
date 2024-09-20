@@ -1,6 +1,6 @@
 "use client"
 
-import { ChangeEvent, KeyboardEvent, MouseEvent, ReactNode, useCallback, useEffect, useRef, useState } from "react"
+import { ChangeEvent, KeyboardEvent, MouseEvent, ReactNode, useEffect, useRef, useState } from "react"
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime"
 import dynamic from "next/dynamic"
 import { useRouter } from "next/navigation"
@@ -19,17 +19,14 @@ import Checkbox from "@/components/ui/Checkbox"
 import Select from "@/components/ui/Select"
 import { CHAT_MESSSAGE_MAX_LENGTH } from "@/constants"
 import { useSessionData } from "@/hooks"
-import { TowersGameUserWithUserAndTables } from "@/interfaces"
-import { beforeLeaveSocketRoom, joinSocketRoom, leaveSocketRoom, sendMessageToTableChat } from "@/redux/features"
-import { AppDispatch, RootState } from "@/redux/store"
 import {
-  fetchRoomUsersData,
-  fetchTableChatData,
-  fetchTableData,
-  fetchTableUsersData,
-  joinRoom,
-  leaveRoom
-} from "@/redux/thunks"
+  TableChatWithTowersGameUser,
+  TableWithHostAndTowersGameUsers,
+  TowersGameUserWithUserAndTables
+} from "@/interfaces"
+import { sendMessageToTableChat, TablesState } from "@/redux/features"
+import { AppDispatch, RootState } from "@/redux/store"
+import { fetchRoomUsers, fetchTableChat, fetchTableInfo, fetchTableUsers, joinRoom, leaveRoom } from "@/redux/thunks"
 import { debounce } from "@/utils"
 
 enum GameState {
@@ -62,8 +59,19 @@ type TableProps = {
 export default function Table({ roomId, tableId }: TableProps): ReactNode {
   const router: AppRouterInstance = useRouter()
   const { data: session } = useSessionData()
-  const { socketRooms, roomsUsers, tables, tablesLoading, tablesChat, tablesChatLoading, tablesUsers } = useSelector(
-    (state: RootState) => state.socket
+  const roomUsers: TowersGameUserWithUserAndTables[] = useSelector(
+    (state: RootState) => state.socket.rooms[roomId]?.users
+  )
+  const tableInfo: TableWithHostAndTowersGameUsers | null = useSelector(
+    (state: RootState) => state.socket.tables[tableId]?.tableInfo
+  )
+  const isTableInfoLoading: boolean = useSelector(
+    (state: RootState) => state.socket.tables[tableId]?.isTableInfoLoading
+  )
+  const chat: TableChatWithTowersGameUser[] = useSelector((state: RootState) => state.socket.tables[tableId]?.chat)
+  const isChatLoading: boolean = useSelector((state: RootState) => state.socket.tables[tableId]?.isChatLoading)
+  const tableUsers: TowersGameUserWithUserAndTables[] = useSelector(
+    (state: RootState) => state.socket.tables[tableId]?.users
   )
   const dispatch: AppDispatch = useDispatch()
   const messageInputRef = useRef<HTMLInputElement>(null)
@@ -83,25 +91,25 @@ export default function Table({ roomId, tableId }: TableProps): ReactNode {
 
   useEffect(() => {
     const debouncedFetchData: Debounce = debounce(() => {
-      dispatch(fetchRoomUsersData(roomId))
-      dispatch(fetchTableData(tableId))
-      dispatch(fetchTableChatData({ tableId, towersUserId: session?.user.towersUserId }))
-      dispatch(fetchTableUsersData(tableId))
+      dispatch(fetchRoomUsers(roomId))
+      dispatch(fetchTableInfo(tableId))
+      dispatch(fetchTableChat({ tableId, towersUserId: session?.user.towersUserId }))
+      dispatch(fetchTableUsers(tableId))
     }, 500)
 
     debouncedFetchData()
-  }, [socketRooms[roomId]])
+  }, [])
 
   useEffect(() => {
-    if (tables[tableId]) {
-      setIsRated(tables[tableId].rated)
-      setTableType(tables[tableId].tableType)
+    if (tableInfo) {
+      setIsRated(tableInfo.rated)
+      setTableType(tableInfo.tableType)
     }
-  }, [tables[tableId]])
+  }, [tableInfo])
 
   useEffect(() => {
     scrollChatToBottom()
-  }, [tablesChat[tableId]])
+  }, [chat])
 
   const handleOpenBootUserModal = (): void => setIsBootUserModalOpen(true)
   const handleCloseBootUserModal = (): void => setIsBootUserModalOpen(false)
@@ -191,12 +199,16 @@ export default function Table({ roomId, tableId }: TableProps): ReactNode {
   return (
     <>
       <div className="grid [grid-template-areas:'banner_banner_banner''sidebar_game_game''sidebar_chat_chat'] grid-rows-table grid-cols-table h-full bg-gray-100 text-black">
-        <TableHeader table={tables[tableId]} />
+        <TableHeader table={tableInfo} />
 
         {/* Left sidebar */}
         <div className="[grid-area:sidebar] flex flex-col justify-between w-56 p-2 bg-gray-200">
           <div className="space-y-2">
-            <Button className="w-full" disabled={tablesLoading} onClick={(event: MouseEvent<HTMLButtonElement>) => {}}>
+            <Button
+              className="w-full"
+              disabled={isTableInfoLoading}
+              onClick={(event: MouseEvent<HTMLButtonElement>) => {}}
+            >
               Start
             </Button>
             <hr className="border-1 border-gray-400" />
@@ -207,7 +219,11 @@ export default function Table({ roomId, tableId }: TableProps): ReactNode {
               Demo
             </Button>
             <hr className="border-1 border-gray-400" />
-            <Button className="w-full" disabled={tablesLoading} onClick={(event: MouseEvent<HTMLButtonElement>) => {}}>
+            <Button
+              className="w-full"
+              disabled={isTableInfoLoading}
+              onClick={(event: MouseEvent<HTMLButtonElement>) => {}}
+            >
               Stand
             </Button>
             <div>
@@ -216,7 +232,7 @@ export default function Table({ roomId, tableId }: TableProps): ReactNode {
             <Select
               id="tableType"
               defaultValue={tableType}
-              disabled={tablesLoading || session?.user.id !== tables[tableId]?.host.user.id}
+              disabled={isTableInfoLoading || session?.user.id !== tableInfo?.host.user.id}
               onChange={setTableType}
             >
               <Select.Option value={TableType.PUBLIC}>Public</Select.Option>
@@ -225,14 +241,14 @@ export default function Table({ roomId, tableId }: TableProps): ReactNode {
             </Select>
             <Button
               className="w-full"
-              disabled={tablesLoading || session?.user.id !== tables[tableId]?.host.user.id}
+              disabled={isTableInfoLoading || session?.user.id !== tableInfo?.host.user.id}
               onClick={handleOpenInviteUserModal}
             >
               Invite
             </Button>
             <Button
               className="w-full"
-              disabled={tablesLoading || session?.user.id !== tables[tableId]?.host.user.id}
+              disabled={isTableInfoLoading || session?.user.id !== tableInfo?.host.user.id}
               onClick={handleOpenBootUserModal}
             >
               Boot
@@ -244,7 +260,7 @@ export default function Table({ roomId, tableId }: TableProps): ReactNode {
               id="ratedGame"
               label="Rated Game"
               defaultChecked={isRated}
-              disabled={tablesLoading || session?.user.id !== tables[tableId]?.host.user.id}
+              disabled={isTableInfoLoading || session?.user.id !== tableInfo?.host.user.id}
               onChange={(event: ChangeEvent<HTMLInputElement>) => setIsRated(event.target.checked)}
             />
             <Checkbox
@@ -385,32 +401,34 @@ export default function Table({ roomId, tableId }: TableProps): ReactNode {
               className="w-full p-2 border"
               placeholder="Write something..."
               maxLength={CHAT_MESSSAGE_MAX_LENGTH}
-              disabled={tablesChatLoading}
+              disabled={isChatLoading}
               onKeyDown={handleSendMessage}
             />
             <div className="overflow-y-auto p-1">
-              <Chat messages={tablesChat[tableId]} isTableChat />
+              <Chat messages={chat} isTableChat />
               <div ref={chatEndRef} />
             </div>
           </div>
 
-          <PlayersList users={tablesUsers[tableId]} />
+          <PlayersList users={tableUsers} />
         </div>
       </div>
 
       <TableInviteUser
         key={uuidv4()}
         isOpen={isInviteUserModalOpen}
-        users={roomsUsers[roomId]?.filter(
-          (roomsUser: TowersGameUserWithUserAndTables) => roomsUser.tableId !== tableId
-        )}
+        users={
+          Array.isArray(roomUsers)
+            ? roomUsers.filter((roomsUser: TowersGameUserWithUserAndTables) => roomsUser.tableId !== tableId)
+            : []
+        }
         onCancel={handleCloseInviteUserModal}
       />
 
       <TableBootUser
         key={uuidv4()}
         isOpen={isBootUserModalOpen}
-        users={tablesUsers[tableId]}
+        users={tableUsers}
         onCancel={handleCloseBootUserModal}
       />
     </>

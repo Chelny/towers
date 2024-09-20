@@ -13,11 +13,6 @@ export interface TableChatWithUsername {
  * Read message
  */
 
-export interface TableChatResponseData {
-  tableId: string
-  tableChat: TableChatWithTowersGameUser[]
-}
-
 export interface TableChatWithTowersGameUser extends TableChat {
   towersGameUser: {
     user: User

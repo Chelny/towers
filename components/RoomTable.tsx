@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation"
 import { TableType } from "@prisma/client"
 import { useSelector } from "react-redux"
 import Button from "@/components/ui/Button"
-import { TableWithHostAndTowersGameUsers, TowersGameUserWithUser } from "@/interfaces"
+import { RoomWithTablesCount, TableWithHostAndTowersGameUsers, TowersGameUserWithUser } from "@/interfaces"
 import { RootState } from "@/redux/store"
 
 type RoomTableProps = {
@@ -15,7 +15,8 @@ type RoomTableProps = {
 
 export default function RoomTable({ roomId }: RoomTableProps): ReactNode {
   const router: AppRouterInstance = useRouter()
-  const { rooms, tablesLoading } = useSelector((state: RootState) => state.socket)
+  const roomInfo: RoomWithTablesCount | null = useSelector((state: RootState) => state.socket.rooms[roomId]?.roomInfo)
+  const isRoomInfoLoading: boolean = useSelector((state: RootState) => state.socket.rooms[roomId]?.isRoomInfoLoading)
   const seatMapping: number[][] = [
     [1, 3, 5, 7],
     [2, 4, 6, 8]
@@ -23,7 +24,7 @@ export default function RoomTable({ roomId }: RoomTableProps): ReactNode {
 
   return (
     <>
-      {rooms[roomId]?.room?.tables?.map((table: TableWithHostAndTowersGameUsers) => (
+      {roomInfo?.room?.tables?.map((table: TableWithHostAndTowersGameUsers) => (
         <div key={table.id} className="flex flex-col">
           <div className="flex items-center border-b-2 border-b-gray-300">
             <div className="basis-20 row-span-2 flex justify-center items-center h-full px-2 border-gray-300">
@@ -34,7 +35,7 @@ export default function RoomTable({ roomId }: RoomTableProps): ReactNode {
                 <div className="basis-32 border-gray-300">
                   <Button
                     className="w-full h-full"
-                    disabled={tablesLoading || table.tableType === TableType.PRIVATE}
+                    disabled={isRoomInfoLoading || table.tableType === TableType.PRIVATE}
                     onClick={() => router.push(`?room=${roomId}&table=${table.id}`)}
                   >
                     Watch
@@ -44,7 +45,7 @@ export default function RoomTable({ roomId }: RoomTableProps): ReactNode {
                   {seatMapping.map((row: number[], rowIndex: number) => (
                     <div key={rowIndex} className="flex flex-row gap-1">
                       {row.map((seatNumber: number, colIndex: number) => {
-                        const user = table.towersGameUsers.find(
+                        const user: TowersGameUserWithUser | undefined = table.towersGameUsers.find(
                           (user: TowersGameUserWithUser) => user.seatNumber === seatNumber
                         )
                         return user ? (
@@ -59,7 +60,7 @@ export default function RoomTable({ roomId }: RoomTableProps): ReactNode {
                             key={colIndex}
                             className="w-36"
                             disabled={
-                              tablesLoading ||
+                              isRoomInfoLoading ||
                               table.tableType === TableType.PROTECTED ||
                               table.tableType === TableType.PRIVATE
                             }

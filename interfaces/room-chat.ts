@@ -13,11 +13,6 @@ export interface RoomChatWithUsername {
  * Read message
  */
 
-export interface RoomChatResponseData {
-  roomId: string
-  roomChat: RoomChatWithTowersGameUser[]
-}
-
 export interface RoomChatWithTowersGameUser extends RoomChat {
   towersGameUser: {
     user: User

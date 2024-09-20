@@ -2,7 +2,8 @@ import { fireEvent, render, screen } from "@testing-library/react"
 import { useSelector } from "react-redux"
 import { Mock } from "vitest"
 import RoomTable from "@/components/RoomTable"
-import { mockedRoomWithTablesCount, mockedSocketStateRooms } from "@/vitest.setup"
+import { SocketState } from "@/redux/features"
+import { mockedRoom1Info, mockedSocketRoom1Id, mockedSocketRoom1Table1Id } from "@/vitest.setup"
 
 const { useRouter, mockedRouterPush } = vi.hoisted(() => {
   const mockedRouterPush: Mock = vi.fn()
@@ -28,9 +29,14 @@ vi.mock("react-redux", () => ({
 
 describe("RoomTable Component", () => {
   beforeEach(() => {
-    vi.mocked(useSelector).mockReturnValue({
-      rooms: mockedSocketStateRooms,
-      tablesLoading: false
+    vi.mocked(useSelector).mockImplementation((selectorFn: (_: SocketState) => unknown) => {
+      if (selectorFn.toString().includes("state.socket.rooms[roomId]?.roomInfo")) {
+        return mockedRoom1Info
+      }
+      if (selectorFn.toString().includes("state.socket.rooms[roomId]?.isRoomInfoLoading")) {
+        return false
+      }
+      return undefined
     })
   })
 
@@ -39,19 +45,18 @@ describe("RoomTable Component", () => {
   })
 
   it("should render room tables correctly", () => {
-    render(<RoomTable roomId={mockedRoomWithTablesCount.room?.id!} />)
+    render(<RoomTable roomId={mockedSocketRoom1Id} />)
 
     expect(screen.getByText("#1")).toBeInTheDocument()
   })
 
   it("should navigate to the correct table on watch button click", () => {
-    render(<RoomTable roomId={mockedRoomWithTablesCount.room?.id!} />)
+    render(<RoomTable roomId={mockedSocketRoom1Id} />)
 
-    const watchButton: HTMLButtonElement = screen.getByRole("button", { name: /Watch/i })
-    fireEvent.click(watchButton)
+    const watchButtons: HTMLButtonElement[] = screen.getAllByRole("button", { name: /Watch/i })
+    expect(watchButtons[1]).toBeInTheDocument()
+    fireEvent.click(watchButtons[0])
 
-    expect(mockedRouterPush).toHaveBeenCalledWith(
-      "?room=7b09737d-aca1-4aaf-be74-5b1d40579224&table=e812b595-1086-484b-9b70-2727ba589060"
-    )
+    expect(mockedRouterPush).toHaveBeenCalledWith(`?room=${mockedSocketRoom1Id}&table=${mockedSocketRoom1Table1Id}`)
   })
 })

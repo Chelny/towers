@@ -16,7 +16,7 @@ type RadioButtonGroupProps = {
   dataTestId?: string
   description?: string
   errorMessage?: string
-  onChange?: (event: ChangeEvent<HTMLInputElement>) => void
+  onChange?: (_: ChangeEvent<HTMLInputElement>) => void
 }
 
 export default function RadioButtonGroup({

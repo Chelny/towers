@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react"
 import { Mock } from "vitest"
 import TableBootUser from "@/components/TableBootUser"
-import { mockedRoom1Table1TowersGameUsers } from "@/vitest.setup"
+import { mockedSocketRoom1Table1Id, mockedSocketStateTables } from "@/vitest.setup"
 
 describe("TableBootUser Component", () => {
   beforeAll(() => {
@@ -12,7 +12,13 @@ describe("TableBootUser Component", () => {
   it("should render the boot user modal", () => {
     const mockedHandleCancel: Mock = vi.fn()
 
-    render(<TableBootUser isOpen={true} users={mockedRoom1Table1TowersGameUsers} onCancel={mockedHandleCancel} />)
+    render(
+      <TableBootUser
+        isOpen={true}
+        users={mockedSocketStateTables[mockedSocketRoom1Table1Id].users}
+        onCancel={mockedHandleCancel}
+      />
+    )
 
     expect(screen.getByText("Boot User")).toBeInTheDocument()
   })
@@ -20,7 +26,13 @@ describe("TableBootUser Component", () => {
   it("should call onCancel when cancel button is clicked", () => {
     const mockedHandleCancel: Mock = vi.fn()
 
-    render(<TableBootUser isOpen={true} users={mockedRoom1Table1TowersGameUsers} onCancel={mockedHandleCancel} />)
+    render(
+      <TableBootUser
+        isOpen={true}
+        users={mockedSocketStateTables[mockedSocketRoom1Table1Id].users}
+        onCancel={mockedHandleCancel}
+      />
+    )
 
     fireEvent.click(screen.getByText("Cancel"))
     expect(mockedHandleCancel).toHaveBeenCalled()
@@ -29,7 +41,13 @@ describe("TableBootUser Component", () => {
   it("should handle user boot action", () => {
     const mockedHandleCancel: Mock = vi.fn()
 
-    render(<TableBootUser isOpen={true} users={mockedRoom1Table1TowersGameUsers} onCancel={mockedHandleCancel} />)
+    render(
+      <TableBootUser
+        isOpen={true}
+        users={mockedSocketStateTables[mockedSocketRoom1Table1Id].users}
+        onCancel={mockedHandleCancel}
+      />
+    )
 
     fireEvent.click(screen.getByText("Boot"))
     expect(mockedHandleCancel).toHaveBeenCalled()

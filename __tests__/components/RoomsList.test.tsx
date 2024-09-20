@@ -1,10 +1,11 @@
-import { RoomLevel } from "@prisma/client"
 import { fireEvent, render, screen } from "@testing-library/react"
 import { useSelector } from "react-redux"
 import { Mock } from "vitest"
 import RoomsList from "@/components/RoomsList"
+import { useSessionData } from "@/hooks"
 import { RoomWithCount } from "@/interfaces"
-import { mockedRoom1, mockedRoom2 } from "@/vitest.setup"
+import { SocketState } from "@/redux/features"
+import { mockedAuthenticatedSession, mockedRoom1, mockedRoom2, mockedSocketRoom1Id } from "@/vitest.setup"
 
 const { useRouter, mockedRouterPush } = vi.hoisted(() => {
   const mockedRouterPush: Mock = vi.fn()
@@ -29,6 +30,10 @@ vi.mock("react-redux", () => ({
   useSelector: vi.fn()
 }))
 
+vi.mock("@/hooks/useSessionData", () => ({
+  useSessionData: vi.fn()
+}))
+
 describe("RoomsList Component", () => {
   const mockedRooms: RoomWithCount[] = [
     {
@@ -42,8 +47,12 @@ describe("RoomsList Component", () => {
   ]
 
   beforeEach(() => {
-    vi.mocked(useSelector).mockReturnValue({
-      isConnected: true
+    vi.mocked(useSessionData).mockReturnValue(mockedAuthenticatedSession)
+    vi.mocked(useSelector).mockImplementation((selectorFn: (_: SocketState) => unknown) => {
+      if (selectorFn.toString().includes("state.socket.isConnected")) {
+        return true
+      }
+      return undefined
     })
   })
 
@@ -54,11 +63,11 @@ describe("RoomsList Component", () => {
   it("should render room details correctly", () => {
     render(<RoomsList rooms={mockedRooms} />)
 
-    expect(screen.getByText("Test Room 1")).toBeInTheDocument()
-    expect(screen.getByText(RoomLevel.SOCIAL)).toBeInTheDocument()
+    expect(screen.getByText(mockedRoom1.name)).toBeInTheDocument()
+    expect(screen.getByText(mockedRoom1.difficulty)).toBeInTheDocument()
     expect(screen.getByText("123 users")).toBeInTheDocument()
-    expect(screen.getByText("Test Room 2")).toBeInTheDocument()
-    expect(screen.getByText(RoomLevel.BEGINNER)).toBeInTheDocument()
+    expect(screen.getByText(mockedRoom2.name)).toBeInTheDocument()
+    expect(screen.getByText(mockedRoom2.difficulty)).toBeInTheDocument()
     expect(screen.getByText("301 users")).toBeInTheDocument()
 
     const buttons: HTMLButtonElement[] = screen.getAllByRole("button", { name: /Join/i })
@@ -79,7 +88,7 @@ describe("RoomsList Component", () => {
     const buttons: HTMLButtonElement[] = screen.getAllByRole("button", { name: /Join/i })
     fireEvent.click(buttons[0])
 
-    expect(mockedRouterPush).toHaveBeenCalledWith("/towers?room=7b09737d-aca1-4aaf-be74-5b1d40579224")
+    expect(mockedRouterPush).toHaveBeenCalledWith(`/towers?room=${mockedSocketRoom1Id}`)
   })
 
   it("should not trigger navigation when join button is disabled", () => {

@@ -11,7 +11,7 @@ export async function GET(_: NextRequest, context: { params: { tableId: string }
     include: {
       room: true,
       host: {
-        select: {
+        include: {
           user: true
         }
       },
@@ -26,10 +26,7 @@ export async function GET(_: NextRequest, context: { params: { tableId: string }
   return NextResponse.json(
     {
       success: true,
-      data: {
-        tableId,
-        tableData: table
-      }
+      data: table
     },
     { status: 200 }
   )
