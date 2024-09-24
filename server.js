@@ -14,25 +14,16 @@ app.prepare().then(() => {
   const httpServer = createServer(handler);
   const io = new Server(httpServer);
 
-  // io.use((socket, next) => {
-  //   const session = socket.handshake.auth.session;
+  io.use((socket, next) => {
+    const session = socket.handshake.auth.session;
 
-  //   if (session) {
-  //     try {
-  //       if (new Date(session.expires) < new Date()) {
-  //         throw new Error("Expired session")
-  //       }
-
-  //       next();
-  //     } catch (error) {
-  //       console.error(error.message ?? "Invalid token. Disconnecting socket.");
-  //       socket.disconnect();
-  //     }
-  //   } else {
-  //     console.log("No token provided. Disconnecting socket.");
-  //     socket.disconnect();
-  //   }
-  // });
+    if (session) {
+      next();
+    } else {
+      console.error("No session found. Disconnecting socket...");
+      socket.disconnect();
+    }
+  });
 
   io.on("connection", (socket) => {
     console.info(`User connected with socket ID: ${socket.id}.`);
@@ -56,8 +47,10 @@ app.prepare().then(() => {
     socket.on('table:join', async ({room: tableId, username}) => {
       socket.join(tableId);
 
+      const session = socket.handshake.auth.session;
       const message = `*** ${username} joined the table.`
       const response = await axios.post(`${process.env.BASE_URL}/api/tables/${tableId}/chat`, {
+        session,
         message,
         type: TableChatMessageType.USER_ACTION
       });
@@ -68,8 +61,10 @@ app.prepare().then(() => {
     });
 
     socket.on("table:leave", async ({room: tableId, username}) => {
+      const session = socket.handshake.auth.session;
       const message = `*** ${username} left the table.`
       const response = await axios.post(`${process.env.BASE_URL}/api/tables/${tableId}/chat`, {
+        session,
         message,
         type: TableChatMessageType.USER_ACTION
       });
@@ -81,20 +76,26 @@ app.prepare().then(() => {
     });
 
     socket.on("room:send-message", async ({roomId, towersUserId, message}) => {
+      const session = socket.handshake.auth.session;
       const response = await axios.post(`${process.env.BASE_URL}/api/rooms/${roomId}/chat`, {
+        session,
         towersUserId,
-        message,
+        message
       });
 
       if (response.status === 201) {
         io.to(roomId).emit("room:set-message", {roomId, data: response.data.data});
+      } else {
+        io.to(roomId).emit("error", response.data.message);
       }
     });
 
     socket.on("table:send-message", async ({tableId, towersUserId, message}) => {
+      const session = socket.handshake.auth.session;
       const response = await axios.post(`${process.env.BASE_URL}/api/tables/${tableId}/chat`, {
+        session,
         towersUserId,
-        message,
+        message
       });
 
       if (response.status === 201) {

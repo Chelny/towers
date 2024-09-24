@@ -1,28 +1,21 @@
 "use server"
 
 import { NextResponse } from "next/server"
-import { type Static, Type } from "@sinclair/typebox"
 import { Value, ValueError } from "@sinclair/typebox/value"
+import {
+  ForgotPasswordErrorMessages,
+  ForgotPasswordPayload,
+  forgotPasswordSchema
+} from "@/app/(auth)/forgot-password/forgot-password.schema"
 import { POST } from "@/app/api/forgot-password/route"
-import { EMAIL_PATTERN } from "@/constants"
 
-const forgotPasswordSchema = Type.Object({
-  email: Type.RegExp(EMAIL_PATTERN)
-})
-
-export type ForgotPasswordData = Static<typeof forgotPasswordSchema>
-
-export type ForgotPasswordErrorMessages<T extends string> = {
-  [K in T]?: string
-}
-
-export async function forgotPassword(prevState: any, formData: FormData) {
-  const rawFormData: ForgotPasswordData = {
+export async function forgotPassword(prevState: ApiResponse, formData: FormData): Promise<ApiResponse> {
+  const rawFormData: ForgotPasswordPayload = {
     email: formData.get("email") as string
   }
 
   const errors: ValueError[] = Array.from(Value.Errors(forgotPasswordSchema, rawFormData))
-  const errorMessages: ForgotPasswordErrorMessages<keyof ForgotPasswordData> = {}
+  const errorMessages: ForgotPasswordErrorMessages = {}
 
   for (const error of errors) {
     switch (error.path.replace("/", "")) {
@@ -37,11 +30,12 @@ export async function forgotPassword(prevState: any, formData: FormData) {
 
   if (Object.keys(errorMessages).length === 0) {
     const response: NextResponse = await POST(rawFormData)
-    return await response.json()
+    const data = await response.json()
+    return data
   }
 
   return {
     success: false,
-    errors: errorMessages
+    error: errorMessages
   }
 }

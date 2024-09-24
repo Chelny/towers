@@ -5,26 +5,27 @@ import { useFormState, useFormStatus } from "react-dom"
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { signIn, SignInData, SignInErrorMessages } from "@/app/(auth)/sign-in/sign-in.actions"
+import { signIn } from "@/app/(auth)/sign-in/sign-in.actions"
+import { SignInFormErrorMessages } from "@/app/(auth)/sign-in/sign-in.schema"
 import { signIn as authSignInWithPasskey } from "@/auth"
 import { SocialLoginButtons } from "@/components/SocialLoginButtons"
 import AlertMessage from "@/components/ui/AlertMessage"
 import Button from "@/components/ui/Button"
 import Input from "@/components/ui/Input"
-import { ROUTE_FORGOT_PASSWORD, ROUTE_SIGN_IN_WITH_MAGIC_LINK, ROUTE_SIGN_UP } from "@/constants"
-import { useSessionData } from "@/hooks"
+import { ROUTE_FORGOT_PASSWORD, ROUTE_SIGN_IN_WITH_MAGIC_LINK, ROUTE_SIGN_UP } from "@/constants/routes"
+import { useSessionData } from "@/hooks/useSessionData"
 
 const initialState = {
   success: false,
   message: "",
-  errors: {} as SignInErrorMessages<keyof SignInData>
+  error: {} as SignInFormErrorMessages
 }
 
 export function SignInForm(): ReactNode {
   const router: AppRouterInstance = useRouter()
   const { status } = useSessionData()
   const { pending } = useFormStatus()
-  const [state, formAction] = useFormState<any, FormData>(signIn, initialState)
+  const [state, formAction] = useFormState<ApiResponse, FormData>(signIn, initialState)
 
   const handleSignIn = (event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault()

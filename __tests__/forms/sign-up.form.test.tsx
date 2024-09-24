@@ -9,7 +9,7 @@ vi.mock("react-dom", () => ({
 
 describe("Sign Up Form", () => {
   beforeEach(() => {
-    vi.mocked(useFormState).mockReturnValue([{ success: false, message: "", errors: {} }, vi.fn(), false])
+    vi.mocked(useFormState).mockReturnValue([{ success: false, message: "", error: {} }, vi.fn(), false])
 
     vi.mocked(useFormStatus).mockReturnValue({
       pending: false,
@@ -56,7 +56,7 @@ describe("Sign Up Form", () => {
     vi.mocked(useFormState).mockReturnValue([
       {
         success: false,
-        errors: {
+        error: {
           name: "The name is invalid.",
           email: "The email is invalid",
           username: "The username is invalid",
@@ -81,7 +81,7 @@ describe("Sign Up Form", () => {
     vi.mocked(useFormState).mockReturnValue([
       {
         success: false,
-        errors: {
+        error: {
           birthdate: "The birthdate is invalid."
         }
       },
@@ -98,7 +98,7 @@ describe("Sign Up Form", () => {
     vi.mocked(useFormState).mockReturnValue([
       {
         success: false,
-        errors: {
+        error: {
           confirmPassword: "The password and password confirmation do not match"
         }
       },

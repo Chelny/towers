@@ -2,7 +2,7 @@ import { useFormState, useFormStatus } from "react-dom"
 import { Account, Gender, User } from "@prisma/client"
 import { render, screen } from "@testing-library/react"
 import { ProfileForm } from "@/app/(protected)/account/profile/profile.form"
-import { useSessionData } from "@/hooks"
+import { useSessionData } from "@/hooks/useSessionData"
 import { mockedUnauthenticatedSession, mockedUser1 } from "@/vitest.setup"
 
 vi.mock("react-dom", () => ({
@@ -10,7 +10,7 @@ vi.mock("react-dom", () => ({
   useFormStatus: vi.fn()
 }))
 
-vi.mock("@/hooks", () => ({
+vi.mock("@/hooks/useSessionData", () => ({
   useSessionData: vi.fn()
 }))
 
@@ -34,7 +34,7 @@ describe("Sign Up Form", () => {
   }
 
   beforeEach(() => {
-    vi.mocked(useFormState).mockReturnValue([{ success: false, message: "", errors: {} }, vi.fn(), false])
+    vi.mocked(useFormState).mockReturnValue([{ success: false, message: "", error: {} }, vi.fn(), false])
 
     vi.mocked(useFormStatus).mockReturnValue({
       pending: false,
@@ -85,7 +85,7 @@ describe("Sign Up Form", () => {
     vi.mocked(useFormState).mockReturnValue([
       {
         success: false,
-        errors: {
+        error: {
           name: "The name is invalid.",
           email: "The email is invalid.",
           username: "The username is invalid."
@@ -106,7 +106,7 @@ describe("Sign Up Form", () => {
     vi.mocked(useFormState).mockReturnValue([
       {
         success: false,
-        errors: {
+        error: {
           birthdate: "The birthdate is invalid."
         }
       },
@@ -123,8 +123,8 @@ describe("Sign Up Form", () => {
     vi.mocked(useFormStatus).mockReturnValue({
       pending: true,
       data: new FormData(),
-      method: "POST",
-      action: "/api/profile"
+      method: "PATCH",
+      action: "/api/account/profile"
     })
 
     render(<ProfileForm user={user} />)

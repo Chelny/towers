@@ -1,16 +1,68 @@
 import { NextResponse } from "next/server"
 import { Account, User, UserStatus } from "@prisma/client"
 import { Session } from "next-auth"
-import { AccountData } from "@/app/(protected)/account/account.actions"
+import { AccountFormData } from "@/app/(protected)/account/account.schema"
 import { auth } from "@/auth"
-import { getAccountsByUserId, getUserById } from "@/data"
-import { sendAccountDeletionEmail } from "@/lib"
+import { getAccountsByUserId } from "@/data/account"
+import { getUserById } from "@/data/user"
+import { sendAccountDeletionEmail } from "@/lib/email"
 import prisma from "@/lib/prisma"
 
-export async function DELETE(body: AccountData): Promise<NextResponse> {
+export async function GET(): Promise<NextResponse> {
   const session: Session | null = await auth()
 
-  if (!session?.user) {
+  if (!session) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Please sign in to access your account."
+      },
+      { status: 401 }
+    )
+  }
+
+  const user: Partial<User> | null = await prisma.user.findUnique({
+    where: {
+      id: session.user.id
+    },
+    select: {
+      name: true,
+      gender: true,
+      birthdate: true,
+      email: true,
+      username: true,
+      image: true,
+      accounts: {
+        select: {
+          provider: true
+        }
+      }
+    }
+  })
+
+  if (!user) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: "We couldn’t find an account with that information. Please check your details and try again."
+      },
+      { status: 404 }
+    )
+  }
+
+  return NextResponse.json(
+    {
+      success: true,
+      data: user
+    },
+    { status: 200 }
+  )
+}
+
+export async function DELETE(body: AccountFormData): Promise<NextResponse> {
+  const session: Session | null = await auth()
+
+  if (!session) {
     return NextResponse.json(
       {
         success: false,
@@ -64,6 +116,8 @@ export async function DELETE(body: AccountData): Promise<NextResponse> {
       id: session.user.id
     },
     data: {
+      isOnline: false,
+      lastActiveAt: new Date(),
       status: UserStatus.PENDING_DELETION,
       deletionScheduledAt: deletionDate
     },

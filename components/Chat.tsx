@@ -1,6 +1,7 @@
 "use client"
 
-import { RoomChatWithTowersGameUser, TableChatWithTowersGameUser } from "@/interfaces"
+import { RoomChatWithTowersGameUser } from "@/interfaces/room-chat"
+import { TableChatWithTowersGameUser } from "@/interfaces/table-chat"
 
 type ChatProps = {
   messages: RoomChatWithTowersGameUser[] | TableChatWithTowersGameUser[]

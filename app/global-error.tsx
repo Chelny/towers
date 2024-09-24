@@ -7,6 +7,7 @@ type GlobalErrorProps = {
   reset: () => void
 }
 
+// eslint-disable-next-line no-unused-vars
 export default function GlobalError({ error, reset }: GlobalErrorProps): ReactNode {
   return (
     <html>

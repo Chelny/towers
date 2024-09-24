@@ -1,9 +1,9 @@
 import { render, screen } from "@testing-library/react"
 import UserAvatar from "@/components/UserAvatar"
-import { useSessionData } from "@/hooks"
+import { useSessionData } from "@/hooks/useSessionData"
 import { mockedAuthenticatedSession, mockedLoadingSession, mockedUnauthenticatedSession } from "@/vitest.setup"
 
-vi.mock("@/hooks", () => ({
+vi.mock("@/hooks/useSessionData", () => ({
   useSessionData: vi.fn()
 }))
 

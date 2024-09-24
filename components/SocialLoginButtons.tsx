@@ -6,7 +6,7 @@ import { signIn } from "next-auth/react"
 import { FaGithub } from "react-icons/fa6"
 import { FcGoogle } from "react-icons/fc"
 import Button from "@/components/ui/Button"
-import { SIGN_IN_REDIRECT } from "@/constants"
+import { SIGN_IN_REDIRECT } from "@/constants/routes"
 
 type SocialLoginButtonsProps = {
   disabled: boolean

@@ -2,11 +2,8 @@
 
 import { FormEvent, ReactNode } from "react"
 import { useFormState, useFormStatus } from "react-dom"
-import {
-  forgotPassword,
-  ForgotPasswordData,
-  ForgotPasswordErrorMessages
-} from "@/app/(auth)/forgot-password/forgot-password.actions"
+import { forgotPassword } from "@/app/(auth)/forgot-password/forgot-password.actions"
+import { ForgotPasswordErrorMessages } from "@/app/(auth)/forgot-password/forgot-password.schema"
 import AlertMessage from "@/components/ui/AlertMessage"
 import Button from "@/components/ui/Button"
 import Input from "@/components/ui/Input"
@@ -14,12 +11,12 @@ import Input from "@/components/ui/Input"
 const initialState = {
   success: false,
   message: "",
-  errors: {} as ForgotPasswordErrorMessages<keyof ForgotPasswordData>
+  error: {} as ForgotPasswordErrorMessages
 }
 
 export function ForgotPasswordForm(): ReactNode {
   const { pending } = useFormStatus()
-  const [state, formAction] = useFormState<any, FormData>(forgotPassword, initialState)
+  const [state, formAction] = useFormState<ApiResponse, FormData>(forgotPassword, initialState)
 
   const handleSendEmail = (event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault()
@@ -29,13 +26,13 @@ export function ForgotPasswordForm(): ReactNode {
 
   return (
     <form className="w-full" noValidate onSubmit={handleSendEmail}>
-      {state.message && <AlertMessage type={state.success ? "success" : "error"}>{state.message}</AlertMessage>}
+      {state?.message && <AlertMessage type={state.success ? "success" : "error"}>{state.message}</AlertMessage>}
       <Input
         id="email"
         label="Email"
         required
         dataTestId="forgot-password-email-input"
-        errorMessage={state.errors?.email}
+        errorMessage={state?.error?.email}
       />
       <Button type="submit" className="w-full" disabled={pending} dataTestId="forgot-password-submit-button">
         Send Email

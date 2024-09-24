@@ -1,9 +1,9 @@
 import { Mock } from "vitest"
 import { password } from "@/app/(protected)/account/update-password/update-password.actions"
-import { POST } from "@/app/api/account/password/route"
+import { PATCH } from "@/app/api/account/password/route"
 
 vi.mock("@/app/api/account/password/route", () => ({
-  POST: vi.fn()
+  PATCH: vi.fn()
 }))
 
 describe("Update Password Actions", () => {
@@ -19,20 +19,20 @@ describe("Update Password Actions", () => {
 
     const response = {
       success: false,
-      errors: {
+      error: {
         currentPassword: "The current password is invalid.",
         newPassword: "The new password is invalid.",
         confirmNewPassword: "The new password confirmation is invalid."
       }
     }
 
-    ;(POST as Mock).mockResolvedValueOnce({
+    ;(PATCH as Mock).mockResolvedValueOnce({
       json: async () => response
     })
 
     const result = await password({}, formData)
 
-    expect(POST).not.toHaveBeenCalled()
+    expect(PATCH).not.toHaveBeenCalled()
     expect(result).toEqual(response)
   })
 
@@ -44,20 +44,20 @@ describe("Update Password Actions", () => {
 
     const response = {
       success: false,
-      errors: {
+      error: {
         currentPassword: "The current password is invalid.",
         newPassword: "The new password is invalid.",
         confirmNewPassword: "The new password confirmation is invalid."
       }
     }
 
-    ;(POST as Mock).mockResolvedValueOnce({
+    ;(PATCH as Mock).mockResolvedValueOnce({
       json: async () => response
     })
 
     const result = await password({}, formData)
 
-    expect(POST).not.toHaveBeenCalled()
+    expect(PATCH).not.toHaveBeenCalled()
     expect(result).toEqual(response)
   })
 
@@ -72,13 +72,13 @@ describe("Update Password Actions", () => {
       message: "The password has been updated!"
     }
 
-    ;(POST as Mock).mockResolvedValueOnce({
+    ;(PATCH as Mock).mockResolvedValueOnce({
       json: async () => response
     })
 
     const result = await password({}, formData)
 
-    expect(POST).toHaveBeenCalledWith({
+    expect(PATCH).toHaveBeenCalledWith({
       currentPassword: "Password123!",
       newPassword: "Password12345!",
       confirmNewPassword: "Password12345!"

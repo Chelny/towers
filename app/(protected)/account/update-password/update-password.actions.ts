@@ -1,32 +1,23 @@
 "use server"
 
 import { NextResponse } from "next/server"
-import { type Static, Type } from "@sinclair/typebox"
 import { Value, ValueError } from "@sinclair/typebox/value"
-import { POST } from "@/app/api/account/password/route"
-import { PASSWORD_PATTERN } from "@/constants"
+import {
+  passwordSchema,
+  UpdatePasswordFormData,
+  UpdatePasswordFormErrorMessages
+} from "@/app/(protected)/account/update-password/update-password.schema"
+import { PATCH } from "@/app/api/account/password/route"
 
-const passwordSchema = Type.Object({
-  currentPassword: Type.String({ minLength: 8 }),
-  newPassword: Type.RegExp(PASSWORD_PATTERN),
-  confirmNewPassword: Type.RegExp(PASSWORD_PATTERN)
-})
-
-export type UpdatePasswordData = Static<typeof passwordSchema>
-
-export type UpdatePasswordErrorMessages<T extends string> = {
-  [K in T]?: string
-}
-
-export async function password(prevState: any, formData: FormData) {
-  const rawFormData: UpdatePasswordData = {
+export async function password(prevState: ApiResponse, formData: FormData): Promise<ApiResponse> {
+  const rawFormData: UpdatePasswordFormData = {
     currentPassword: formData.get("currentPassword") as string,
     newPassword: formData.get("newPassword") as string,
     confirmNewPassword: formData.get("confirmNewPassword") as string
   }
 
   const errors: ValueError[] = Array.from(Value.Errors(passwordSchema, rawFormData))
-  const errorMessages: UpdatePasswordErrorMessages<keyof UpdatePasswordData> = {}
+  const errorMessages: UpdatePasswordFormErrorMessages = {}
 
   for (const error of errors) {
     switch (error.path.replace("/", "")) {
@@ -50,12 +41,13 @@ export async function password(prevState: any, formData: FormData) {
   }
 
   if (Object.keys(errorMessages).length === 0) {
-    const response: NextResponse = await POST(rawFormData)
-    return await response.json()
+    const response: NextResponse = await PATCH(rawFormData)
+    const data = await response.json()
+    return data
   }
 
   return {
     success: false,
-    errors: errorMessages
+    error: errorMessages
   }
 }

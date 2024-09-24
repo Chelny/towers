@@ -2,7 +2,7 @@ import { configureStore } from "@reduxjs/toolkit"
 import { render, screen } from "@testing-library/react"
 import { Provider } from "react-redux"
 import RoomHeader from "@/components/RoomHeader"
-import socketReducer, { SocketState } from "@/redux/features"
+import socketReducer, { SocketState } from "@/redux/features/socket-slice"
 import { mockedRoom1, mockedSocketInitialState, mockedSocketRoom1Id, mockedSocketStateRooms } from "@/vitest.setup"
 
 const initialState: SocketState = {

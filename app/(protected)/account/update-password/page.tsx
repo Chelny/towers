@@ -1,7 +1,7 @@
 import { ReactNode } from "react"
 import { Metadata } from "next"
 import { UpdatePasswordForm } from "@/app/(protected)/account/update-password/update-password.form"
-import { ROUTE_UPDATE_PASSWORD } from "@/constants"
+import { ROUTE_UPDATE_PASSWORD } from "@/constants/routes"
 
 export const metadata: Metadata = {
   title: ROUTE_UPDATE_PASSWORD.TITLE

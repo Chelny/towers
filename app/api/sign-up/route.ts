@@ -1,11 +1,13 @@
 import { NextResponse } from "next/server"
 import { User, VerificationToken } from "@prisma/client"
 import { hash } from "bcryptjs"
-import { SignUpData } from "@/app/(auth)/sign-up/sign-up.actions"
-import { getUserByEmail } from "@/data"
-import prisma, { generateVerificationToken, sendVerificationEmail } from "@/lib"
+import { SignUpFormData } from "@/app/(auth)/sign-up/sign-up.schema"
+import { getUserByEmail } from "@/data/user"
+import { sendVerificationEmail } from "@/lib/email"
+import prisma from "@/lib/prisma"
+import { generateVerificationToken } from "@/lib/token"
 
-export async function POST(body: SignUpData): Promise<NextResponse> {
+export async function POST(body: SignUpFormData): Promise<NextResponse> {
   const user: User | null = await getUserByEmail(body.email)
 
   if (user) {
@@ -34,7 +36,7 @@ export async function POST(body: SignUpData): Promise<NextResponse> {
     data: {
       name: body.name,
       gender: body.gender,
-      birthdate: body.birthdate ? new Date(body.birthdate) : null,
+      birthdate: body.birthdate ? new Date(body.birthdate) : undefined,
       email: body.email,
       username: body.username,
       password: hashedPassword

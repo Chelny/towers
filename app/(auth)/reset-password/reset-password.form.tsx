@@ -3,11 +3,8 @@
 import { FormEvent, ReactNode } from "react"
 import { useFormState, useFormStatus } from "react-dom"
 import { ReadonlyURLSearchParams, useSearchParams } from "next/navigation"
-import {
-  resetPassword,
-  ResetPasswordData,
-  ResetPasswordErrorMessages
-} from "@/app/(auth)/reset-password/reset-password.actions"
+import { resetPassword } from "@/app/(auth)/reset-password/reset-password.actions"
+import { ResetPasswordFormErrorMessages } from "@/app/(auth)/reset-password/reset-password.schema"
 import AlertMessage from "@/components/ui/AlertMessage"
 import Button from "@/components/ui/Button"
 import Input from "@/components/ui/Input"
@@ -15,14 +12,14 @@ import Input from "@/components/ui/Input"
 const initialState = {
   success: false,
   message: "",
-  errors: {} as ResetPasswordErrorMessages<keyof ResetPasswordData>
+  error: {} as ResetPasswordFormErrorMessages
 }
 
 export function ResetPasswordForm(): ReactNode {
   const searchParams: ReadonlyURLSearchParams = useSearchParams()
   const token: string | null = searchParams.get("token")
   const { pending } = useFormStatus()
-  const [state, formAction] = useFormState<any, FormData>(resetPassword, initialState)
+  const [state, formAction] = useFormState<ApiResponse, FormData>(resetPassword, initialState)
 
   const handleResetPassword = (event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault()
@@ -32,7 +29,7 @@ export function ResetPasswordForm(): ReactNode {
 
   return (
     <form className="w-full" noValidate onSubmit={handleResetPassword}>
-      {state.message && <AlertMessage type={state.success ? "success" : "error"}>{state.message}</AlertMessage>}
+      {state?.message && <AlertMessage type={state.success ? "success" : "error"}>{state.message}</AlertMessage>}
       <Input
         type="password"
         id="password"
@@ -41,7 +38,7 @@ export function ResetPasswordForm(): ReactNode {
         required
         dataTestId="reset-password-password-input"
         description="Password must be at least 8 characters long, must contain at least one digit, one uppercase letter, and at least one special character."
-        errorMessage={state.errors?.password}
+        errorMessage={state?.error?.password}
       />
       <Input
         type="password"
@@ -50,7 +47,7 @@ export function ResetPasswordForm(): ReactNode {
         autoComplete="off"
         required
         dataTestId="reset-password-confirm-password-input"
-        errorMessage={state.errors?.confirmPassword}
+        errorMessage={state?.error?.confirmPassword}
       />
       <input
         type="hidden"

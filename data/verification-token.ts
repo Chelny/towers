@@ -1,6 +1,6 @@
 import { User, VerificationToken } from "@prisma/client"
-import { getUserByEmail } from "@/data"
-import prisma from "@/lib"
+import { getUserByEmail } from "@/data/user"
+import prisma from "@/lib/prisma"
 
 export const getVerificationTokenByToken = async (email: string, token: string): Promise<VerificationToken | null> => {
   const user: User | null = await getUserByEmail(email)

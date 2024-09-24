@@ -1,6 +1,6 @@
-import { BOARD_COLS, BOARD_ROWS } from "@/constants"
-import { Block, Board, BoardBlock, BoardRow, PowerLevel } from "@/interfaces"
-import { isEmptyCell, isMedusaBlock } from "@/utils"
+import { BOARD_COLS, BOARD_ROWS } from "@/constants/game"
+import { Block, Board, BoardBlock, BoardRow, PowerLevel } from "@/interfaces/game"
+import { isEmptyCell, isMedusaBlock } from "@/utils/block-guards-utils"
 
 /**
  * Checks if swapping two blocks on the board will create adjacent blocks of the same color and letter.

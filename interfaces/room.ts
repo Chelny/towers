@@ -1,5 +1,5 @@
 import { Room } from "@prisma/client"
-import { TableWithHostAndTowersGameUsers } from "@/interfaces"
+import { TableWithHostAndTowersGameUsers } from "@/interfaces/table"
 
 export interface RoomWithCount extends Room {
   _count: {

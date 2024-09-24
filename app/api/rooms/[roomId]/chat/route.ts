@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from "next/server"
 import { RoomChat } from "@prisma/client"
 import DOMPurify from "isomorphic-dompurify"
-import { RoomChatWithTowersGameUser } from "@/interfaces"
-import prisma from "@/lib"
+import { Session } from "next-auth"
+import { RoomChatWithTowersGameUser } from "@/interfaces/room-chat"
+import prisma from "@/lib/prisma"
+import { updateLastActiveAt } from "@/lib/user"
 
 export async function GET(_: NextRequest, context: { params: { roomId: string } }): Promise<NextResponse> {
   const { roomId } = context.params
@@ -38,6 +40,17 @@ export async function GET(_: NextRequest, context: { params: { roomId: string } 
 export async function POST(request: NextRequest, context: { params: { roomId: string } }): Promise<NextResponse> {
   const { roomId } = context.params
   const data = await request.json()
+  const session: Session | null = data.session
+
+  if (!session) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Please sign in to access your account."
+      },
+      { status: 401 }
+    )
+  }
 
   let message: string = DOMPurify.sanitize(data.message)
 
@@ -65,6 +78,8 @@ export async function POST(request: NextRequest, context: { params: { roomId: st
       }
     }
   })
+
+  await updateLastActiveAt(session.user.id)
 
   return NextResponse.json(
     {

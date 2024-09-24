@@ -1,5 +1,5 @@
-import { Block } from "@/interfaces"
-import { isMedusaBlock, isMidasBlock, isTowersBlock } from "@/utils"
+import { Block } from "@/interfaces/game"
+import { isMedusaBlock, isMidasBlock, isTowersBlock } from "@/utils/block-guards-utils"
 
 /**
  * Returns the CSS class name corresponding to a given block type for styling purposes.

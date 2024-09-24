@@ -1,15 +1,22 @@
 import { Gender, Room, RoomLevel, Table, TableType, TowersGameUser, User, UserStatus } from "@prisma/client"
 import "@testing-library/jest-dom"
-import { TSessionContextValue } from "@/context"
-import {
-  BoardBlock,
-  RoomChatWithTowersGameUser,
-  RoomWithTablesCount,
-  TableChatWithTowersGameUser,
-  TableWithHostAndTowersGameUsers,
-  TowersGameUserWithUserAndTables
-} from "@/interfaces"
-import { RoomsState, SocketState, TablesState } from "@/redux/features"
+import { TSessionContextValue } from "@/context/session-context"
+import { BoardBlock } from "@/interfaces/game"
+import { RoomWithTablesCount } from "@/interfaces/room"
+import { RoomChatWithTowersGameUser } from "@/interfaces/room-chat"
+import { TableWithHostAndTowersGameUsers } from "@/interfaces/table"
+import { TableChatWithTowersGameUser } from "@/interfaces/table-chat"
+import { TowersGameUserWithUserAndTables } from "@/interfaces/towers-game-user"
+import { RoomsState, SocketState, TablesState } from "@/redux/features/socket-slice"
+
+export const mockedRouter = {
+  back: vi.fn(),
+  forward: vi.fn(),
+  refresh: vi.fn(),
+  push: vi.fn(),
+  replace: vi.fn(),
+  prefetch: vi.fn()
+}
 
 /**
  * Next-auth Session States

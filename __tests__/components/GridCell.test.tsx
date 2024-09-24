@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react"
 import GridCell from "@/components/game/GridCell"
-import { BoardBlock } from "@/interfaces"
+import { BoardBlock } from "@/interfaces/game"
 import { mockedDefaultTowersBlockProps } from "@/vitest.setup"
 
 describe("GridCell Component", () => {

@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { ROUTE_HOME } from "@/constants"
+import { ROUTE_HOME } from "@/constants/routes"
 
 export default function Breadcrumb() {
   const pathname: string = usePathname()

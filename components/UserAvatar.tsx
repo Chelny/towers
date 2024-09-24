@@ -2,12 +2,12 @@
 
 import { ReactNode } from "react"
 import Image from "next/image"
-import { useSessionData } from "@/hooks"
+import { useSessionData } from "@/hooks/useSessionData"
 
 export default function UserAvatar(): ReactNode {
   const { data: session, status } = useSessionData()
 
-  if (!session?.user || status === "loading") {
+  if (!session || status === "loading") {
     return (
       <div className="w-10 h-10 rounded bg-zinc-400">
         <Image

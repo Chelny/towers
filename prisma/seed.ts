@@ -1,6 +1,6 @@
 import { Gender, RoomLevel, TableType, UserStatus } from "@prisma/client"
 import { parseArgs } from "node:util"
-import prisma from "@/lib"
+import prisma from "@/lib/prisma"
 
 const options = {
   environment: { type: "string" }
@@ -57,6 +57,7 @@ async function main() {
         password: "$2a$12$.a4AhkJrYEAefd2Ok3S4YOKNPiYMO44GCthg.DwwPgY4eqmoPjqWC",
         emailVerified: new Date(),
         isOnline: true,
+        lastActiveAt: new Date(),
         status: UserStatus.ACTIVE
       }))
     })

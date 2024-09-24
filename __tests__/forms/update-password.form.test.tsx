@@ -9,7 +9,7 @@ vi.mock("react-dom", () => ({
 
 describe("Update Password Form", () => {
   beforeEach(() => {
-    vi.mocked(useFormState).mockReturnValue([{ success: false, message: "", errors: {} }, vi.fn(), false])
+    vi.mocked(useFormState).mockReturnValue([{ success: false, message: "", error: {} }, vi.fn(), false])
 
     vi.mocked(useFormStatus).mockReturnValue({
       pending: false,
@@ -44,7 +44,7 @@ describe("Update Password Form", () => {
     vi.mocked(useFormState).mockReturnValue([
       {
         success: false,
-        errors: {
+        error: {
           currentPassword: "The current password is invalid.",
           newPassword: "The new password is invalid.",
           confirmNewPassword: "The new password confirmation is invalid."
@@ -65,7 +65,7 @@ describe("Update Password Form", () => {
     vi.mocked(useFormState).mockReturnValue([
       {
         success: false,
-        errors: {
+        error: {
           confirmNewPassword: "The new password and new password confirmation do not match."
         }
       },
@@ -82,7 +82,7 @@ describe("Update Password Form", () => {
     vi.mocked(useFormStatus).mockReturnValue({
       pending: true,
       data: new FormData(),
-      method: "POST",
+      method: "PATCH",
       action: "/api/account/update-password"
     })
 

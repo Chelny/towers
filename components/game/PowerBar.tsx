@@ -3,8 +3,9 @@ import clsx from "clsx/lite"
 import DefenseBlock from "@/components/game/DefenseBlock"
 import RegularBlock from "@/components/game/RegularBlock"
 import SpecialDiamondBlock from "@/components/game/SpecialDiamondBlock"
-import { PowerBarBlock } from "@/interfaces"
-import { getClassNameForBlock, getClassNameForBlockPowerType, isPowerBarBlock, isSpecialDiamond } from "@/utils"
+import { PowerBarBlock } from "@/interfaces/game"
+import { getClassNameForBlock, getClassNameForBlockPowerType } from "@/utils/block-class-names-utils"
+import { isPowerBarBlock, isSpecialDiamond } from "@/utils/block-guards-utils"
 import styles from "./Block.module.scss"
 
 type PowerBarProps = {

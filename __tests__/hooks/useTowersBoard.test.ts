@@ -1,6 +1,6 @@
 import { act } from "react"
 import { renderHook } from "@testing-library/react-hooks"
-import { BOARD_ROWS, HIDDEN_ROWS_COUNT, PIECE_LENGTH, PIECE_STARTING_COL, PIECE_STARTING_ROW } from "@/constants"
+import { BOARD_ROWS, HIDDEN_ROWS_COUNT, PIECE_LENGTH, PIECE_STARTING_COL, PIECE_STARTING_ROW } from "@/constants/game"
 import {
   boardReducer,
   checkGameOver,
@@ -9,8 +9,8 @@ import {
   getRandomPiece,
   hasCollisions,
   useTowersBoard
-} from "@/hooks"
-import { Board, BoardState, Piece } from "@/interfaces"
+} from "@/hooks/useTowersBoard"
+import { Board, BoardState, Piece } from "@/interfaces/game"
 
 describe("useTowersBoard Hook", () => {
   it("should initialize board state with default values", () => {

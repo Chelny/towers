@@ -1,5 +1,5 @@
-import { USERNAME_PATTERN } from "@/constants"
-import { generateRandomUsername } from "@/utils"
+import { USERNAME_PATTERN } from "@/constants/regex"
+import { generateRandomUsername } from "@/utils/user-utils"
 
 describe("generateRandomUsername Utility", () => {
   it("should generate a username with base and a random suffix", () => {

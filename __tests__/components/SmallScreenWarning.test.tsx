@@ -1,33 +1,33 @@
 import { fireEvent, render, screen } from "@testing-library/react"
 import { signOut } from "next-auth/react"
-import { useDispatch } from "react-redux"
 import { Mock } from "vitest"
 import SmallScreenWarning from "@/components/SmallScreenWarning"
-import { useSessionData } from "@/hooks"
-import { destroySocket } from "@/redux/features"
+import { useSessionData } from "@/hooks/useSessionData"
+import { useAppDispatch } from "@/lib/hooks"
+import { destroySocket } from "@/redux/features/socket-slice"
 import { mockedAuthenticatedSession } from "@/vitest.setup"
 
 vi.mock("next-auth/react", () => ({
   signOut: vi.fn()
 }))
 
-vi.mock("react-redux", () => ({
-  useDispatch: vi.fn()
-}))
-
 vi.mock("@/hooks/useSessionData", () => ({
   useSessionData: vi.fn()
 }))
 
-vi.mock("@/lib", () => ({
+vi.mock("@/lib/email", () => ({
   sendEmail: vi.fn().mockResolvedValue({ success: true })
 }))
 
+vi.mock("@/lib/hooks", () => ({
+  useAppDispatch: vi.fn()
+}))
+
 describe("SmallScreenWarning Component", () => {
-  const mockedDispatch: Mock = vi.fn()
+  const mockedAppDispatch: Mock = vi.fn()
 
   beforeEach(() => {
-    vi.mocked(useDispatch).mockReturnValue(mockedDispatch)
+    vi.mocked(useAppDispatch).mockReturnValue(mockedAppDispatch)
     vi.mocked(useSessionData).mockReturnValue(mockedAuthenticatedSession)
   })
 
@@ -55,7 +55,7 @@ describe("SmallScreenWarning Component", () => {
     const signOutButton: HTMLButtonElement = screen.getByRole("button", { name: /Sign out/i })
     fireEvent.click(signOutButton)
 
-    expect(mockedDispatch).toHaveBeenCalledWith(destroySocket())
+    expect(mockedAppDispatch).toHaveBeenCalledWith(destroySocket())
     expect(signOut).toHaveBeenCalled()
   })
 })

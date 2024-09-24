@@ -4,7 +4,7 @@ import { ReactNode } from "react"
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime"
 import { useRouter } from "next/navigation"
 import Button from "@/components/ui/Button"
-import { ROUTE_HOME } from "@/constants"
+import { ROUTE_HOME } from "@/constants/routes"
 
 export default function NotFound(): ReactNode {
   const router: AppRouterInstance = useRouter()

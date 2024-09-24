@@ -3,13 +3,14 @@
 import { FormEvent, ReactNode, useEffect } from "react"
 import { useFormState, useFormStatus } from "react-dom"
 import { Account, Gender, User } from "@prisma/client"
-import { profile, ProfileData, ProfileErrorMessages } from "@/app/(protected)/account/profile/profile.actions"
+import { profile } from "@/app/(protected)/account/profile/profile.actions"
+import { ProfileFormErrorMessages } from "@/app/(protected)/account/profile/profile.schema"
 import AlertMessage from "@/components/ui/AlertMessage"
 import Button from "@/components/ui/Button"
 import Calendar from "@/components/ui/Calendar"
 import Input from "@/components/ui/Input"
 import RadioButtonGroup from "@/components/ui/RadioButtonGroup"
-import { useSessionData } from "@/hooks"
+import { useSessionData } from "@/hooks/useSessionData"
 
 type ProfileProps = {
   user: (Partial<User> & { accounts: Partial<Account>[] }) | null
@@ -18,21 +19,21 @@ type ProfileProps = {
 const initialState = {
   success: false,
   message: "",
-  errors: {} as ProfileErrorMessages<keyof ProfileData>
+  error: {} as ProfileFormErrorMessages
 }
 
 export function ProfileForm({ user }: ProfileProps): ReactNode {
   const { pending } = useFormStatus()
-  const [state, formAction] = useFormState<any, FormData>(profile, initialState)
+  const [state, formAction] = useFormState<ApiResponse<User>, FormData>(profile, initialState)
   const { update } = useSessionData()
 
   useEffect(() => {
-    if (state.success) {
+    if (state?.success) {
       update({
-        name: state?.data.name,
-        email: state?.data.email,
-        username: state?.data.username,
-        image: state?.data.image
+        name: state?.data?.name,
+        email: state?.data?.email,
+        username: state?.data?.username,
+        image: state?.data?.image
       })
     }
   }, [state])
@@ -45,7 +46,17 @@ export function ProfileForm({ user }: ProfileProps): ReactNode {
 
   return (
     <form className="w-full" noValidate onSubmit={handleUpdateProfile}>
-      {state.message && <AlertMessage type={state.success ? "success" : "error"}>{state.message}</AlertMessage>}
+      {state?.message && <AlertMessage type={state.success ? "success" : "error"}>{state.message}</AlertMessage>}
+      {/* <Input
+        type="file"
+        id="image"
+        label="Avatar"
+        defaultValue={undefined}
+        disabled
+        dataTestId="profile-image-input"
+        errorMessage={state?.error?.image}
+      />
+      <hr className="mt-6 mb-4" /> */}
       <Input
         id="name"
         label="Name"
@@ -53,7 +64,7 @@ export function ProfileForm({ user }: ProfileProps): ReactNode {
         defaultValue={user?.name}
         required
         dataTestId="profile-name-input"
-        errorMessage={state.errors?.name}
+        errorMessage={state?.error?.name}
       />
       <RadioButtonGroup
         id="gender"
@@ -61,7 +72,7 @@ export function ProfileForm({ user }: ProfileProps): ReactNode {
         inline
         defaultValue={String(user?.gender)}
         dataTestId="profile-gender-radio-group"
-        errorMessage={state.errors?.gender}
+        errorMessage={state?.error?.gender}
       >
         <RadioButtonGroup.Option id="male" value={Gender.M} label="Male" />
         <RadioButtonGroup.Option id="female" value={Gender.F} label="Female" />
@@ -71,10 +82,10 @@ export function ProfileForm({ user }: ProfileProps): ReactNode {
         id="birthdate"
         label="Birthdate"
         maxDate={new Date(new Date().getFullYear() - 12, new Date().getMonth(), new Date().getDate())}
-        defaultValue={String(new Date(user?.birthdate!))}
+        defaultValue={user?.birthdate ? String(new Date(user?.birthdate)) : undefined}
         dataTestId="profile-birthdate-calendar"
         description="You must be at least 12 years old."
-        errorMessage={state.errors?.birthdate}
+        errorMessage={state?.error?.birthdate}
       />
       <Input
         type="email"
@@ -90,7 +101,7 @@ export function ProfileForm({ user }: ProfileProps): ReactNode {
             ? `Email linked to your account can only be updated through ${user?.accounts[0]?.provider}.`
             : ""
         }
-        errorMessage={state.errors?.email}
+        errorMessage={state?.error?.email}
       />
       <hr className="mt-6 mb-4" />
       <Input
@@ -102,7 +113,7 @@ export function ProfileForm({ user }: ProfileProps): ReactNode {
         required
         dataTestId="profile-username-input"
         description="Username must be between 5 and 16 characters long and can contain digits, periods, and underscores."
-        errorMessage={state.errors?.username}
+        errorMessage={state?.error?.username}
       />
       <Button type="submit" className="w-full" disabled={pending} dataTestId="profile-submit-button">
         Update Profile

@@ -1,9 +1,9 @@
 import { renderHook } from "@testing-library/react"
-import { SessionContext } from "@/context"
-import { useSessionData } from "@/hooks"
+import { SessionContext } from "@/context/session-context"
+import { useSessionData } from "@/hooks/useSessionData"
 import { mockedAuthenticatedSession, mockedUnauthenticatedSession } from "@/vitest.setup"
 
-vi.mock("@/hooks", () => ({
+vi.mock("@/hooks/useSessionData", () => ({
   useSessionData: vi.fn()
 }))
 

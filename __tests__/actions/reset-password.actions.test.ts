@@ -1,9 +1,9 @@
 import { Mock } from "vitest"
 import { resetPassword } from "@/app/(auth)/reset-password/reset-password.actions"
-import { POST } from "@/app/api/reset-password/route"
+import { PATCH } from "@/app/api/reset-password/route"
 
 vi.mock("@/app/api/reset-password/route", () => ({
-  POST: vi.fn()
+  PATCH: vi.fn()
 }))
 
 describe("Reset Password Actions", () => {
@@ -19,20 +19,20 @@ describe("Reset Password Actions", () => {
 
     const response = {
       success: false,
-      errors: {
+      error: {
         token: "The token is missing or invalid.",
         password: "The password is invalid.",
         confirmPassword: "The password confirmation is invalid."
       }
     }
 
-    ;(POST as Mock).mockResolvedValueOnce({
+    ;(PATCH as Mock).mockResolvedValueOnce({
       json: async () => response
     })
 
     const result = await resetPassword({}, formData)
 
-    expect(POST).not.toHaveBeenCalled()
+    expect(PATCH).not.toHaveBeenCalled()
     expect(result).toEqual(response)
   })
 
@@ -44,19 +44,19 @@ describe("Reset Password Actions", () => {
 
     const response = {
       success: false,
-      errors: {
+      error: {
         password: "The password is invalid.",
         confirmPassword: "The password confirmation is invalid."
       }
     }
 
-    ;(POST as Mock).mockResolvedValueOnce({
+    ;(PATCH as Mock).mockResolvedValueOnce({
       json: async () => response
     })
 
     const result = await resetPassword({}, formData)
 
-    expect(POST).not.toHaveBeenCalled()
+    expect(PATCH).not.toHaveBeenCalled()
     expect(result).toEqual(response)
   })
 
@@ -68,22 +68,22 @@ describe("Reset Password Actions", () => {
 
     const response = {
       success: false,
-      errors: {
+      error: {
         confirmPassword: "The password and password confirmation do not match."
       }
     }
 
-    ;(POST as Mock).mockResolvedValueOnce({
+    ;(PATCH as Mock).mockResolvedValueOnce({
       json: async () => response
     })
 
     const result = await resetPassword({}, formData)
 
-    expect(POST).not.toHaveBeenCalled()
+    expect(PATCH).not.toHaveBeenCalled()
     expect(result).toEqual(response)
   })
 
-  it("should call POST and return success if the payload is valid", async () => {
+  it("should call PATCH and return success if the payload is valid", async () => {
     const formData = new FormData()
     formData.append("token", "d457775d-9123-4922-84de-cf535a63484e")
     formData.append("password", "Password123!")
@@ -94,13 +94,13 @@ describe("Reset Password Actions", () => {
       message: "Your password has been reset."
     }
 
-    ;(POST as Mock).mockResolvedValueOnce({
+    ;(PATCH as Mock).mockResolvedValueOnce({
       json: async () => response
     })
 
     const result = await resetPassword({}, formData)
 
-    expect(POST).toHaveBeenCalledWith({
+    expect(PATCH).toHaveBeenCalledWith({
       token: "d457775d-9123-4922-84de-cf535a63484e",
       password: "Password123!",
       confirmPassword: "Password123!"

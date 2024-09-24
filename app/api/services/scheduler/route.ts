@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import cron from "node-cron"
-import prisma from "@/lib"
+import prisma from "@/lib/prisma"
 
 export async function POST(): Promise<NextResponse> {
   try {
@@ -22,7 +22,7 @@ export async function POST(): Promise<NextResponse> {
       })
     })
 
-    return NextResponse.json({ success: true }, { status: 200 })
+    return NextResponse.json({ success: true }, { status: 201 })
   } catch (error) {
     const errorMessage: string = error instanceof Error ? error.message : "Unknown error occurred"
     return NextResponse.json({ success: false, message: errorMessage }, { status: 500 })

@@ -1,7 +1,7 @@
 import { ReactNode } from "react"
 import { Metadata } from "next/types"
 import { VerifyEmailForm } from "@/app/(auth)/verify-email/verify-email.form"
-import { ROUTE_VERIFY_EMAIL } from "@/constants"
+import { ROUTE_VERIFY_EMAIL } from "@/constants/routes"
 
 export const metadata: Metadata = {
   title: ROUTE_VERIFY_EMAIL.TITLE

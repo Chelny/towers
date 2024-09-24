@@ -1,6 +1,6 @@
 import { act } from "react"
 import { renderHook } from "@testing-library/react-hooks"
-import { useInterval } from "@/hooks"
+import { useInterval } from "@/hooks/useInterval"
 
 describe("useInterval Hook", () => {
   beforeEach(() => {

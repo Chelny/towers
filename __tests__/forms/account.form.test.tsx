@@ -2,6 +2,7 @@ import { useFormState, useFormStatus } from "react-dom"
 import { useRouter } from "next/navigation"
 import { render, screen } from "@testing-library/react"
 import { AccountForm } from "@/app/(protected)/account/account.form"
+import { mockedRouter } from "@/vitest.setup"
 
 vi.mock("next/navigation")
 
@@ -12,18 +13,8 @@ vi.mock("react-dom", () => ({
 
 describe("Account Form", () => {
   beforeEach(() => {
-    const mockRouter = {
-      back: vi.fn(),
-      forward: vi.fn(),
-      refresh: vi.fn(),
-      push: vi.fn(),
-      replace: vi.fn(),
-      prefetch: vi.fn()
-    }
-    vi.mocked(useRouter).mockReturnValue(mockRouter)
-
-    vi.mocked(useFormState).mockReturnValue([{ success: false, message: "", errors: {} }, vi.fn(), false])
-
+    vi.mocked(useRouter).mockReturnValue(mockedRouter)
+    vi.mocked(useFormState).mockReturnValue([{ success: false, message: "", error: {} }, vi.fn(), false])
     vi.mocked(useFormStatus).mockReturnValue({
       pending: false,
       data: null,
@@ -53,7 +44,7 @@ describe("Account Form", () => {
     vi.mocked(useFormState).mockReturnValue([
       {
         success: false,
-        errors: {
+        error: {
           email: "The email is invalid"
         }
       },

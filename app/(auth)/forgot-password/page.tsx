@@ -1,7 +1,7 @@
 import { ReactNode } from "react"
 import { Metadata } from "next/types"
 import { ForgotPasswordForm } from "@/app/(auth)/forgot-password/forgot-password.form"
-import { ROUTE_FORGOT_PASSWORD } from "@/constants"
+import { ROUTE_FORGOT_PASSWORD } from "@/constants/routes"
 
 export const metadata: Metadata = {
   title: ROUTE_FORGOT_PASSWORD.TITLE

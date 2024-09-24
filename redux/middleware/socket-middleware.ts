@@ -1,5 +1,6 @@
+/* eslint-disable no-unused-vars */
 import { Middleware, MiddlewareAPI } from "redux"
-import { SocketFactory, SocketInterface } from "@/lib"
+import { SocketFactory, SocketInterface } from "@/lib/socket-factory"
 import {
   beforeLeaveSocketRoom,
   connectionEstablished,
@@ -11,7 +12,7 @@ import {
   sendMessageToTableChat,
   setRoomChatMessage,
   setTableChatMessage
-} from "@/redux/features"
+} from "@/redux/features/socket-slice"
 
 enum SocketEvent {
   Connect = "connect",

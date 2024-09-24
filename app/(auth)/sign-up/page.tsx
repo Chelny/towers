@@ -1,7 +1,7 @@
 import { ReactNode } from "react"
 import { Metadata } from "next/types"
 import { SignUpForm } from "@/app/(auth)/sign-up/sign-up.form"
-import { ROUTE_SIGN_UP } from "@/constants"
+import { ROUTE_SIGN_UP } from "@/constants/routes"
 
 export const metadata: Metadata = {
   title: ROUTE_SIGN_UP.TITLE

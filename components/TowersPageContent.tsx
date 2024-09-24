@@ -1,11 +1,11 @@
 "use client"
 
 import { ReactNode, useEffect } from "react"
-import { useDispatch, useSelector } from "react-redux"
 import Room from "@/components/Room"
 import Table from "@/components/Table"
-import { useSessionData } from "@/hooks"
-import { destroySocket, initSocket } from "@/redux/features"
+import { useSessionData } from "@/hooks/useSessionData"
+import { useAppDispatch, useAppSelector } from "@/lib/hooks"
+import { destroySocket, initSocket } from "@/redux/features/socket-slice"
 import { AppDispatch, RootState } from "@/redux/store"
 
 type TowersPageContentProps = {
@@ -15,8 +15,8 @@ type TowersPageContentProps = {
 
 export default function TowersPageContent({ roomId, tableId }: TowersPageContentProps): ReactNode {
   const { status, update } = useSessionData()
-  const isConnected: boolean = useSelector((state: RootState) => state.socket.isConnected)
-  const dispatch: AppDispatch = useDispatch()
+  const isConnected: boolean = useAppSelector((state: RootState) => state.socket.isConnected)
+  const dispatch: AppDispatch = useAppDispatch()
 
   // Polling the session every 1 hour
   useEffect(() => {

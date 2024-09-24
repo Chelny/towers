@@ -1,8 +1,8 @@
 "use client"
 
 import { ReactNode } from "react"
-import { useSelector } from "react-redux"
-import { RoomWithTablesCount } from "@/interfaces"
+import { RoomWithTablesCount } from "@/interfaces/room"
+import { useAppSelector } from "@/lib/hooks"
 import { RootState } from "@/redux/store"
 
 type RoomHeaderProps = {
@@ -10,7 +10,7 @@ type RoomHeaderProps = {
 }
 
 export default function RoomHeader({ room }: RoomHeaderProps): ReactNode {
-  const isConnected: boolean = useSelector((state: RootState) => state.socket.isConnected)
+  const isConnected: boolean = useAppSelector((state: RootState) => state.socket.isConnected)
 
   return (
     <div className="py-2">

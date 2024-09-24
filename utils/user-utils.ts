@@ -1,4 +1,4 @@
-import { USERNAME_PATTERN } from "@/constants"
+import { USERNAME_PATTERN } from "@/constants/regex"
 
 export const generateRandomUsername = (base: string): string => {
   const maxBaseLength: number = 28 // Max length of base string to keep username within 32 characters after adding the suffix

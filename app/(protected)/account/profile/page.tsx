@@ -4,7 +4,7 @@ import { NextResponse } from "next/server"
 import { Account, User } from "@prisma/client"
 import { ProfileForm } from "@/app/(protected)/account/profile/profile.form"
 import { GET } from "@/app/api/account/profile/route"
-import { ROUTE_PROFILE } from "@/constants"
+import { ROUTE_PROFILE } from "@/constants/routes"
 
 export const metadata: Metadata = {
   title: ROUTE_PROFILE.TITLE

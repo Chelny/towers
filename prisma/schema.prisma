@@ -113,17 +113,16 @@ model PasswordResetToken {
 }
 
 model LoginHistory {
-  id          String       @id @default(uuid())
-  userId      String
-  ipAddress   String
-  userAgent   String
-  location    String? // E.g., "Montreal, Quebec, Canada"
-  loginMethod LoginMethod?
-  sessionId   String?
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  session     Session?     @relation(fields: [sessionId], references: [id])
+  id        String   @id @default(uuid())
+  userId    String
+  ipAddress String
+  userAgent String
+  location  String? // E.g., "Montreal, Quebec, Canada"
+  sessionId String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  session   Session? @relation(fields: [sessionId], references: [id])
 }
 
 model Friendship {
@@ -270,12 +269,6 @@ enum UserStatus {
   ACTIVE
   BANNED
   PENDING_DELETION
-}
-
-enum LoginMethod {
-  CREDENTIALS
-  GITHUB
-  GOOGLE
 }
 
 enum FriendshipStatus {

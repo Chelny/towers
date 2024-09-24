@@ -17,7 +17,7 @@ describe("Account Actions", () => {
 
     const response = {
       success: false,
-      errors: {
+      error: {
         email: "The email is invalid."
       }
     }
@@ -38,7 +38,7 @@ describe("Account Actions", () => {
 
     const response = {
       success: false,
-      errors: {
+      error: {
         email: "The email is invalid."
       }
     }

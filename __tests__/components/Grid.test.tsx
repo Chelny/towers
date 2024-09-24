@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react"
 import Grid from "@/components/game/Grid"
-import { BOARD_COLS, BOARD_ROWS } from "@/constants"
-import { Board } from "@/interfaces"
+import { BOARD_COLS, BOARD_ROWS } from "@/constants/game"
+import { Board } from "@/interfaces/game"
 import {
   mockedBlockE,
   mockedBlockEmpty,

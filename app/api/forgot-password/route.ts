@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server"
 import { PasswordResetToken, User, UserStatus } from "@prisma/client"
-import { ForgotPasswordData } from "@/app/(auth)/forgot-password/forgot-password.actions"
-import { getUserByEmail } from "@/data"
-import { generatePasswordResetToken, sendPasswordResetEmail } from "@/lib"
+import { ForgotPasswordPayload } from "@/app/(auth)/forgot-password/forgot-password.schema"
+import { getUserByEmail } from "@/data/user"
+import { sendPasswordResetEmail } from "@/lib/email"
+import { generatePasswordResetToken } from "@/lib/token"
 
-export async function POST(body: ForgotPasswordData): Promise<NextResponse> {
+export async function POST(body: ForgotPasswordPayload): Promise<NextResponse> {
   const user: User | null = await getUserByEmail(body.email)
 
   if (!user) {
@@ -37,6 +38,6 @@ export async function POST(body: ForgotPasswordData): Promise<NextResponse> {
       success: true,
       message: "A reset password link has been sent in your inbox!"
     },
-    { status: 200 }
+    { status: 201 }
   )
 }

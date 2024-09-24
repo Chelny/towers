@@ -1,5 +1,5 @@
 import React, { ReactNode } from "react"
-import { SpecialDiamond } from "@/interfaces"
+import { SpecialDiamond } from "@/interfaces/game"
 import styles from "./Block.module.scss"
 
 type SpecialDiamondBlockProps = {

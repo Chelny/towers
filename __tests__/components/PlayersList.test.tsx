@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react"
 import { Mock } from "vitest"
 import PlayersList from "@/components/PlayersList"
-import { TowersGameUserWithUserAndTables } from "@/interfaces"
+import { TowersGameUserWithUserAndTables } from "@/interfaces/towers-game-user"
 
 describe("PlayersList Component", () => {
   const players: TowersGameUserWithUserAndTables[] = [

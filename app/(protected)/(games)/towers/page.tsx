@@ -2,9 +2,9 @@ import { ReactNode } from "react"
 import type { Metadata } from "next"
 import { Room, Table } from "@prisma/client"
 import TowersPageContent from "@/components/TowersPageContent"
-import { ROUTE_TOWERS } from "@/constants"
-import { TowersGameUserWithUser } from "@/interfaces"
-import prisma from "@/lib"
+import { ROUTE_TOWERS } from "@/constants/routes"
+import { TowersGameUserWithUser } from "@/interfaces/towers-game-user"
+import prisma from "@/lib/prisma"
 
 type PageProps = {
   params: { id: string }

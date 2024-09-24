@@ -1,5 +1,6 @@
 "use client"
 
+import { Session } from "next-auth"
 import { getSession } from "next-auth/react"
 import { io, Socket } from "socket.io-client"
 
@@ -14,18 +15,15 @@ class SocketConnection implements SocketInterface {
     if (!this._socket) {
       throw new Error("Socket is not initialized yet.")
     }
+
     return this._socket
   }
 
   public async initialize(): Promise<void> {
-    const session = await getSession()
+    const session: Session | null = await getSession()
 
     if (session) {
-      this._socket = io({
-        auth: {
-          session
-        }
-      })
+      this._socket = io({ auth: { session } })
     } else {
       throw new Error("No session found. Cannot initialize socket.")
     }

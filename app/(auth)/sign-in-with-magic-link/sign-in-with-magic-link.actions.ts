@@ -1,28 +1,22 @@
 "use server"
 
-import { type Static, Type } from "@sinclair/typebox"
 import { Value, ValueError } from "@sinclair/typebox/value"
 import { AuthError } from "next-auth"
+import {
+  SignInWithMagicLinkFormData,
+  SignInWithMagicLinkFormErrorMessages,
+  signInWithMagicLinkSchema
+} from "@/app/(auth)/sign-in-with-magic-link/sign-in-with-magic-link.schema"
 import { signIn as authSignInWithMagicLink } from "@/auth"
-import { EMAIL_PATTERN, SIGN_IN_REDIRECT } from "@/constants"
+import { SIGN_IN_REDIRECT } from "@/constants/routes"
 
-const signInWithMagicLinkSchema = Type.Object({
-  email: Type.RegExp(EMAIL_PATTERN)
-})
-
-export type SignInWithMagicLinkData = Static<typeof signInWithMagicLinkSchema>
-
-export type SignInWithMagicLinkErrorMessages<T extends string> = {
-  [K in T]?: string
-}
-
-export async function signInWithMagicLink(prevState: any, formData: FormData) {
-  const rawFormData: SignInWithMagicLinkData = {
+export async function signInWithMagicLink(prevState: ApiResponse, formData: FormData): Promise<ApiResponse> {
+  const rawFormData: SignInWithMagicLinkFormData = {
     email: formData.get("email") as string
   }
 
   const errors: ValueError[] = Array.from(Value.Errors(signInWithMagicLinkSchema, rawFormData))
-  const errorMessages: SignInWithMagicLinkErrorMessages<keyof SignInWithMagicLinkData> = {}
+  const errorMessages: SignInWithMagicLinkFormErrorMessages = {}
 
   for (const error of errors) {
     switch (error.path.replace("/", "")) {
@@ -64,6 +58,6 @@ export async function signInWithMagicLink(prevState: any, formData: FormData) {
   return {
     success: false,
     message: "",
-    errors: errorMessages
+    error: errorMessages
   }
 }

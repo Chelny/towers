@@ -1,6 +1,6 @@
 import { MutableRefObject, ReactNode, useEffect, useRef } from "react"
 import GridRow from "@/components/game/GridRow"
-import { Board, BoardRow } from "@/interfaces"
+import { Board, BoardRow } from "@/interfaces/game"
 
 type GridProps = {
   board: Board

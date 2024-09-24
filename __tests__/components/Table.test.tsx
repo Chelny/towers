@@ -1,9 +1,9 @@
 import { fireEvent, render, screen } from "@testing-library/react"
-import { useDispatch, useSelector } from "react-redux"
 import { Mock } from "vitest"
 import Table from "@/components/Table"
-import { useSessionData } from "@/hooks"
-import { SocketState } from "@/redux/features"
+import { useSessionData } from "@/hooks/useSessionData"
+import { useAppDispatch, useAppSelector } from "@/lib/hooks"
+import { SocketState } from "@/redux/features/socket-slice"
 import {
   mockedAuthenticatedSession,
   mockedRoom1,
@@ -32,26 +32,27 @@ vi.mock("next/navigation", async () => {
   }
 })
 
-vi.mock("react-redux", () => ({
-  useDispatch: vi.fn(),
-  useSelector: vi.fn()
-}))
-
 vi.mock("@/hooks/useSessionData", () => ({
   useSessionData: vi.fn()
 }))
 
+vi.mock("@/lib/hooks", () => ({
+  useAppDispatch: vi.fn(),
+  useAppSelector: vi.fn()
+}))
+
 describe("Table Component", () => {
-  const mockedDispatch: Mock = vi.fn()
+  const mockedAppDispatch: Mock = vi.fn()
 
   beforeAll(() => {
     Element.prototype.scrollIntoView = vi.fn()
   })
 
   beforeEach(() => {
-    vi.mocked(useDispatch).mockReturnValue(mockedDispatch)
+    vi.mocked(useAppDispatch).mockReturnValue(mockedAppDispatch)
     vi.mocked(useSessionData).mockReturnValue(mockedAuthenticatedSession)
-    vi.mocked(useSelector).mockImplementation((selectorFn: (_: SocketState) => unknown) => {
+    // eslint-disable-next-line no-unused-vars
+    vi.mocked(useAppSelector).mockImplementation((selectorFn: (state: { socket: SocketState }) => unknown) => {
       if (selectorFn.toString().includes("state.socket.rooms[roomId]?.users")) {
         return mockedRoom1Users
       }
@@ -88,7 +89,7 @@ describe("Table Component", () => {
     fireEvent.change(messageInput, { target: { value: "Hello!" } })
     fireEvent.keyDown(messageInput, { key: "Enter" })
 
-    expect(mockedDispatch).toHaveBeenCalled()
+    expect(mockedAppDispatch).toHaveBeenCalled()
   })
 
   it("should render the correct table type and rated status", () => {

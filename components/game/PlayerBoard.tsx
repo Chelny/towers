@@ -7,7 +7,7 @@ import Grid from "@/components/game/Grid"
 import NextPiece from "@/components/game/NextPiece"
 import PowerBar from "@/components/game/PowerBar"
 import Button from "@/components/ui/Button"
-import { useTowers } from "@/hooks"
+import { useTowers } from "@/hooks/useTowers"
 import styles from "./PlayerBoard.module.scss"
 
 type PlayerBoardProps = {

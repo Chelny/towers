@@ -1,11 +1,12 @@
-import { fireEvent, render, screen } from "@testing-library/react"
-import { useSelector } from "react-redux"
+import { fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { Mock } from "vitest"
 import RoomsList from "@/components/RoomsList"
-import { useSessionData } from "@/hooks"
-import { RoomWithCount } from "@/interfaces"
-import { SocketState } from "@/redux/features"
-import { mockedAuthenticatedSession, mockedRoom1, mockedRoom2, mockedSocketRoom1Id } from "@/vitest.setup"
+import { useSessionData } from "@/hooks/useSessionData"
+import { RoomWithCount } from "@/interfaces/room"
+import { useAppDispatch, useAppSelector } from "@/lib/hooks"
+import { SocketState } from "@/redux/features/socket-slice"
+import { SocketRoomThunk } from "@/redux/thunks/socket-thunks"
+import { mockedAuthenticatedSession, mockedRoom1, mockedRoom2, mockedSocketRoom1Id, mockedUser1 } from "@/vitest.setup"
 
 const { useRouter, mockedRouterPush } = vi.hoisted(() => {
   const mockedRouterPush: Mock = vi.fn()
@@ -25,16 +26,26 @@ vi.mock("next/navigation", async () => {
   }
 })
 
-vi.mock("react-redux", () => ({
-  useDispatch: vi.fn(),
-  useSelector: vi.fn()
-}))
-
 vi.mock("@/hooks/useSessionData", () => ({
   useSessionData: vi.fn()
 }))
 
+vi.mock("@/lib/hooks", () => ({
+  useAppDispatch: vi.fn(),
+  useAppSelector: vi.fn()
+}))
+
+vi.mock("@/redux/features/socket-slice")
+
+vi.mock("@/redux/thunks/socket-thunks")
+
 describe("RoomsList Component", () => {
+  const mockedAppDispatch: Mock = vi.fn()
+  const mockedSocketRoomThunkParams: SocketRoomThunk = {
+    room: mockedSocketRoom1Id,
+    isTable: false,
+    username: mockedUser1.username!
+  }
   const mockedRooms: RoomWithCount[] = [
     {
       ...mockedRoom1,
@@ -47,8 +58,10 @@ describe("RoomsList Component", () => {
   ]
 
   beforeEach(() => {
+    vi.mocked(useAppDispatch).mockReturnValue(mockedAppDispatch)
     vi.mocked(useSessionData).mockReturnValue(mockedAuthenticatedSession)
-    vi.mocked(useSelector).mockImplementation((selectorFn: (_: SocketState) => unknown) => {
+    // eslint-disable-next-line no-unused-vars
+    vi.mocked(useAppSelector).mockImplementation((selectorFn: (state: { socket: SocketState }) => unknown) => {
       if (selectorFn.toString().includes("state.socket.isConnected")) {
         return true
       }
@@ -82,13 +95,19 @@ describe("RoomsList Component", () => {
     expect(buttons[1]).toBeDisabled()
   })
 
-  it("should navigate to the correct room when join button is clicked", () => {
+  it("should navigate to the correct room when join button is clicked", async () => {
+    mockedAppDispatch.mockReturnValue({
+      unwrap: () => Promise.resolve(mockedSocketRoomThunkParams)
+    })
+
     render(<RoomsList rooms={mockedRooms} />)
 
     const buttons: HTMLButtonElement[] = screen.getAllByRole("button", { name: /Join/i })
     fireEvent.click(buttons[0])
 
-    expect(mockedRouterPush).toHaveBeenCalledWith(`/towers?room=${mockedSocketRoom1Id}`)
+    await waitFor(() => {
+      expect(mockedRouterPush).toHaveBeenCalledWith(`/towers?room=${mockedSocketRoom1Id}`)
+    })
   })
 
   it("should not trigger navigation when join button is disabled", () => {

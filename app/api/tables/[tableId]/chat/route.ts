@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from "next/server"
 import { TableChat } from "@prisma/client"
 import DOMPurify from "isomorphic-dompurify"
-import { TableChatWithTowersGameUser } from "@/interfaces"
-import prisma from "@/lib"
-import { removeNullUndefined } from "@/utils"
+import { Session } from "next-auth"
+import { TableChatWithTowersGameUser } from "@/interfaces/table-chat"
+import prisma from "@/lib/prisma"
+import { updateLastActiveAt } from "@/lib/user"
+import { removeNullUndefined } from "@/utils/object-utils"
 
 export async function GET(request: NextRequest, context: { params: { tableId: string } }): Promise<NextResponse> {
   const { tableId } = context.params
@@ -53,6 +55,17 @@ export async function GET(request: NextRequest, context: { params: { tableId: st
 export async function POST(request: NextRequest, context: { params: { tableId: string } }): Promise<NextResponse> {
   const { tableId } = context.params
   const data = await request.json()
+  const session: Session | null = data.session
+
+  if (!session) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Please sign in to access your account."
+      },
+      { status: 401 }
+    )
+  }
 
   let message: string = DOMPurify.sanitize(data.message)
 
@@ -72,6 +85,7 @@ export async function POST(request: NextRequest, context: { params: { tableId: s
     message,
     type: data.type
   }
+
   const chatMessage: TableChat = await prisma.tableChat.create({
     data: removeNullUndefined(chatData),
     include: {
@@ -82,6 +96,8 @@ export async function POST(request: NextRequest, context: { params: { tableId: s
       }
     }
   })
+
+  await updateLastActiveAt(session.user.id)
 
   return NextResponse.json(
     {

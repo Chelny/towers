@@ -1,5 +1,5 @@
-import { MedusaBlock, MidasBlock, SpecialDiamond, TowersBlock } from "@/interfaces"
-import { getClassNameForBlock, getClassNameForBlockPowerType } from "@/utils"
+import { MedusaBlock, MidasBlock, SpecialDiamond, TowersBlock } from "@/interfaces/game"
+import { getClassNameForBlock, getClassNameForBlockPowerType } from "@/utils/block-class-names-utils"
 
 const defaultTowersBlockProps = {
   powerType: null,

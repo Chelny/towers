@@ -2,11 +2,8 @@
 
 import { FormEvent, ReactNode } from "react"
 import { useFormState, useFormStatus } from "react-dom"
-import {
-  signInWithMagicLink,
-  SignInWithMagicLinkData,
-  SignInWithMagicLinkErrorMessages
-} from "@/app/(auth)/sign-in-with-magic-link/sign-in-with-magic-link.actions"
+import { signInWithMagicLink } from "@/app/(auth)/sign-in-with-magic-link/sign-in-with-magic-link.actions"
+import { SignInWithMagicLinkFormErrorMessages } from "@/app/(auth)/sign-in-with-magic-link/sign-in-with-magic-link.schema"
 import AlertMessage from "@/components/ui/AlertMessage"
 import Button from "@/components/ui/Button"
 import Input from "@/components/ui/Input"
@@ -14,12 +11,12 @@ import Input from "@/components/ui/Input"
 const initialState = {
   success: false,
   message: "",
-  errors: {} as SignInWithMagicLinkErrorMessages<keyof SignInWithMagicLinkData>
+  error: {} as SignInWithMagicLinkFormErrorMessages
 }
 
 export function SignInWithMagicLinkForm(): ReactNode {
   const { pending } = useFormStatus()
-  const [state, formAction] = useFormState<any, FormData>(signInWithMagicLink, initialState)
+  const [state, formAction] = useFormState<ApiResponse, FormData>(signInWithMagicLink, initialState)
 
   const handleSignInWithMagicLink = (event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault()
@@ -35,7 +32,7 @@ export function SignInWithMagicLinkForm(): ReactNode {
         label="Email"
         required
         dataTestId="sign-in-with-magic-link-email-input"
-        errorMessage={state.errors?.email}
+        errorMessage={state?.error?.email}
       />
       <Button type="submit" className="w-full" disabled={pending} dataTestId="sign-in-with-magic-link-submit-button">
         Sign In With Magic Link

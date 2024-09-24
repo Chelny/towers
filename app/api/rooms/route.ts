@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
-import { RoomWithCount } from "@/interfaces"
-import prisma from "@/lib"
+import { RoomWithCount } from "@/interfaces/room"
+import prisma from "@/lib/prisma"
 
 export async function GET(): Promise<NextResponse> {
   const roomsWithUserCount: RoomWithCount[] = await prisma.room.findMany({

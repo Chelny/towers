@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react"
 import NextPiece from "@/components/game/NextPiece"
-import { Piece } from "@/interfaces"
+import { Piece } from "@/interfaces/game"
 import { mockedDefaultTowersBlockProps } from "@/vitest.setup"
 
 describe("NextPiece Component", () => {

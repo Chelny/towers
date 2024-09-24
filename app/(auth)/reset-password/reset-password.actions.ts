@@ -1,32 +1,23 @@
 "use server"
 
 import { NextResponse } from "next/server"
-import { type Static, Type } from "@sinclair/typebox"
 import { Value, ValueError } from "@sinclair/typebox/value"
-import { POST } from "@/app/api/reset-password/route"
-import { PASSWORD_PATTERN } from "@/constants"
+import {
+  ResetPasswordFormData,
+  ResetPasswordFormErrorMessages,
+  resetPasswordSchema
+} from "@/app/(auth)/reset-password/reset-password.schema"
+import { PATCH } from "@/app/api/reset-password/route"
 
-const resetPasswordSchema = Type.Object({
-  token: Type.String({ minLength: 1 }),
-  password: Type.RegExp(PASSWORD_PATTERN),
-  confirmPassword: Type.RegExp(PASSWORD_PATTERN)
-})
-
-export type ResetPasswordData = Static<typeof resetPasswordSchema>
-
-export type ResetPasswordErrorMessages<T extends string> = {
-  [K in T]?: string
-}
-
-export async function resetPassword(prevState: any, formData: FormData) {
-  const rawFormData: ResetPasswordData = {
+export async function resetPassword(prevState: ApiResponse, formData: FormData): Promise<ApiResponse> {
+  const rawFormData: ResetPasswordFormData = {
     token: formData.get("token") as string,
     password: formData.get("password") as string,
     confirmPassword: formData.get("confirmPassword") as string
   }
 
   const errors: ValueError[] = Array.from(Value.Errors(resetPasswordSchema, rawFormData))
-  const errorMessages: ResetPasswordErrorMessages<keyof ResetPasswordData> = {}
+  const errorMessages: ResetPasswordFormErrorMessages = {}
 
   for (const error of errors) {
     switch (error.path.replace("/", "")) {
@@ -50,12 +41,13 @@ export async function resetPassword(prevState: any, formData: FormData) {
   }
 
   if (Object.keys(errorMessages).length === 0) {
-    const response: NextResponse = await POST(rawFormData)
-    return await response.json()
+    const response: NextResponse = await PATCH(rawFormData)
+    const data = await response.json()
+    return data
   }
 
   return {
     success: false,
-    errors: errorMessages
+    error: errorMessages
   }
 }

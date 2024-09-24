@@ -1,10 +1,10 @@
 import { Gender } from "@prisma/client"
 import { Mock } from "vitest"
 import { profile } from "@/app/(protected)/account/profile/profile.actions"
-import { POST } from "@/app/api/account/profile/route"
+import { PATCH } from "@/app/api/account/profile/route"
 
 vi.mock("@/app/api/account/profile/route", () => ({
-  POST: vi.fn()
+  PATCH: vi.fn()
 }))
 
 describe("Profile Actions", () => {
@@ -20,20 +20,20 @@ describe("Profile Actions", () => {
 
     const response = {
       success: false,
-      errors: {
+      error: {
         name: "The name is invalid.",
         email: "The email is invalid.",
         username: "The username is invalid."
       }
     }
 
-    ;(POST as Mock).mockResolvedValueOnce({
+    ;(PATCH as Mock).mockResolvedValueOnce({
       json: async () => response
     })
 
     const result = await profile({}, formData)
 
-    expect(POST).not.toHaveBeenCalled()
+    expect(PATCH).not.toHaveBeenCalled()
     expect(result).toEqual(response)
   })
 
@@ -47,7 +47,7 @@ describe("Profile Actions", () => {
 
     const response = {
       success: false,
-      errors: {
+      error: {
         name: "The name is invalid.",
         gender: "The gender is invalid.",
         birthdate: "The birthdate is invalid.",
@@ -56,17 +56,17 @@ describe("Profile Actions", () => {
       }
     }
 
-    ;(POST as Mock).mockResolvedValueOnce({
+    ;(PATCH as Mock).mockResolvedValueOnce({
       json: async () => response
     })
 
     const result = await profile({}, formData)
 
-    expect(POST).not.toHaveBeenCalled()
+    expect(PATCH).not.toHaveBeenCalled()
     expect(result).toEqual(response)
   })
 
-  it("should call POST and return success when payload is valid", async () => {
+  it("should call PATCH and return success when payload is valid", async () => {
     const formData = new FormData()
     formData.append("name", "John Doe")
     formData.append("gender", Gender.M)
@@ -77,13 +77,13 @@ describe("Profile Actions", () => {
 
     const response = { success: true, message: "Your profile has been updated!" }
 
-    ;(POST as Mock).mockResolvedValueOnce({
+    ;(PATCH as Mock).mockResolvedValueOnce({
       json: async () => response
     })
 
     const result = await profile({}, formData)
 
-    expect(POST).toHaveBeenCalledWith({
+    expect(PATCH).toHaveBeenCalledWith({
       name: "John Doe",
       gender: Gender.M,
       birthdate: "2000-01-01",

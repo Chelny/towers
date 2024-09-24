@@ -4,7 +4,7 @@ import { ReactNode, useState } from "react"
 import dynamic from "next/dynamic"
 import PlayersListSkeleton from "@/components/skeleton/PlayersListSkeleton"
 import Modal from "@/components/ui/Modal"
-import { TowersGameUserWithUserAndTables } from "@/interfaces"
+import { TowersGameUserWithUserAndTables } from "@/interfaces/towers-game-user"
 
 type TableBootUserProps = {
   isOpen: boolean

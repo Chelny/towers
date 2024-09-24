@@ -1,30 +1,19 @@
 "use server"
 
-import { type Static, Type } from "@sinclair/typebox"
 import { Value, ValueError } from "@sinclair/typebox/value"
 import { AuthError } from "next-auth"
+import { SignInFormData, SignInFormErrorMessages, signInSchema } from "@/app/(auth)/sign-in/sign-in.schema"
 import { signIn as authSignIn } from "@/auth"
-import { EMAIL_PATTERN, SIGN_IN_REDIRECT } from "@/constants"
+import { SIGN_IN_REDIRECT } from "@/constants/routes"
 
-const signInSchema = Type.Object({
-  email: Type.RegExp(EMAIL_PATTERN),
-  password: Type.String({ minLength: 1 })
-})
-
-export type SignInData = Static<typeof signInSchema>
-
-export type SignInErrorMessages<T extends string> = {
-  [K in T]?: string
-}
-
-export async function signIn(prevState: any, formData: FormData) {
-  const rawFormData: SignInData = {
+export async function signIn(prevState: ApiResponse, formData: FormData): Promise<ApiResponse> {
+  const rawFormData: SignInFormData = {
     email: formData.get("email") as string,
     password: formData.get("password") as string
   }
 
   const errors: ValueError[] = Array.from(Value.Errors(signInSchema, rawFormData))
-  const errorMessages: SignInErrorMessages<keyof SignInData> = {}
+  const errorMessages: SignInFormErrorMessages = {}
 
   for (const error of errors) {
     switch (error.path.replace("/", "")) {
@@ -74,6 +63,6 @@ export async function signIn(prevState: any, formData: FormData) {
   return {
     success: false,
     message: "The email or the password is invalid.",
-    errors: errorMessages
+    error: errorMessages
   }
 }

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { Table } from "@prisma/client"
-import prisma from "@/lib"
+import prisma from "@/lib/prisma"
 
 export async function GET(_: NextRequest, context: { params: { tableId: string } }): Promise<NextResponse> {
   const { tableId } = context.params

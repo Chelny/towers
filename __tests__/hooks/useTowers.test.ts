@@ -1,12 +1,12 @@
 import { act } from "react"
 import { renderHook } from "@testing-library/react-hooks"
-import { NUM_NEXT_PIECES } from "@/constants"
-import { getRandomPiece } from "@/hooks"
+import { NUM_NEXT_PIECES } from "@/constants/game"
 import { useTowers } from "@/hooks/useTowers"
-import { BoardBlock, BoardRow, Piece } from "@/interfaces"
+import { getRandomPiece } from "@/hooks/useTowersBoard"
+import { BoardBlock, BoardRow, Piece } from "@/interfaces/game"
 
-vi.mock("@/hooks", async () => {
-  const actual = await vi.importActual("@/hooks")
+vi.mock("@/hooks/useTowersBoard", async () => {
+  const actual = await vi.importActual("@/hooks/useTowersBoard")
 
   return {
     ...actual,

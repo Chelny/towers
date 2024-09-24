@@ -7,25 +7,26 @@ import { useRouter } from "next/navigation"
 import clsx from "clsx/lite"
 import { signOut } from "next-auth/react"
 import { FaMinus, FaPlus } from "react-icons/fa6"
-import { account, AccountData, AccountErrorMessages } from "@/app/(protected)/account/account.actions"
+import { account } from "@/app/(protected)/account/account.actions"
+import { AccountFormErrorMessages } from "@/app/(protected)/account/account.schema"
 import Button from "@/components/ui/Button"
 import Input from "@/components/ui/Input"
-import { ROUTE_SIGN_IN } from "@/constants"
+import { ROUTE_SIGN_IN } from "@/constants/routes"
 
 const initialState = {
   success: false,
   message: "",
-  errors: {} as AccountErrorMessages<keyof AccountData>
+  error: {} as AccountFormErrorMessages
 }
 
 export function AccountForm(): ReactNode {
   const router: AppRouterInstance = useRouter()
   const { pending } = useFormStatus()
-  const [state, formAction] = useFormState<any, FormData>(account, initialState)
+  const [state, formAction] = useFormState<ApiResponse, FormData>(account, initialState)
   const [isExpanded, setIsExpanded] = useState<boolean>(false)
 
   useEffect(() => {
-    if (state.success) {
+    if (state?.success) {
       const timer = setTimeout(async () => {
         try {
           await signOut()
@@ -70,7 +71,7 @@ export function AccountForm(): ReactNode {
             required
             dataTestId="account-delete-email-input"
             placeholder="Enter your email"
-            errorMessage={state.errors?.email}
+            errorMessage={state?.error?.email}
             onPaste={(event: ClipboardEvent<HTMLInputElement>) => event.preventDefault()}
           />
 
@@ -84,7 +85,7 @@ export function AccountForm(): ReactNode {
           </Button>
         </div>
 
-        {state.message && (
+        {state?.message && (
           <div className={clsx("mt-4", state.success ? "text-green-600" : "text-red-500", "hover:cursor-text")}>
             {state.message}
           </div>

@@ -2,7 +2,8 @@ import { useFormState, useFormStatus } from "react-dom"
 import { useRouter } from "next/navigation"
 import { fireEvent, render, screen } from "@testing-library/react"
 import { SignInForm } from "@/app/(auth)/sign-in/sign-in.form"
-import { ROUTE_FORGOT_PASSWORD, ROUTE_SIGN_IN_WITH_MAGIC_LINK, ROUTE_SIGN_UP } from "@/constants"
+import { ROUTE_FORGOT_PASSWORD, ROUTE_SIGN_IN_WITH_MAGIC_LINK, ROUTE_SIGN_UP } from "@/constants/routes"
+import { mockedRouter } from "@/vitest.setup"
 
 vi.mock("next/navigation")
 
@@ -13,18 +14,8 @@ vi.mock("react-dom", () => ({
 
 describe("Sign In Form", () => {
   beforeEach(() => {
-    const mockRouter = {
-      back: vi.fn(),
-      forward: vi.fn(),
-      refresh: vi.fn(),
-      push: vi.fn(),
-      replace: vi.fn(),
-      prefetch: vi.fn()
-    }
-    vi.mocked(useRouter).mockReturnValue(mockRouter)
-
-    vi.mocked(useFormState).mockReturnValue([{ success: false, message: "", errors: {} }, vi.fn(), false])
-
+    vi.mocked(useRouter).mockReturnValue(mockedRouter)
+    vi.mocked(useFormState).mockReturnValue([{ success: false, message: "", error: {} }, vi.fn(), false])
     vi.mocked(useFormStatus).mockReturnValue({
       pending: false,
       data: null,
@@ -69,7 +60,7 @@ describe("Sign In Form", () => {
     expect(signUpLink.closest("a")).toHaveAttribute("href", ROUTE_SIGN_UP.PATH)
 
     // fireEvent.click(screen.getByTestId("sign-in-magic-link-button"))
-    // expect(mockRouter.push).toHaveBeenCalledWith(ROUTE_SIGN_IN_WITH_MAGIC_LINK.PATH)
+    // expect(mockedRouter.push).toHaveBeenCalledWith(ROUTE_SIGN_IN_WITH_MAGIC_LINK.PATH)
   })
 
   it("should show error messages when submitting an empty form", () => {

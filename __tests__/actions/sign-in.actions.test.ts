@@ -2,13 +2,19 @@ import { AuthError } from "next-auth"
 import { Mock } from "vitest"
 import { signIn } from "@/app/(auth)/sign-in/sign-in.actions"
 import { signIn as authSignIn } from "@/auth"
-import { ROUTE_ROOMS } from "@/constants"
+import { ROUTE_ROOMS } from "@/constants/routes"
 
 vi.mock("@/auth", () => ({
   signIn: vi.fn()
 }))
 
 describe("Sign In Actions", () => {
+  const initialState = {
+    success: false,
+    message: "",
+    error: {}
+  }
+
   afterEach(() => {
     vi.restoreAllMocks()
   })
@@ -18,12 +24,12 @@ describe("Sign In Actions", () => {
     formData.append("email", "")
     formData.append("password", "")
 
-    const result = await signIn({}, formData)
+    const result = await signIn(initialState, formData)
 
     expect(result).toEqual({
       success: false,
       message: "The email or the password is invalid.",
-      errors: {
+      error: {
         email: "The email is invalid.",
         password: "The password is invalid."
       }
@@ -42,7 +48,7 @@ describe("Sign In Actions", () => {
     }
     ;(authSignIn as Mock).mockRejectedValueOnce(authError)
 
-    const result = await signIn({}, formData)
+    const result = await signIn(initialState, formData)
 
     expect(authSignIn).toHaveBeenCalledWith("credentials", {
       email: "john.doe@example.com",
@@ -58,7 +64,7 @@ describe("Sign In Actions", () => {
     formData.append("password", "Password123!")
     ;(authSignIn as Mock).mockResolvedValueOnce({})
 
-    const result = await signIn({}, formData)
+    const result = await signIn(initialState, formData)
 
     expect(authSignIn).toHaveBeenCalledWith("credentials", {
       email: "john.doe@example.com",

@@ -4,10 +4,14 @@ import { ReactNode } from "react"
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime"
 import { useRouter } from "next/navigation"
 import { TableType } from "@prisma/client"
-import { useSelector } from "react-redux"
 import Button from "@/components/ui/Button"
-import { RoomWithTablesCount, TableWithHostAndTowersGameUsers, TowersGameUserWithUser } from "@/interfaces"
-import { RootState } from "@/redux/store"
+import { useSessionData } from "@/hooks/useSessionData"
+import { RoomWithTablesCount } from "@/interfaces/room"
+import { TableWithHostAndTowersGameUsers } from "@/interfaces/table"
+import { TowersGameUserWithUser } from "@/interfaces/towers-game-user"
+import { useAppDispatch, useAppSelector } from "@/lib/hooks"
+import { AppDispatch, RootState } from "@/redux/store"
+import { joinRoom } from "@/redux/thunks/socket-thunks"
 
 type RoomTableProps = {
   roomId: string
@@ -15,12 +19,27 @@ type RoomTableProps = {
 
 export default function RoomTable({ roomId }: RoomTableProps): ReactNode {
   const router: AppRouterInstance = useRouter()
-  const roomInfo: RoomWithTablesCount | null = useSelector((state: RootState) => state.socket.rooms[roomId]?.roomInfo)
-  const isRoomInfoLoading: boolean = useSelector((state: RootState) => state.socket.rooms[roomId]?.isRoomInfoLoading)
+  const { data: session } = useSessionData()
+  const dispatch: AppDispatch = useAppDispatch()
+  const roomInfo: RoomWithTablesCount | null = useAppSelector(
+    (state: RootState) => state.socket.rooms[roomId]?.roomInfo
+  )
+  const isRoomInfoLoading: boolean = useAppSelector((state: RootState) => state.socket.rooms[roomId]?.isRoomInfoLoading)
   const seatMapping: number[][] = [
     [1, 3, 5, 7],
     [2, 4, 6, 8]
   ]
+
+  const handleJoinTable = (roomId: string, tableId: string): void => {
+    dispatch(joinRoom({ room: tableId, isTable: true, username: session?.user.username }))
+      .unwrap()
+      .then(() => {
+        router.push(`?room=${roomId}&table=${tableId}`)
+      })
+      .catch((error) => {
+        console.error("Error joining table:", error)
+      })
+  }
 
   return (
     <>
@@ -36,7 +55,7 @@ export default function RoomTable({ roomId }: RoomTableProps): ReactNode {
                   <Button
                     className="w-full h-full"
                     disabled={isRoomInfoLoading || table.tableType === TableType.PRIVATE}
-                    onClick={() => router.push(`?room=${roomId}&table=${table.id}`)}
+                    onClick={() => handleJoinTable(roomId, table.id)}
                   >
                     Watch
                   </Button>
@@ -64,7 +83,7 @@ export default function RoomTable({ roomId }: RoomTableProps): ReactNode {
                               table.tableType === TableType.PROTECTED ||
                               table.tableType === TableType.PRIVATE
                             }
-                            onClick={() => router.push(`?room=${roomId}&table=${table.id}`)}
+                            onClick={() => handleJoinTable(roomId, table.id)}
                           >
                             Join
                           </Button>

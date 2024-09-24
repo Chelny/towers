@@ -46,7 +46,7 @@ vi.mock("react-dom", () => ({
 
 describe("Verify Email Form", () => {
   beforeEach(() => {
-    vi.mocked(useFormState).mockReturnValue([{ success: false, message: "", errors: {} }, vi.fn(), false])
+    vi.mocked(useFormState).mockReturnValue([{ success: false, message: "", error: {} }, vi.fn(), false])
 
     vi.mocked(useFormStatus).mockReturnValue({
       pending: false,

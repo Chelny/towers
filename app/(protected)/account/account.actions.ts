@@ -1,28 +1,17 @@
 "use server"
 
 import { NextResponse } from "next/server"
-import { type Static, Type } from "@sinclair/typebox"
 import { Value, ValueError } from "@sinclair/typebox/value"
+import { AccountFormData, AccountFormErrorMessages, accountSchema } from "@/app/(protected)/account/account.schema"
 import { DELETE } from "@/app/api/account/route"
-import { EMAIL_PATTERN } from "@/constants"
 
-const accountSchema = Type.Object({
-  email: Type.RegExp(EMAIL_PATTERN)
-})
-
-export type AccountData = Static<typeof accountSchema>
-
-export type AccountErrorMessages<T extends string> = {
-  [K in T]?: string
-}
-
-export async function account(prevState: any, formData: FormData) {
-  const rawFormData: AccountData = {
+export async function account(prevState: ApiResponse, formData: FormData): Promise<ApiResponse> {
+  const rawFormData: AccountFormData = {
     email: formData.get("email") as string
   }
 
   const errors: ValueError[] = Array.from(Value.Errors(accountSchema, rawFormData))
-  const errorMessages: AccountErrorMessages<keyof AccountData> = {}
+  const errorMessages: AccountFormErrorMessages = {}
 
   for (const error of errors) {
     switch (error.path.replace("/", "")) {
@@ -37,11 +26,12 @@ export async function account(prevState: any, formData: FormData) {
 
   if (Object.keys(errorMessages).length === 0) {
     const response: NextResponse = await DELETE(rawFormData)
-    return await response.json()
+    const data = await response.json()
+    return data
   }
 
   return {
     success: false,
-    errors: errorMessages
+    error: errorMessages
   }
 }

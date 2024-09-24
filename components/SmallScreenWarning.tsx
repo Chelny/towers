@@ -3,15 +3,15 @@
 import { ReactNode } from "react"
 import clsx from "clsx/lite"
 import { signOut } from "next-auth/react"
-import { useDispatch } from "react-redux"
 import Button from "@/components/ui/Button"
-import { useSessionData } from "@/hooks"
-import { destroySocket } from "@/redux/features"
+import { useSessionData } from "@/hooks/useSessionData"
+import { useAppDispatch } from "@/lib/hooks"
+import { destroySocket } from "@/redux/features/socket-slice"
 import { AppDispatch } from "@/redux/store"
 
 export default function SmallScreenWarning(): ReactNode {
   const { data: session } = useSessionData()
-  const dispatch: AppDispatch = useDispatch()
+  const dispatch: AppDispatch = useAppDispatch()
 
   const handleSignOut = (): void => {
     dispatch(destroySocket())

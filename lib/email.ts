@@ -1,6 +1,7 @@
 import { User } from "@prisma/client"
+import axios, { AxiosResponse } from "axios"
 import { Resend } from "resend"
-import { ROUTE_RESET_PASSWORD, ROUTE_VERIFY_EMAIL } from "@/constants"
+import { ROUTE_RESET_PASSWORD, ROUTE_VERIFY_EMAIL } from "@/constants/routes"
 
 const resend: Resend = new Resend(process.env.AUTH_RESEND_KEY)
 const brandColor: string = "#346df1"
@@ -64,13 +65,14 @@ export const sendVerificationRequest = async (params: SendVerificationRequestPro
   const { host } = new URL(url)
   const escapedHost: string = host.replace(/\./g, "&#8203;.")
 
-  const res = await fetch("https://api.resend.com/emails", {
+  const response: AxiosResponse = await axios({
     method: "POST",
+    url: "https://api.resend.com/emails",
     headers: {
       Authorization: `Bearer ${provider.apiKey}`,
       "Content-Type": "application/json"
     },
-    body: JSON.stringify({
+    data: {
       from: provider.from,
       to,
       subject: `Sign in to ${host}`,
@@ -82,11 +84,11 @@ export const sendVerificationRequest = async (params: SendVerificationRequestPro
         `
       ),
       text: text({ url, host })
-    })
+    }
   })
 
-  if (!res.ok) {
-    throw new Error("Resend error: " + JSON.stringify(await res.json()))
+  if (response.status !== 201) {
+    throw new Error("Resend error: " + JSON.stringify(response))
   }
 }
 

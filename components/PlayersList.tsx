@@ -5,8 +5,8 @@ import clsx from "clsx/lite"
 import { BsSortAlphaDown, BsSortAlphaDownAlt, BsSortNumericDown, BsSortNumericDownAlt } from "react-icons/bs"
 import { v4 as uuidv4 } from "uuid"
 import PlayerInformation from "@/components/PlayerInformation"
-import { PROVISIONAL_MAX_COMPLETED_GAMES } from "@/constants"
-import { TowersGameUserWithUserAndTables } from "@/interfaces"
+import { PROVISIONAL_MAX_COMPLETED_GAMES } from "@/constants/game"
+import { TowersGameUserWithUserAndTables } from "@/interfaces/towers-game-user"
 
 type PlayersListProps = {
   users: TowersGameUserWithUserAndTables[]

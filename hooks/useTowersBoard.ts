@@ -7,30 +7,28 @@ import {
   PIECE_STARTING_COL,
   PIECE_STARTING_ROW,
   POWER_BAR_LENGTH
-} from "@/constants"
-import { BlockPosition, EmptyCell, MedusaBlock, MidasBlock, PowerBlock, TowersBlock } from "@/interfaces"
+} from "@/constants/game"
 import {
   Block,
+  BlockPosition,
   Board,
   BoardAction,
   BoardBlock,
   BoardRow,
   BoardState,
+  EmptyCell,
+  MedusaBlock,
+  MidasBlock,
   Piece,
   PowerBarBlock,
+  PowerBlock,
   PowerLevel,
   Powers,
+  TowersBlock,
   TowersLetter
-} from "@/interfaces"
-import {
-  areAdjacentBlocksSame,
-  getNumBlocksToRearrange,
-  isEmptyCell,
-  isMedusaBlock,
-  isSettingUpThreeInRow,
-  isSpecialDiamond,
-  isTowersBlock
-} from "@/utils"
+} from "@/interfaces/game"
+import { isEmptyCell, isMedusaBlock, isSpecialDiamond, isTowersBlock } from "@/utils/block-guards-utils"
+import { areAdjacentBlocksSame, getNumBlocksToRearrange, isSettingUpThreeInRow } from "@/utils/board-utils"
 
 /**
  * Custom hook for managing the game board state and actions.

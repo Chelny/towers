@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server"
 import { TowersGameUser, User, UserStatus } from "@prisma/client"
 import { compare } from "bcryptjs"
-import { getUserByEmail } from "@/data"
-import prisma from "@/lib"
+import { SignInFormData } from "@/app/(auth)/sign-in/sign-in.schema"
+import { getUserByEmail } from "@/data/user"
+import prisma from "@/lib/prisma"
 
-export async function POST(body: { email: string; password: string }): Promise<NextResponse> {
+export async function POST(body: SignInFormData): Promise<NextResponse> {
   const user: User | null = await getUserByEmail(body.email)
   if (!user) throw new Error("The email or the password is invalid.")
 
@@ -35,15 +36,6 @@ export async function POST(body: { email: string; password: string }): Promise<N
     default:
       break
   }
-
-  // Update online status
-  await prisma.user.update({
-    where: { id: user.id },
-    data: {
-      isOnline: true,
-      lastActiveAt: new Date()
-    }
-  })
 
   // Get or create Towers table entry
   const towersGameUser: TowersGameUser | null = await prisma.towersGameUser.upsert({

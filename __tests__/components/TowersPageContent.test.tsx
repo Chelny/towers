@@ -1,9 +1,9 @@
 import { render, screen } from "@testing-library/react"
-import { useDispatch, useSelector } from "react-redux"
 import { Mock } from "vitest"
 import TowersPageContent from "@/components/TowersPageContent"
-import { useSessionData } from "@/hooks"
-import { destroySocket, initSocket, SocketState } from "@/redux/features"
+import { useSessionData } from "@/hooks/useSessionData"
+import { useAppDispatch, useAppSelector } from "@/lib/hooks"
+import { destroySocket, initSocket, SocketState } from "@/redux/features/socket-slice"
 import {
   mockedAuthenticatedSession,
   mockedRoom1Table1,
@@ -29,31 +29,32 @@ vi.mock("next/navigation", async () => {
   }
 })
 
-vi.mock("react-redux", async () => {
-  const actual = await vi.importActual("react-redux")
-
-  return {
-    ...actual,
-    useDispatch: vi.fn(),
-    useSelector: vi.fn()
-  }
-})
-
 vi.mock("@/hooks/useSessionData", () => ({
   useSessionData: vi.fn()
 }))
 
+vi.mock("@/lib/hooks", async () => {
+  const actual = await vi.importActual("@/lib/hooks")
+
+  return {
+    ...actual,
+    useAppDispatch: vi.fn(),
+    useAppSelector: vi.fn()
+  }
+})
+
 describe("TowersPageContent Component", () => {
-  const mockedDispatch: Mock = vi.fn()
+  const mockedAppDispatch: Mock = vi.fn()
 
   beforeAll(() => {
     Element.prototype.scrollIntoView = vi.fn()
   })
 
   beforeEach(() => {
-    vi.mocked(useDispatch).mockReturnValue(mockedDispatch)
+    vi.mocked(useAppDispatch).mockReturnValue(mockedAppDispatch)
     vi.mocked(useSessionData).mockReturnValue(mockedAuthenticatedSession)
-    vi.mocked(useSelector).mockImplementation((selectorFn: (_: SocketState) => unknown) => {
+    // eslint-disable-next-line no-unused-vars
+    vi.mocked(useAppSelector).mockImplementation((selectorFn: (state: { socket: SocketState }) => unknown) => {
       if (selectorFn.toString().includes("state.socket.tables")) {
         return mockedRoom1Table1
       }
@@ -82,14 +83,14 @@ describe("TowersPageContent Component", () => {
   it("should dispatch initSocket when not connected and session is authenticated", () => {
     render(<TowersPageContent roomId={mockedSocketRoom1Id} tableId="" />)
 
-    expect(mockedDispatch).toHaveBeenCalledWith(initSocket())
+    expect(mockedAppDispatch).toHaveBeenCalledWith(initSocket())
   })
 
   it("should dispatche destroySocket when offline event is triggered", () => {
     render(<TowersPageContent roomId={mockedSocketRoom1Id} tableId="" />)
 
     window.dispatchEvent(new Event("offline"))
-    expect(mockedDispatch).toHaveBeenCalledWith(destroySocket())
+    expect(mockedAppDispatch).toHaveBeenCalledWith(destroySocket())
   })
 
   it("should update session on online event", () => {

@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server"
 import { UserStatus, VerificationToken } from "@prisma/client"
-import { VerifyEmailData } from "@/app/(auth)/verify-email/verify-email.actions"
-import { getUserByEmail, getVerificationTokenByToken } from "@/data"
-import prisma from "@/lib"
+import { VerifyEmailFormData } from "@/app/(auth)/verify-email/verify-email.schema"
+import { getUserByEmail } from "@/data/user"
+import { getVerificationTokenByToken } from "@/data/verification-token"
+import prisma from "@/lib/prisma"
 
-export async function POST(body: VerifyEmailData): Promise<NextResponse> {
+export async function PATCH(body: VerifyEmailFormData): Promise<NextResponse> {
   // Check token validity
   const token: VerificationToken | null = await getVerificationTokenByToken(body.email, body.token)
 

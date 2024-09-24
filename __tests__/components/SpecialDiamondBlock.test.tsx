@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react"
 import SpecialDiamondBlock from "@/components/game/SpecialDiamondBlock"
-import { SpecialDiamond } from "@/interfaces"
+import { SpecialDiamond } from "@/interfaces/game"
 import { mockedDefaultTowersBlockProps } from "@/vitest.setup"
 
 describe("SpecialDiamondBlock Component", () => {

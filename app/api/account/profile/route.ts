@@ -1,15 +1,15 @@
 import { NextResponse } from "next/server"
 import { User } from "@prisma/client"
 import { Session } from "next-auth"
-import { ProfileData } from "@/app/(protected)/account/profile/profile.actions"
+import { ProfileFormData } from "@/app/(protected)/account/profile/profile.schema"
 import { auth } from "@/auth"
-import { getUserById, getUserByUsername } from "@/data"
-import prisma from "@/lib"
+import { getUserById, getUserByUsername } from "@/data/user"
+import prisma from "@/lib/prisma"
 
 export async function GET(): Promise<NextResponse> {
   const session: Session | null = await auth()
 
-  if (!session?.user) {
+  if (!session) {
     return NextResponse.json(
       {
         success: false,
@@ -57,10 +57,10 @@ export async function GET(): Promise<NextResponse> {
   )
 }
 
-export async function POST(body: ProfileData): Promise<NextResponse> {
+export async function PATCH(body: ProfileFormData): Promise<NextResponse> {
   const session: Session | null = await auth()
 
-  if (!session?.user) {
+  if (!session) {
     return NextResponse.json(
       {
         success: false,
@@ -71,7 +71,6 @@ export async function POST(body: ProfileData): Promise<NextResponse> {
   }
 
   const user: User | null = await getUserById(session.user.id)
-
   if (!user) {
     return NextResponse.json(
       {
@@ -94,18 +93,24 @@ export async function POST(body: ProfileData): Promise<NextResponse> {
     )
   }
 
+  const userData: Partial<User> = {
+    name: body.name,
+    gender: body.gender,
+    birthdate: body.birthdate ? new Date(body.birthdate) : undefined,
+    username: body.username,
+    image: body.image
+  }
+
+  // Do not let third-party users change their email
+  if (session.account?.provider === "credentials") {
+    userData.email = body.email
+  }
+
   const updatedUser: User = await prisma.user.update({
     where: {
       id: session.user.id
     },
-    data: {
-      name: body.name,
-      gender: body.gender,
-      birthdate: body.birthdate ? new Date(body.birthdate) : null,
-      email: body.email,
-      username: body.username,
-      image: body.image
-    }
+    data: userData
   })
 
   if (!updatedUser) {
@@ -125,7 +130,7 @@ export async function POST(body: ProfileData): Promise<NextResponse> {
       data: {
         name: updatedUser.name,
         gender: updatedUser.gender,
-        birthdate: updatedUser.birthdate ? new Date(updatedUser.birthdate) : null,
+        birthdate: updatedUser.birthdate,
         email: updatedUser.email,
         username: updatedUser.username,
         image: updatedUser.image

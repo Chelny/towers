@@ -2,17 +2,19 @@ import { ReadonlyRequestCookies } from "next/dist/server/web/spec-extension/adap
 import { cookies } from "next/headers"
 import { NextResponse } from "next/server"
 import { PrismaAdapter } from "@auth/prisma-adapter"
-import { LoginMethod, TowersGameUser, User, UserStatus } from "@prisma/client"
+import { TowersGameUser, User, UserStatus } from "@prisma/client"
 import NextAuth from "next-auth"
 import Credentials from "next-auth/providers/credentials"
 import GitHub from "next-auth/providers/github"
 import Google from "next-auth/providers/google"
-import Passkey from "next-auth/providers/passkey"
+// import Passkey from "next-auth/providers/passkey"
 import Resend from "next-auth/providers/resend"
 import { POST } from "@/app/api/sign-in/route"
-import { ROUTE_AUTH_ERROR, ROUTE_SIGN_IN } from "@/constants"
-import prisma, { getLocation, sendVerificationRequest } from "@/lib"
-import { generateRandomUsername } from "@/utils"
+import { ROUTE_AUTH_ERROR, ROUTE_SIGN_IN } from "@/constants/routes"
+import { sendVerificationRequest } from "@/lib/email"
+import { getLocation } from "@/lib/geolocation"
+import prisma from "@/lib/prisma"
+import { generateRandomUsername } from "@/utils/user-utils"
 
 export const { auth, handlers, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
@@ -133,11 +135,6 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         session.user.towersUserId = token.towersUserId
         session.account = token.account
         session.isNewUser = token.isNewUser
-      } else {
-        await prisma.user.update({
-          where: { id: session.user.id },
-          data: { isOnline: false }
-        })
       }
 
       return session
@@ -157,7 +154,6 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
           emailVerified: new Date(),
           username: user.username,
           isOnline: true,
-          lastActiveAt: new Date(),
           status: UserStatus.ACTIVE
         }
       })
@@ -171,26 +167,26 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
 
       user.towersUserId = towersGameUser.id
     },
-    async signIn({ user, account }) {
+    async signIn({ user }) {
       if (user.id) {
         const cookieStore: ReadonlyRequestCookies = cookies()
         const ipAddress: string | null = cookieStore.get("user-ip")?.value || "[unknown]"
         const userAgent: string | null = cookieStore.get("user-agent")?.value || "[unknown]"
         const location: string | null = await getLocation(ipAddress)
-        const loginMethod: LoginMethod = account?.provider
-          ? (account?.provider.toUpperCase() as LoginMethod)
-          : LoginMethod.CREDENTIALS
 
-        // TODO: Uncomment for production
-        // await prisma.loginHistory.create({
-        //   data: {
-        //     userId: user.id,
-        //     ipAddress,
-        //     userAgent,
-        //     location,
-        //     loginMethod
-        //   }
-        // })
+        await prisma.loginHistory.create({
+          data: {
+            userId: user.id,
+            ipAddress,
+            userAgent,
+            location
+          }
+        })
+
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { isOnline: true }
+        })
       }
     },
     // @ts-ignore

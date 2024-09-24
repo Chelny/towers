@@ -9,7 +9,7 @@ vi.mock("react-dom", () => ({
 
 describe("Forgot Password Form", () => {
   beforeEach(() => {
-    vi.mocked(useFormState).mockReturnValue([{ success: false, message: "", errors: {} }, vi.fn(), false])
+    vi.mocked(useFormState).mockReturnValue([{ success: false, message: "", error: {} }, vi.fn(), false])
 
     vi.mocked(useFormStatus).mockReturnValue({
       pending: false,
@@ -38,7 +38,7 @@ describe("Forgot Password Form", () => {
 
   it("should show error messages when submitting an empty form", async () => {
     vi.mocked(useFormState).mockReturnValue([
-      { success: false, errors: { email: "The email is required." } },
+      { success: false, error: { email: "The email is required." } },
       vi.fn(),
       false
     ])

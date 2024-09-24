@@ -4,7 +4,7 @@ import PlayerBoard from "@/components/game/PlayerBoard"
 
 const mockedHandleStartGame: Mock = vi.fn()
 
-vi.mock("@/hooks", () => ({
+vi.mock("@/hooks/useTowers", () => ({
   useTowers: () => ({
     board: [],
     startGame: mockedHandleStartGame,

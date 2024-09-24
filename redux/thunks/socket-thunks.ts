@@ -1,23 +1,23 @@
 import { createAsyncThunk } from "@reduxjs/toolkit"
-import { beforeLeaveSocketRoom, joinSocketRoom } from "@/redux/features"
-import store from "@/redux/store"
+import axios, { AxiosResponse } from "axios"
 
-type SocketRoom = { room: string; isTable: boolean; username: string }
+export type SocketRoomThunk = { room: string; isTable: boolean; username: string }
 
-export const joinRoom = createAsyncThunk<SocketRoom, SocketRoom, { rejectValue: string }>(
+export const joinRoom = createAsyncThunk<SocketRoomThunk, SocketRoomThunk, { rejectValue: string }>(
   "socket/joinRoom",
-  async ({ room, isTable, username }: SocketRoom, { rejectWithValue }) => {
+  async ({ room, isTable, username }: SocketRoomThunk, { rejectWithValue }) => {
     const errorMessage: string = "Failed to join room"
 
     try {
-      const response: Response = await fetch("/api/socket/room/join", {
-        method: "POST",
-        body: JSON.stringify({ room, isTable, username })
+      const response: AxiosResponse<ApiResponse<SocketRoomThunk>> = await axios.patch("/api/socket/room/join", {
+        room,
+        isTable,
+        username
       })
 
-      if (!response.ok) throw new Error(errorMessage)
-
-      store.dispatch(joinSocketRoom({ room, isTable, username }))
+      if (response.status !== 200) {
+        return rejectWithValue(errorMessage)
+      }
 
       return { room, isTable, username }
     } catch (error) {
@@ -27,20 +27,21 @@ export const joinRoom = createAsyncThunk<SocketRoom, SocketRoom, { rejectValue: 
   }
 )
 
-export const leaveRoom = createAsyncThunk<SocketRoom, SocketRoom, { rejectValue: string }>(
+export const leaveRoom = createAsyncThunk<SocketRoomThunk, SocketRoomThunk, { rejectValue: string }>(
   "socket/leaveRoom",
-  async ({ room, isTable, username }: SocketRoom, { rejectWithValue }) => {
+  async ({ room, isTable, username }: SocketRoomThunk, { rejectWithValue }) => {
     const errorMessage: string = "Failed to leave room"
 
     try {
-      const response: Response = await fetch("/api/socket/room/leave", {
-        method: "POST",
-        body: JSON.stringify({ room, isTable, username })
+      const response: AxiosResponse<ApiResponse<SocketRoomThunk>> = await axios.patch("/api/socket/room/leave", {
+        room,
+        isTable,
+        username
       })
 
-      if (!response.ok) throw new Error(errorMessage)
-
-      store.dispatch(beforeLeaveSocketRoom({ room, isTable, username }))
+      if (response.status !== 200) {
+        return rejectWithValue(errorMessage)
+      }
 
       return { room, isTable, username }
     } catch (error) {

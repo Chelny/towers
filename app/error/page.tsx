@@ -4,7 +4,7 @@ import { ReactNode } from "react"
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime"
 import { ReadonlyURLSearchParams, useRouter, useSearchParams } from "next/navigation"
 import Button from "@/components/ui/Button"
-import { ROUTE_HOME } from "@/constants"
+import { ROUTE_HOME } from "@/constants/routes"
 
 enum Error {
   Configuration = "Configuration", // There is a problem with the server configuration. Check if your options are correct.

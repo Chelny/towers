@@ -1,5 +1,5 @@
 import { User, UserStatus } from "@prisma/client"
-import prisma from "@/lib"
+import prisma from "@/lib/prisma"
 
 export const getUserById = async (id: string | undefined): Promise<User | null> => {
   return await prisma.user.findUnique({ where: { id } })

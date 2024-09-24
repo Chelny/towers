@@ -1,7 +1,7 @@
 "use client"
 
 import { ReactNode } from "react"
-import { TableWithHostAndTowersGameUsers } from "@/interfaces"
+import { TableWithHostAndTowersGameUsers } from "@/interfaces/table"
 
 type TableHeaderProps = {
   table: TableWithHostAndTowersGameUsers | null

@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react"
 import PowerBar from "@/components/game/PowerBar"
-import { PowerBarBlock } from "@/interfaces"
+import { PowerBarBlock } from "@/interfaces/game"
 import { mockedDefaultTowersBlockProps } from "@/vitest.setup"
 
 describe("PowerBar Component", () => {

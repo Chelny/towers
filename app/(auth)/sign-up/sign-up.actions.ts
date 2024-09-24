@@ -2,31 +2,12 @@
 
 import { NextResponse } from "next/server"
 import { Gender } from "@prisma/client"
-import { type Static, Type } from "@sinclair/typebox"
 import { Value, ValueError } from "@sinclair/typebox/value"
+import { SignUpFormData, SignUpFormErrorMessages, signUpSchema } from "@/app/(auth)/sign-up/sign-up.schema"
 import { POST } from "@/app/api/sign-up/route"
-import { BIRTH_DATE_PATTERN, EMAIL_PATTERN, NAME_PATTERN, PASSWORD_PATTERN, USERNAME_PATTERN } from "@/constants"
 
-const GenderType = Type.Union([Type.Literal(Gender.M), Type.Literal(Gender.F), Type.Literal(Gender.X)])
-
-const signUpSchema = Type.Object({
-  name: Type.RegExp(NAME_PATTERN),
-  gender: Type.Optional(GenderType),
-  birthdate: Type.Optional(Type.RegExp(BIRTH_DATE_PATTERN)),
-  email: Type.RegExp(EMAIL_PATTERN),
-  username: Type.RegExp(USERNAME_PATTERN),
-  password: Type.RegExp(PASSWORD_PATTERN),
-  confirmPassword: Type.RegExp(PASSWORD_PATTERN)
-})
-
-export type SignUpData = Static<typeof signUpSchema>
-
-export type SignUpErrorMessages<T extends string> = {
-  [K in T]?: string
-}
-
-export async function signUp(prevState: any, formData: FormData) {
-  const rawFormData: SignUpData = {
+export async function signUp(prevState: ApiResponse, formData: FormData): Promise<ApiResponse> {
+  const rawFormData: SignUpFormData = {
     name: formData.get("name") as string,
     gender: formData.get("gender") as Gender,
     birthdate: formData.get("birthdate") as string,
@@ -37,7 +18,7 @@ export async function signUp(prevState: any, formData: FormData) {
   }
 
   const errors: ValueError[] = Array.from(Value.Errors(signUpSchema, rawFormData))
-  const errorMessages: SignUpErrorMessages<keyof SignUpData> = {}
+  const errorMessages: SignUpFormErrorMessages = {}
 
   for (const error of errors) {
     switch (error.path.replace("/", "")) {
@@ -78,11 +59,12 @@ export async function signUp(prevState: any, formData: FormData) {
 
   if (Object.keys(errorMessages).length === 0) {
     const response: NextResponse = await POST(rawFormData)
-    return await response.json()
+    const data = await response.json()
+    return data
   }
 
   return {
     success: false,
-    errors: errorMessages
+    error: errorMessages
   }
 }

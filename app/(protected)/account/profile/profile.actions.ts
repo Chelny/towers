@@ -1,31 +1,17 @@
 "use server"
 
 import { NextResponse } from "next/server"
-import { Gender } from "@prisma/client"
-import { type Static, Type } from "@sinclair/typebox"
+import { Gender, User } from "@prisma/client"
 import { Value, ValueError } from "@sinclair/typebox/value"
-import { POST } from "@/app/api/account/profile/route"
-import { BIRTH_DATE_PATTERN, EMAIL_PATTERN, NAME_PATTERN, USERNAME_PATTERN } from "@/constants"
+import {
+  ProfileFormData,
+  ProfileFormErrorMessages,
+  profileSchema
+} from "@/app/(protected)/account/profile/profile.schema"
+import { PATCH } from "@/app/api/account/profile/route"
 
-const GenderType = Type.Union([Type.Literal(Gender.M), Type.Literal(Gender.F), Type.Literal(Gender.X)])
-
-const profileSchema = Type.Object({
-  name: Type.RegExp(NAME_PATTERN),
-  gender: Type.Optional(GenderType),
-  birthdate: Type.Optional(Type.RegExp(BIRTH_DATE_PATTERN)),
-  email: Type.RegExp(EMAIL_PATTERN),
-  username: Type.RegExp(USERNAME_PATTERN),
-  image: Type.Optional(Type.String())
-})
-
-export type ProfileData = Static<typeof profileSchema>
-
-export type ProfileErrorMessages<T extends string> = {
-  [K in T]?: string
-}
-
-export async function profile(prevState: any, formData: FormData) {
-  const rawFormData: ProfileData = {
+export async function profile(prevState: ApiResponse<User>, formData: FormData): Promise<ApiResponse<User>> {
+  const rawFormData: ProfileFormData = {
     name: formData.get("name") as string,
     gender: formData.get("gender") as Gender,
     birthdate: formData.get("birthdate") as string,
@@ -35,7 +21,7 @@ export async function profile(prevState: any, formData: FormData) {
   }
 
   const errors: ValueError[] = Array.from(Value.Errors(profileSchema, rawFormData))
-  const errorMessages: ProfileErrorMessages<keyof ProfileData> = {}
+  const errorMessages: ProfileFormErrorMessages = {}
 
   for (const error of errors) {
     switch (error.path.replace("/", "")) {
@@ -70,12 +56,13 @@ export async function profile(prevState: any, formData: FormData) {
   }
 
   if (Object.keys(errorMessages).length === 0) {
-    const response: NextResponse = await POST(rawFormData)
-    return await response.json()
+    const response: NextResponse = await PATCH(rawFormData)
+    const data = await response.json()
+    return data
   }
 
   return {
     success: false,
-    errors: errorMessages
+    error: errorMessages
   }
 }

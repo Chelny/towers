@@ -1,8 +1,8 @@
 import { ReactNode } from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
-import { ReduxProvider } from "@/app/redux-provider"
-import { SessionDataProvider } from "@/context"
+import { StoreProvider } from "@/app/store-provider"
+import { SessionDataProvider } from "@/context/session-context"
 import "./globals.scss"
 
 type RootLayoutProps = {
@@ -27,7 +27,7 @@ export default function RootLayout({ children }: Readonly<RootLayoutProps>): Rea
     <html lang="en">
       <body className={inter.className}>
         <SessionDataProvider>
-          <ReduxProvider>{children}</ReduxProvider>
+          <StoreProvider>{children}</StoreProvider>
         </SessionDataProvider>
       </body>
     </html>

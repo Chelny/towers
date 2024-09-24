@@ -13,8 +13,9 @@ import {
   PIECE_LENGTH,
   PIECE_STARTING_COL,
   PIECE_STARTING_ROW
-} from "@/constants"
-import { TickSpeed } from "@/enums"
+} from "@/constants/game"
+import { TickSpeed } from "@/enums/tick-speed"
+import { useInterval } from "@/hooks/useInterval"
 import {
   checkGameOver,
   createEmptyCell,
@@ -26,12 +27,29 @@ import {
   getRandomPiece,
   hasCollisions,
   isInBounds,
-  useInterval,
   useTowersBoard
-} from "@/hooks"
-import { BlockPosition, BoardCellPosition, MarkBlocksForDeletion, PowerBlock } from "@/interfaces"
-import { Block, Board, BoardBlock, Piece, PowerBarBlock, Powers, TowersLetter } from "@/interfaces"
-import { isEmptyCell, isMedusaBlock, isMidasBlock, isPowerBarBlock, isSpecialDiamond, isTowersBlock } from "@/utils"
+} from "@/hooks/useTowersBoard"
+import {
+  Block,
+  BlockPosition,
+  Board,
+  BoardBlock,
+  BoardCellPosition,
+  MarkBlocksForDeletion,
+  Piece,
+  PowerBarBlock,
+  PowerBlock,
+  Powers,
+  TowersLetter
+} from "@/interfaces/game"
+import {
+  isEmptyCell,
+  isMedusaBlock,
+  isMidasBlock,
+  isPowerBarBlock,
+  isSpecialDiamond,
+  isTowersBlock
+} from "@/utils/block-guards-utils"
 
 const cipherKeysMap: Record<string, string> = {
   A: "P",

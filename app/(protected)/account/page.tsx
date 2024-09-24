@@ -1,11 +1,18 @@
 import { ReactNode } from "react"
 import Link from "next/link"
+import { NextResponse } from "next/server"
+import { Account as DBAccount, User } from "@prisma/client"
 import clsx from "clsx/lite"
 import { PiArrowFatRightDuotone } from "react-icons/pi"
 import { AccountForm } from "@/app/(protected)/account/account.form"
-import { ROUTE_PROFILE, ROUTE_UPDATE_PASSWORD } from "@/constants"
+import { GET } from "@/app/api/account/route"
+import { ROUTE_PROFILE, ROUTE_UPDATE_PASSWORD } from "@/constants/routes"
 
-export default function Account(): ReactNode {
+export default async function Account(): Promise<ReactNode> {
+  const response: NextResponse = await GET()
+  const data = await response.json()
+  const user: (Partial<User> & { accounts: Partial<DBAccount>[] }) | null = data.data
+
   return (
     <ul
       className={clsx(
@@ -19,12 +26,14 @@ export default function Account(): ReactNode {
           <PiArrowFatRightDuotone className={clsx("group-hover:text-gray-500")} />
         </Link>
       </li>
-      <li className="group">
-        <Link className="flex justify-between items-center w-full" href={ROUTE_UPDATE_PASSWORD.PATH}>
-          <span className={clsx("text-blue-500", "group-hover:underline")}>{ROUTE_UPDATE_PASSWORD.TITLE}</span>
-          <PiArrowFatRightDuotone className={clsx("group-hover:text-gray-500")} />
-        </Link>
-      </li>
+      {user?.accounts && user?.accounts.length === 0 && (
+        <li className="group">
+          <Link className="flex justify-between items-center w-full" href={ROUTE_UPDATE_PASSWORD.PATH}>
+            <span className={clsx("text-blue-500", "group-hover:underline")}>{ROUTE_UPDATE_PASSWORD.TITLE}</span>
+            <PiArrowFatRightDuotone className={clsx("group-hover:text-gray-500")} />
+          </Link>
+        </li>
+      )}
       <li className={clsx("group", "hover:cursor-pointer")}>
         <AccountForm />
       </li>

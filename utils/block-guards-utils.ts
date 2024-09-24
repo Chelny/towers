@@ -1,5 +1,14 @@
-import { EmptyCell, MedusaBlock, MidasBlock, SpecialDiamond, TowersBlock } from "@/interfaces"
-import { Block, BoardBlock, PowerBarBlock, PowerPieceBlock } from "@/interfaces"
+import {
+  Block,
+  BoardBlock,
+  EmptyCell,
+  MedusaBlock,
+  MidasBlock,
+  PowerBarBlock,
+  PowerPieceBlock,
+  SpecialDiamond,
+  TowersBlock
+} from "@/interfaces/game"
 
 export const isTowersBlock = (block: Block): block is TowersBlock => {
   return ["T", "O", "W", "E", "R", "S"].includes(block.letter)

@@ -2,15 +2,16 @@ import { NextResponse } from "next/server"
 import { User } from "@prisma/client"
 import { compare, hash } from "bcryptjs"
 import { Session } from "next-auth"
-import { UpdatePasswordData } from "@/app/(protected)/account/update-password/update-password.actions"
+import { UpdatePasswordFormData } from "@/app/(protected)/account/update-password/update-password.schema"
 import { auth } from "@/auth"
-import { getAccountsByUserId, getUserById } from "@/data"
-import prisma from "@/lib"
+import { getAccountsByUserId } from "@/data/account"
+import { getUserById } from "@/data/user"
+import prisma from "@/lib/prisma"
 
-export async function POST(body: UpdatePasswordData): Promise<NextResponse> {
+export async function PATCH(body: UpdatePasswordFormData): Promise<NextResponse> {
   const session: Session | null = await auth()
 
-  if (!session?.user) {
+  if (!session) {
     return NextResponse.json(
       {
         success: false,

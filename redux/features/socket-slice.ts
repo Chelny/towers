@@ -1,23 +1,13 @@
+/* eslint-disable no-unused-vars */
 import { ActionReducerMapBuilder, createSlice, PayloadAction } from "@reduxjs/toolkit"
-import {
-  RoomChatMessageInput,
-  RoomChatWithTowersGameUser,
-  RoomWithTablesCount,
-  TableChatMessageInput,
-  TableChatWithTowersGameUser,
-  TableWithHostAndTowersGameUsers,
-  TowersGameUserWithUserAndTables
-} from "@/interfaces"
-import {
-  fetchRoomChat,
-  fetchRoomInfo,
-  fetchRoomUsers,
-  fetchTableChat,
-  fetchTableInfo,
-  fetchTableUsers,
-  joinRoom,
-  leaveRoom
-} from "@/redux/thunks"
+import { RoomWithTablesCount } from "@/interfaces/room"
+import { RoomChatMessageInput, RoomChatWithTowersGameUser } from "@/interfaces/room-chat"
+import { TableWithHostAndTowersGameUsers } from "@/interfaces/table"
+import { TableChatMessageInput, TableChatWithTowersGameUser } from "@/interfaces/table-chat"
+import { TowersGameUserWithUserAndTables } from "@/interfaces/towers-game-user"
+import { fetchRoomChat, fetchRoomInfo, fetchRoomUsers } from "@/redux/thunks/room-thunks"
+import { joinRoom, leaveRoom } from "@/redux/thunks/socket-thunks"
+import { fetchTableChat, fetchTableInfo, fetchTableUsers } from "@/redux/thunks/table-thunks"
 
 export interface RoomsState {
   roomInfo: RoomWithTablesCount | null
@@ -162,7 +152,7 @@ const socketSlice = createSlice({
        * Room info
        */
       .addCase(fetchRoomInfo.pending, (state: SocketState, action) => {
-        const roomId: string = action.meta.arg
+        const roomId: string = action.meta.arg.roomId
 
         state.isLoading = true
 
@@ -171,7 +161,7 @@ const socketSlice = createSlice({
         }
       })
       .addCase(fetchRoomInfo.fulfilled, (state: SocketState, action) => {
-        const roomId: string = action.meta.arg
+        const roomId: string = action.meta.arg.roomId
 
         state.isLoading = false
         state.rooms[roomId] = {
@@ -181,7 +171,7 @@ const socketSlice = createSlice({
         }
       })
       .addCase(fetchRoomInfo.rejected, (state: SocketState, action) => {
-        const roomId: string = action.meta.arg
+        const roomId: string = action.meta.arg.roomId
 
         state.isLoading = false
 
@@ -195,7 +185,7 @@ const socketSlice = createSlice({
        * Room chat
        */
       .addCase(fetchRoomChat.pending, (state: SocketState, action) => {
-        const roomId: string = action.meta.arg
+        const roomId: string = action.meta.arg.roomId
 
         state.isLoading = true
 
@@ -204,7 +194,7 @@ const socketSlice = createSlice({
         }
       })
       .addCase(fetchRoomChat.fulfilled, (state: SocketState, action) => {
-        const roomId: string = action.meta.arg
+        const roomId: string = action.meta.arg.roomId
 
         state.isLoading = false
         state.rooms[roomId] = {
@@ -214,7 +204,7 @@ const socketSlice = createSlice({
         }
       })
       .addCase(fetchRoomChat.rejected, (state: SocketState, action) => {
-        const roomId: string = action.meta.arg
+        const roomId: string = action.meta.arg.roomId
 
         state.isLoading = false
 
@@ -228,7 +218,7 @@ const socketSlice = createSlice({
        * Room users
        */
       .addCase(fetchRoomUsers.pending, (state: SocketState, action) => {
-        const roomId: string = action.meta.arg
+        const roomId: string = action.meta.arg.roomId
 
         state.isLoading = true
 
@@ -237,7 +227,7 @@ const socketSlice = createSlice({
         }
       })
       .addCase(fetchRoomUsers.fulfilled, (state: SocketState, action) => {
-        const roomId: string = action.meta.arg
+        const roomId: string = action.meta.arg.roomId
 
         state.isLoading = false
         state.rooms[roomId] = {
@@ -247,7 +237,7 @@ const socketSlice = createSlice({
         }
       })
       .addCase(fetchRoomUsers.rejected, (state: SocketState, action) => {
-        const roomId: string = action.meta.arg
+        const roomId: string = action.meta.arg.roomId
 
         state.isLoading = false
 
@@ -261,7 +251,7 @@ const socketSlice = createSlice({
        * Table info
        */
       .addCase(fetchTableInfo.pending, (state: SocketState, action) => {
-        const tableId: string = action.meta.arg
+        const tableId: string = action.meta.arg.tableId
 
         state.isLoading = true
 
@@ -270,7 +260,7 @@ const socketSlice = createSlice({
         }
       })
       .addCase(fetchTableInfo.fulfilled, (state: SocketState, action) => {
-        const tableId: string = action.meta.arg
+        const tableId: string = action.meta.arg.tableId
 
         state.isLoading = false
         state.tables[tableId] = {
@@ -280,7 +270,7 @@ const socketSlice = createSlice({
         }
       })
       .addCase(fetchTableInfo.rejected, (state: SocketState, action) => {
-        const tableId: string = action.meta.arg
+        const tableId: string = action.meta.arg.tableId
 
         state.isLoading = false
 
@@ -294,7 +284,7 @@ const socketSlice = createSlice({
        * Table chat
        */
       .addCase(fetchTableChat.pending, (state: SocketState, action) => {
-        const { tableId }: { tableId: string; towersUserId: string } = action.meta.arg
+        const tableId: string = action.meta.arg.tableId
 
         state.isLoading = true
 
@@ -303,7 +293,7 @@ const socketSlice = createSlice({
         }
       })
       .addCase(fetchTableChat.fulfilled, (state: SocketState, action) => {
-        const { tableId }: { tableId: string; towersUserId: string } = action.meta.arg
+        const tableId: string = action.meta.arg.tableId
 
         state.isLoading = false
         state.tables[tableId] = {
@@ -313,7 +303,7 @@ const socketSlice = createSlice({
         }
       })
       .addCase(fetchTableChat.rejected, (state: SocketState, action) => {
-        const { tableId }: { tableId: string; towersUserId: string } = action.meta.arg
+        const tableId: string = action.meta.arg.tableId
 
         state.isLoading = false
 
@@ -327,7 +317,7 @@ const socketSlice = createSlice({
        * Table users
        */
       .addCase(fetchTableUsers.pending, (state: SocketState, action) => {
-        const tableId: string = action.meta.arg
+        const tableId: string = action.meta.arg.tableId
 
         state.isLoading = true
 
@@ -336,7 +326,7 @@ const socketSlice = createSlice({
         }
       })
       .addCase(fetchTableUsers.fulfilled, (state: SocketState, action) => {
-        const tableId: string = action.meta.arg
+        const tableId: string = action.meta.arg.tableId
 
         state.isLoading = false
         state.tables[tableId] = {
@@ -346,7 +336,7 @@ const socketSlice = createSlice({
         }
       })
       .addCase(fetchTableUsers.rejected, (state: SocketState, action) => {
-        const tableId: string = action.meta.arg
+        const tableId: string = action.meta.arg.tableId
 
         state.isLoading = false
 

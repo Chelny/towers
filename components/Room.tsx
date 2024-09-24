@@ -4,7 +4,6 @@ import { KeyboardEvent, MouseEvent, ReactNode, useEffect, useRef, useState } fro
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime"
 import dynamic from "next/dynamic"
 import { useRouter } from "next/navigation"
-import { useDispatch, useSelector } from "react-redux"
 import { v4 as uuidv4 } from "uuid"
 import CreateTable from "@/components/CreateTable"
 import ChatSkeleton from "@/components/skeleton/ChatSkeleton"
@@ -14,13 +13,17 @@ import RoomTableSkeleton from "@/components/skeleton/RoomTableSkeleton"
 import TableInvitation, { TableInvitationData } from "@/components/TableInvitation"
 import AlertMessage from "@/components/ui/AlertMessage"
 import Button from "@/components/ui/Button"
-import { CHAT_MESSSAGE_MAX_LENGTH, ROUTE_ROOMS } from "@/constants"
-import { useSessionData } from "@/hooks"
-import { RoomChatWithTowersGameUser, RoomWithTablesCount, TowersGameUserWithUserAndTables } from "@/interfaces"
-import { sendMessageToRoomChat } from "@/redux/features"
+import { CHAT_MESSSAGE_MAX_LENGTH } from "@/constants/game"
+import { ROUTE_ROOMS } from "@/constants/routes"
+import { useSessionData } from "@/hooks/useSessionData"
+import { RoomWithTablesCount } from "@/interfaces/room"
+import { RoomChatWithTowersGameUser } from "@/interfaces/room-chat"
+import { TowersGameUserWithUserAndTables } from "@/interfaces/towers-game-user"
+import { useAppDispatch, useAppSelector } from "@/lib/hooks"
+import { beforeLeaveSocketRoom, joinSocketRoom, sendMessageToRoomChat } from "@/redux/features/socket-slice"
 import { AppDispatch, RootState } from "@/redux/store"
-import { fetchRoomChat, fetchRoomInfo, fetchRoomUsers, joinRoom, leaveRoom } from "@/redux/thunks"
-import { debounce } from "@/utils"
+import { fetchRoomChat, fetchRoomInfo, fetchRoomUsers } from "@/redux/thunks/room-thunks"
+import { leaveRoom } from "@/redux/thunks/socket-thunks"
 
 type RoomProps = {
   roomId: string
@@ -29,31 +32,31 @@ type RoomProps = {
 export default function Room({ roomId }: RoomProps): ReactNode {
   const router: AppRouterInstance = useRouter()
   const { data: session } = useSessionData()
-  const roomInfo: RoomWithTablesCount | null = useSelector((state: RootState) => state.socket.rooms[roomId]?.roomInfo)
-  const isRoomInfoLoading: boolean = useSelector((state: RootState) => state.socket.rooms[roomId]?.isRoomInfoLoading)
-  const chat: RoomChatWithTowersGameUser[] = useSelector((state: RootState) => state.socket.rooms[roomId]?.chat)
-  const isChatLoading: boolean = useSelector((state: RootState) => state.socket.rooms[roomId]?.isChatLoading)
-  const users: TowersGameUserWithUserAndTables[] = useSelector((state: RootState) => state.socket.rooms[roomId]?.users)
-  const errorMessage = useSelector((state: RootState) => state.socket.errorMessage)
-  const dispatch: AppDispatch = useDispatch()
+  const roomInfo: RoomWithTablesCount | null = useAppSelector(
+    (state: RootState) => state.socket.rooms[roomId]?.roomInfo
+  )
+  const isRoomInfoLoading: boolean = useAppSelector((state: RootState) => state.socket.rooms[roomId]?.isRoomInfoLoading)
+  const chat: RoomChatWithTowersGameUser[] = useAppSelector((state: RootState) => state.socket.rooms[roomId]?.chat)
+  const isChatLoading: boolean = useAppSelector((state: RootState) => state.socket.rooms[roomId]?.isChatLoading)
+  const users: TowersGameUserWithUserAndTables[] = useAppSelector(
+    (state: RootState) => state.socket.rooms[roomId]?.users
+  )
+  const errorMessage = useAppSelector((state: RootState) => state.socket.errorMessage)
+  const dispatch: AppDispatch = useAppDispatch()
   const messageInputRef = useRef<HTMLInputElement>(null)
   const chatEndRef = useRef<HTMLDivElement>(null)
   const [isCreateTableModalOpen, setIsCreateTableModalOpen] = useState<boolean>(false)
   const [invitationModals, setInvitationModals] = useState<{ id: string; data: TableInvitationData }[]>([])
 
   useEffect(() => {
-    dispatch(joinRoom({ room: roomId, isTable: false, username: session?.user.username }))
+    dispatch(joinSocketRoom({ room: roomId, isTable: false, username: session?.user.username }))
     // openInvitationModal(uuidv4(), { user: { username: "the_player1" }, table: { tableId: 67 } })
   }, [])
 
   useEffect(() => {
-    const debouncedFetchData: Debounce = debounce(() => {
-      dispatch(fetchRoomInfo(roomId))
-      dispatch(fetchRoomChat(roomId))
-      dispatch(fetchRoomUsers(roomId))
-    }, 500)
-
-    debouncedFetchData()
+    dispatch(fetchRoomInfo({ roomId }))
+    dispatch(fetchRoomChat({ roomId }))
+    dispatch(fetchRoomUsers({ roomId }))
   }, [])
 
   useEffect(() => {
@@ -107,7 +110,14 @@ export default function Room({ roomId }: RoomProps): ReactNode {
 
   const handleExitRoom = (): void => {
     dispatch(leaveRoom({ room: roomId, isTable: false, username: session?.user.username }))
-    router.push(ROUTE_ROOMS.PATH)
+      .unwrap()
+      .then(() => {
+        dispatch(beforeLeaveSocketRoom({ room: roomId, isTable: false, username: session?.user.username }))
+        router.push(ROUTE_ROOMS.PATH)
+      })
+      .catch((error) => {
+        console.error("Error leaving room:", error)
+      })
   }
 
   return (

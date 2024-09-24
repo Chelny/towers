@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react"
 import Chat from "@/components/Chat"
-import { RoomChatWithTowersGameUser, TableChatWithTowersGameUser } from "@/interfaces"
+import { RoomChatWithTowersGameUser } from "@/interfaces/room-chat"
+import { TableChatWithTowersGameUser } from "@/interfaces/table-chat"
 
 describe("Chat Component", () => {
   it("should render room chat messages correctly", () => {

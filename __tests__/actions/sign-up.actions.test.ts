@@ -22,7 +22,7 @@ describe("Sign Up Actions", () => {
 
     const response = {
       success: false,
-      errors: {
+      error: {
         name: "The name is invalid.",
         email: "The email is invalid.",
         username: "The username is invalid.",
@@ -51,7 +51,7 @@ describe("Sign Up Actions", () => {
 
     const response = {
       success: false,
-      errors: {
+      error: {
         name: "The name is invalid.",
         email: "The email is invalid.",
         username: "The username is invalid.",
@@ -82,7 +82,7 @@ describe("Sign Up Actions", () => {
 
     const response = {
       success: false,
-      errors: {
+      error: {
         confirmPassword: "The password and password confirmation do not match."
       }
     }

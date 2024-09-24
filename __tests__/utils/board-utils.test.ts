@@ -1,5 +1,5 @@
-import { Board, BoardBlock } from "@/interfaces"
-import { areAdjacentBlocksSame, getNumBlocksToRearrange, isSettingUpThreeInRow } from "@/utils"
+import { Board, BoardBlock } from "@/interfaces/game"
+import { areAdjacentBlocksSame, getNumBlocksToRearrange, isSettingUpThreeInRow } from "@/utils/board-utils"
 import {
   mockedBlockE,
   mockedBlockEmpty,

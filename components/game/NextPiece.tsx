@@ -2,8 +2,9 @@ import { ReactNode } from "react"
 import clsx from "clsx/lite"
 import DefenseBlock from "@/components/game/DefenseBlock"
 import RegularBlock from "@/components/game/RegularBlock"
-import { Block, Piece } from "@/interfaces"
-import { getClassNameForBlock, getClassNameForBlockPowerType, isPowerPieceBlock, isTowersBlock } from "@/utils"
+import { Block, Piece } from "@/interfaces/game"
+import { getClassNameForBlock, getClassNameForBlockPowerType } from "@/utils/block-class-names-utils"
+import { isPowerPieceBlock, isTowersBlock } from "@/utils/block-guards-utils"
 import styles from "./Block.module.scss"
 
 type NextPieceProps = {

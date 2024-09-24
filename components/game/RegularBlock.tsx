@@ -1,5 +1,5 @@
 import React, { ReactNode } from "react"
-import { BlockLetter } from "@/interfaces"
+import { BlockLetter } from "@/interfaces/game"
 
 type RegularBlockProps = {
   letter?: BlockLetter

@@ -49,7 +49,7 @@ vi.mock("resend", () => {
 
 describe("Reset Password Form", () => {
   beforeEach(() => {
-    vi.mocked(useFormState).mockReturnValue([{ success: false, message: "", errors: {} }, vi.fn(), false])
+    vi.mocked(useFormState).mockReturnValue([{ success: false, message: "", error: {} }, vi.fn(), false])
 
     vi.mocked(useFormStatus).mockReturnValue({
       pending: false,
@@ -86,7 +86,7 @@ describe("Reset Password Form", () => {
 
   it("should show an error for invalid password format", () => {
     vi.mocked(useFormState).mockReturnValue([
-      { success: false, errors: { password: "The password is invalid." } },
+      { success: false, error: { password: "The password is invalid." } },
       vi.fn(),
       false
     ])
@@ -100,7 +100,7 @@ describe("Reset Password Form", () => {
     vi.mocked(useFormStatus).mockReturnValue({
       pending: true,
       data: new FormData(),
-      method: "POST",
+      method: "PATCH",
       action: "/api/reset-password"
     })
 

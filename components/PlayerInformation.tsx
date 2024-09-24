@@ -4,7 +4,7 @@ import { ChangeEvent, ReactNode, useEffect, useState } from "react"
 import { formatDistanceToNow } from "date-fns"
 import Input from "@/components/ui/Input"
 import Modal from "@/components/ui/Modal"
-import { TowersGameUserWithUserAndTables } from "@/interfaces"
+import { TowersGameUserWithUserAndTables } from "@/interfaces/towers-game-user"
 
 type PlayerInformationProps = {
   isOpen: boolean

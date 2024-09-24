@@ -18,7 +18,7 @@ vi.mock("@/hooks/useSessionData", () => ({
   useSessionData: vi.fn()
 }))
 
-vi.mock("@/lib", () => ({
+vi.mock("@/lib/email", () => ({
   sendEmail: vi.fn().mockResolvedValue({ success: true })
 }))
 

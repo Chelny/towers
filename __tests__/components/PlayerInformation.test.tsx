@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react"
 import { Mock } from "vitest"
 import PlayerInformation from "@/components/PlayerInformation"
-import { TowersGameUserWithUserAndTables } from "@/interfaces"
+import { TowersGameUserWithUserAndTables } from "@/interfaces/towers-game-user"
 
 const mockPlayer: TowersGameUserWithUserAndTables = {
   user: { username: "john.doe" },

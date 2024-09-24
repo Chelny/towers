@@ -1,5 +1,5 @@
 import React, { ReactNode } from "react"
-import { TowersLetter } from "@/interfaces"
+import { TowersLetter } from "@/interfaces/game"
 import styles from "./Block.module.scss"
 
 type DefenseBlockProps = {

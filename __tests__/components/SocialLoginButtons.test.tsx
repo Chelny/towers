@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react"
 import { signIn } from "next-auth/react"
 import { SocialLoginButtons } from "@/components/SocialLoginButtons"
-import { ROUTE_ROOMS } from "@/constants"
+import { ROUTE_ROOMS } from "@/constants/routes"
 
 vi.mock("next-auth/react", () => ({
   signIn: vi.fn()

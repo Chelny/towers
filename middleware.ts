@@ -1,6 +1,6 @@
 import { NextURL } from "next/dist/server/web/next-url"
 import { NextResponse, userAgent } from "next/server"
-import { Session } from "next-auth"
+import axios, { AxiosResponse } from "axios"
 import { auth } from "@/auth"
 import {
   API_AUTH_PREFIX,
@@ -10,30 +10,29 @@ import {
   ROUTE_ROOMS,
   ROUTE_SIGN_IN,
   ROUTE_TOWERS
-} from "@/constants"
-import prisma from "@/lib"
+} from "@/constants/routes"
 
 const validateToken = async (token: string): Promise<boolean> => {
-  const response: Response = await fetch(`${process.env.BASE_URL}/api/reset-password?token=${token}`)
-  const data = await response.json()
-  return data.valid
+  const response: AxiosResponse<ApiResponse> = await axios.get(
+    `${process.env.BASE_URL}/api/reset-password?token=${token}`
+  )
+  return response.data.success
 }
 
 export default auth(async (request): Promise<NextResponse> => {
   // Content Security Policy (CSP)
-  const isDevelopment: boolean = process.env.NODE_ENV === "development"
   const nonce: string = Buffer.from(crypto.randomUUID()).toString("base64")
   const cspHeader: string = `
     default-src 'self';
-    script-src 'self' ${isDevelopment ? "'unsafe-eval' 'unsafe-inline'" : `'nonce-${nonce}' 'strict-dynamic'`};
-    style-src 'self' ${isDevelopment ? "'unsafe-inline'" : `'nonce-${nonce}'`};
+    script-src 'self' 'nonce-${nonce}' 'strict-dynamic';
+    style-src 'self' 'nonce-${nonce}';
     img-src 'self' blob: data:;
     font-src 'self';
     object-src 'none';
     base-uri 'self';
     form-action 'self';
     frame-ancestors 'none';
-    ${isDevelopment ? "" : "upgrade-insecure-requests"};
+    upgrade-insecure-requests;
   `
 
   const requestHeaders: Headers = new Headers(request.headers)
@@ -41,7 +40,6 @@ export default auth(async (request): Promise<NextResponse> => {
   requestHeaders.set("Content-Security-Policy", cspHeader.replace(/\s{2,}/g, " ").trim())
 
   const response: NextResponse = NextResponse.next({
-    headers: requestHeaders,
     request: {
       headers: requestHeaders
     }
@@ -91,15 +89,6 @@ export default auth(async (request): Promise<NextResponse> => {
   if (request.nextUrl.pathname === ROUTE_TOWERS.PATH && request.nextUrl.search === "") {
     const newUrl: URL = new URL(ROUTE_ROOMS.PATH, request.nextUrl.origin)
     return NextResponse.redirect(newUrl)
-  }
-
-  // Update lastActiveAt on POST, PUT, DELETE requests
-  const session: Session | null = await auth()
-  if (session && request.method !== "GET") {
-    await prisma.user.update({
-      where: { id: session.user.id, isOnline: true },
-      data: { lastActiveAt: new Date() }
-    })
   }
 
   return response

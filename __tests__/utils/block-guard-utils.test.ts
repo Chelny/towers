@@ -1,4 +1,4 @@
-import { Block } from "@/interfaces"
+import { Block } from "@/interfaces/game"
 import {
   isBoardBlock,
   isEmptyCell,
@@ -8,7 +8,7 @@ import {
   isPowerPieceBlock,
   isSpecialDiamond,
   isTowersBlock
-} from "@/utils"
+} from "@/utils/block-guards-utils"
 
 const defaultTowersBlockProps = {
   powerType: null,

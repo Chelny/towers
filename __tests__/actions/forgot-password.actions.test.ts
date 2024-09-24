@@ -17,7 +17,7 @@ describe("Forgot Password Actions", () => {
 
     const response = {
       success: false,
-      errors: {
+      error: {
         email: "The email is required."
       }
     }
@@ -38,7 +38,7 @@ describe("Forgot Password Actions", () => {
 
     const response = {
       success: false,
-      errors: {
+      error: {
         email: "The email is required."
       }
     }

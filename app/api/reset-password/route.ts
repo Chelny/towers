@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server"
 import { PasswordResetToken, User } from "@prisma/client"
 import { hash } from "bcryptjs"
-import { ResetPasswordData } from "@/app/(auth)/reset-password/reset-password.actions"
-import { getPasswordResetTokenByToken, getUserByEmail } from "@/data"
-import prisma from "@/lib"
+import { ResetPasswordFormData } from "@/app/(auth)/reset-password/reset-password.schema"
+import { getPasswordResetTokenByToken } from "@/data/password-reset-token"
+import { getUserByEmail } from "@/data/user"
+import prisma from "@/lib/prisma"
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
   const searchParams: URLSearchParams = request.nextUrl.searchParams
@@ -41,7 +42,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   )
 }
 
-export async function POST(body: ResetPasswordData): Promise<NextResponse> {
+export async function PATCH(body: ResetPasswordFormData): Promise<NextResponse> {
   // Check token validity
   const existingToken = await getPasswordResetTokenByToken(body.token)
 

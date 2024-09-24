@@ -1,8 +1,8 @@
 import { ReactNode } from "react"
 import clsx from "clsx/lite"
 import GridCell from "@/components/game/GridCell"
-import { HIDDEN_ROWS_COUNT } from "@/constants"
-import { BoardBlock, BoardRow } from "@/interfaces"
+import { HIDDEN_ROWS_COUNT } from "@/constants/game"
+import { BoardBlock, BoardRow } from "@/interfaces/game"
 
 type GridRowProps = {
   rowIndex: number

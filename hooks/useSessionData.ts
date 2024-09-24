@@ -1,7 +1,7 @@
 "use client"
 
 import { useContext } from "react"
-import { SessionContext, type TSessionContextValue } from "@/context"
+import { SessionContext, type TSessionContextValue } from "@/context/session-context"
 import type { Session } from "next-auth"
 
 /**

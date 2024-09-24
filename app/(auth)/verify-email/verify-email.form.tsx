@@ -6,15 +6,16 @@ import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.share
 import { ReadonlyURLSearchParams, useSearchParams } from "next/navigation"
 import { useRouter } from "next/navigation"
 import { CgSpinner } from "react-icons/cg"
-import { verifyEmail, VerifyEmailData, VerifyEmailErrorMessages } from "@/app/(auth)/verify-email/verify-email.actions"
+import { verifyEmail } from "@/app/(auth)/verify-email/verify-email.actions"
+import { VerifyEmailFormErrorMessages } from "@/app/(auth)/verify-email/verify-email.schema"
 import AlertMessage from "@/components/ui/AlertMessage"
 import Button from "@/components/ui/Button"
-import { ROUTE_SIGN_IN } from "@/constants"
+import { ROUTE_SIGN_IN } from "@/constants/routes"
 
 const initialState = {
   success: false,
   message: "",
-  errors: {} as VerifyEmailErrorMessages<keyof VerifyEmailData>
+  error: {} as VerifyEmailFormErrorMessages
 }
 
 export function VerifyEmailForm(): ReactNode {
@@ -23,10 +24,10 @@ export function VerifyEmailForm(): ReactNode {
   const email: string | null = searchParams.get("email")
   const token: string | null = searchParams.get("token")
   const formRef: RefObject<HTMLFormElement> = useRef<HTMLFormElement>(null)
-  const [state, formAction] = useFormState<any, FormData>(verifyEmail, initialState)
+  const [state, formAction] = useFormState<ApiResponse, FormData>(verifyEmail, initialState)
 
   const handleSubmit = useCallback(() => {
-    if (state.success) return
+    if (state?.success) return
     formRef.current?.requestSubmit()
   }, [state])
 
