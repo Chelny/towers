@@ -1,7 +1,7 @@
 import { useFormState, useFormStatus } from "react-dom"
 import { render, screen } from "@testing-library/react"
 import { Mock } from "vitest"
-import { VerifyEmailForm } from "@/app/(auth)/verify-email/verify-email.form"
+import { UpdateEmailForm } from "@/app/(auth)/update-email/update-email.form"
 
 const { useRouter, mockedRouterPush, useSearchParams, mockedSearchParams } = vi.hoisted(() => {
   const mockedRouterPush: Mock = vi.fn()
@@ -44,7 +44,7 @@ vi.mock("react-dom", () => ({
   useFormStatus: vi.fn()
 }))
 
-describe("Verify Email Form", () => {
+describe("Update Email Form", () => {
   beforeEach(() => {
     vi.mocked(useFormState).mockReturnValue([{ success: false, message: "", error: {} }, vi.fn(), false])
 
@@ -61,10 +61,10 @@ describe("Verify Email Form", () => {
   })
 
   it("should render the form with all elements", () => {
-    render(<VerifyEmailForm />)
+    render(<UpdateEmailForm />)
 
-    expect(screen.getByTestId("verify-email-spinner-icon")).toBeInTheDocument()
-    expect(screen.getByTestId("verify-email-token-input")).toBeInTheDocument()
+    expect(screen.getByTestId("update-email-spinner-icon")).toBeInTheDocument()
+    expect(screen.getByTestId("update-email-token-input")).toBeInTheDocument()
   })
 
   it("should pass the email and token from URL params to the hidden input fields", () => {
@@ -75,9 +75,9 @@ describe("Verify Email Form", () => {
       return null
     })
 
-    render(<VerifyEmailForm />)
+    render(<UpdateEmailForm />)
 
-    const tokenInput: HTMLInputElement = screen.getByTestId("verify-email-token-input")
+    const tokenInput: HTMLInputElement = screen.getByTestId("update-email-token-input")
     expect(tokenInput).toHaveValue(token)
   })
 
@@ -88,23 +88,19 @@ describe("Verify Email Form", () => {
       false
     ])
 
-    render(<VerifyEmailForm />)
+    render(<UpdateEmailForm />)
 
-    expect(screen.queryByTestId("verify-email-spinner-icon")).not.toBeInTheDocument()
+    expect(screen.queryByTestId("update-email-spinner-icon")).not.toBeInTheDocument()
     expect(screen.getByText(/The verification link is invalid/i)).toBeInTheDocument()
   })
 
-  it("should display a success message if email verification is successful", () => {
-    vi.mocked(useFormState).mockReturnValue([
-      { success: true, message: "The email has been verified!" },
-      vi.fn(),
-      false
-    ])
+  it("should display a success message if email update is successful", () => {
+    vi.mocked(useFormState).mockReturnValue([{ success: true, message: "The email has been updated!" }, vi.fn(), false])
 
-    render(<VerifyEmailForm />)
+    render(<UpdateEmailForm />)
 
-    expect(screen.queryByTestId("verify-email-spinner-icon")).not.toBeInTheDocument()
-    expect(screen.getByText(/The email has been verified/i)).toBeInTheDocument()
-    expect(screen.getByTestId("verify-email-sign-in-button")).toBeInTheDocument()
+    expect(screen.queryByTestId("update-email-spinner-icon")).not.toBeInTheDocument()
+    expect(screen.getByText(/The email has been updated/i)).toBeInTheDocument()
+    expect(screen.getByTestId("update-email-profile-button")).toBeInTheDocument()
   })
 })

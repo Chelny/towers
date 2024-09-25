@@ -2,7 +2,10 @@
 
 import { FormEvent, ReactNode, useEffect } from "react"
 import { useFormState, useFormStatus } from "react-dom"
-import { Account, Gender, User } from "@prisma/client"
+import { Account, Gender, User, UserStatus } from "@prisma/client"
+import axios from "axios"
+import clsx from "clsx"
+import { IoWarning } from "react-icons/io5"
 import { profile } from "@/app/(protected)/account/profile/profile.actions"
 import { ProfileFormErrorMessages } from "@/app/(protected)/account/profile/profile.schema"
 import AlertMessage from "@/components/ui/AlertMessage"
@@ -28,7 +31,7 @@ export function ProfileForm({ user }: ProfileProps): ReactNode {
   const { update } = useSessionData()
 
   useEffect(() => {
-    if (state?.success) {
+    if (state?.success && state?.data) {
       update({
         name: state?.data?.name,
         email: state?.data?.email,
@@ -42,6 +45,10 @@ export function ProfileForm({ user }: ProfileProps): ReactNode {
     event.preventDefault()
     const formData: FormData = new FormData(event.currentTarget)
     formAction(formData)
+  }
+
+  const handleResendVerification = async (): Promise<void> => {
+    await axios.post("/api/send-email-verification", { user })
   }
 
   return (
@@ -92,7 +99,7 @@ export function ProfileForm({ user }: ProfileProps): ReactNode {
         id="email"
         label="Email"
         placeholder="Enter your email"
-        defaultValue={user?.email}
+        defaultValue={user?.pendingEmail || user?.email}
         required
         readOnly={typeof user?.accounts !== "undefined" && user?.accounts?.length > 0}
         dataTestId="profile-email-input"
@@ -103,6 +110,20 @@ export function ProfileForm({ user }: ProfileProps): ReactNode {
         }
         errorMessage={state?.error?.email}
       />
+      {user?.status === UserStatus.PENDING_EMAIL_VERIFICATION && (
+        <div className="flex items-center gap-2 font-medium">
+          <IoWarning className="w-5 h-5 text-amber-500" />
+          <div>
+            Email not verified.{" "}
+            <a
+              className={clsx("text-blue-500", "hover:underline hover:cursor-pointer")}
+              onClick={handleResendVerification}
+            >
+              Resend verification
+            </a>
+          </div>
+        </div>
+      )}
       <hr className="mt-6 mb-4" />
       <Input
         id="username"

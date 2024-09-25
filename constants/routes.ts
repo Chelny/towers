@@ -8,6 +8,7 @@ export const ROUTE_SIGN_IN_WITH_MAGIC_LINK = { TITLE: "Sign In With Email", PATH
 export const ROUTE_AUTH_ERROR = { TITLE: "Error", PATH: "/error" }
 export const ROUTE_ACCOUNT = { TITLE: "Account", PATH: "/account" }
 export const ROUTE_PROFILE = { TITLE: "Profile", PATH: `${ROUTE_ACCOUNT.PATH}/profile` }
+export const ROUTE_UPDATE_EMAIL = { TITLE: "Update Email", PATH: "/update-email" }
 export const ROUTE_UPDATE_PASSWORD = { TITLE: "Update Password", PATH: `${ROUTE_ACCOUNT.PATH}/update-password` }
 export const ROUTE_ROOMS = { TITLE: "Rooms", PATH: "/rooms" }
 export const ROUTE_TOWERS = { TITLE: "Towers", PATH: "/towers" }

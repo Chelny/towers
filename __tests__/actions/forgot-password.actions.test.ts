@@ -1,6 +1,7 @@
 import { Mock } from "vitest"
 import { forgotPassword } from "@/app/(auth)/forgot-password/forgot-password.actions"
 import { POST } from "@/app/api/forgot-password/route"
+import { mockedFormInitialState } from "@/vitest.setup"
 
 vi.mock("@/app/api/forgot-password/route", () => ({
   POST: vi.fn()
@@ -26,7 +27,7 @@ describe("Forgot Password Actions", () => {
       json: async () => response
     })
 
-    const result = await forgotPassword({}, formData)
+    const result = await forgotPassword(mockedFormInitialState, formData)
 
     expect(POST).not.toHaveBeenCalled()
     expect(result).toEqual(response)
@@ -47,7 +48,7 @@ describe("Forgot Password Actions", () => {
       json: async () => response
     })
 
-    const result = await forgotPassword({}, formData)
+    const result = await forgotPassword(mockedFormInitialState, formData)
 
     expect(POST).not.toHaveBeenCalled()
     expect(result).toEqual(response)
@@ -66,7 +67,7 @@ describe("Forgot Password Actions", () => {
       json: async () => response
     })
 
-    const result = await forgotPassword({}, formData)
+    const result = await forgotPassword(mockedFormInitialState, formData)
 
     expect(POST).toHaveBeenCalledWith({
       email: "john.doe@example.com"

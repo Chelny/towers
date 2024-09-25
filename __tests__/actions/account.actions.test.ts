@@ -1,6 +1,7 @@
 import { Mock } from "vitest"
 import { account } from "@/app/(protected)/account/account.actions"
 import { DELETE } from "@/app/api/account/route"
+import { mockedFormInitialState } from "@/vitest.setup"
 
 vi.mock("@/app/api/account/route", () => ({
   DELETE: vi.fn()
@@ -26,7 +27,7 @@ describe("Account Actions", () => {
       json: async () => response
     })
 
-    const result = await account({}, formData)
+    const result = await account(mockedFormInitialState, formData)
 
     expect(DELETE).not.toHaveBeenCalled()
     expect(result).toEqual(response)
@@ -47,7 +48,7 @@ describe("Account Actions", () => {
       json: async () => response
     })
 
-    const result = await account({}, formData)
+    const result = await account(mockedFormInitialState, formData)
 
     expect(DELETE).not.toHaveBeenCalled()
     expect(result).toEqual(response)
@@ -67,7 +68,7 @@ describe("Account Actions", () => {
       json: async () => response
     })
 
-    const result = await account({}, formData)
+    const result = await account(mockedFormInitialState, formData)
 
     expect(DELETE).toHaveBeenCalledWith({
       email: "john.doe@example.com"

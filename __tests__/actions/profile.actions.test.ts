@@ -2,6 +2,7 @@ import { Gender } from "@prisma/client"
 import { Mock } from "vitest"
 import { profile } from "@/app/(protected)/account/profile/profile.actions"
 import { PATCH } from "@/app/api/account/profile/route"
+import { mockedFormInitialState } from "@/vitest.setup"
 
 vi.mock("@/app/api/account/profile/route", () => ({
   PATCH: vi.fn()
@@ -31,7 +32,7 @@ describe("Profile Actions", () => {
       json: async () => response
     })
 
-    const result = await profile({}, formData)
+    const result = await profile(mockedFormInitialState, formData)
 
     expect(PATCH).not.toHaveBeenCalled()
     expect(result).toEqual(response)
@@ -60,7 +61,7 @@ describe("Profile Actions", () => {
       json: async () => response
     })
 
-    const result = await profile({}, formData)
+    const result = await profile(mockedFormInitialState, formData)
 
     expect(PATCH).not.toHaveBeenCalled()
     expect(result).toEqual(response)
@@ -81,7 +82,7 @@ describe("Profile Actions", () => {
       json: async () => response
     })
 
-    const result = await profile({}, formData)
+    const result = await profile(mockedFormInitialState, formData)
 
     expect(PATCH).toHaveBeenCalledWith({
       name: "John Doe",

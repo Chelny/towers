@@ -1,20 +1,17 @@
-import { User, VerificationToken } from "@prisma/client"
-import { getUserByEmail } from "@/data/user"
+import { VerificationToken } from "@prisma/client"
 import prisma from "@/lib/prisma"
 
-export const getVerificationTokenByToken = async (email: string, token: string): Promise<VerificationToken | null> => {
-  const user: User | null = await getUserByEmail(email)
-
-  if (!user) {
-    return null
-  }
+export const getVerificationTokenByIdTokenEmail = async (token: string): Promise<VerificationToken | null> => {
+  const decodedToken: string = Buffer.from(token, "base64").toString("utf-8")
+  const [userId, email] = decodedToken.split("|")
 
   return await prisma.verificationToken.findUnique({
     where: {
       identifier_token: {
-        identifier: user.id,
+        identifier: userId,
         token
-      }
+      },
+      email
     }
   })
 }

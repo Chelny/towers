@@ -1,10 +1,14 @@
+import { revalidatePath } from "next/cache"
 import { NextResponse } from "next/server"
-import { User } from "@prisma/client"
+import { User, UserStatus, VerificationToken } from "@prisma/client"
 import { Session } from "next-auth"
 import { ProfileFormData } from "@/app/(protected)/account/profile/profile.schema"
 import { auth } from "@/auth"
+import { ROUTE_PROFILE } from "@/constants/routes"
 import { getUserById, getUserByUsername } from "@/data/user"
+import { sendEmailChangeEmail } from "@/lib/email"
 import prisma from "@/lib/prisma"
+import { generateEmailChangeVerificationToken } from "@/lib/token"
 
 export async function GET(): Promise<NextResponse> {
   const session: Session | null = await auth()
@@ -28,8 +32,10 @@ export async function GET(): Promise<NextResponse> {
       gender: true,
       birthdate: true,
       email: true,
+      pendingEmail: true,
       username: true,
       image: true,
+      status: true,
       accounts: {
         select: {
           provider: true
@@ -71,6 +77,7 @@ export async function PATCH(body: ProfileFormData): Promise<NextResponse> {
   }
 
   const user: User | null = await getUserById(session.user.id)
+
   if (!user) {
     return NextResponse.json(
       {
@@ -93,7 +100,7 @@ export async function PATCH(body: ProfileFormData): Promise<NextResponse> {
     )
   }
 
-  const userData: Partial<User> = {
+  let userData: Partial<User> = {
     name: body.name,
     gender: body.gender,
     birthdate: body.birthdate ? new Date(body.birthdate) : undefined,
@@ -101,9 +108,28 @@ export async function PATCH(body: ProfileFormData): Promise<NextResponse> {
     image: body.image
   }
 
+  let successMessage: string = "Your profile has been updated!"
+
   // Do not let third-party users change their email
   if (session.account?.provider === "credentials") {
-    userData.email = body.email
+    if (user.email !== body.email) {
+      const token: VerificationToken | null = await generateEmailChangeVerificationToken(user.id, body.email)
+
+      if (token) {
+        // Send email verification
+        await sendEmailChangeEmail(body.name, token.email, token.token)
+
+        userData = {
+          ...userData,
+          emailVerified: null,
+          pendingEmail: body.email,
+          status: UserStatus.PENDING_EMAIL_VERIFICATION
+        }
+
+        successMessage +=
+          " A verification email has been sent to your new email address. Please check your inbox or your spam folder."
+      }
+    }
   }
 
   const updatedUser: User = await prisma.user.update({
@@ -123,17 +149,21 @@ export async function PATCH(body: ProfileFormData): Promise<NextResponse> {
     )
   }
 
+  revalidatePath(ROUTE_PROFILE.PATH)
+
   return NextResponse.json(
     {
       success: true,
-      message: "Your profile has been updated!",
+      message: successMessage,
       data: {
         name: updatedUser.name,
         gender: updatedUser.gender,
         birthdate: updatedUser.birthdate,
         email: updatedUser.email,
+        pendingEmail: updatedUser.pendingEmail,
         username: updatedUser.username,
-        image: updatedUser.image
+        image: updatedUser.image,
+        status: updatedUser.status
       }
     },
     { status: 200 }

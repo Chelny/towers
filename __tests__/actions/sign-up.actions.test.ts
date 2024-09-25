@@ -2,6 +2,7 @@ import { Gender } from "@prisma/client"
 import { Mock } from "vitest"
 import { signUp } from "@/app/(auth)/sign-up/sign-up.actions"
 import { POST } from "@/app/api/sign-up/route"
+import { mockedFormInitialState } from "@/vitest.setup"
 
 vi.mock("@/app/api/sign-up/route", () => ({
   POST: vi.fn()
@@ -35,7 +36,7 @@ describe("Sign Up Actions", () => {
       json: async () => response
     })
 
-    const result = await signUp({}, formData)
+    const result = await signUp(mockedFormInitialState, formData)
 
     expect(POST).not.toHaveBeenCalled()
     expect(result).toEqual(response)
@@ -64,7 +65,7 @@ describe("Sign Up Actions", () => {
       json: async () => response
     })
 
-    const result = await signUp({}, formData)
+    const result = await signUp(mockedFormInitialState, formData)
 
     expect(POST).not.toHaveBeenCalled()
     expect(result).toEqual(response)
@@ -91,7 +92,7 @@ describe("Sign Up Actions", () => {
       json: async () => response
     })
 
-    const result = await signUp({}, formData)
+    const result = await signUp(mockedFormInitialState, formData)
 
     expect(POST).not.toHaveBeenCalled()
     expect(result).toEqual(response)
@@ -116,7 +117,7 @@ describe("Sign Up Actions", () => {
       json: async () => response
     })
 
-    const result = await signUp({}, formData)
+    const result = await signUp(mockedFormInitialState, formData)
 
     expect(POST).toHaveBeenCalledWith({
       name: "John Doe",

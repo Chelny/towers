@@ -20,6 +20,7 @@ model User {
   birthdate              DateTime?
   email                  String          @unique
   emailVerified          DateTime?
+  pendingEmail           String?
   username               String?         @unique
   password               String?
   image                  String?

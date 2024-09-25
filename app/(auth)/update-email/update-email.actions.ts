@@ -3,19 +3,19 @@
 import { NextResponse } from "next/server"
 import { Value, ValueError } from "@sinclair/typebox/value"
 import {
-  VerifyEmailFormData,
-  VerifyEmailFormErrorMessages,
-  verifyEmailSchema
-} from "@/app/(auth)/verify-email/verify-email.schema"
-import { PATCH } from "@/app/api/verify-email/route"
+  UpdateEmailFormData,
+  UpdateEmailFormErrorMessages,
+  updateEmailSchema
+} from "@/app/(auth)/update-email/update-email.schema"
+import { PATCH } from "@/app/api/update-email/route"
 
-export async function verifyEmail(prevState: ApiResponse, formData: FormData): Promise<ApiResponse> {
-  const rawFormData: VerifyEmailFormData = {
+export async function updateEmail(prevState: ApiResponse, formData: FormData): Promise<ApiResponse> {
+  const rawFormData: UpdateEmailFormData = {
     token: formData.get("token") as string
   }
 
-  const errors: ValueError[] = Array.from(Value.Errors(verifyEmailSchema, rawFormData))
-  const errorMessages: VerifyEmailFormErrorMessages = {}
+  const errors: ValueError[] = Array.from(Value.Errors(updateEmailSchema, rawFormData))
+  const errorMessages: UpdateEmailFormErrorMessages = {}
 
   for (const error of errors) {
     switch (error.path.replace("/", "")) {
@@ -23,7 +23,7 @@ export async function verifyEmail(prevState: ApiResponse, formData: FormData): P
         errorMessages.token = "The token is missing or invalid."
         break
       default:
-        console.error(`Verify Email Action: Unknown error at ${error.path}`)
+        console.error(`Update Email Action: Unknown error at ${error.path}`)
         break
     }
   }

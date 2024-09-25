@@ -5,7 +5,7 @@ import { SignUpFormData } from "@/app/(auth)/sign-up/sign-up.schema"
 import { getUserByEmail } from "@/data/user"
 import { sendVerificationEmail } from "@/lib/email"
 import prisma from "@/lib/prisma"
-import { generateVerificationToken } from "@/lib/token"
+import { generateEmailVerificationToken } from "@/lib/token"
 
 export async function POST(body: SignUpFormData): Promise<NextResponse> {
   const user: User | null = await getUserByEmail(body.email)
@@ -53,7 +53,7 @@ export async function POST(body: SignUpFormData): Promise<NextResponse> {
     )
   }
 
-  const token: VerificationToken | null = await generateVerificationToken(newUser.email)
+  const token: VerificationToken | null = await generateEmailVerificationToken(newUser.id, newUser.email)
 
   if (token) {
     await sendVerificationEmail(newUser.name, token.email, token.token)

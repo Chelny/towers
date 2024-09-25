@@ -1,6 +1,7 @@
 import { Mock } from "vitest"
 import { resetPassword } from "@/app/(auth)/reset-password/reset-password.actions"
 import { PATCH } from "@/app/api/reset-password/route"
+import { mockedFormInitialState } from "@/vitest.setup"
 
 vi.mock("@/app/api/reset-password/route", () => ({
   PATCH: vi.fn()
@@ -30,7 +31,7 @@ describe("Reset Password Actions", () => {
       json: async () => response
     })
 
-    const result = await resetPassword({}, formData)
+    const result = await resetPassword(mockedFormInitialState, formData)
 
     expect(PATCH).not.toHaveBeenCalled()
     expect(result).toEqual(response)
@@ -54,7 +55,7 @@ describe("Reset Password Actions", () => {
       json: async () => response
     })
 
-    const result = await resetPassword({}, formData)
+    const result = await resetPassword(mockedFormInitialState, formData)
 
     expect(PATCH).not.toHaveBeenCalled()
     expect(result).toEqual(response)
@@ -77,7 +78,7 @@ describe("Reset Password Actions", () => {
       json: async () => response
     })
 
-    const result = await resetPassword({}, formData)
+    const result = await resetPassword(mockedFormInitialState, formData)
 
     expect(PATCH).not.toHaveBeenCalled()
     expect(result).toEqual(response)
@@ -98,7 +99,7 @@ describe("Reset Password Actions", () => {
       json: async () => response
     })
 
-    const result = await resetPassword({}, formData)
+    const result = await resetPassword(mockedFormInitialState, formData)
 
     expect(PATCH).toHaveBeenCalledWith({
       token: "d457775d-9123-4922-84de-cf535a63484e",

@@ -1,13 +1,13 @@
 import { Mock } from "vitest"
-import { verifyEmail } from "@/app/(auth)/verify-email/verify-email.actions"
-import { PATCH } from "@/app/api/verify-email/route"
+import { updateEmail } from "@/app/(auth)/update-email/update-email.actions"
+import { PATCH } from "@/app/api/update-email/route"
 import { mockedFormInitialState } from "@/vitest.setup"
 
-vi.mock("@/app/api/verify-email/route", () => ({
+vi.mock("@/app/api/update-email/route", () => ({
   PATCH: vi.fn()
 }))
 
-describe("Verify Email Actions", () => {
+describe("Update Email Actions", () => {
   afterEach(() => {
     vi.restoreAllMocks()
   })
@@ -28,7 +28,7 @@ describe("Verify Email Actions", () => {
       json: async () => response
     })
 
-    const result = await verifyEmail(mockedFormInitialState, formData)
+    const result = await updateEmail(mockedFormInitialState, formData)
 
     expect(PATCH).not.toHaveBeenCalled()
     expect(result).toEqual(response)
@@ -38,13 +38,13 @@ describe("Verify Email Actions", () => {
     const formData = new FormData()
     formData.append("token", "YjY1ZWYwYzEtYWU2My00YWIwLTljZmQtMzcxYjdiY2UwODRifGNoZWxueTFAZXhhbXBsZS5kZXY=")
 
-    const response = { success: true, message: "The email has been verified!" }
+    const response = { success: true, message: "The email has been updated!" }
 
     ;(PATCH as Mock).mockResolvedValueOnce({
       json: async () => response
     })
 
-    const result = await verifyEmail(mockedFormInitialState, formData)
+    const result = await updateEmail(mockedFormInitialState, formData)
 
     expect(PATCH).toHaveBeenCalledWith({
       token: "YjY1ZWYwYzEtYWU2My00YWIwLTljZmQtMzcxYjdiY2UwODRifGNoZWxueTFAZXhhbXBsZS5kZXY="

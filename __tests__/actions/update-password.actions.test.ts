@@ -1,6 +1,7 @@
 import { Mock } from "vitest"
 import { password } from "@/app/(protected)/account/update-password/update-password.actions"
 import { PATCH } from "@/app/api/account/password/route"
+import { mockedFormInitialState } from "@/vitest.setup"
 
 vi.mock("@/app/api/account/password/route", () => ({
   PATCH: vi.fn()
@@ -30,7 +31,7 @@ describe("Update Password Actions", () => {
       json: async () => response
     })
 
-    const result = await password({}, formData)
+    const result = await password(mockedFormInitialState, formData)
 
     expect(PATCH).not.toHaveBeenCalled()
     expect(result).toEqual(response)
@@ -55,7 +56,7 @@ describe("Update Password Actions", () => {
       json: async () => response
     })
 
-    const result = await password({}, formData)
+    const result = await password(mockedFormInitialState, formData)
 
     expect(PATCH).not.toHaveBeenCalled()
     expect(result).toEqual(response)
@@ -76,7 +77,7 @@ describe("Update Password Actions", () => {
       json: async () => response
     })
 
-    const result = await password({}, formData)
+    const result = await password(mockedFormInitialState, formData)
 
     expect(PATCH).toHaveBeenCalledWith({
       currentPassword: "Password123!",

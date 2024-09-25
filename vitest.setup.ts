@@ -18,6 +18,12 @@ export const mockedRouter = {
   prefetch: vi.fn()
 }
 
+export const mockedFormInitialState = {
+  success: false,
+  message: "",
+  error: {}
+}
+
 /**
  * Next-auth Session States
  */
@@ -60,9 +66,10 @@ export const mockedUser1: User = {
   gender: Gender.M,
   birthdate: new Date("2000-01-01"),
   email: "john.doe@example.com",
+  emailVerified: new Date("2024-09-01"),
+  pendingEmail: null,
   username: "john.doe",
   password: "Password123!",
-  emailVerified: new Date("2024-09-01"),
   image: "https://example.com/avatar.jpg",
   language: "en",
   isOnline: true,
@@ -81,6 +88,7 @@ export const mockedUser2: User = {
   birthdate: new Date("1985-05-15"),
   email: "test_jane@example.dev",
   emailVerified: new Date(),
+  pendingEmail: null,
   username: "janesmith",
   password: "Password123!",
   image: null,
@@ -101,6 +109,7 @@ export const mockedUser3: User = {
   birthdate: new Date("2000-07-21"),
   email: "test_sam@example.dev",
   emailVerified: new Date(),
+  pendingEmail: null,
   username: "samlee",
   password: "Password123!",
   image: null,
@@ -121,6 +130,7 @@ export const mockedUser4: User = {
   birthdate: null,
   email: "test_chris@example.dev",
   emailVerified: new Date(),
+  pendingEmail: null,
   username: "chrisgreen",
   password: "Password123!",
   image: null,
@@ -141,6 +151,7 @@ export const mockedUser5: User = {
   birthdate: new Date("1992-02-28"),
   email: "test_patricia@example.dev",
   emailVerified: new Date(),
+  pendingEmail: null,
   username: "patwhite",
   password: "Password123!",
   image: null,

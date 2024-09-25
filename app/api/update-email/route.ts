@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server"
 import { User, UserStatus, VerificationToken } from "@prisma/client"
-import { VerifyEmailFormData } from "@/app/(auth)/verify-email/verify-email.schema"
-import { getUserByEmail } from "@/data/user"
+import { UpdateEmailFormData } from "@/app/(auth)/update-email/update-email.schema"
+import { getUserById } from "@/data/user"
 import { getVerificationTokenByIdTokenEmail } from "@/data/verification-token"
 import prisma from "@/lib/prisma"
 
-export async function PATCH(body: VerifyEmailFormData): Promise<NextResponse> {
+export async function PATCH(body: UpdateEmailFormData): Promise<NextResponse> {
   // Check token validity
   const token: VerificationToken | null = await getVerificationTokenByIdTokenEmail(body.token)
 
@@ -33,7 +33,7 @@ export async function PATCH(body: VerifyEmailFormData): Promise<NextResponse> {
   }
 
   // Validate user and token
-  const user: User | null = await getUserByEmail(token.email)
+  const user: User | null = await getUserById(token.identifier)
 
   if (!user) {
     return NextResponse.json(
@@ -48,8 +48,9 @@ export async function PATCH(body: VerifyEmailFormData): Promise<NextResponse> {
   await prisma.user.update({
     where: { id: user.id },
     data: {
-      emailVerified: new Date(),
       email: token.email,
+      emailVerified: new Date(),
+      pendingEmail: null,
       status: UserStatus.ACTIVE
     }
   })
@@ -66,7 +67,7 @@ export async function PATCH(body: VerifyEmailFormData): Promise<NextResponse> {
   return NextResponse.json(
     {
       success: true,
-      message: "The email has been verified!"
+      message: "The email has been updated!"
     },
     { status: 200 }
   )

@@ -3,16 +3,11 @@ import { Mock } from "vitest"
 import { signInWithMagicLink } from "@/app/(auth)/sign-in-with-magic-link/sign-in-with-magic-link.actions"
 import { signIn as authSignInWithMagicLink } from "@/auth"
 import { ROUTE_ROOMS } from "@/constants/routes"
+import { mockedFormInitialState } from "@/vitest.setup"
 
 vi.mock("@/auth")
 
 describe("Sign In With Magic Link Actions", () => {
-  const initialState = {
-    success: false,
-    message: "",
-    error: {}
-  }
-
   afterEach(() => {
     vi.restoreAllMocks()
   })
@@ -21,7 +16,7 @@ describe("Sign In With Magic Link Actions", () => {
     const formData = new FormData()
     formData.append("email", "")
 
-    const result = await signInWithMagicLink(initialState, formData)
+    const result = await signInWithMagicLink(mockedFormInitialState, formData)
 
     expect(result).toEqual({
       success: false,
@@ -36,7 +31,7 @@ describe("Sign In With Magic Link Actions", () => {
     const formData = new FormData()
     formData.append("email", "john.doe.com")
 
-    const result = await signInWithMagicLink(initialState, formData)
+    const result = await signInWithMagicLink(mockedFormInitialState, formData)
 
     expect(result).toEqual({
       success: false,
@@ -58,7 +53,7 @@ describe("Sign In With Magic Link Actions", () => {
     }
     ;(authSignInWithMagicLink as Mock).mockRejectedValueOnce(authError)
 
-    const result = await signInWithMagicLink(initialState, formData)
+    const result = await signInWithMagicLink(mockedFormInitialState, formData)
 
     expect(authSignInWithMagicLink).toHaveBeenCalledWith("resend", {
       email: "john.doe@example.com",
@@ -72,7 +67,7 @@ describe("Sign In With Magic Link Actions", () => {
     formData.append("email", "john.doe@example.com")
     ;(authSignInWithMagicLink as Mock).mockResolvedValueOnce({})
 
-    const result = await signInWithMagicLink(initialState, formData)
+    const result = await signInWithMagicLink(mockedFormInitialState, formData)
 
     expect(authSignInWithMagicLink).toHaveBeenCalledWith("resend", {
       email: "john.doe@example.com",

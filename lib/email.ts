@@ -1,7 +1,22 @@
 import { User } from "@prisma/client"
 import axios, { AxiosResponse } from "axios"
 import { Resend } from "resend"
-import { ROUTE_RESET_PASSWORD, ROUTE_VERIFY_EMAIL } from "@/constants/routes"
+import { ROUTE_RESET_PASSWORD, ROUTE_UPDATE_EMAIL, ROUTE_VERIFY_EMAIL } from "@/constants/routes"
+
+type SendVerificationRequestProps = {
+  identifier: string
+  provider: {
+    from: string
+    apiKey: string | undefined
+  }
+  url: string
+}
+
+type SendEmailProps = {
+  email: string
+  subject: string
+  body: string
+}
 
 const resend: Resend = new Resend(process.env.AUTH_RESEND_KEY)
 const brandColor: string = "#346df1"
@@ -47,15 +62,6 @@ const text = ({ url, host }: { url: string; host: string }): string => {
   return `Sign in to ${host}\n${url}\n\n`
 }
 
-type SendVerificationRequestProps = {
-  identifier: string
-  provider: {
-    from: string
-    apiKey: string | undefined
-  }
-  url: string
-}
-
 /**
  * Magic link email
  * @param params
@@ -91,13 +97,6 @@ export const sendVerificationRequest = async (params: SendVerificationRequestPro
     throw new Error("Resend error: " + JSON.stringify(response))
   }
 }
-
-type SendEmailProps = {
-  email: string
-  subject: string
-  body: string
-}
-
 const sendEmail = async ({ email, subject, body }: SendEmailProps): Promise<void> => {
   await resend.emails.send({
     from: process.env.EMAIL_FROM as string,
@@ -108,23 +107,19 @@ const sendEmail = async ({ email, subject, body }: SendEmailProps): Promise<void
 }
 
 export const sendVerificationEmail = async (name: string, email: string, token: string): Promise<void> => {
-  const encodedEmail: string = encodeURIComponent(email)
-  const confirmLink: string = `http://localhost:3000${ROUTE_VERIFY_EMAIL.PATH}?email=${encodedEmail}&token=${token}`
+  const verificationLink: string = `http://localhost:3000${ROUTE_VERIFY_EMAIL.PATH}?token=${token}`
 
   const body: string = `
     <p>Hi ${name},</p>
-    <p>Thank you for signing up! To complete your registration, please verify your email address by clicking the following link: <a href="${confirmLink}" style="color: ${color.link};">confirm email</a> or by copying and pasting the following URL in a browser:</p>
-
-    <p><a href="${confirmLink}" style="color: ${color.link};">${confirmLink}</a></p>
-
-    <p>Please note that the verification token will expire one hour after receiving this message.</p>
-
+    <p>Thank you for signing up! To complete your registration, please verify your email address by clicking the following link: <a href="${verificationLink}" style="color: ${color.link};">verify email</a> or by copying and pasting the following URL in a browser:</p>
+    <p><a href="${verificationLink}" style="color: ${color.link};">${verificationLink}</a></p>
+    <p>Please note that the verification token will expire 1 hour after receiving this message.</p>
     <p>If you did not sign up to our website or if you believe your account has been compromised, please contact our support team immediately.</p>
   `
 
   await sendEmail({
     email,
-    subject: "Confirm Your Email Address to Complete Registration",
+    subject: "Verify Your Email Address to Complete Registration",
     body
   })
 }
@@ -143,6 +138,24 @@ export const sendPasswordResetEmail = async (name: string, email: string, token:
   await sendEmail({
     email,
     subject: "Password Reset Request",
+    body
+  })
+}
+
+export const sendEmailChangeEmail = async (name: string, email: string, token: string): Promise<void> => {
+  const verificationLink: string = `http://localhost:3000${ROUTE_UPDATE_EMAIL.PATH}?token=${token}`
+
+  const body: string = `
+    <p>Hi ${name},</p>
+    <p>We’ve received an email change request for your account. You’ve entered ${email} as the email address for your Towers account. Please verify this email address by clicking link below:</p>
+    <p><a href="${verificationLink}" style="color: ${color.link};">Update Email</a></p>
+    <p>Please note that the verification token will expire 15 minutes after receiving this message.</p>
+    <p>If you did not make this change, your account might have been compromised, please contact our support team immediately.</p>
+  `
+
+  await sendEmail({
+    email,
+    subject: "Verify Your Email Address Change Request",
     body
   })
 }

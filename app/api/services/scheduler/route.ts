@@ -14,11 +14,15 @@ export async function POST(): Promise<NextResponse> {
       console.log("")
 
       await prisma.user.deleteMany({
-        where: {
-          deletionScheduledAt: {
-            lte: new Date()
-          }
-        }
+        where: { deletionScheduledAt: { lte: new Date() } }
+      })
+
+      await prisma.verificationToken.deleteMany({
+        where: { expires: { lte: new Date() } }
+      })
+
+      await prisma.passwordResetToken.deleteMany({
+        where: { expires: { lte: new Date() } }
       })
     })
 

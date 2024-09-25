@@ -1,8 +1,6 @@
 import { Type } from "@sinclair/typebox"
-import { EMAIL_PATTERN } from "@/constants/regex"
 
 export const verifyEmailSchema = Type.Object({
-  email: Type.RegExp(EMAIL_PATTERN),
   token: Type.String({ minLength: 1 })
 })
 
