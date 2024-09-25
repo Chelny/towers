@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: ROUTE_SIGN_IN_WITH_MAGIC_LINK.TITLE
 }
 
-export default function SignInPage(): ReactNode {
+export default function SignInWithMagicLinkPage(): ReactNode {
   return (
     <>
       <h2 className="mb-4 text-3xl">{ROUTE_SIGN_IN_WITH_MAGIC_LINK.TITLE}</h2>

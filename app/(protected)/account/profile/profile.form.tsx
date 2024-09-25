@@ -1,8 +1,9 @@
 "use client"
 
-import { FormEvent, ReactNode, useEffect } from "react"
+import { ClipboardEvent, FormEvent, ReactNode, useEffect, useState } from "react"
 import { useFormState, useFormStatus } from "react-dom"
-import { Account, Gender, User, UserStatus } from "@prisma/client"
+import { useRouter } from "next/navigation"
+import { Account, User, UserStatus } from "@prisma/client"
 import axios from "axios"
 import clsx from "clsx"
 import { IoWarning } from "react-icons/io5"
@@ -12,11 +13,12 @@ import AlertMessage from "@/components/ui/AlertMessage"
 import Button from "@/components/ui/Button"
 import Calendar from "@/components/ui/Calendar"
 import Input from "@/components/ui/Input"
-import RadioButtonGroup from "@/components/ui/RadioButtonGroup"
+import { ROUTE_ROOMS } from "@/constants/routes"
 import { useSessionData } from "@/hooks/useSessionData"
 
 type ProfileProps = {
   user: (Partial<User> & { accounts: Partial<Account>[] }) | null
+  isNewUser?: boolean
 }
 
 const initialState = {
@@ -25,19 +27,30 @@ const initialState = {
   error: {} as ProfileFormErrorMessages
 }
 
-export function ProfileForm({ user }: ProfileProps): ReactNode {
+export function ProfileForm({ user, isNewUser }: ProfileProps): ReactNode {
+  const router = useRouter()
   const { pending } = useFormStatus()
   const [state, formAction] = useFormState<ApiResponse<User>, FormData>(profile, initialState)
   const { update } = useSessionData()
+  const [isNewUserSuccess, setIsNewUserSuccess] = useState<boolean>(false)
 
   useEffect(() => {
-    if (state?.success && state?.data) {
-      update({
-        name: state?.data?.name,
-        email: state?.data?.email,
-        username: state?.data?.username,
-        image: state?.data?.image
-      })
+    if (state?.success) {
+      if (state?.data) {
+        update({
+          name: state?.data?.name,
+          email: state?.data?.email,
+          username: state?.data?.username,
+          image: state?.data?.image
+        })
+      }
+
+      if (isNewUser) {
+        setIsNewUserSuccess(true)
+        setTimeout(() => {
+          router.push(ROUTE_ROOMS.PATH)
+        }, 5000)
+      }
     }
   }, [state])
 
@@ -53,7 +66,12 @@ export function ProfileForm({ user }: ProfileProps): ReactNode {
 
   return (
     <form className="w-full" noValidate onSubmit={handleUpdateProfile}>
-      {state?.message && <AlertMessage type={state.success ? "success" : "error"}>{state.message}</AlertMessage>}
+      {state?.message && (
+        <AlertMessage type={state.success ? "success" : "error"}>
+          {state.message}
+          {isNewUserSuccess && " You will be redirected in 5 seconds..."}
+        </AlertMessage>
+      )}
       {/* <Input
         type="file"
         id="image"
@@ -73,25 +91,13 @@ export function ProfileForm({ user }: ProfileProps): ReactNode {
         dataTestId="profile-name-input"
         errorMessage={state?.error?.name}
       />
-      <RadioButtonGroup
-        id="gender"
-        label="Gender"
-        inline
-        defaultValue={String(user?.gender)}
-        dataTestId="profile-gender-radio-group"
-        errorMessage={state?.error?.gender}
-      >
-        <RadioButtonGroup.Option id="male" value={Gender.M} label="Male" />
-        <RadioButtonGroup.Option id="female" value={Gender.F} label="Female" />
-        <RadioButtonGroup.Option id="other" value={Gender.X} label="Other" />
-      </RadioButtonGroup>
       <Calendar
         id="birthdate"
         label="Birthdate"
-        maxDate={new Date(new Date().getFullYear() - 12, new Date().getMonth(), new Date().getDate())}
+        maxDate={new Date(new Date().getFullYear() - 13, new Date().getMonth(), new Date().getDate())}
         defaultValue={user?.birthdate ? String(new Date(user?.birthdate)) : undefined}
         dataTestId="profile-birthdate-calendar"
-        description="You must be at least 12 years old."
+        description="You must be at least 13 years old."
         errorMessage={state?.error?.birthdate}
       />
       <Input
@@ -103,6 +109,7 @@ export function ProfileForm({ user }: ProfileProps): ReactNode {
         required
         readOnly={typeof user?.accounts !== "undefined" && user?.accounts?.length > 0}
         dataTestId="profile-email-input"
+        onPaste={(event: ClipboardEvent<HTMLInputElement>) => event.preventDefault()}
         description={
           typeof user?.accounts !== "undefined" && user?.accounts?.length > 0
             ? `Email linked to your account can only be updated through ${user?.accounts[0]?.provider}.`
@@ -137,7 +144,7 @@ export function ProfileForm({ user }: ProfileProps): ReactNode {
         errorMessage={state?.error?.username}
       />
       <Button type="submit" className="w-full" disabled={pending} dataTestId="profile-submit-button">
-        Update Profile
+        {isNewUser ? "Complete Registration" : "Update Profile"}
       </Button>
     </form>
   )

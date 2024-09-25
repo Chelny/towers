@@ -1,7 +1,6 @@
 "use server"
 
 import { NextResponse } from "next/server"
-import { Gender } from "@prisma/client"
 import { Value, ValueError } from "@sinclair/typebox/value"
 import { SignUpFormData, SignUpFormErrorMessages, signUpSchema } from "@/app/(auth)/sign-up/sign-up.schema"
 import { POST } from "@/app/api/sign-up/route"
@@ -9,7 +8,6 @@ import { POST } from "@/app/api/sign-up/route"
 export async function signUp(prevState: ApiResponse, formData: FormData): Promise<ApiResponse> {
   const rawFormData: SignUpFormData = {
     name: formData.get("name") as string,
-    gender: formData.get("gender") as Gender,
     birthdate: formData.get("birthdate") as string,
     email: formData.get("email") as string,
     username: formData.get("username") as string,
@@ -24,11 +22,6 @@ export async function signUp(prevState: ApiResponse, formData: FormData): Promis
     switch (error.path.replace("/", "")) {
       case "name":
         errorMessages.name = "The name is invalid."
-        break
-      case "gender":
-        if (rawFormData.gender) {
-          errorMessages.gender = "The gender is invalid."
-        }
         break
       case "birthdate":
         if (rawFormData.birthdate) {

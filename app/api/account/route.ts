@@ -27,7 +27,6 @@ export async function GET(): Promise<NextResponse> {
     },
     select: {
       name: true,
-      gender: true,
       birthdate: true,
       email: true,
       username: true,

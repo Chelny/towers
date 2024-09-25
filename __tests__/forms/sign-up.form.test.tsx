@@ -27,9 +27,6 @@ describe("Sign Up Form", () => {
     render(<SignUpForm />)
 
     expect(screen.getByTestId("sign-up-name-input")).toBeInTheDocument()
-    expect(screen.getByTestId("sign-up-gender-radio-group-M")).toBeInTheDocument()
-    expect(screen.getByTestId("sign-up-gender-radio-group-F")).toBeInTheDocument()
-    expect(screen.getByTestId("sign-up-gender-radio-group-X")).toBeInTheDocument()
     expect(screen.getByTestId("sign-up-birthdate-calendar")).toBeInTheDocument()
     expect(screen.getByTestId("sign-up-email-input")).toBeInTheDocument()
     expect(screen.getByTestId("sign-up-username-input")).toBeInTheDocument()
@@ -42,9 +39,6 @@ describe("Sign Up Form", () => {
     render(<SignUpForm />)
 
     expect(screen.getByTestId("sign-up-name-input")).toHaveAttribute("required")
-    expect(screen.getByTestId("sign-up-gender-radio-group-M")).not.toHaveAttribute("required")
-    expect(screen.getByTestId("sign-up-gender-radio-group-F")).not.toHaveAttribute("required")
-    expect(screen.getByTestId("sign-up-gender-radio-group-X")).not.toHaveAttribute("required")
     expect(screen.getByTestId("sign-up-birthdate-calendar")).not.toHaveAttribute("required")
     expect(screen.getByTestId("sign-up-email-input")).toHaveAttribute("required")
     expect(screen.getByTestId("sign-up-username-input")).toHaveAttribute("required")

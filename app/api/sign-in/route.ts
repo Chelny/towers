@@ -17,9 +17,12 @@ export async function POST(body: SignInFormData): Promise<NextResponse> {
   // Check user status
   switch (user.status) {
     case UserStatus.PENDING_EMAIL_VERIFICATION:
-      throw new Error(
-        "Your email verification is pending. Please check your inbox and verify your email to activate your account."
-      )
+      if (!user.emailVerified) {
+        throw new Error(
+          "Your email verification is pending. Please check your inbox and verify your email to activate your account."
+        )
+      }
+      break
     case UserStatus.BANNED:
       throw new Error("The account has been banned. Please contact customer support for assistance.")
     case UserStatus.PENDING_DELETION:

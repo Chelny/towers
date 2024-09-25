@@ -1,4 +1,3 @@
-import { Gender } from "@prisma/client"
 import { Mock } from "vitest"
 import { profile } from "@/app/(protected)/account/profile/profile.actions"
 import { PATCH } from "@/app/api/account/profile/route"
@@ -41,7 +40,6 @@ describe("Profile Actions", () => {
   it("should return errors if required fields are invalid", async () => {
     const formData = new FormData()
     formData.append("name", "John Doe #1")
-    formData.append("gender", "1")
     formData.append("birthdate", "01/01/2000")
     formData.append("email", "john.doe@example")
     formData.append("username", "john.doe.")
@@ -50,7 +48,6 @@ describe("Profile Actions", () => {
       success: false,
       error: {
         name: "The name is invalid.",
-        gender: "The gender is invalid.",
         birthdate: "The birthdate is invalid.",
         email: "The email is invalid.",
         username: "The username is invalid."
@@ -70,7 +67,6 @@ describe("Profile Actions", () => {
   it("should call PATCH and return success when payload is valid", async () => {
     const formData = new FormData()
     formData.append("name", "John Doe")
-    formData.append("gender", Gender.M)
     formData.append("birthdate", "2000-01-01")
     formData.append("email", "john.doe@example.com")
     formData.append("username", "john.doe")
@@ -86,7 +82,6 @@ describe("Profile Actions", () => {
 
     expect(PATCH).toHaveBeenCalledWith({
       name: "John Doe",
-      gender: Gender.M,
       birthdate: "2000-01-01",
       email: "john.doe@example.com",
       username: "john.doe",

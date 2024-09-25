@@ -29,7 +29,6 @@ export async function GET(): Promise<NextResponse> {
     },
     select: {
       name: true,
-      gender: true,
       birthdate: true,
       email: true,
       pendingEmail: true,
@@ -102,7 +101,6 @@ export async function PATCH(body: ProfileFormData): Promise<NextResponse> {
 
   let userData: Partial<User> = {
     name: body.name,
-    gender: body.gender,
     birthdate: body.birthdate ? new Date(body.birthdate) : undefined,
     username: body.username,
     image: body.image
@@ -121,7 +119,6 @@ export async function PATCH(body: ProfileFormData): Promise<NextResponse> {
 
         userData = {
           ...userData,
-          emailVerified: null,
           pendingEmail: body.email,
           status: UserStatus.PENDING_EMAIL_VERIFICATION
         }
@@ -157,7 +154,6 @@ export async function PATCH(body: ProfileFormData): Promise<NextResponse> {
       message: successMessage,
       data: {
         name: updatedUser.name,
-        gender: updatedUser.gender,
         birthdate: updatedUser.birthdate,
         email: updatedUser.email,
         pendingEmail: updatedUser.pendingEmail,

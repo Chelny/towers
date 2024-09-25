@@ -4,7 +4,6 @@
 
 - Add localization
 - Add dark theme (?)
-- Redirects new OAuth users to new page where they can choose their username before redirecting to /rooms
 - Add predefined avatars or let users upload their picture
 - Sign in with passkey
 - Sign in with magic link

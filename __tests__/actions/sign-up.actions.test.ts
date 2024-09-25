@@ -1,4 +1,3 @@
-import { Gender } from "@prisma/client"
 import { Mock } from "vitest"
 import { signUp } from "@/app/(auth)/sign-up/sign-up.actions"
 import { POST } from "@/app/api/sign-up/route"
@@ -74,7 +73,6 @@ describe("Sign Up Actions", () => {
   it("should return error if passwords do not match", async () => {
     const formData = new FormData()
     formData.append("name", "John Doe")
-    formData.append("gender", Gender.M)
     formData.append("birthdate", "2000-01-01")
     formData.append("email", "john.doe@example.com")
     formData.append("username", "john.doe")
@@ -101,7 +99,6 @@ describe("Sign Up Actions", () => {
   it("should call POST and return success when payload is valid", async () => {
     const formData = new FormData()
     formData.append("name", "John Doe")
-    formData.append("gender", Gender.M)
     formData.append("birthdate", "2000-01-01")
     formData.append("email", "john.doe@example.com")
     formData.append("username", "john.doe")
@@ -121,7 +118,6 @@ describe("Sign Up Actions", () => {
 
     expect(POST).toHaveBeenCalledWith({
       name: "John Doe",
-      gender: Gender.M,
       birthdate: "2000-01-01",
       email: "john.doe@example.com",
       username: "john.doe",

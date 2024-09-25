@@ -1,9 +1,28 @@
 import { useFormState, useFormStatus } from "react-dom"
-import { Account, Gender, User } from "@prisma/client"
+import { Account, User } from "@prisma/client"
 import { render, screen } from "@testing-library/react"
+import { Mock } from "vitest"
 import { ProfileForm } from "@/app/(protected)/account/profile/profile.form"
 import { useSessionData } from "@/hooks/useSessionData"
 import { mockedUnauthenticatedSession, mockedUser1 } from "@/vitest.setup"
+
+const { useRouter, mockedRouterPush } = vi.hoisted(() => {
+  const mockedRouterPush: Mock = vi.fn()
+
+  return {
+    useRouter: () => ({ push: mockedRouterPush }),
+    mockedRouterPush
+  }
+})
+
+vi.mock("next/navigation", async () => {
+  const actual = await vi.importActual("next/navigation")
+
+  return {
+    ...actual,
+    useRouter
+  }
+})
 
 vi.mock("react-dom", () => ({
   useFormState: vi.fn(),
@@ -54,9 +73,6 @@ describe("Sign Up Form", () => {
     render(<ProfileForm user={user} />)
 
     expect(screen.getByTestId("profile-name-input")).toBeInTheDocument()
-    expect(screen.getByTestId("profile-gender-radio-group-M")).toBeInTheDocument()
-    expect(screen.getByTestId("profile-gender-radio-group-F")).toBeInTheDocument()
-    expect(screen.getByTestId("profile-gender-radio-group-X")).toBeInTheDocument()
     expect(screen.getByTestId("profile-birthdate-calendar")).toBeInTheDocument()
     expect(screen.getByTestId("profile-email-input")).toBeInTheDocument()
     expect(screen.getByTestId("profile-username-input")).toBeInTheDocument()
@@ -67,9 +83,6 @@ describe("Sign Up Form", () => {
     render(<ProfileForm user={user} />)
 
     expect(screen.getByTestId("profile-name-input")).toHaveAttribute("required")
-    expect(screen.getByTestId("profile-gender-radio-group-M")).not.toHaveAttribute("required")
-    expect(screen.getByTestId("profile-gender-radio-group-F")).not.toHaveAttribute("required")
-    expect(screen.getByTestId("profile-gender-radio-group-X")).not.toHaveAttribute("required")
     expect(screen.getByTestId("profile-birthdate-calendar")).not.toHaveAttribute("required")
     expect(screen.getByTestId("profile-email-input")).toHaveAttribute("required")
     expect(screen.getByTestId("profile-username-input")).toHaveAttribute("required")
@@ -142,7 +155,6 @@ describe("Sign Up Form", () => {
         data: {
           ...user,
           name: "Jane Doe",
-          gender: Gender.F,
           email: "jane.doe@example.com",
           username: "jane.doe"
         }

@@ -1,7 +1,7 @@
 "use server"
 
 import { NextResponse } from "next/server"
-import { Gender, User } from "@prisma/client"
+import { User } from "@prisma/client"
 import { Value, ValueError } from "@sinclair/typebox/value"
 import {
   ProfileFormData,
@@ -13,7 +13,6 @@ import { PATCH } from "@/app/api/account/profile/route"
 export async function profile(prevState: ApiResponse<User>, formData: FormData): Promise<ApiResponse<User>> {
   const rawFormData: ProfileFormData = {
     name: formData.get("name") as string,
-    gender: formData.get("gender") as Gender,
     birthdate: formData.get("birthdate") as string,
     email: formData.get("email") as string,
     username: formData.get("username") as string,
@@ -27,11 +26,6 @@ export async function profile(prevState: ApiResponse<User>, formData: FormData):
     switch (error.path.replace("/", "")) {
       case "name":
         errorMessages.name = "The name is invalid."
-        break
-      case "gender":
-        if (rawFormData.gender) {
-          errorMessages.gender = "The gender is invalid."
-        }
         break
       case "birthdate":
         if (rawFormData.birthdate) {

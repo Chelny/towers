@@ -1,6 +1,6 @@
 "use client"
 
-import { FormEvent, ReactNode } from "react"
+import { ClipboardEvent, FormEvent, ReactNode } from "react"
 import { useFormState, useFormStatus } from "react-dom"
 import { ReadonlyURLSearchParams, useSearchParams } from "next/navigation"
 import { resetPassword } from "@/app/(auth)/reset-password/reset-password.actions"
@@ -47,6 +47,7 @@ export function ResetPasswordForm(): ReactNode {
         autoComplete="off"
         required
         dataTestId="reset-password-confirm-password-input"
+        onPaste={(event: ClipboardEvent<HTMLInputElement>) => event.preventDefault()}
         errorMessage={state?.error?.confirmPassword}
       />
       <input

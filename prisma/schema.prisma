@@ -16,7 +16,6 @@ datasource db {
 model User {
   id                     String          @id @default(uuid())
   name                   String
-  gender                 Gender?
   birthdate              DateTime?
   email                  String          @unique
   emailVerified          DateTime?
@@ -257,12 +256,6 @@ model DirectMessage {
   updatedAt DateTime @updatedAt
   User1     User     @relation("DirectMessagesSent", fields: [userId1], references: [id])
   User2     User     @relation("DirectMessagesReceived", fields: [userId2], references: [id])
-}
-
-enum Gender {
-  M
-  F
-  X
 }
 
 enum UserStatus {

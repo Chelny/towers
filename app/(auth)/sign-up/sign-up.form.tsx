@@ -1,8 +1,7 @@
 "use client"
 
-import { FormEvent, ReactNode } from "react"
+import { ClipboardEvent, FormEvent, ReactNode } from "react"
 import { useFormState, useFormStatus } from "react-dom"
-import { Gender } from "@prisma/client"
 import { signUp } from "@/app/(auth)/sign-up/sign-up.actions"
 import { SignUpFormErrorMessages } from "@/app/(auth)/sign-up/sign-up.schema"
 import AlertMessage from "@/components/ui/AlertMessage"
@@ -38,23 +37,12 @@ export function SignUpForm(): ReactNode {
         dataTestId="sign-up-name-input"
         errorMessage={state?.error?.name}
       />
-      <RadioButtonGroup
-        id="gender"
-        label="Gender"
-        inline
-        dataTestId="sign-up-gender-radio-group"
-        errorMessage={state?.error?.gender}
-      >
-        <RadioButtonGroup.Option id="male" value={Gender.M} label="Male" />
-        <RadioButtonGroup.Option id="female" value={Gender.F} label="Female" />
-        <RadioButtonGroup.Option id="other" value={Gender.X} label="Other" />
-      </RadioButtonGroup>
       <Calendar
         id="birthdate"
         label="Birthdate"
-        maxDate={new Date(new Date().getFullYear() - 12, new Date().getMonth(), new Date().getDate())}
+        maxDate={new Date(new Date().getFullYear() - 13, new Date().getMonth(), new Date().getDate())}
         dataTestId="sign-up-birthdate-calendar"
-        description="You must be at least 12 years old."
+        description="You must be at least 13 years old."
         errorMessage={state?.error?.birthdate}
       />
       <Input
@@ -64,6 +52,7 @@ export function SignUpForm(): ReactNode {
         placeholder="Enter your email"
         required
         dataTestId="sign-up-email-input"
+        onPaste={(event: ClipboardEvent<HTMLInputElement>) => event.preventDefault()}
         errorMessage={state?.error?.email}
       />
       <hr className="mt-6 mb-4" />
@@ -94,6 +83,7 @@ export function SignUpForm(): ReactNode {
         autoComplete="off"
         required
         dataTestId="sign-up-confirm-password-input"
+        onPaste={(event: ClipboardEvent<HTMLInputElement>) => event.preventDefault()}
         errorMessage={state?.error?.confirmPassword}
       />
       <Button type="submit" className="w-full" disabled={pending || state.success} dataTestId="sign-up-submit-button">

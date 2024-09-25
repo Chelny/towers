@@ -1,4 +1,4 @@
-import { Gender, Room, RoomLevel, Table, TableType, TowersGameUser, User, UserStatus } from "@prisma/client"
+import { Room, RoomLevel, Table, TableType, TowersGameUser, User, UserStatus } from "@prisma/client"
 import "@testing-library/jest-dom"
 import { TSessionContextValue } from "@/context/session-context"
 import { BoardBlock } from "@/interfaces/game"
@@ -63,7 +63,6 @@ export const mockedAuthenticatedSession: TSessionContextValue = {
 export const mockedUser1: User = {
   id: "112dc46f-54cb-43f9-81fa-21080a4fb990",
   name: "John Doe",
-  gender: Gender.M,
   birthdate: new Date("2000-01-01"),
   email: "john.doe@example.com",
   emailVerified: new Date("2024-09-01"),
@@ -84,7 +83,6 @@ export const mockedUser1: User = {
 export const mockedUser2: User = {
   id: "6db799ae-bb22-4257-aed2-58788d3eb6fb",
   name: "Jane Smith",
-  gender: "F",
   birthdate: new Date("1985-05-15"),
   email: "test_jane@example.dev",
   emailVerified: new Date(),
@@ -105,7 +103,6 @@ export const mockedUser2: User = {
 export const mockedUser3: User = {
   id: "a20ec552-68a5-4734-9530-e16a5074150d",
   name: "Sam Lee",
-  gender: "X",
   birthdate: new Date("2000-07-21"),
   email: "test_sam@example.dev",
   emailVerified: new Date(),
@@ -126,7 +123,6 @@ export const mockedUser3: User = {
 export const mockedUser4: User = {
   id: "5d6c6316-8edb-4556-90e0-65fe61dd6d5c",
   name: "Chris Green",
-  gender: null,
   birthdate: null,
   email: "test_chris@example.dev",
   emailVerified: new Date(),
@@ -147,7 +143,6 @@ export const mockedUser4: User = {
 export const mockedUser5: User = {
   id: "cd6b72cb-ab7b-4405-b43d-126b620d4e0e",
   name: "Patricia White",
-  gender: "F",
   birthdate: new Date("1992-02-28"),
   email: "test_patricia@example.dev",
   emailVerified: new Date(),

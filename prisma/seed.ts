@@ -1,4 +1,4 @@
-import { Gender, RoomLevel, TableType, UserStatus } from "@prisma/client"
+import { RoomLevel, TableType, UserStatus } from "@prisma/client"
 import { parseArgs } from "node:util"
 import prisma from "@/lib/prisma"
 
@@ -22,21 +22,18 @@ async function main() {
         name: "John Doe",
         email: "test_john@example.dev",
         username: "johndoe",
-        gender: Gender.M,
         birthdate: new Date("1990-01-01")
       },
       {
         name: "Jane Smith",
         email: "test_jane@example.dev",
         username: "janesmith",
-        gender: Gender.F,
         birthdate: new Date("1985-05-15")
       },
       {
         name: "Sam Lee",
         email: "test_sam@example.dev",
         username: "samlee",
-        gender: Gender.X,
         birthdate: new Date("2000-07-21")
       },
       {

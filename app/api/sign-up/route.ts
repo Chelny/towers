@@ -35,7 +35,6 @@ export async function POST(body: SignUpFormData): Promise<NextResponse> {
   const newUser: User = await prisma.user.create({
     data: {
       name: body.name,
-      gender: body.gender,
       birthdate: body.birthdate ? new Date(body.birthdate) : undefined,
       email: body.email,
       username: body.username,

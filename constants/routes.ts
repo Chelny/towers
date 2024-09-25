@@ -1,5 +1,6 @@
 export const ROUTE_HOME = { TITLE: "Home", PATH: "/" }
 export const ROUTE_SIGN_UP = { TITLE: "Sign Up", PATH: "/sign-up" }
+export const ROUTE_NEW_USER = { TITLE: "Complete Your Profile", PATH: "/new-user" }
 export const ROUTE_VERIFY_EMAIL = { TITLE: "Verify Email", PATH: "/verify-email" }
 export const ROUTE_FORGOT_PASSWORD = { TITLE: "Forgot Password", PATH: "/forgot-password" }
 export const ROUTE_RESET_PASSWORD = { TITLE: "Reset Password", PATH: "/reset-password" }
@@ -28,6 +29,7 @@ export const PUBLIC_ROUTES = [
 
 export const PROTECTED_ROUTES = [
   ROUTE_HOME.PATH,
+  ROUTE_NEW_USER.PATH,
   ROUTE_ACCOUNT.PATH,
   ROUTE_PROFILE.PATH,
   ROUTE_UPDATE_PASSWORD.PATH,

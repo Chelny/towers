@@ -1,6 +1,6 @@
 "use client"
 
-import { FormEvent, ReactNode, useEffect, useRef } from "react"
+import { ClipboardEvent, FormEvent, ReactNode, useEffect, useRef } from "react"
 import { useFormState, useFormStatus } from "react-dom"
 import { password } from "@/app/(protected)/account/update-password/update-password.actions"
 import { UpdatePasswordFormErrorMessages } from "@/app/(protected)/account/update-password/update-password.schema"
@@ -76,6 +76,7 @@ export function UpdatePasswordForm(): ReactNode {
           autoComplete="off"
           required
           dataTestId="update-password-confirm-new-password-input"
+          onPaste={(event: ClipboardEvent<HTMLInputElement>) => event.preventDefault()}
           errorMessage={state?.error?.confirmNewPassword}
         />
       </>
