@@ -6,7 +6,6 @@
 - Add dark theme (?)
 - Add predefined avatars or let users upload their picture
 - Sign in with passkey
-- Sign in with magic link
 - Double check account deletion date (timezone) in email
 
 ## Rooms List

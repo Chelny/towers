@@ -52,10 +52,10 @@ export async function POST(body: SignUpFormData): Promise<NextResponse> {
     )
   }
 
-  const token: VerificationToken | null = await generateEmailVerificationToken(newUser.id, newUser.email)
+  const token: VerificationToken | null = await generateEmailVerificationToken(newUser.id)
 
   if (token) {
-    await sendVerificationEmail(newUser.name, token.email, token.token)
+    await sendVerificationEmail(newUser.name, body.email, token.token)
   }
 
   return NextResponse.json(

@@ -10,7 +10,7 @@ import Google from "next-auth/providers/google"
 // import Passkey from "next-auth/providers/passkey"
 import Resend from "next-auth/providers/resend"
 import { POST } from "@/app/api/sign-in/route"
-import { ROUTE_AUTH_ERROR, ROUTE_NEW_USER, ROUTE_SIGN_IN } from "@/constants/routes"
+import { ROUTE_AUTH_ERROR, ROUTE_NEW_USER, ROUTE_SIGN_IN, ROUTE_VERIFY_REQUEST } from "@/constants/routes"
 import { sendVerificationRequest } from "@/lib/email"
 import { getLocation } from "@/lib/geolocation"
 import prisma from "@/lib/prisma"
@@ -31,8 +31,8 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     Resend({
       apiKey: process.env.AUTH_RESEND_KEY,
       from: process.env.EMAIL_FROM,
-      sendVerificationRequest({ identifier: email, url, provider: { from, apiKey } }) {
-        sendVerificationRequest({ identifier: email, provider: { from, apiKey }, url })
+      sendVerificationRequest({ identifier, url, provider: { from, apiKey } }) {
+        sendVerificationRequest({ identifier, provider: { from, apiKey }, url })
       }
     }),
     Credentials({
@@ -202,6 +202,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
   pages: {
     newUser: ROUTE_NEW_USER.PATH,
     signIn: ROUTE_SIGN_IN.PATH,
+    verifyRequest: ROUTE_VERIFY_REQUEST.PATH,
     error: ROUTE_AUTH_ERROR.PATH
   }
   // experimental: { enableWebAuthn: true },

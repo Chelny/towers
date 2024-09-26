@@ -1,9 +1,9 @@
 import { Mock } from "vitest"
-import { updateEmail } from "@/app/(auth)/update-email/update-email.actions"
-import { PATCH } from "@/app/api/update-email/route"
+import { confirmEmailChange } from "@/app/(auth)/confirm-email-change/confirm-email-change.actions"
+import { PATCH } from "@/app/api/confirm-email-change/route"
 import { mockedFormInitialState } from "@/vitest.setup"
 
-vi.mock("@/app/api/update-email/route", () => ({
+vi.mock("@/app/api/confirm-email-change/route", () => ({
   PATCH: vi.fn()
 }))
 
@@ -28,7 +28,7 @@ describe("Update Email Actions", () => {
       json: async () => response
     })
 
-    const result = await updateEmail(mockedFormInitialState, formData)
+    const result = await confirmEmailChange(mockedFormInitialState, formData)
 
     expect(PATCH).not.toHaveBeenCalled()
     expect(result).toEqual(response)
@@ -44,7 +44,7 @@ describe("Update Email Actions", () => {
       json: async () => response
     })
 
-    const result = await updateEmail(mockedFormInitialState, formData)
+    const result = await confirmEmailChange(mockedFormInitialState, formData)
 
     expect(PATCH).toHaveBeenCalledWith({
       token: "YjY1ZWYwYzEtYWU2My00YWIwLTljZmQtMzcxYjdiY2UwODRifGNoZWxueTFAZXhhbXBsZS5kZXY="

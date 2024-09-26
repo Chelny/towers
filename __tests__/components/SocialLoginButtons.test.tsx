@@ -8,22 +8,11 @@ vi.mock("next-auth/react", () => ({
 }))
 
 describe("SocialLoginButtons Component", () => {
-  it("should render Google and GitHub login buttons", () => {
+  it("should render GitHub and Google login buttons", () => {
     render(<SocialLoginButtons disabled={false} />)
 
-    expect(screen.getByText("Login with Google")).toBeInTheDocument()
     expect(screen.getByText("Login with GitHub")).toBeInTheDocument()
-  })
-
-  it("should call signIn with Google when Google button is clicked", () => {
-    render(<SocialLoginButtons disabled={false} />)
-
-    const googleButton: HTMLButtonElement = screen.getByTestId("sign-in-google-button")
-    fireEvent.click(googleButton)
-
-    expect(signIn).toHaveBeenCalledWith("google", {
-      callbackUrl: ROUTE_ROOMS.PATH
-    })
+    expect(screen.getByText("Login with Google")).toBeInTheDocument()
   })
 
   it("should call signIn with GitHub when GitHub button is clicked", () => {
@@ -37,11 +26,22 @@ describe("SocialLoginButtons Component", () => {
     })
   })
 
+  it("should call signIn with Google when Google button is clicked", () => {
+    render(<SocialLoginButtons disabled={false} />)
+
+    const googleButton: HTMLButtonElement = screen.getByTestId("sign-in-google-button")
+    fireEvent.click(googleButton)
+
+    expect(signIn).toHaveBeenCalledWith("google", {
+      callbackUrl: ROUTE_ROOMS.PATH
+    })
+  })
+
   it("should disable the buttons when disabled prop is true", () => {
     render(<SocialLoginButtons disabled={true} />)
 
-    const googleButton: HTMLButtonElement = screen.getByTestId("sign-in-google-button")
     const githubButton: HTMLButtonElement = screen.getByTestId("sign-in-github-button")
+    const googleButton: HTMLButtonElement = screen.getByTestId("sign-in-google-button")
 
     expect(googleButton).toBeDisabled()
     expect(githubButton).toBeDisabled()

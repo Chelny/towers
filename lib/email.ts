@@ -1,7 +1,7 @@
 import { User } from "@prisma/client"
-import axios, { AxiosResponse } from "axios"
+import axios from "axios"
 import { Resend } from "resend"
-import { ROUTE_RESET_PASSWORD, ROUTE_UPDATE_EMAIL, ROUTE_VERIFY_EMAIL } from "@/constants/routes"
+import { ROUTE_CONFIRM_EMAIL_CHANGE, ROUTE_RESET_PASSWORD, ROUTE_VERIFY_EMAIL } from "@/constants/routes"
 
 type SendVerificationRequestProps = {
   identifier: string
@@ -26,7 +26,7 @@ const color: Record<string, string> = {
   mainBackground: "#fff",
   buttonBackground: brandColor,
   buttonBorder: brandColor,
-  buttonText: "#fff"
+  buttonText: "#444"
 }
 
 const html = (subject: string, body: string): string => {
@@ -71,7 +71,7 @@ export const sendVerificationRequest = async (params: SendVerificationRequestPro
   const { host } = new URL(url)
   const escapedHost: string = host.replace(/\./g, "&#8203;.")
 
-  const response: AxiosResponse = await axios({
+  await axios({
     method: "POST",
     url: "https://api.resend.com/emails",
     headers: {
@@ -92,11 +92,8 @@ export const sendVerificationRequest = async (params: SendVerificationRequestPro
       text: text({ url, host })
     }
   })
-
-  if (response.status !== 201) {
-    throw new Error("Resend error: " + JSON.stringify(response))
-  }
 }
+
 const sendEmail = async ({ email, subject, body }: SendEmailProps): Promise<void> => {
   await resend.emails.send({
     from: process.env.EMAIL_FROM as string,
@@ -143,7 +140,7 @@ export const sendPasswordResetEmail = async (name: string, email: string, token:
 }
 
 export const sendEmailChangeEmail = async (name: string, email: string, token: string): Promise<void> => {
-  const verificationLink: string = `http://localhost:3000${ROUTE_UPDATE_EMAIL.PATH}?token=${token}`
+  const verificationLink: string = `http://localhost:3000${ROUTE_CONFIRM_EMAIL_CHANGE.PATH}?token=${token}`
 
   const body: string = `
     <p>Hi ${name},</p>

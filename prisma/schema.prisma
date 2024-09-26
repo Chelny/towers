@@ -76,7 +76,6 @@ model Session {
 model VerificationToken {
   id         String   @id @default(uuid())
   identifier String
-  email      String
   token      String
   expires    DateTime
   createdAt  DateTime @default(now())

@@ -111,11 +111,11 @@ export async function PATCH(body: ProfileFormData): Promise<NextResponse> {
   // Do not let third-party users change their email
   if (session.account?.provider === "credentials") {
     if (user.email !== body.email) {
-      const token: VerificationToken | null = await generateEmailChangeVerificationToken(user.id, body.email)
+      const token: VerificationToken | null = await generateEmailChangeVerificationToken(session.user.id)
 
       if (token) {
         // Send email verification
-        await sendEmailChangeEmail(body.name, token.email, token.token)
+        await sendEmailChangeEmail(body.name, body.email, token.token)
 
         userData = {
           ...userData,

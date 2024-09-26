@@ -57,7 +57,6 @@ export async function signInWithMagicLink(prevState: ApiResponse, formData: Form
 
   return {
     success: false,
-    message: "",
     error: errorMessages
   }
 }

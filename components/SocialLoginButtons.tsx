@@ -1,7 +1,6 @@
 "use client"
 
 import { ReactNode } from "react"
-import clsx from "clsx/lite"
 import { signIn } from "next-auth/react"
 import { FaGithub } from "react-icons/fa6"
 import { FcGoogle } from "react-icons/fc"
@@ -20,17 +19,7 @@ export function SocialLoginButtons({ disabled }: SocialLoginButtonsProps): React
   }
 
   return (
-    <div className={clsx("flex flex-col w-full gap-4", "md:flex-row md:gap-2")}>
-      <Button
-        type="button"
-        className="flex justify-center items-center w-full gap-x-2"
-        disabled={disabled}
-        dataTestId="sign-in-google-button"
-        onClick={() => handleClick("google")}
-      >
-        <FcGoogle className="w-5 h-5" />
-        <span>Login with Google</span>
-      </Button>
+    <div className="flex flex-col w-full gap-4">
       <Button
         type="button"
         className="flex justify-center items-center w-full gap-x-2"
@@ -40,6 +29,16 @@ export function SocialLoginButtons({ disabled }: SocialLoginButtonsProps): React
       >
         <FaGithub className="w-5 h-5" />
         <span>Login with GitHub</span>
+      </Button>
+      <Button
+        type="button"
+        className="flex justify-center items-center w-full gap-x-2"
+        disabled={disabled}
+        dataTestId="sign-in-google-button"
+        onClick={() => handleClick("google")}
+      >
+        <FcGoogle className="w-5 h-5" />
+        <span>Login with Google</span>
       </Button>
     </div>
   )

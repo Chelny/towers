@@ -8,14 +8,11 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
   // Do not let third-party users send an email
   if (data.user.accounts?.length === 0) {
-    const token: VerificationToken | null = await generateEmailChangeVerificationToken(
-      data.user.id,
-      data.user.pendingEmail
-    )
+    const token: VerificationToken | null = await generateEmailChangeVerificationToken(data.user.id)
 
     if (token) {
       // Send email verification
-      await sendEmailChangeEmail(data.user.name, token.email, token.token)
+      await sendEmailChangeEmail(data.user.name, data.user.email, token.token)
     }
   }
 

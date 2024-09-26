@@ -35,7 +35,7 @@ export function SignInWithMagicLinkForm(): ReactNode {
         errorMessage={state?.error?.email}
       />
       <Button type="submit" className="w-full" disabled={pending} dataTestId="sign-in-with-magic-link-submit-button">
-        Sign In With Magic Link
+        Email Me A Sign In Link
       </Button>
     </form>
   )

@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server"
 import { User, UserStatus, VerificationToken } from "@prisma/client"
 import { VerifyEmailFormData } from "@/app/(auth)/verify-email/verify-email.schema"
-import { getUserByEmail } from "@/data/user"
-import { getVerificationTokenByIdTokenEmail } from "@/data/verification-token"
+import { getUserById } from "@/data/user"
+import { getVerificationTokenByIdentifierToken } from "@/data/verification-token"
 import prisma from "@/lib/prisma"
 
 export async function PATCH(body: VerifyEmailFormData): Promise<NextResponse> {
   // Check token validity
-  const token: VerificationToken | null = await getVerificationTokenByIdTokenEmail(body.token)
+  const token: VerificationToken | null = await getVerificationTokenByIdentifierToken(body.token)
 
   if (!token) {
     return NextResponse.json(
@@ -33,7 +33,7 @@ export async function PATCH(body: VerifyEmailFormData): Promise<NextResponse> {
   }
 
   // Validate user and token
-  const user: User | null = await getUserByEmail(token.email)
+  const user: User | null = await getUserById(token.identifier)
 
   if (!user) {
     return NextResponse.json(
@@ -49,7 +49,6 @@ export async function PATCH(body: VerifyEmailFormData): Promise<NextResponse> {
     where: { id: user.id },
     data: {
       emailVerified: new Date(),
-      email: token.email,
       status: UserStatus.ACTIVE
     }
   })

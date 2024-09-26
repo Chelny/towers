@@ -64,16 +64,15 @@ export function SignInForm(): ReactNode {
         <hr className="flex-1 h-0 ml-4 border border-t-neutral-200" />
       </div>
       <div className="space-y-4">
-        <SocialLoginButtons disabled={pending} />
-        {/* TODO: Test other login methods + Update related test suites */}
-        {/* <Button
+        <Button
           className="w-full"
           disabled={pending}
           dataTestId="sign-in-magic-link-button"
           onClick={handleSignInWithMagicLink}
         >
           Sign In With Magic Link
-        </Button> */}
+        </Button>
+        {/* TODO: The WebAuthn / Passkeys provider is experimental and not yet recommended for production use. */}
         {/* {status === "authenticated" ? (
           <Button
             className="w-full"
@@ -93,6 +92,7 @@ export function SignInForm(): ReactNode {
             Sign In With Passkey
           </Button>
         ) : null} */}
+        <SocialLoginButtons disabled={pending} />
       </div>
     </form>
   )

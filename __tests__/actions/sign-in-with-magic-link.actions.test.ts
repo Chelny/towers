@@ -20,7 +20,6 @@ describe("Sign In With Magic Link Actions", () => {
 
     expect(result).toEqual({
       success: false,
-      message: "",
       error: {
         email: "The email is invalid."
       }
@@ -35,7 +34,6 @@ describe("Sign In With Magic Link Actions", () => {
 
     expect(result).toEqual({
       success: false,
-      message: "",
       error: {
         email: "The email is invalid."
       }

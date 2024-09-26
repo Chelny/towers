@@ -1,22 +1,18 @@
 import { PasswordResetToken, User, VerificationToken } from "@prisma/client"
-import { v4 as uuidv4 } from "uuid"
-import { getUserByEmail, getUserById } from "@/data/user"
-import { getVerificationTokenByEmail } from "@/data/verification-token"
+import { getUserById } from "@/data/user"
+import { getVerificationTokenByIdentifierToken } from "@/data/verification-token"
 import prisma from "@/lib/prisma"
 
-export const generateEmailVerificationToken = async (
-  userId: string,
-  email: string
-): Promise<VerificationToken | null> => {
-  const user: User | null = await getUserByEmail(email)
+export const generateEmailVerificationToken = async (userId: string): Promise<VerificationToken | null> => {
+  const user: User | null = await getUserById(userId)
 
   if (!user) {
     return null
   }
 
-  const generatedToken: string = Buffer.from(`${userId}|${email}`).toString("base64")
+  const generatedToken: string = Buffer.from(userId).toString("base64")
   const expires: Date = new Date(new Date().getTime() + 60 * 60 * 1000) // 1 hour
-  const token: VerificationToken | null = await getVerificationTokenByEmail(email)
+  const token: VerificationToken | null = await getVerificationTokenByIdentifierToken(generatedToken)
 
   if (token) {
     await prisma.verificationToken.delete({
@@ -32,7 +28,6 @@ export const generateEmailVerificationToken = async (
   return await prisma.verificationToken.create({
     data: {
       identifier: user.id,
-      email,
       token: generatedToken,
       expires
     }
@@ -40,12 +35,14 @@ export const generateEmailVerificationToken = async (
 }
 
 export const generatePasswordResetToken = async (email: string): Promise<PasswordResetToken> => {
-  const generatedToken: string = uuidv4()
+  const generatedToken: string = Buffer.from(email).toString("base64")
   const expires: Date = new Date(new Date().getTime() + 3600 * 1000) // 1 hour
-  const token: VerificationToken | null = await getVerificationTokenByEmail(email)
+  const token: VerificationToken | null = await getVerificationTokenByIdentifierToken(generatedToken)
 
   if (token) {
-    await prisma.passwordResetToken.delete({ where: { id: token.identifier } })
+    await prisma.passwordResetToken.delete({
+      where: { id: token.identifier }
+    })
   }
 
   return await prisma.passwordResetToken.create({
@@ -57,25 +54,16 @@ export const generatePasswordResetToken = async (email: string): Promise<Passwor
   })
 }
 
-/**
- *
- * @param userId
- * @param email New email
- * @returns
- */
-export const generateEmailChangeVerificationToken = async (
-  userId: string,
-  email: string
-): Promise<VerificationToken | null> => {
+export const generateEmailChangeVerificationToken = async (userId: string): Promise<VerificationToken | null> => {
   const user: User | null = await getUserById(userId)
 
   if (!user) {
     return null
   }
 
-  const generatedToken: string = Buffer.from(`${userId}|${email}`).toString("base64")
+  const generatedToken: string = Buffer.from(userId).toString("base64")
   const expires: Date = new Date(new Date().getTime() + 15 * 60 * 1000) // 15 minutes
-  const token: VerificationToken | null = await getVerificationTokenByEmail(email)
+  const token: VerificationToken | null = await getVerificationTokenByIdentifierToken(generatedToken)
 
   if (token) {
     await prisma.verificationToken.delete({
@@ -91,7 +79,6 @@ export const generateEmailChangeVerificationToken = async (
   return await prisma.verificationToken.create({
     data: {
       identifier: user.id,
-      email,
       token: generatedToken,
       expires
     }

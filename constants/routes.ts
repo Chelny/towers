@@ -5,11 +5,12 @@ export const ROUTE_VERIFY_EMAIL = { TITLE: "Verify Email", PATH: "/verify-email"
 export const ROUTE_FORGOT_PASSWORD = { TITLE: "Forgot Password", PATH: "/forgot-password" }
 export const ROUTE_RESET_PASSWORD = { TITLE: "Reset Password", PATH: "/reset-password" }
 export const ROUTE_SIGN_IN = { TITLE: "Sign In", PATH: "/sign-in" }
-export const ROUTE_SIGN_IN_WITH_MAGIC_LINK = { TITLE: "Sign In With Email", PATH: "/sign-in-with-magic-link" }
+export const ROUTE_SIGN_IN_WITH_MAGIC_LINK = { TITLE: "Sign In With Magic Link", PATH: "/sign-in-with-magic-link" }
+export const ROUTE_VERIFY_REQUEST = { TITLE: "Check Your Email", PATH: "/verify-request" }
 export const ROUTE_AUTH_ERROR = { TITLE: "Error", PATH: "/error" }
 export const ROUTE_ACCOUNT = { TITLE: "Account", PATH: "/account" }
 export const ROUTE_PROFILE = { TITLE: "Profile", PATH: `${ROUTE_ACCOUNT.PATH}/profile` }
-export const ROUTE_UPDATE_EMAIL = { TITLE: "Update Email", PATH: "/update-email" }
+export const ROUTE_CONFIRM_EMAIL_CHANGE = { TITLE: "Confirm Email Change", PATH: "/confirm-email-change" }
 export const ROUTE_UPDATE_PASSWORD = { TITLE: "Update Password", PATH: `${ROUTE_ACCOUNT.PATH}/update-password` }
 export const ROUTE_ROOMS = { TITLE: "Rooms", PATH: "/rooms" }
 export const ROUTE_TOWERS = { TITLE: "Towers", PATH: "/towers" }
@@ -24,6 +25,7 @@ export const PUBLIC_ROUTES = [
   ROUTE_RESET_PASSWORD.PATH,
   ROUTE_SIGN_IN.PATH,
   ROUTE_SIGN_IN_WITH_MAGIC_LINK.PATH,
+  ROUTE_VERIFY_REQUEST.PATH,
   ROUTE_AUTH_ERROR.PATH
 ]
 

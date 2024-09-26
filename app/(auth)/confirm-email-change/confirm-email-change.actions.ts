@@ -3,19 +3,19 @@
 import { NextResponse } from "next/server"
 import { Value, ValueError } from "@sinclair/typebox/value"
 import {
-  UpdateEmailFormData,
-  UpdateEmailFormErrorMessages,
-  updateEmailSchema
-} from "@/app/(auth)/update-email/update-email.schema"
-import { PATCH } from "@/app/api/update-email/route"
+  ConfirmEmailChangeFormData,
+  ConfirmEmailChangeFormErrorMessages,
+  confirmEmailChangeSchema
+} from "@/app/(auth)/confirm-email-change/confirm-email-change.schema"
+import { PATCH } from "@/app/api/confirm-email-change/route"
 
-export async function updateEmail(prevState: ApiResponse, formData: FormData): Promise<ApiResponse> {
-  const rawFormData: UpdateEmailFormData = {
+export async function confirmEmailChange(prevState: ApiResponse, formData: FormData): Promise<ApiResponse> {
+  const rawFormData: ConfirmEmailChangeFormData = {
     token: formData.get("token") as string
   }
 
-  const errors: ValueError[] = Array.from(Value.Errors(updateEmailSchema, rawFormData))
-  const errorMessages: UpdateEmailFormErrorMessages = {}
+  const errors: ValueError[] = Array.from(Value.Errors(confirmEmailChangeSchema, rawFormData))
+  const errorMessages: ConfirmEmailChangeFormErrorMessages = {}
 
   for (const error of errors) {
     switch (error.path.replace("/", "")) {

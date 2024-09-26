@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server"
 import { User, UserStatus, VerificationToken } from "@prisma/client"
-import { UpdateEmailFormData } from "@/app/(auth)/update-email/update-email.schema"
+import { ConfirmEmailChangeFormData } from "@/app/(auth)/confirm-email-change/confirm-email-change.schema"
 import { getUserById } from "@/data/user"
-import { getVerificationTokenByIdTokenEmail } from "@/data/verification-token"
+import { getVerificationTokenByIdentifierToken } from "@/data/verification-token"
 import prisma from "@/lib/prisma"
 
-export async function PATCH(body: UpdateEmailFormData): Promise<NextResponse> {
+export async function PATCH(body: ConfirmEmailChangeFormData): Promise<NextResponse> {
   // Check token validity
-  const token: VerificationToken | null = await getVerificationTokenByIdTokenEmail(body.token)
+  const token: VerificationToken | null = await getVerificationTokenByIdentifierToken(body.token)
 
   if (!token) {
     return NextResponse.json(
@@ -45,15 +45,17 @@ export async function PATCH(body: UpdateEmailFormData): Promise<NextResponse> {
     )
   }
 
-  await prisma.user.update({
-    where: { id: user.id },
-    data: {
-      email: token.email,
-      emailVerified: new Date(),
-      pendingEmail: null,
-      status: UserStatus.ACTIVE
-    }
-  })
+  if (user.pendingEmail) {
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        email: user.pendingEmail,
+        emailVerified: new Date(),
+        pendingEmail: null,
+        status: UserStatus.ACTIVE
+      }
+    })
+  }
 
   await prisma.verificationToken.delete({
     where: {

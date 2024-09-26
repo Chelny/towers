@@ -1,7 +1,7 @@
 import { useFormState, useFormStatus } from "react-dom"
 import { render, screen } from "@testing-library/react"
 import { Mock } from "vitest"
-import { UpdateEmailForm } from "@/app/(auth)/update-email/update-email.form"
+import { ConfirmEmailChangeForm } from "@/app/(auth)/confirm-email-change/confirm-email-change.form"
 
 const { useRouter, mockedRouterPush, useSearchParams, mockedSearchParams } = vi.hoisted(() => {
   const mockedRouterPush: Mock = vi.fn()
@@ -61,10 +61,10 @@ describe("Update Email Form", () => {
   })
 
   it("should render the form with all elements", () => {
-    render(<UpdateEmailForm />)
+    render(<ConfirmEmailChangeForm />)
 
-    expect(screen.getByTestId("update-email-spinner-icon")).toBeInTheDocument()
-    expect(screen.getByTestId("update-email-token-input")).toBeInTheDocument()
+    expect(screen.getByTestId("confirm-email-change-spinner-icon")).toBeInTheDocument()
+    expect(screen.getByTestId("confirm-email-change-token-input")).toBeInTheDocument()
   })
 
   it("should pass the email and token from URL params to the hidden input fields", () => {
@@ -75,9 +75,9 @@ describe("Update Email Form", () => {
       return null
     })
 
-    render(<UpdateEmailForm />)
+    render(<ConfirmEmailChangeForm />)
 
-    const tokenInput: HTMLInputElement = screen.getByTestId("update-email-token-input")
+    const tokenInput: HTMLInputElement = screen.getByTestId("confirm-email-change-token-input")
     expect(tokenInput).toHaveValue(token)
   })
 
@@ -88,19 +88,19 @@ describe("Update Email Form", () => {
       false
     ])
 
-    render(<UpdateEmailForm />)
+    render(<ConfirmEmailChangeForm />)
 
-    expect(screen.queryByTestId("update-email-spinner-icon")).not.toBeInTheDocument()
+    expect(screen.queryByTestId("confirm-email-change-spinner-icon")).not.toBeInTheDocument()
     expect(screen.getByText(/The verification link is invalid/i)).toBeInTheDocument()
   })
 
   it("should display a success message if email update is successful", () => {
     vi.mocked(useFormState).mockReturnValue([{ success: true, message: "The email has been updated!" }, vi.fn(), false])
 
-    render(<UpdateEmailForm />)
+    render(<ConfirmEmailChangeForm />)
 
-    expect(screen.queryByTestId("update-email-spinner-icon")).not.toBeInTheDocument()
+    expect(screen.queryByTestId("confirm-email-change-spinner-icon")).not.toBeInTheDocument()
     expect(screen.getByText(/The email has been updated/i)).toBeInTheDocument()
-    expect(screen.getByTestId("update-email-profile-button")).toBeInTheDocument()
+    expect(screen.getByTestId("confirm-email-change-profile-button")).toBeInTheDocument()
   })
 })
