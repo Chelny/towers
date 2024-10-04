@@ -320,7 +320,7 @@ export function boardReducer(state: BoardState, action: BoardAction): BoardState
 }
 
 /**
- * Adds an additional row to the bottom of an opponent's screen.
+ * Adds an additional row to the bottom of an opponent’s screen.
  *
  * @param newState - The current state of the board.
  * @returns The new state of the board after adding the row.
@@ -595,7 +595,7 @@ function colorBlast(newState: BoardState): BoardState {
 }
 
 /**
- * Takes either one, two or three powers depending on minor/normal/mega from opponent's power bar and
+ * Takes either one, two or three powers depending on minor/normal/mega from opponent’s power bar and
  * places them on the bottom row of their board.
  *
  * @param newState - The current state of the game board.
@@ -700,7 +700,7 @@ function colorPlague(newState: BoardState): BoardState {
 }
 
 /**
- * Increases the speed of one opponent's fall rate.
+ * Increases the speed of one opponent’s fall rate.
  *
  * @param newState - The current state of the game board.
  * @returns The updated state of the game board with an increased fall rate speed.
@@ -710,7 +710,7 @@ function specialSpeedDrop(newState: BoardState): BoardState {
 }
 
 /**
- * Removes all powers from an opponent's board and power bar.
+ * Removes all powers from an opponent’s board and power bar.
  *
  * @param newState - The current state of the game board.
  * @returns The updated state of the game board with all powers removed.

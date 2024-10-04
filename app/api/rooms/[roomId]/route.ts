@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server"
-import { Room } from "@prisma/client"
+import { Room, RoomInfo } from "@prisma/client"
 import prisma from "@/lib/prisma"
 
 export async function GET(_: NextRequest, context: { params: { roomId: string } }): Promise<NextResponse> {
   const { roomId } = context.params
-  const room: Room | null = await prisma.room.findUnique({
+  const room: RoomInfo | null = await prisma.room.findUnique({
     where: {
       id: roomId
     },
@@ -16,9 +16,13 @@ export async function GET(_: NextRequest, context: { params: { roomId: string } 
               user: true
             }
           },
-          towersGameUsers: {
+          towersUserRoomTables: {
             include: {
-              user: true
+              towersUserProfile: {
+                include: {
+                  user: true
+                }
+              }
             }
           }
         }

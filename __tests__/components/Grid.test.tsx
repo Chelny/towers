@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react"
-import Grid from "@/components/game/Grid"
+import Grid from "@/components/towers/Grid"
 import { BOARD_COLS, BOARD_ROWS } from "@/constants/game"
 import { Board } from "@/interfaces/game"
 import {

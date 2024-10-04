@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react"
-import TableHeader from "@/components/TableHeader"
+import TableHeader from "@/components/game/TableHeader"
 import { mockedRoom1, mockedRoom1Table1, mockedRoom1Table1Info, mockedUser1 } from "@/vitest.setup"
 
 describe("TableHeader Component", () => {

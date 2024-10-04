@@ -1,3 +1,5 @@
+"use client"
+
 import { ReactNode } from "react"
 import { ReadonlyURLSearchParams, useSearchParams } from "next/navigation"
 import GoToHomepageLink from "@/components/GoToHomepageLink"

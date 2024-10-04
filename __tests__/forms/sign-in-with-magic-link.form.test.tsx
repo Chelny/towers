@@ -7,7 +7,7 @@ vi.mock("react-dom", () => ({
   useFormStatus: vi.fn()
 }))
 
-describe("Sign In With Magic Link Form", () => {
+describe("Sign In with Magic Link Form", () => {
   beforeEach(() => {
     vi.mocked(useFormState).mockReturnValue([{ success: false, message: "", error: {} }, vi.fn(), false])
 

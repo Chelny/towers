@@ -1,8 +1,9 @@
 import { render, screen } from "@testing-library/react"
 import { Mock } from "vitest"
-import TowersPageContent from "@/components/TowersPageContent"
+import TowersPageContent from "@/components/game/TowersPageContent"
 import { useSessionData } from "@/hooks/useSessionData"
 import { useAppDispatch, useAppSelector } from "@/lib/hooks"
+import { SidebarState } from "@/redux/features/sidebar-slice"
 import { destroySocket, initSocket, SocketState } from "@/redux/features/socket-slice"
 import {
   mockedAuthenticatedSession,
@@ -54,12 +55,12 @@ describe("TowersPageContent Component", () => {
     vi.mocked(useAppDispatch).mockReturnValue(mockedAppDispatch)
     vi.mocked(useSessionData).mockReturnValue(mockedAuthenticatedSession)
     // eslint-disable-next-line no-unused-vars
-    vi.mocked(useAppSelector).mockImplementation((selectorFn: (state: { socket: SocketState }) => unknown) => {
-      if (selectorFn.toString().includes("state.socket.tables")) {
-        return mockedRoom1Table1
+    vi.mocked(useAppSelector).mockImplementation(
+      (selectorFn: (state: { socket: SocketState; sidebar: SidebarState }) => unknown) => {
+        if (selectorFn.toString().includes("state.socket.tables")) return mockedRoom1Table1
+        return undefined
       }
-      return undefined
-    })
+    )
   })
 
   afterEach(() => {

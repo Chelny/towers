@@ -1,0 +1,13 @@
+.BoardContainer {
+  position: relative;
+
+  &::before {
+    content: attr(data-seat-number);
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 7rem;
+    font-weight: 700;
+    text-align: center;
+  }
+}

@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react"
-import PowerBar from "@/components/game/PowerBar"
+import PowerBar from "@/components/towers/PowerBar"
 import { PowerBarBlock } from "@/interfaces/game"
 import { mockedDefaultTowersBlockProps } from "@/vitest.setup"
 

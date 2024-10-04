@@ -1,7 +1,8 @@
 import next from "next";
 import {createServer} from "node:http";
 import {Server} from "socket.io";
-import axios from 'axios';
+import axios from "axios";
+import os from "os";
 import {TableChatMessageType} from "@prisma/client";
 
 const dev = process.env.NODE_ENV !== "production";
@@ -9,6 +10,21 @@ const hostname = "localhost";
 const port = 3000;
 const app = next({dev, hostname, port});
 const handler = app.getRequestHandler();
+
+const getLocalIpAddress = () => {
+  const interfaces = os.networkInterfaces();
+
+  for (const name of Object.keys(interfaces)) {
+    for (const iface of interfaces[name]) {
+      // Skip over internal (i.e. 127.0.0.1) and non-IPv4 addresses
+      if (iface.family === "IPv4" && !iface.internal) {
+        return iface.address;
+      }
+    }
+  }
+
+  return "localhost";
+};
 
 app.prepare().then(() => {
   const httpServer = createServer(handler);
@@ -40,66 +56,96 @@ app.prepare().then(() => {
       socket.join(roomId);
     });
 
-    socket.on("room:leave", ({room: roomId}) => {
+    socket.on("room:leave", async ({room: roomId, tableIds, username}) => {
+      // Loop through each tableId and leave the corresponding socket room
+      for (const tableId of tableIds) {
+        socket.emit("table:leave-multiple", { roomId, tableId, username });
+      }
+
       socket.leave(roomId);
     });
 
-    socket.on('table:join', async ({room: tableId, username}) => {
+    socket.on("table:join", async ({room: tableId, username}) => {
       socket.join(tableId);
 
-      const session = socket.handshake.auth.session;
-      const message = `*** ${username} joined the table.`
-      const response = await axios.post(`${process.env.BASE_URL}/api/tables/${tableId}/chat`, {
-        session,
-        message,
-        type: TableChatMessageType.USER_ACTION
-      });
+      try {
+        const session = socket.handshake.auth.session;
+        const message = `*** ${username} joined the table.`
+        const response = await axios.post(`${process.env.BASE_URL}/api/tables/${tableId}/chat`, {
+          session,
+          message,
+          type: TableChatMessageType.USER_ACTION
+        });
 
-      if (response.status === 201) {
-        io.to(tableId).emit("table:send-user-joined-message", {tableId, data: response.data.data});
+        if (response.status === 201) {
+          io.to(tableId).emit("table:send-user-joined-message", {tableId, data: response.data.data});
+        }
+      } catch (error) {
+        console.error(`Error sending joining message in table ${tableId}. Error description:`, error);
       }
     });
 
     socket.on("table:leave", async ({room: tableId, username}) => {
-      const session = socket.handshake.auth.session;
-      const message = `*** ${username} left the table.`
-      const response = await axios.post(`${process.env.BASE_URL}/api/tables/${tableId}/chat`, {
-        session,
-        message,
-        type: TableChatMessageType.USER_ACTION
-      });
+      try {
+        const session = socket.handshake.auth.session;
+        const message = `*** ${username} left the table.`
+        const response = await axios.post(`${process.env.BASE_URL}/api/tables/${tableId}/chat`, {
+          session,
+          message,
+          type: TableChatMessageType.USER_ACTION
+        });
 
-      if (response.status === 201) {
-        socket.broadcast.to(tableId).emit("table:send-user-left-message", {tableId, data: response.data.data});
+        if (response.status === 201) {
+         socket.broadcast.to(tableId).emit("table:send-user-left-message", {tableId, data: response.data.data});
+        }
+      } catch (error) {
+        console.error(`Error sending leaving message in table ${tableId}. Error description:`, error);
+      } finally {
         socket.leave(tableId);
       }
     });
 
-    socket.on("room:send-message", async ({roomId, towersUserId, message}) => {
-      const session = socket.handshake.auth.session;
-      const response = await axios.post(`${process.env.BASE_URL}/api/rooms/${roomId}/chat`, {
-        session,
-        towersUserId,
-        message
-      });
+    socket.on("room:send-message", async ({roomId, message}) => {
+      try {
+        const session = socket.handshake.auth.session;
+        const response = await axios.post(`${process.env.BASE_URL}/api/rooms/${roomId}/chat`, { session, message });
 
-      if (response.status === 201) {
-        io.to(roomId).emit("room:set-message", {roomId, data: response.data.data});
-      } else {
-        io.to(roomId).emit("error", response.data.message);
+        if (response.status === 201) {
+          io.to(roomId).emit("room:set-message", {roomId, data: response.data.data});
+        }
+      } catch (error) {
+        console.error(`Error sending message in room ${roomId}. Error description:`, error);
+
+        // FIXME: Manage errors for specific user in a specific room
+        // if (axios.isAxiosError(error) && error.response) {
+        //   socket.emit("err", error.response.data.message || "An error occurred while sending the message.");
+        // } else if (error instanceof Error) {
+        //   socket.emit("err", error.message || "An unexpected error occurred.");
+        // } else {
+        //   socket.emit("err", "An unexpected error occurred.");
+        // }
       }
     });
 
-    socket.on("table:send-message", async ({tableId, towersUserId, message}) => {
-      const session = socket.handshake.auth.session;
-      const response = await axios.post(`${process.env.BASE_URL}/api/tables/${tableId}/chat`, {
-        session,
-        towersUserId,
-        message
-      });
+    socket.on("table:send-message", async ({tableId, message}) => {
+      try {
+        const session = socket.handshake.auth.session;
+        const response = await axios.post(`${process.env.BASE_URL}/api/tables/${tableId}/chat`, { session, message });
 
-      if (response.status === 201) {
-        io.to(tableId).emit("table:set-message", {tableId, data: response.data.data});
+        if (response.status === 201) {
+          io.to(tableId).emit("table:set-message", {tableId, data: response.data.data});
+        }
+      } catch (error) {
+        console.error(`Error sending message in table ${tableId}. Error description:`, error);
+
+        // FIXME: Manage errors for specific user in a specific room
+        // if (axios.isAxiosError(error) && error.response) {
+        //   socket.to(tableId).emit("err", error.response.data.message || "An error occurred while sending the message.");
+        // } else if (error instanceof Error) {
+        //   socket.to(tableId).emit("err", error.message || "An unexpected error occurred.");
+        // } else {
+        //   socket.to(tableId).emit("err", "An unexpected error occurred.");
+        // }
       }
     });
 
@@ -148,7 +194,9 @@ app.prepare().then(() => {
       process.exit(1);
     })
     .listen(port, () => {
-      console.log(`> Ready on http://${hostname}:${port}`);
+      const localIp = getLocalIpAddress();
+      console.log(`> Ready on \x1b[34mhttp://${hostname}:${port}\x1b[0m`);
+      if (dev) console.log(`> Accessible locally at \x1b[34mhttp://${localIp}:${port}\x1b[0m`);
       runScheduler();
     });
 });

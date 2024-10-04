@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { TowersGameUserWithUserAndTables } from "@/interfaces/towers-game-user"
+import { TowersUser } from "@prisma/client"
 import prisma from "@/lib/prisma"
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
@@ -19,10 +19,16 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
   const whereClause = roomId ? { roomId } : { tableId }
 
-  const towersGameUsers: TowersGameUserWithUserAndTables[] = await prisma.towersGameUser.findMany({
+  const towersUsers: TowersUser[] = await prisma.towersUserRoomTable.findMany({
     where: whereClause,
     include: {
-      user: true,
+      towersUserProfile: {
+        include: {
+          user: true,
+          towersUserRoomTables: true
+        }
+      },
+      room: true,
       table: true
     },
     orderBy: {
@@ -35,12 +41,12 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   if (roomId) {
     data = {
       roomId,
-      roomUsers: towersGameUsers
+      roomUsers: towersUsers
     }
   } else {
     data = {
       tableId,
-      tableUsers: towersGameUsers
+      tableUsers: towersUsers
     }
   }
 

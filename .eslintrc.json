@@ -42,7 +42,7 @@
           }
         ],
         "no-undef": "off",
-        "no-unused-vars": ["warn", {
+        "no-unused-vars": ["off", {
           "vars": "all",
           "args": "after-used",
           "argsIgnorePattern": "^_",

@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react"
 import { Mock } from "vitest"
-import PlayerBoard from "@/components/game/PlayerBoard"
+import PlayerBoard from "@/components/towers/PlayerBoard"
 
 const mockedHandleStartGame: Mock = vi.fn()
 
@@ -55,14 +55,14 @@ describe("PlayerBoard Component", () => {
     expect(mockedHandleStartGame).toHaveBeenCalled()
   })
 
-  it("should render the grid and power bar correctly for the player's board", () => {
+  it("should render the grid and power bar correctly for the player’s board", () => {
     render(<PlayerBoard seatNumber={1} isOpponentBoard={false} onChooseSeat={mockedHandleChooseSeat} />)
 
     expect(screen.getByTestId("player-board-power-bar-container")).toBeInTheDocument()
     expect(screen.getByTestId("player-board-grid-container")).toBeInTheDocument()
   })
 
-  it("should render smaller avatar and text for opponent's board", () => {
+  it("should render smaller avatar and text for opponent’s board", () => {
     render(<PlayerBoard seatNumber={2} isOpponentBoard={true} onChooseSeat={mockedHandleChooseSeat} />)
 
     const avatar: HTMLImageElement = screen.getByAltText("")

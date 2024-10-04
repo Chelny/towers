@@ -19,6 +19,7 @@ describe("Sign Up Actions", () => {
     formData.append("username", "")
     formData.append("password", "")
     formData.append("confirmPassword", "")
+    // formData.append("termsAndConditions", null)
 
     const response = {
       success: false,
@@ -27,7 +28,8 @@ describe("Sign Up Actions", () => {
         email: "The email is invalid.",
         username: "The username is invalid.",
         password: "The password is invalid.",
-        confirmPassword: "The password confirmation is invalid."
+        confirmPassword: "The password confirmation is invalid.",
+        termsAndConditions: "You must accept the terms and conditions."
       }
     }
 
@@ -48,6 +50,7 @@ describe("Sign Up Actions", () => {
     formData.append("username", "john.doe.")
     formData.append("password", "password")
     formData.append("confirmPassword", "password")
+    // formData.append("termsAndConditions", null)
 
     const response = {
       success: false,
@@ -56,7 +59,8 @@ describe("Sign Up Actions", () => {
         email: "The email is invalid.",
         username: "The username is invalid.",
         password: "The password is invalid.",
-        confirmPassword: "The password confirmation is invalid."
+        confirmPassword: "The password confirmation is invalid.",
+        termsAndConditions: "You must accept the terms and conditions."
       }
     }
 
@@ -78,6 +82,7 @@ describe("Sign Up Actions", () => {
     formData.append("username", "john.doe")
     formData.append("password", "Password123!")
     formData.append("confirmPassword", "Password12345!")
+    formData.append("termsAndConditions", "on")
 
     const response = {
       success: false,
@@ -104,6 +109,7 @@ describe("Sign Up Actions", () => {
     formData.append("username", "john.doe")
     formData.append("password", "Password123!")
     formData.append("confirmPassword", "Password123!")
+    formData.append("termsAndConditions", "on")
 
     const response = {
       success: true,
@@ -122,7 +128,8 @@ describe("Sign Up Actions", () => {
       email: "john.doe@example.com",
       username: "john.doe",
       password: "Password123!",
-      confirmPassword: "Password123!"
+      confirmPassword: "Password123!",
+      termsAndConditions: "on"
     })
     expect(result).toEqual(response)
   })

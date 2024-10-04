@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react"
-import RegularBlock from "@/components/game/RegularBlock"
+import RegularBlock from "@/components/towers/RegularBlock"
 
 describe("RegularBlock Component", () => {
   it("should render the letter inside the block", () => {

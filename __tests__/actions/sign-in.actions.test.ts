@@ -2,7 +2,7 @@ import { AuthError } from "next-auth"
 import { Mock } from "vitest"
 import { signIn } from "@/app/(auth)/sign-in/sign-in.actions"
 import { signIn as authSignIn } from "@/auth"
-import { ROUTE_ROOMS } from "@/constants/routes"
+import { ROUTE_GAMES } from "@/constants/routes"
 import { mockedFormInitialState } from "@/vitest.setup"
 
 vi.mock("@/auth", () => ({
@@ -48,7 +48,7 @@ describe("Sign In Actions", () => {
     expect(authSignIn).toHaveBeenCalledWith("credentials", {
       email: "john.doe@example.com",
       password: "wrongpassword",
-      redirectTo: ROUTE_ROOMS.PATH
+      redirectTo: ROUTE_GAMES.PATH
     })
     expect(result).toEqual(response)
   })
@@ -64,7 +64,7 @@ describe("Sign In Actions", () => {
     expect(authSignIn).toHaveBeenCalledWith("credentials", {
       email: "john.doe@example.com",
       password: "Password123!",
-      redirectTo: ROUTE_ROOMS.PATH
+      redirectTo: ROUTE_GAMES.PATH
     })
     expect(result).toEqual({
       success: true,

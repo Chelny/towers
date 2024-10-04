@@ -1,12 +1,11 @@
 import { ReactNode } from "react"
-import Link from "next/link"
-import clsx from "clsx/lite"
+import Anchor from "@/components/ui/Anchor"
 import { ROUTE_HOME } from "@/constants/routes"
 
 export default function GoToHomepageLink(): ReactNode {
   return (
-    <Link className={clsx("text-blue-500 mt-6", "hover:underline")} href={ROUTE_HOME.PATH}>
+    <Anchor href={ROUTE_HOME.PATH} className="mt-6">
       Go to homepage
-    </Link>
+    </Anchor>
   )
 }

@@ -1,12 +1,21 @@
-import { Room, RoomLevel, Table, TableType, TowersGameUser, User, UserStatus } from "@prisma/client"
+import {
+  Room,
+  RoomInfoWithTablesCount,
+  RoomLevel,
+  RoomMessage,
+  Table,
+  TableInfo,
+  TableMessage,
+  TableType,
+  TowersUser,
+  TowersUserProfileWithRelations,
+  TowersUserRoomTable,
+  User,
+  UserStatus
+} from "@prisma/client"
 import "@testing-library/jest-dom"
 import { TSessionContextValue } from "@/context/session-context"
 import { BoardBlock } from "@/interfaces/game"
-import { RoomWithTablesCount } from "@/interfaces/room"
-import { RoomChatWithTowersGameUser } from "@/interfaces/room-chat"
-import { TableWithHostAndTowersGameUsers } from "@/interfaces/table"
-import { TableChatWithTowersGameUser } from "@/interfaces/table-chat"
-import { TowersGameUserWithUserAndTables } from "@/interfaces/towers-game-user"
 import { RoomsState, SocketState, TablesState } from "@/redux/features/socket-slice"
 
 export const mockedRouter = {
@@ -43,10 +52,11 @@ export const mockedUnauthenticatedSession: TSessionContextValue = {
 export const mockedAuthenticatedSession: TSessionContextValue = {
   data: {
     user: {
+      id: "112dc46f-54cb-43f9-81fa-21080a4fb990",
       name: "John Doe",
       username: "john.doe",
       image: "https://example.com/avatar.jpg",
-      towersUserId: "233507f9-7f92-45fa-bf34-4eb98944b461"
+      towersUserProfileId: "233507f9-7f92-45fa-bf34-4eb98944b461"
     },
     account: null,
     isNewUser: false,
@@ -229,80 +239,124 @@ export const mockedRoom1Table3: Table = {
 }
 
 /**
- * TowerGameUsers
+ * TowersUserProfile
  */
 
-export const mockedRoom1Table1TowersGameUser1: TowersGameUser = {
+export const mockedRoom1Table1TowersUserProfile1: TowersUserProfileWithRelations = {
   id: "b96a633f-5945-44b2-8075-696a6d09fec2",
   userId: "7b93cba2-f15a-42ac-ac22-3c8bc1fc4799",
-  roomId: "28015627-f4d1-46f5-a863-b6da71b3b97e",
-  tableId: "7eae47e5-3b1c-462c-9d9f-1f3b4ca2b8eb",
-  seatNumber: 1,
   rating: 4159,
   gamesCompleted: 81,
   wins: 5,
   loses: 3,
   streak: 4,
   createdAt: new Date(),
-  updatedAt: new Date()
+  updatedAt: new Date(),
+  user: mockedUser1
 }
 
-export const mockedRoom1Table1TowersGameUser2: TowersGameUser = {
+export const mockedRoom1Table1TowersUserProfile2: TowersUserProfileWithRelations = {
   id: "d5850073-736a-4078-af51-73c40fa5eba2",
   userId: "6db799ae-bb22-4257-aed2-58788d3eb6fb",
-  roomId: "28015627-f4d1-46f5-a863-b6da71b3b97e",
-  tableId: "7eae47e5-3b1c-462c-9d9f-1f3b4ca2b8eb",
-  seatNumber: 2,
   rating: 1897,
   gamesCompleted: 97,
   wins: 9,
   loses: 38,
   streak: 1,
   createdAt: new Date(),
-  updatedAt: new Date()
+  updatedAt: new Date(),
+  user: mockedUser2
 }
 
-export const mockedRoom1Table1TowersGameUser3: TowersGameUser = {
+export const mockedRoom1Table1TowersUserProfile3: TowersUserProfileWithRelations = {
   id: "3f813c7c-0599-4bee-a641-403a11b32ce8",
   userId: "a20ec552-68a5-4734-9530-e16a5074150d",
-  roomId: "28015627-f4d1-46f5-a863-b6da71b3b97e",
-  tableId: "7eae47e5-3b1c-462c-9d9f-1f3b4ca2b8eb",
-  seatNumber: 3,
   rating: 3677,
   gamesCompleted: 96,
   wins: 15,
   loses: 49,
   streak: 0,
   createdAt: new Date(),
-  updatedAt: new Date()
+  updatedAt: new Date(),
+  user: mockedUser3
 }
 
-export const mockedRoom1Table1TowersGameUser4: TowersGameUser = {
+export const mockedRoom1Table1TowersUserProfile4: TowersUserProfileWithRelations = {
   id: "fb12d58f-3123-4f28-bf50-5d34864fbc76",
   userId: "5d6c6316-8edb-4556-90e0-65fe61dd6d5c",
-  roomId: "28015627-f4d1-46f5-a863-b6da71b3b97e",
-  tableId: "be6c9c4c-27cf-4fd1-88b3-ffa834611576",
-  seatNumber: null,
   rating: 1785,
   gamesCompleted: 67,
   wins: 2,
   loses: 40,
   streak: 0,
   createdAt: new Date(),
-  updatedAt: new Date()
+  updatedAt: new Date(),
+  user: mockedUser4
 }
 
-export const mockedRoom1Table1TowersGameUser5: TowersGameUser = {
+export const mockedRoom1Table1TowersUserProfile5: TowersUserProfileWithRelations = {
   id: "b797a2ee-c904-4f32-a8a8-69669fd428fd",
   userId: "cd6b72cb-ab7b-4405-b43d-126b620d4e0e",
-  roomId: "28015627-f4d1-46f5-a863-b6da71b3b97e",
-  tableId: "baa53a4c-4764-40d4-9f1d-701ffe1204a8",
-  seatNumber: null,
   rating: 2166,
   gamesCompleted: 38,
   wins: 49,
   loses: 38,
   streak: 3,
+  createdAt: new Date(),
+  updatedAt: new Date(),
+  user: mockedUser5
+}
+
+/**
+ * TowersUserRoomTable
+ */
+
+export const mockedRoom1Table1TowersUserRoomTable1: TowersUserRoomTable = {
+  id: "1a42184f-12e6-4d65-8020-84c5421d2f57",
+  towersUserProfileId: "b96a633f-5945-44b2-8075-696a6d09fec2",
+  roomId: "28015627-f4d1-46f5-a863-b6da71b3b97e",
+  tableId: "7eae47e5-3b1c-462c-9d9f-1f3b4ca2b8eb",
+  seatNumber: 1,
+  createdAt: new Date(),
+  updatedAt: new Date()
+}
+
+export const mockedRoom1Table1TowersUserRoomTable2: TowersUserRoomTable = {
+  id: "3e3ca954-4980-4ab4-928b-b0a51a681b0f",
+  towersUserProfileId: "d5850073-736a-4078-af51-73c40fa5eba2",
+  roomId: "28015627-f4d1-46f5-a863-b6da71b3b97e",
+  tableId: "7eae47e5-3b1c-462c-9d9f-1f3b4ca2b8eb",
+  seatNumber: 2,
+  createdAt: new Date(),
+  updatedAt: new Date()
+}
+
+export const mockedRoom1Table1TowersUserRoomTable3: TowersUserRoomTable = {
+  id: "86be1b11-2e15-478d-8d62-d3eab7e92590",
+  towersUserProfileId: "3f813c7c-0599-4bee-a641-403a11b32ce8",
+  roomId: "28015627-f4d1-46f5-a863-b6da71b3b97e",
+  tableId: "7eae47e5-3b1c-462c-9d9f-1f3b4ca2b8eb",
+  seatNumber: 3,
+  createdAt: new Date(),
+  updatedAt: new Date()
+}
+
+export const mockedRoom1Table1TowersUserRoomTable4: TowersUserRoomTable = {
+  id: "e00ab6af-294b-48f6-b1c7-f1d1dbc42df5",
+  towersUserProfileId: "fb12d58f-3123-4f28-bf50-5d34864fbc76",
+  roomId: "28015627-f4d1-46f5-a863-b6da71b3b97e",
+  tableId: "be6c9c4c-27cf-4fd1-88b3-ffa834611576",
+  seatNumber: null,
+  createdAt: new Date(),
+  updatedAt: new Date()
+}
+
+export const mockedRoom1Table1TowersUserRoomTable5: TowersUserRoomTable = {
+  id: "fe804468-4e7c-4afc-b5c4-7667a9954a22",
+  towersUserProfileId: "b797a2ee-c904-4f32-a8a8-69669fd428fd",
+  roomId: "28015627-f4d1-46f5-a863-b6da71b3b97e",
+  tableId: "baa53a4c-4764-40d4-9f1d-701ffe1204a8",
+  seatNumber: null,
   createdAt: new Date(),
   updatedAt: new Date()
 }
@@ -311,54 +365,54 @@ export const mockedRoom1Table1TowersGameUser5: TowersGameUser = {
  * Rooms Socket Data
  */
 
-export const mockedRoom1Info: RoomWithTablesCount = {
+export const mockedRoom1Info: RoomInfoWithTablesCount = {
   room: {
     ...mockedRoom1,
     tables: [
       {
         ...mockedRoom1Table1,
         host: {
-          ...mockedRoom1Table1TowersGameUser1,
+          ...mockedRoom1Table1TowersUserProfile1,
           user: mockedUser1
         },
-        towersGameUsers: [
+        towersUserRoomTables: [
           {
-            ...mockedRoom1Table1TowersGameUser1,
-            user: mockedUser1
+            ...mockedRoom1Table1TowersUserRoomTable1,
+            towersUserProfile: mockedRoom1Table1TowersUserProfile1
           },
           {
-            ...mockedRoom1Table1TowersGameUser2,
-            user: mockedUser2
+            ...mockedRoom1Table1TowersUserRoomTable2,
+            towersUserProfile: mockedRoom1Table1TowersUserProfile2
           },
           {
-            ...mockedRoom1Table1TowersGameUser3,
-            user: mockedUser3
+            ...mockedRoom1Table1TowersUserRoomTable3,
+            towersUserProfile: mockedRoom1Table1TowersUserProfile3
           }
         ]
       },
       {
         ...mockedRoom1Table2,
         host: {
-          ...mockedRoom1Table1TowersGameUser2,
+          ...mockedRoom1Table1TowersUserProfile2,
           user: mockedUser2
         },
-        towersGameUsers: [
+        towersUserRoomTables: [
           {
-            ...mockedRoom1Table1TowersGameUser4,
-            user: mockedUser4
+            ...mockedRoom1Table1TowersUserRoomTable4,
+            towersUserProfile: mockedRoom1Table1TowersUserProfile4
           }
         ]
       },
       {
         ...mockedRoom1Table3,
         host: {
-          ...mockedRoom1Table1TowersGameUser3,
+          ...mockedRoom1Table1TowersUserProfile3,
           user: mockedUser3
         },
-        towersGameUsers: [
+        towersUserRoomTables: [
           {
-            ...mockedRoom1Table1TowersGameUser5,
-            user: mockedUser5
+            ...mockedRoom1Table1TowersUserRoomTable5,
+            towersUserProfile: mockedRoom1Table1TowersUserProfile5
           }
         ]
       }
@@ -367,32 +421,37 @@ export const mockedRoom1Info: RoomWithTablesCount = {
   tablesCount: 3
 }
 
-export const mockedRoom1Chat: RoomChatWithTowersGameUser[] = []
+export const mockedRoom1Chat: RoomMessage[] = []
 
-export const mockedRoom1Users: TowersGameUserWithUserAndTables[] = [
+export const mockedRoom1Users: TowersUser[] = [
   {
-    ...mockedRoom1Table1TowersGameUser1,
-    user: mockedUser1,
+    ...mockedRoom1Table1TowersUserRoomTable1,
+    towersUserProfile: mockedRoom1Table1TowersUserProfile1,
+    room: mockedRoom1,
     table: mockedRoom1Table1
   },
   {
-    ...mockedRoom1Table1TowersGameUser2,
-    user: mockedUser2,
+    ...mockedRoom1Table1TowersUserRoomTable2,
+    towersUserProfile: mockedRoom1Table1TowersUserProfile2,
+    room: mockedRoom1,
     table: mockedRoom1Table1
   },
   {
-    ...mockedRoom1Table1TowersGameUser3,
-    user: mockedUser3,
+    ...mockedRoom1Table1TowersUserRoomTable3,
+    towersUserProfile: mockedRoom1Table1TowersUserProfile3,
+    room: mockedRoom1,
     table: mockedRoom1Table1
   },
   {
-    ...mockedRoom1Table1TowersGameUser4,
-    user: mockedUser4,
+    ...mockedRoom1Table1TowersUserRoomTable4,
+    towersUserProfile: mockedRoom1Table1TowersUserProfile4,
+    room: mockedRoom1,
     table: mockedRoom1Table2
   },
   {
-    ...mockedRoom1Table1TowersGameUser5,
-    user: mockedUser5,
+    ...mockedRoom1Table1TowersUserRoomTable5,
+    towersUserProfile: mockedRoom1Table1TowersUserProfile5,
+    room: mockedRoom1,
     table: mockedRoom1Table3
   }
 ]
@@ -401,45 +460,48 @@ export const mockedRoom1Users: TowersGameUserWithUserAndTables[] = [
  * Tables Socket Data
  */
 
-export const mockedRoom1Table1Info: TableWithHostAndTowersGameUsers = {
+export const mockedRoom1Table1Info: TableInfo = {
   ...mockedRoom1Table1,
   room: mockedRoom1,
   host: {
-    ...mockedRoom1Table1TowersGameUser1,
+    ...mockedRoom1Table1TowersUserProfile1,
     user: mockedUser1
   },
-  towersGameUsers: [
+  towersUserRoomTables: [
     {
-      ...mockedRoom1Table1TowersGameUser1,
-      user: mockedUser1
+      ...mockedRoom1Table1TowersUserRoomTable1,
+      towersUserProfile: mockedRoom1Table1TowersUserProfile1
     },
     {
-      ...mockedRoom1Table1TowersGameUser2,
-      user: mockedUser2
+      ...mockedRoom1Table1TowersUserRoomTable1,
+      towersUserProfile: mockedRoom1Table1TowersUserProfile2
     },
     {
-      ...mockedRoom1Table1TowersGameUser3,
-      user: mockedUser3
+      ...mockedRoom1Table1TowersUserRoomTable1,
+      towersUserProfile: mockedRoom1Table1TowersUserProfile3
     }
   ]
 }
 
-export const mockedRoom1Table1Chat: TableChatWithTowersGameUser[] = []
+export const mockedRoom1Table1Chat: TableMessage[] = []
 
-export const mockedRoom1Table1Users: TowersGameUserWithUserAndTables[] = [
+export const mockedRoom1Table1Users: TowersUser[] = [
   {
-    ...mockedRoom1Table1TowersGameUser1,
-    user: mockedUser1,
+    ...mockedRoom1Table1TowersUserRoomTable1,
+    towersUserProfile: mockedRoom1Table1TowersUserProfile1,
+    room: mockedRoom1,
     table: mockedRoom1Table1
   },
   {
-    ...mockedRoom1Table1TowersGameUser2,
-    user: mockedUser2,
+    ...mockedRoom1Table1TowersUserRoomTable2,
+    towersUserProfile: mockedRoom1Table1TowersUserProfile2,
+    room: mockedRoom1,
     table: mockedRoom1Table1
   },
   {
-    ...mockedRoom1Table1TowersGameUser3,
-    user: mockedUser3,
+    ...mockedRoom1Table1TowersUserRoomTable3,
+    towersUserProfile: mockedRoom1Table1TowersUserProfile3,
+    room: mockedRoom1,
     table: mockedRoom1Table1
   }
 ]

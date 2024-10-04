@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react"
-import { describe, expect, it, Mock, vi } from "vitest"
-import Room from "@/components/Room"
-import { ROUTE_ROOMS } from "@/constants/routes"
+import { Mock } from "vitest"
+import Room from "@/components/game/Room"
+import { ROUTE_TOWERS } from "@/constants/routes"
 import { useSessionData } from "@/hooks/useSessionData"
 import { useAppDispatch } from "@/lib/hooks"
 import { beforeLeaveSocketRoom } from "@/redux/features/socket-slice"
@@ -42,8 +42,7 @@ vi.mock("@/redux/thunks/socket-thunks")
 describe("Room Component", () => {
   const mockedAppDispatch: Mock = vi.fn()
   const mockedSocketRoomThunkParams: SocketRoomThunk = {
-    room: mockedSocketRoom1Id,
-    isTable: false,
+    roomId: mockedSocketRoom1Id,
     username: mockedUser1.username!
   }
 
@@ -114,7 +113,7 @@ describe("Room Component", () => {
     expect(mockedAppDispatch).toHaveBeenCalledWith(beforeLeaveSocketRoom(mockedSocketRoomThunkParams))
 
     await waitFor(() => {
-      expect(mockedRouterPush).toHaveBeenCalledWith(ROUTE_ROOMS.PATH)
+      expect(mockedRouterPush).toHaveBeenCalledWith(ROUTE_TOWERS.PATH)
     })
   })
 })

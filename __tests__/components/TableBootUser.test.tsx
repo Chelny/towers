@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react"
 import { Mock } from "vitest"
-import TableBootUser from "@/components/TableBootUser"
+import TableBootUser from "@/components/game/TableBootUser"
 import { mockedSocketRoom1Table1Id, mockedSocketStateTables } from "@/vitest.setup"
 
 describe("TableBootUser Component", () => {

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { TowersUserRoomTable } from "@prisma/client"
 import { Session } from "next-auth"
 import { auth } from "@/auth"
 import prisma from "@/lib/prisma"
@@ -9,15 +10,46 @@ export async function PATCH(request: NextRequest): Promise<NextResponse> {
 
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-  const { room, isTable } = await request.json()
+  const { roomId, tableId } = await request.json()
 
   try {
-    const data = isTable ? { tableId: room } : { roomId: room, tableId: null }
-
-    await prisma.towersGameUser.update({
-      where: { userId: session.user.id },
-      data
+    // Check if there is an entry with the same towersUserProfileId and roomId
+    const joinedRoom: TowersUserRoomTable | null = await prisma.towersUserRoomTable.findFirst({
+      where: {
+        towersUserProfileId: session.user.towersUserProfileId,
+        roomId
+      }
     })
+
+    if (!joinedRoom) {
+      // User joins room
+      await prisma.towersUserRoomTable.create({
+        data: {
+          towersUserProfileId: session.user.towersUserProfileId,
+          roomId,
+          tableId
+        }
+      })
+    } else {
+      if (joinedRoom.tableId === null) {
+        // User joins first table in the room
+        await prisma.towersUserRoomTable.update({
+          where: { id: joinedRoom.id },
+          data: {
+            tableId
+          }
+        })
+      } else if (joinedRoom.tableId !== tableId) {
+        // User joins another table in the same room
+        await prisma.towersUserRoomTable.create({
+          data: {
+            towersUserProfileId: session.user.towersUserProfileId,
+            roomId,
+            tableId
+          }
+        })
+      }
+    }
 
     await updateLastActiveAt(session.user.id)
 

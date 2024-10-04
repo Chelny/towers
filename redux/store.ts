@@ -1,11 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit"
+import sidebarReducer from "@/redux/features/sidebar-slice"
 import socketReducer from "@/redux/features/socket-slice"
 import socketMiddleware from "@/redux/middleware/socket-middleware"
 
 export const makeStore = () => {
   return configureStore({
     reducer: {
-      socket: socketReducer
+      socket: socketReducer,
+      sidebar: sidebarReducer
     },
     middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(socketMiddleware)
   })

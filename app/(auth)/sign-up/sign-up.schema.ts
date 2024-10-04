@@ -7,7 +7,8 @@ export const signUpSchema = Type.Object({
   email: Type.RegExp(EMAIL_PATTERN),
   username: Type.RegExp(USERNAME_PATTERN),
   password: Type.RegExp(PASSWORD_PATTERN),
-  confirmPassword: Type.RegExp(PASSWORD_PATTERN)
+  confirmPassword: Type.RegExp(PASSWORD_PATTERN),
+  termsAndConditions: Type.String()
 })
 
 export type SignUpFormData = SchemaFormData<typeof signUpSchema>

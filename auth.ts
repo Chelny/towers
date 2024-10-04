@@ -2,7 +2,7 @@ import { ReadonlyRequestCookies } from "next/dist/server/web/spec-extension/adap
 import { cookies } from "next/headers"
 import { NextResponse } from "next/server"
 import { PrismaAdapter } from "@auth/prisma-adapter"
-import { TowersGameUser, User, UserStatus } from "@prisma/client"
+import { TowersUserProfile, User, UserStatus } from "@prisma/client"
 import NextAuth from "next-auth"
 import Credentials from "next-auth/providers/credentials"
 import GitHub from "next-auth/providers/github"
@@ -79,24 +79,24 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         token.picture = user.image
         token.account = account
 
-        if (user.id && !user.towersUserId) {
-          const towersGameUser: TowersGameUser | null = await prisma.towersGameUser.findUnique({
+        if (user.id && !user.towersUserProfileId) {
+          const towersUserProfile: TowersUserProfile | null = await prisma.towersUserProfile.findUnique({
             where: { userId: user.id }
           })
 
-          if (towersGameUser) {
-            token.towersUserId = towersGameUser.id
+          if (towersUserProfile) {
+            token.towersUserProfileId = towersUserProfile.id
           } else {
-            const newTowersGameUser: TowersGameUser = await prisma.towersGameUser.create({
+            const newTowersUserProfile: TowersUserProfile = await prisma.towersUserProfile.create({
               data: {
                 userId: user.id
               }
             })
 
-            token.towersUserId = newTowersGameUser.id
+            token.towersUserProfileId = newTowersUserProfile.id
           }
         } else {
-          token.towersUserId = user.towersUserId
+          token.towersUserProfileId = user.towersUserProfileId
         }
       }
 
@@ -132,7 +132,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         session.user.email = token.email
         session.user.username = token.username
         session.user.image = token.picture
-        session.user.towersUserId = token.towersUserId
+        session.user.towersUserProfileId = token.towersUserProfileId
         session.account = token.account
         session.isNewUser = token.isNewUser
       }
@@ -159,13 +159,13 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       })
 
       // Create Towers table entry
-      const towersGameUser: TowersGameUser = await prisma.towersGameUser.create({
+      const towersUserProfile: TowersUserProfile = await prisma.towersUserProfile.create({
         data: {
           userId: updatedUser.id
         }
       })
 
-      user.towersUserId = towersGameUser.id
+      user.towersUserProfileId = towersUserProfile.id
     },
     async signIn({ user }) {
       if (user.id) {

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { TowersUserRoomTable } from "@prisma/client"
 import { Session } from "next-auth"
 import { auth } from "@/auth"
 import prisma from "@/lib/prisma"
@@ -9,15 +10,51 @@ export async function PATCH(request: NextRequest): Promise<NextResponse> {
 
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-  const { isTable } = await request.json()
+  const { roomId, tableId } = await request.json()
 
   try {
-    const data = isTable ? { tableId: null } : { roomId: null, tableId: null }
+    if (!roomId) {
+      return NextResponse.json({ success: false, message: "Room ID is required" }, { status: 400 })
+    }
 
-    await prisma.towersGameUser.update({
-      where: { userId: session.user.id },
-      data
-    })
+    if (tableId) {
+      const joinedTables: TowersUserRoomTable[] = await prisma.towersUserRoomTable.findMany({
+        where: {
+          towersUserProfileId: session.user.towersUserProfileId,
+          roomId: roomId
+        }
+      })
+
+      if (joinedTables.length > 1) {
+        // User leaves one of many joined tables
+        await prisma.towersUserRoomTable.deleteMany({
+          where: {
+            towersUserProfileId: session.user.towersUserProfileId,
+            roomId: roomId,
+            tableId: tableId
+          }
+        })
+      } else {
+        // User leaves last table
+        await prisma.towersUserRoomTable.updateMany({
+          where: {
+            towersUserProfileId: session.user.towersUserProfileId,
+            roomId: roomId
+          },
+          data: {
+            tableId: null
+          }
+        })
+      }
+    } else {
+      // User leaves room
+      await prisma.towersUserRoomTable.deleteMany({
+        where: {
+          towersUserProfileId: session.user.towersUserProfileId,
+          roomId: roomId
+        }
+      })
+    }
 
     await updateLastActiveAt(session.user.id)
 

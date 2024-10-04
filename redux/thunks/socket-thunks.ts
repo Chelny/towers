@@ -1,17 +1,17 @@
 import { createAsyncThunk } from "@reduxjs/toolkit"
 import axios, { AxiosResponse } from "axios"
 
-export type SocketRoomThunk = { room: string; isTable: boolean; username: string }
+export type SocketRoomThunk = { roomId: string; tableId?: string; username: string }
 
 export const joinRoom = createAsyncThunk<SocketRoomThunk, SocketRoomThunk, { rejectValue: string }>(
   "socket/joinRoom",
-  async ({ room, isTable, username }: SocketRoomThunk, { rejectWithValue }) => {
+  async ({ roomId, tableId, username }: SocketRoomThunk, { rejectWithValue }) => {
     const errorMessage: string = "Failed to join room"
 
     try {
       const response: AxiosResponse<ApiResponse<SocketRoomThunk>> = await axios.patch("/api/socket/room/join", {
-        room,
-        isTable,
+        roomId,
+        tableId,
         username
       })
 
@@ -19,7 +19,7 @@ export const joinRoom = createAsyncThunk<SocketRoomThunk, SocketRoomThunk, { rej
         return rejectWithValue(errorMessage)
       }
 
-      return { room, isTable, username }
+      return { roomId, tableId, username }
     } catch (error) {
       console.error(error)
       return rejectWithValue(errorMessage)
@@ -29,13 +29,13 @@ export const joinRoom = createAsyncThunk<SocketRoomThunk, SocketRoomThunk, { rej
 
 export const leaveRoom = createAsyncThunk<SocketRoomThunk, SocketRoomThunk, { rejectValue: string }>(
   "socket/leaveRoom",
-  async ({ room, isTable, username }: SocketRoomThunk, { rejectWithValue }) => {
+  async ({ roomId, tableId, username }: SocketRoomThunk, { rejectWithValue }) => {
     const errorMessage: string = "Failed to leave room"
 
     try {
       const response: AxiosResponse<ApiResponse<SocketRoomThunk>> = await axios.patch("/api/socket/room/leave", {
-        room,
-        isTable,
+        roomId,
+        tableId,
         username
       })
 
@@ -43,7 +43,7 @@ export const leaveRoom = createAsyncThunk<SocketRoomThunk, SocketRoomThunk, { re
         return rejectWithValue(errorMessage)
       }
 
-      return { room, isTable, username }
+      return { roomId, tableId, username }
     } catch (error) {
       console.error(error)
       return rejectWithValue(errorMessage)

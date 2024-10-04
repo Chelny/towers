@@ -1,9 +1,11 @@
+import { RoomListItemWithUsersCount } from "@prisma/client"
 import { fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { Mock } from "vitest"
-import RoomsList from "@/components/RoomsList"
+import RoomsList from "@/components/game/RoomsList"
+import { ROUTE_TOWERS } from "@/constants/routes"
 import { useSessionData } from "@/hooks/useSessionData"
-import { RoomWithCount } from "@/interfaces/room"
 import { useAppDispatch, useAppSelector } from "@/lib/hooks"
+import { SidebarState } from "@/redux/features/sidebar-slice"
 import { SocketState } from "@/redux/features/socket-slice"
 import { SocketRoomThunk } from "@/redux/thunks/socket-thunks"
 import { mockedAuthenticatedSession, mockedRoom1, mockedRoom2, mockedSocketRoom1Id, mockedUser1 } from "@/vitest.setup"
@@ -42,18 +44,19 @@ vi.mock("@/redux/thunks/socket-thunks")
 describe("RoomsList Component", () => {
   const mockedAppDispatch: Mock = vi.fn()
   const mockedSocketRoomThunkParams: SocketRoomThunk = {
-    room: mockedSocketRoom1Id,
-    isTable: false,
+    roomId: mockedSocketRoom1Id,
     username: mockedUser1.username!
   }
-  const mockedRooms: RoomWithCount[] = [
+  const mockedRooms: RoomListItemWithUsersCount[] = [
     {
       ...mockedRoom1,
-      _count: { towersGameUsers: 123 }
+      towersUserRoomTables: [],
+      usersCount: 123
     },
     {
       ...mockedRoom2,
-      _count: { towersGameUsers: 301 }
+      towersUserRoomTables: [],
+      usersCount: 301
     }
   ]
 
@@ -61,12 +64,13 @@ describe("RoomsList Component", () => {
     vi.mocked(useAppDispatch).mockReturnValue(mockedAppDispatch)
     vi.mocked(useSessionData).mockReturnValue(mockedAuthenticatedSession)
     // eslint-disable-next-line no-unused-vars
-    vi.mocked(useAppSelector).mockImplementation((selectorFn: (state: { socket: SocketState }) => unknown) => {
-      if (selectorFn.toString().includes("state.socket.isConnected")) {
-        return true
+    vi.mocked(useAppSelector).mockImplementation(
+      (selectorFn: (state: { socket: SocketState; sidebar: SidebarState }) => unknown) => {
+        if (selectorFn.toString().includes("state.socket.isConnected")) return true
+        if (selectorFn.toString().includes("state.socket.rooms")) return mockedRoom1
+        return undefined
       }
-      return undefined
-    })
+    )
   })
 
   afterEach(() => {
@@ -106,7 +110,7 @@ describe("RoomsList Component", () => {
     fireEvent.click(buttons[0])
 
     await waitFor(() => {
-      expect(mockedRouterPush).toHaveBeenCalledWith(`/towers?room=${mockedSocketRoom1Id}`)
+      expect(mockedRouterPush).toHaveBeenCalledWith(`${ROUTE_TOWERS.PATH}?room=${mockedSocketRoom1Id}`)
     })
   })
 

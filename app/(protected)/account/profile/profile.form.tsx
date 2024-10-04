@@ -5,7 +5,6 @@ import { useFormState, useFormStatus } from "react-dom"
 import { useRouter } from "next/navigation"
 import { Account, User, UserStatus } from "@prisma/client"
 import axios from "axios"
-import clsx from "clsx"
 import { IoWarning } from "react-icons/io5"
 import { profile } from "@/app/(protected)/account/profile/profile.actions"
 import { ProfileFormErrorMessages } from "@/app/(protected)/account/profile/profile.schema"
@@ -13,7 +12,7 @@ import AlertMessage from "@/components/ui/AlertMessage"
 import Button from "@/components/ui/Button"
 import Calendar from "@/components/ui/Calendar"
 import Input from "@/components/ui/Input"
-import { ROUTE_ROOMS } from "@/constants/routes"
+import { ROUTE_GAMES } from "@/constants/routes"
 import { useSessionData } from "@/hooks/useSessionData"
 
 type ProfileProps = {
@@ -48,7 +47,7 @@ export function ProfileForm({ user, isNewUser }: ProfileProps): ReactNode {
       if (isNewUser) {
         setIsNewUserSuccess(true)
         setTimeout(() => {
-          router.push(ROUTE_ROOMS.PATH)
+          router.push(ROUTE_GAMES.PATH)
         }, 5000)
       }
     }
@@ -122,12 +121,9 @@ export function ProfileForm({ user, isNewUser }: ProfileProps): ReactNode {
           <IoWarning className="w-5 h-5 text-amber-500" />
           <div>
             Email not verified.{" "}
-            <a
-              className={clsx("text-blue-500", "hover:underline hover:cursor-pointer")}
-              onClick={handleResendVerification}
-            >
+            <button className="towers-link" onClick={handleResendVerification}>
               Resend verification
-            </a>
+            </button>
           </div>
         </div>
       )}

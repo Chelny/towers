@@ -1,22 +1,21 @@
 import { NextRequest, NextResponse } from "next/server"
-import { RoomChat } from "@prisma/client"
+import { RoomChat, RoomMessage, TowersUserProfile } from "@prisma/client"
 import DOMPurify from "isomorphic-dompurify"
 import { Session } from "next-auth"
-import { RoomChatWithTowersGameUser } from "@/interfaces/room-chat"
 import prisma from "@/lib/prisma"
 import { updateLastActiveAt } from "@/lib/user"
 
 export async function GET(_: NextRequest, context: { params: { roomId: string } }): Promise<NextResponse> {
   const { roomId } = context.params
-  const chat: RoomChatWithTowersGameUser[] = await prisma.roomChat.findMany({
+  const chat: RoomMessage[] = await prisma.roomChat.findMany({
     where: {
       roomId: roomId,
       createdAt: {
-        gte: new Date(new Date().setHours(0, 0, 0, 0))
+        gte: new Date(Date.now() - 24 * 60 * 60 * 1000) // 24 hours ago
       }
     },
     include: {
-      towersGameUser: {
+      towersUserProfile: {
         include: {
           user: true
         }
@@ -52,6 +51,20 @@ export async function POST(request: NextRequest, context: { params: { roomId: st
     )
   }
 
+  const towersUserProfile: TowersUserProfile | null = await prisma.towersUserProfile.findUnique({
+    where: { id: session.user.towersUserProfileId }
+  })
+
+  if (!towersUserProfile) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Unable to find the requested user profile."
+      },
+      { status: 404 }
+    )
+  }
+
   let message: string = DOMPurify.sanitize(data.message)
 
   if (message.trim().length === 0) {
@@ -67,11 +80,11 @@ export async function POST(request: NextRequest, context: { params: { roomId: st
   const chatMessage: RoomChat = await prisma.roomChat.create({
     data: {
       roomId: roomId,
-      towersUserId: data.towersUserId,
+      towersUserProfileId: session.user.towersUserProfileId,
       message
     },
     include: {
-      towersGameUser: {
+      towersUserProfile: {
         include: {
           user: true
         }

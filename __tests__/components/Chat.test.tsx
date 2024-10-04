@@ -1,14 +1,13 @@
+import { RoomMessage, TableMessage } from "@prisma/client"
 import { render, screen } from "@testing-library/react"
-import Chat from "@/components/Chat"
-import { RoomChatWithTowersGameUser } from "@/interfaces/room-chat"
-import { TableChatWithTowersGameUser } from "@/interfaces/table-chat"
+import Chat from "@/components/game/Chat"
 
 describe("Chat Component", () => {
   it("should render room chat messages correctly", () => {
-    const roomMessages: RoomChatWithTowersGameUser[] = [
-      { towersGameUser: { user: { username: "Alice" } }, message: "Hello" },
-      { towersGameUser: { user: { username: "Bob" } }, message: "Hi" }
-    ] as RoomChatWithTowersGameUser[]
+    const roomMessages: RoomMessage[] = [
+      { towersUserProfile: { user: { username: "Alice" } }, message: "Hello" },
+      { towersUserProfile: { user: { username: "Bob" } }, message: "Hi" }
+    ] as RoomMessage[]
 
     render(<Chat messages={roomMessages} />)
 
@@ -18,14 +17,14 @@ describe("Chat Component", () => {
 
   it("should render table chat messages correctly when isTableChat is true", () => {
     const tableMessages = [
-      { towersGameUser: { user: { username: "Charlie" } }, message: "Ready to play" },
-      { towersGameUser: { user: { username: "David" } }, message: "Let's go" }
-    ] as TableChatWithTowersGameUser[]
+      { towersUserProfile: { user: { username: "Charlie" } }, message: "Ready to play" },
+      { towersUserProfile: { user: { username: "David" } }, message: "Let’s go" }
+    ] as TableMessage[]
 
     render(<Chat messages={tableMessages} isTableChat />)
 
     expect(screen.getByText("Charlie: Ready to play")).toBeInTheDocument()
-    expect(screen.getByText("David: Let's go")).toBeInTheDocument()
+    expect(screen.getByText("David: Let’s go")).toBeInTheDocument()
   })
 
   it("should handle an empty message array without crashing", () => {

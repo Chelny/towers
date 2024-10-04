@@ -1,4 +1,4 @@
-import { RoomChat, User } from "@prisma/client"
+import { RoomChat } from "@prisma/client"
 
 /**
  * Create message
@@ -10,21 +10,10 @@ export interface RoomChatWithUsername {
 }
 
 /**
- * Read message
- */
-
-export interface RoomChatWithTowersGameUser extends RoomChat {
-  towersGameUser: {
-    user: User
-  }
-}
-
-/**
  * Redux
  */
 
 export interface RoomChatMessageInput {
   roomId: string
-  towersUserId: string
   message: string
 }

@@ -7,8 +7,8 @@ import { SignUpFormErrorMessages } from "@/app/(auth)/sign-up/sign-up.schema"
 import AlertMessage from "@/components/ui/AlertMessage"
 import Button from "@/components/ui/Button"
 import Calendar from "@/components/ui/Calendar"
+import Checkbox from "@/components/ui/Checkbox"
 import Input from "@/components/ui/Input"
-import RadioButtonGroup from "@/components/ui/RadioButtonGroup"
 
 const initialState = {
   success: false,
@@ -85,6 +85,13 @@ export function SignUpForm(): ReactNode {
         dataTestId="sign-up-confirm-password-input"
         onPaste={(event: ClipboardEvent<HTMLInputElement>) => event.preventDefault()}
         errorMessage={state?.error?.confirmPassword}
+      />
+      <Checkbox
+        id="termsAndConditions"
+        label="I agree to the terms and conditions."
+        required
+        dataTestId="sign-up-terms-and-conditions-checkbox"
+        errorMessage={state?.error?.termsAndConditions}
       />
       <Button type="submit" className="w-full" disabled={pending || state.success} dataTestId="sign-up-submit-button">
         Sign Up

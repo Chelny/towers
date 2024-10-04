@@ -6,6 +6,7 @@ import { getUserByEmail } from "@/data/user"
 import { sendVerificationEmail } from "@/lib/email"
 import prisma from "@/lib/prisma"
 import { generateEmailVerificationToken } from "@/lib/token"
+import { generateRandomUsername } from "@/utils/user-utils"
 
 export async function POST(body: SignUpFormData): Promise<NextResponse> {
   const user: User | null = await getUserByEmail(body.email)
@@ -61,7 +62,7 @@ export async function POST(body: SignUpFormData): Promise<NextResponse> {
   return NextResponse.json(
     {
       success: true,
-      message: `A confirmation email has been sent to ${body.email}. If you don't see it in your inbox, please check your spam or junk folder.`
+      message: `A confirmation email has been sent to ${body.email}. If you don’t see it in your inbox, please check your spam or junk folder.`
     },
     { status: 201 }
   )

@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server"
-import { Table } from "@prisma/client"
+import { TableInfo } from "@prisma/client"
 import prisma from "@/lib/prisma"
 
 export async function GET(_: NextRequest, context: { params: { tableId: string } }): Promise<NextResponse> {
   const { tableId } = context.params
-  const table: Table | null = await prisma.table.findUnique({
+  const table: TableInfo | null = await prisma.table.findUnique({
     where: {
       id: tableId
     },
@@ -15,9 +15,13 @@ export async function GET(_: NextRequest, context: { params: { tableId: string }
           user: true
         }
       },
-      towersGameUsers: {
+      towersUserRoomTables: {
         include: {
-          user: true
+          towersUserProfile: {
+            include: {
+              user: true
+            }
+          }
         }
       }
     }

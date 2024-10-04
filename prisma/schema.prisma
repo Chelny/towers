@@ -14,32 +14,32 @@ datasource db {
 }
 
 model User {
-  id                     String          @id @default(uuid())
+  id                     String             @id @default(uuid())
   name                   String
   birthdate              DateTime?
-  email                  String          @unique
+  email                  String             @unique
   emailVerified          DateTime?
   pendingEmail           String?
-  username               String?         @unique
+  username               String?            @unique
   password               String?
   image                  String?
-  language               String          @default("en")
-  isOnline               Boolean         @default(false)
-  lastActiveAt           DateTime        @default(now())
-  status                 UserStatus      @default(PENDING_EMAIL_VERIFICATION)
+  language               String             @default("en")
+  isOnline               Boolean            @default(false)
+  lastActiveAt           DateTime           @default(now())
+  status                 UserStatus         @default(PENDING_EMAIL_VERIFICATION)
   bannedAt               DateTime?
   deletionScheduledAt    DateTime?
-  createdAt              DateTime        @default(now())
-  updatedAt              DateTime        @updatedAt
+  createdAt              DateTime           @default(now())
+  updatedAt              DateTime           @updatedAt
   accounts               Account[]
   sessions               Session[]
-  towersGameUser         TowersGameUser?
+  towersUserProfile      TowersUserProfile?
   authenticators         Authenticator[]
   loginHistoryRecords    LoginHistory[]
-  sentFriendRequests     Friendship[]    @relation("FriendshipsSent")
-  receivedFriendRequests Friendship[]    @relation("FriendshipsReceived")
-  sentDirectMessages     DirectMessage[] @relation("DirectMessagesSent")
-  receivedDirectMessages DirectMessage[] @relation("DirectMessagesReceived")
+  sentFriendRequests     Friendship[]       @relation("FriendshipsSent")
+  receivedFriendRequests Friendship[]       @relation("FriendshipsReceived")
+  sentDirectMessages     DirectMessage[]    @relation("DirectMessagesSent")
+  receivedDirectMessages DirectMessage[]    @relation("DirectMessagesReceived")
 }
 
 model Account {
@@ -137,113 +137,120 @@ model Friendship {
   @@unique([userId1, userId2])
 }
 
-model TowersGameUser {
-  id                String          @id @default(uuid())
-  userId            String          @unique
-  roomId            String?
-  tableId           String?
-  seatNumber        Int?
-  rating            Int             @default(0)
-  gamesCompleted    Int             @default(0)
-  wins              Int             @default(0)
-  loses             Int             @default(0)
-  streak            Int             @default(0)
-  createdAt         DateTime        @default(now())
-  updatedAt         DateTime        @updatedAt
-  user              User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  room              Room?           @relation(fields: [roomId], references: [id])
-  roomChatMessages  RoomChat[]
-  table             Table?          @relation(fields: [tableId], references: [id])
-  tableSettings     TableSettings[]
-  tableChatMessages TableChat[]
-  hostedTables      Table[]         @relation("TableHost")
-  bootedTables      TableBoot[]     @relation("TableBooted")
-  bootedByTables    TableBoot[]     @relation("TableBootedBy")
+model TowersUserProfile {
+  id                   String                @id @default(uuid())
+  userId               String                @unique
+  rating               Int                   @default(0)
+  gamesCompleted       Int                   @default(0)
+  wins                 Int                   @default(0)
+  loses                Int                   @default(0)
+  streak               Int                   @default(0)
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+  user                 User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  roomChatMessages     RoomChat[]
+  towersUserRoomTables TowersUserRoomTable[] @relation("UserProfileToRoomTables")
+  tableSettings        TableSettings[]
+  tableChatMessages    TableChat[]
+  hostedTables         Table[]               @relation("TableHost")
+  bootedTables         TableBoot[]           @relation("TableBooted")
+  bootedByTables       TableBoot[]           @relation("TableBootedBy")
+}
 
-  @@unique([userId, roomId])
-  @@unique([userId, tableId])
-  @@unique([tableId, seatNumber])
+model TowersUserRoomTable {
+  id                  String            @id @default(uuid())
+  towersUserProfileId String
+  roomId              String
+  tableId             String?
+  seatNumber          Int?
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+  towersUserProfile   TowersUserProfile @relation("UserProfileToRoomTables", fields: [towersUserProfileId], references: [id], onDelete: Cascade)
+  room                Room              @relation(fields: [roomId], references: [id])
+  table               Table?            @relation(fields: [tableId], references: [id])
+
+  @@unique([roomId, tableId, seatNumber])
 }
 
 model Room {
-  id              String           @id @default(uuid())
-  name            String           @unique
-  difficulty      RoomLevel        @default(SOCIAL)
-  full            Boolean          @default(false)
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
-  towersGameUsers TowersGameUser[]
-  chatMessages    RoomChat[]
-  tables          Table[]
+  id                   String                @id @default(uuid())
+  name                 String                @unique
+  difficulty           RoomLevel             @default(SOCIAL)
+  full                 Boolean               @default(false)
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+  chatMessages         RoomChat[]
+  tables               Table[]
+  towersUserRoomTables TowersUserRoomTable[]
 }
 
 model RoomChat {
-  id             String              @id @default(uuid())
-  roomId         String
-  towersUserId   String
-  message        String
-  type           RoomChatMessageType @default(CHAT)
-  createdAt      DateTime            @default(now())
-  updatedAt      DateTime            @updatedAt
-  room           Room                @relation(fields: [roomId], references: [id], onDelete: Cascade)
-  towersGameUser TowersGameUser      @relation(fields: [towersUserId], references: [id])
+  id                  String              @id @default(uuid())
+  roomId              String
+  towersUserProfileId String
+  message             String
+  type                RoomChatMessageType @default(CHAT)
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+  room                Room                @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  towersUserProfile   TowersUserProfile   @relation(fields: [towersUserProfileId], references: [id])
 }
 
 model Table {
-  id              String           @id @default(uuid())
-  roomId          String
-  tableNumber     Int
-  hostId          String
-  tableType       TableType        @default(PUBLIC)
-  rated           Boolean          @default(true)
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
-  room            Room             @relation(fields: [roomId], references: [id], onDelete: Cascade)
-  host            TowersGameUser   @relation("TableHost", fields: [hostId], references: [id])
-  towersGameUsers TowersGameUser[]
-  chatMessages    TableChat[]
-  bootedPlayers   TableBoot[]
+  id                   String                @id @default(uuid())
+  roomId               String
+  tableNumber          Int
+  hostId               String
+  tableType            TableType             @default(PUBLIC)
+  rated                Boolean               @default(true)
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+  room                 Room                  @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  host                 TowersUserProfile     @relation("TableHost", fields: [hostId], references: [id])
+  chatMessages         TableChat[]
+  bootedPlayers        TableBoot[]
+  towersUserRoomTables TowersUserRoomTable[]
 
   @@unique([roomId, tableNumber])
 }
 
 model TableSettings {
-  id             String         @id @default(uuid())
-  towersUserId   String
-  sound          Boolean        @default(true)
-  upKey          String         @default("ArrowUp")
-  downKey        String         @default("ArrowDown")
-  leftKey        String         @default("ArrowLeft")
-  rightKey       String         @default("ArrowRight")
-  spaceKey       String         @default("Space")
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
-  towersGameUser TowersGameUser @relation(fields: [towersUserId], references: [id], onDelete: Cascade)
+  id                  String            @id @default(uuid())
+  towersUserProfileId String
+  sound               Boolean           @default(true)
+  upKey               String            @default("ArrowUp")
+  downKey             String            @default("ArrowDown")
+  leftKey             String            @default("ArrowLeft")
+  rightKey            String            @default("ArrowRight")
+  spaceKey            String            @default("Space")
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+  towersUserProfile   TowersUserProfile @relation(fields: [towersUserProfileId], references: [id], onDelete: Cascade)
 }
 
 model TableChat {
   id                    String               @id @default(uuid())
   tableId               String
-  towersUserId          String?
+  towersUserProfileId   String
   message               String
   type                  TableChatMessageType @default(CHAT)
   visibleToTowersUserId String?
   createdAt             DateTime             @default(now())
   updatedAt             DateTime             @updatedAt
   table                 Table                @relation(fields: [tableId], references: [id], onDelete: Cascade)
-  towersGameUser        TowersGameUser?      @relation(fields: [towersUserId], references: [id])
+  towersUserProfile     TowersUserProfile    @relation(fields: [towersUserProfileId], references: [id])
 }
 
 model TableBoot {
-  id                   String         @id @default(uuid())
+  id                   String            @id @default(uuid())
   tableId              String
-  towersUserId         String
+  towersUserProfileId  String
   bootedByTowersUserId String
-  createdAt            DateTime       @default(now())
-  updatedAt            DateTime       @updatedAt
-  table                Table          @relation(fields: [tableId], references: [id], onDelete: Cascade)
-  bootedUser           TowersGameUser @relation("TableBooted", fields: [towersUserId], references: [id], onDelete: Cascade)
-  bootedBy             TowersGameUser @relation("TableBootedBy", fields: [bootedByTowersUserId], references: [id], onDelete: Cascade)
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+  table                Table             @relation(fields: [tableId], references: [id], onDelete: Cascade)
+  bootedUser           TowersUserProfile @relation("TableBooted", fields: [towersUserProfileId], references: [id], onDelete: Cascade)
+  bootedBy             TowersUserProfile @relation("TableBootedBy", fields: [bootedByTowersUserId], references: [id], onDelete: Cascade)
 }
 
 model DirectMessage {

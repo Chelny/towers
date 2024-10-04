@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react"
-import GridRow from "@/components/game/GridRow"
+import GridRow from "@/components/towers/GridRow"
 import { BoardRow } from "@/interfaces/game"
 import { mockedDefaultTowersBlockProps } from "@/vitest.setup"
 

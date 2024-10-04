@@ -17,7 +17,9 @@ type TSessionProviderProps = PropsWithChildren<{
  * Type of the returned Provider elements with data which contains session data, status that shows the state of the Provider, and update which is the function to update session data
  */
 type TSessionStatus = "authenticated" | "loading" | "unauthenticated"
-type TUpdateSession = (_data?: any) => Promise<Session | null | undefined>
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type TUpdateSessionData = { [key: string]: any }
+type TUpdateSession = (data?: TUpdateSessionData) => Promise<Session | null | undefined>
 export type TSessionContextValue = { data: Session | null; status: TSessionStatus; update: TUpdateSession }
 
 /**
@@ -56,7 +58,7 @@ export const SessionDataProvider = ({ session: initialSession = null, children }
     () => ({
       data: session,
       status: loading ? "loading" : session ? "authenticated" : "unauthenticated",
-      async update(data?: any) {
+      async update(data?: TUpdateSessionData) {
         if (loading || !session) return
 
         setLoading(true)

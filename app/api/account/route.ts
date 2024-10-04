@@ -1,64 +1,14 @@
 import { NextResponse } from "next/server"
 import { Account, User, UserStatus } from "@prisma/client"
 import { Session } from "next-auth"
-import { AccountFormData } from "@/app/(protected)/account/account.schema"
+import { CancelAccountFormData } from "@/app/(protected)/account/cancel/cancel.schema"
 import { auth } from "@/auth"
 import { getAccountsByUserId } from "@/data/account"
 import { getUserById } from "@/data/user"
 import { sendAccountDeletionEmail } from "@/lib/email"
 import prisma from "@/lib/prisma"
 
-export async function GET(): Promise<NextResponse> {
-  const session: Session | null = await auth()
-
-  if (!session) {
-    return NextResponse.json(
-      {
-        success: false,
-        message: "Please sign in to access your account."
-      },
-      { status: 401 }
-    )
-  }
-
-  const user: Partial<User> | null = await prisma.user.findUnique({
-    where: {
-      id: session.user.id
-    },
-    select: {
-      name: true,
-      birthdate: true,
-      email: true,
-      username: true,
-      image: true,
-      accounts: {
-        select: {
-          provider: true
-        }
-      }
-    }
-  })
-
-  if (!user) {
-    return NextResponse.json(
-      {
-        success: false,
-        message: "We couldn’t find an account with that information. Please check your details and try again."
-      },
-      { status: 404 }
-    )
-  }
-
-  return NextResponse.json(
-    {
-      success: true,
-      data: user
-    },
-    { status: 200 }
-  )
-}
-
-export async function DELETE(body: AccountFormData): Promise<NextResponse> {
+export async function DELETE(body: CancelAccountFormData): Promise<NextResponse> {
   const session: Session | null = await auth()
 
   if (!session) {

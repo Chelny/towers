@@ -1,8 +1,9 @@
 import { fireEvent, render, screen } from "@testing-library/react"
 import { Mock } from "vitest"
-import Table from "@/components/Table"
+import Table from "@/components/game/Table"
 import { useSessionData } from "@/hooks/useSessionData"
 import { useAppDispatch, useAppSelector } from "@/lib/hooks"
+import { SidebarState } from "@/redux/features/sidebar-slice"
 import { SocketState } from "@/redux/features/socket-slice"
 import {
   mockedAuthenticatedSession,
@@ -52,30 +53,18 @@ describe("Table Component", () => {
     vi.mocked(useAppDispatch).mockReturnValue(mockedAppDispatch)
     vi.mocked(useSessionData).mockReturnValue(mockedAuthenticatedSession)
     // eslint-disable-next-line no-unused-vars
-    vi.mocked(useAppSelector).mockImplementation((selectorFn: (state: { socket: SocketState }) => unknown) => {
-      if (selectorFn.toString().includes("state.socket.rooms[roomId]?.users")) {
-        return mockedRoom1Users
+    vi.mocked(useAppSelector).mockImplementation(
+      (selectorFn: (state: { socket: SocketState; sidebar: SidebarState }) => unknown) => {
+        if (selectorFn.toString().includes("state.socket.rooms[roomId]?.users")) return mockedRoom1Users
+        if (selectorFn.toString().includes("state.socket.tables")) return mockedRoom1Table1
+        if (selectorFn.toString().includes("state.socket.tables[tableId]?.tableInfo")) return mockedRoom1Table1Info
+        if (selectorFn.toString().includes("state.socket.tables[tableId]?.isTableInfoLoading")) return false
+        if (selectorFn.toString().includes("state.socket.tables[tableId]?.chat")) return mockedRoom1Table1Chat
+        if (selectorFn.toString().includes("state.socket.tables[tableId]?.isChatLoading")) return false
+        if (selectorFn.toString().includes("state.socket.tables[tableId]?.users")) return mockedRoom1Table1Users
+        return undefined
       }
-      if (selectorFn.toString().includes("state.socket.tables")) {
-        return mockedRoom1Table1
-      }
-      if (selectorFn.toString().includes("state.socket.tables[tableId]?.tableInfo")) {
-        return mockedRoom1Table1Info
-      }
-      if (selectorFn.toString().includes("state.socket.tables[tableId]?.isTableInfoLoading")) {
-        return false
-      }
-      if (selectorFn.toString().includes("state.socket.tables[tableId]?.chat")) {
-        return mockedRoom1Table1Chat
-      }
-      if (selectorFn.toString().includes("state.socket.tables[tableId]?.isChatLoading")) {
-        return false
-      }
-      if (selectorFn.toString().includes("state.socket.tables[tableId]?.users")) {
-        return mockedRoom1Table1Users
-      }
-      return undefined
-    })
+    )
   })
 
   afterEach(() => {

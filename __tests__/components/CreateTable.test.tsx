@@ -1,7 +1,7 @@
 import { TableType } from "@prisma/client"
 import { fireEvent, render, screen } from "@testing-library/react"
 import { Mock } from "vitest"
-import CreateTable from "@/components/CreateTable"
+import CreateTable from "@/components/game/CreateTable"
 
 describe("CreateTable Component", () => {
   beforeAll(() => {

@@ -8,7 +8,7 @@ declare module "next-auth" {
    */
   interface User {
     username: string
-    towersUserId: string
+    towersUserProfileId: string
   }
   /**
    * The shape of the account object returned in the OAuth providers' `account` callback,
@@ -23,7 +23,7 @@ declare module "next-auth" {
     user: {
       id: string
       username: string
-      towersUserId: string
+      towersUserProfileId: string
       /**
        * By default, TypeScript merges new interface properties and overwrites existing ones.
        * In this case, the default session user properties will be overwritten,
@@ -46,7 +46,7 @@ declare module "next-auth/jwt" {
     /** OpenID ID Token */
     idToken?: string
     username: string
-    towersUserId: string
+    towersUserProfileId: string
     account: Account | null
     isNewUser: boolean
   }

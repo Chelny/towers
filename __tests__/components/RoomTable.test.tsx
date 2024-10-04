@@ -1,8 +1,9 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { Mock } from "vitest"
-import RoomTable from "@/components/RoomTable"
+import RoomTable from "@/components/game/RoomTable"
 import { useSessionData } from "@/hooks/useSessionData"
 import { useAppDispatch, useAppSelector } from "@/lib/hooks"
+import { SidebarState } from "@/redux/features/sidebar-slice"
 import { SocketState } from "@/redux/features/socket-slice"
 import { SocketRoomThunk } from "@/redux/thunks/socket-thunks"
 import {
@@ -47,8 +48,7 @@ vi.mock("@/redux/thunks/socket-thunks")
 describe("RoomTable Component", () => {
   const mockedAppDispatch: Mock = vi.fn()
   const mockedSocketRoomThunkParams: SocketRoomThunk = {
-    room: mockedSocketRoom1Id,
-    isTable: false,
+    roomId: mockedSocketRoom1Id,
     username: mockedUser1.username!
   }
 
@@ -56,15 +56,13 @@ describe("RoomTable Component", () => {
     vi.mocked(useAppDispatch).mockReturnValue(mockedAppDispatch)
     vi.mocked(useSessionData).mockReturnValue(mockedAuthenticatedSession)
     // eslint-disable-next-line no-unused-vars
-    vi.mocked(useAppSelector).mockImplementation((selectorFn: (state: { socket: SocketState }) => unknown) => {
-      if (selectorFn.toString().includes("state.socket.rooms[roomId]?.roomInfo")) {
-        return mockedRoom1Info
+    vi.mocked(useAppSelector).mockImplementation(
+      (selectorFn: (state: { socket: SocketState; sidebar: SidebarState }) => unknown) => {
+        if (selectorFn.toString().includes("state.socket.rooms[roomId]?.roomInfo")) return mockedRoom1Info
+        if (selectorFn.toString().includes("state.socket.rooms[roomId]?.isRoomInfoLoading")) return false
+        return undefined
       }
-      if (selectorFn.toString().includes("state.socket.rooms[roomId]?.isRoomInfoLoading")) {
-        return false
-      }
-      return undefined
-    })
+    )
   })
 
   afterEach(() => {

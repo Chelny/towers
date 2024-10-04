@@ -1,29 +1,27 @@
 /* eslint-disable no-unused-vars */
+import { RoomInfoWithTablesCount, RoomMessage, TableInfo, TableMessage, TowersUser } from "@prisma/client"
 import { ActionReducerMapBuilder, createSlice, PayloadAction } from "@reduxjs/toolkit"
-import { RoomWithTablesCount } from "@/interfaces/room"
-import { RoomChatMessageInput, RoomChatWithTowersGameUser } from "@/interfaces/room-chat"
-import { TableWithHostAndTowersGameUsers } from "@/interfaces/table"
-import { TableChatMessageInput, TableChatWithTowersGameUser } from "@/interfaces/table-chat"
-import { TowersGameUserWithUserAndTables } from "@/interfaces/towers-game-user"
+import { RoomChatMessageInput } from "@/interfaces/room-chat"
+import { TableChatMessageInput } from "@/interfaces/table-chat"
 import { fetchRoomChat, fetchRoomInfo, fetchRoomUsers } from "@/redux/thunks/room-thunks"
 import { joinRoom, leaveRoom } from "@/redux/thunks/socket-thunks"
 import { fetchTableChat, fetchTableInfo, fetchTableUsers } from "@/redux/thunks/table-thunks"
 
 export interface RoomsState {
-  roomInfo: RoomWithTablesCount | null
+  roomInfo: RoomInfoWithTablesCount | null
   isRoomInfoLoading: boolean
-  chat: RoomChatWithTowersGameUser[]
+  chat: RoomMessage[]
   isChatLoading: boolean
-  users: TowersGameUserWithUserAndTables[]
+  users: TowersUser[]
   isUsersLoading: boolean
 }
 
 export interface TablesState {
-  tableInfo: TableWithHostAndTowersGameUsers | null
+  tableInfo: TableInfo | null
   isTableInfoLoading: boolean
-  chat: TableChatWithTowersGameUser[]
+  chat: TableMessage[]
   isChatLoading: boolean
-  users: TowersGameUserWithUserAndTables[]
+  users: TowersUser[]
   isUsersLoading: boolean
 }
 
@@ -43,36 +41,45 @@ const initialState: SocketState = {
   errorMessage: undefined
 }
 
+type SocketErrorAction = PayloadAction<string | undefined>
 type RoomAction = PayloadAction<{
-  room: string
-  isTable: boolean
+  roomId?: string
+  tableId?: string
+  tableIds?: string[]
   username: string
 }>
 type RoomChatMessageInputAction = PayloadAction<RoomChatMessageInput>
-type RoomChatMessageAction = PayloadAction<{ roomId: string; data: RoomChatWithTowersGameUser }>
+type RoomChatMessageAction = PayloadAction<{ roomId: string; data: RoomMessage }>
 type TableChatMessageInputAction = PayloadAction<TableChatMessageInput>
-type TableChatMessageAction = PayloadAction<{ tableId: string; data: TableChatWithTowersGameUser }>
+type TableChatMessageAction = PayloadAction<{ tableId: string; data: TableMessage }>
+type ServerErrorAction = PayloadAction<string>
 
 const socketSlice = createSlice({
   name: "socket",
   initialState,
   reducers: {
-    initSocket: (state: SocketState) => {
+    initSocket: (state: SocketState): void => {
+      state.isConnected = false
+      state.errorMessage = undefined
+    },
+    destroySocket: (state: SocketState): void => {
       state.isConnected = false
     },
-    destroySocket: (state: SocketState) => {
-      state.isConnected = false
-    },
-    connectionEstablished: (state: SocketState) => {
+    connectionEstablished: (state: SocketState): void => {
       state.isConnected = true
+      state.errorMessage = undefined
     },
-    connectionLost: (state: SocketState) => {
+    connectionLost: (state: SocketState, action: SocketErrorAction): void => {
       state.isConnected = false
+      state.errorMessage = action.payload
     },
-    joinSocketRoom: (state: SocketState, action: RoomAction) => {},
-    beforeLeaveSocketRoom: (state: SocketState, action: RoomAction) => {},
-    sendMessageToRoomChat: (state: SocketState, action: RoomChatMessageInputAction) => {},
-    setRoomChatMessage: (state: SocketState, action: RoomChatMessageAction) => {
+    serverError: (state: SocketState, action: ServerErrorAction): void => {
+      state.errorMessage = action.payload
+    },
+    joinSocketRoom: (state: SocketState, action: RoomAction): void => {},
+    beforeLeaveSocketRoom: (state: SocketState, action: RoomAction): void => {},
+    sendMessageToRoomChat: (state: SocketState, action: RoomChatMessageInputAction): void => {},
+    setRoomChatMessage: (state: SocketState, action: RoomChatMessageAction): void => {
       const { roomId, data } = action.payload
 
       state.rooms[roomId] = {
@@ -80,8 +87,8 @@ const socketSlice = createSlice({
         chat: [...state.rooms[roomId]?.chat, data]
       }
     },
-    sendMessageToTableChat: (state: SocketState, action: TableChatMessageInputAction) => {},
-    setTableChatMessage: (state: SocketState, action: TableChatMessageAction) => {
+    sendMessageToTableChat: (state: SocketState, action: TableChatMessageInputAction): void => {},
+    setTableChatMessage: (state: SocketState, action: TableChatMessageAction): void => {
       const { tableId, data } = action.payload
 
       state.tables[tableId] = {
@@ -90,21 +97,21 @@ const socketSlice = createSlice({
       }
     }
   },
-  extraReducers: (builder: ActionReducerMapBuilder<SocketState>) => {
+  extraReducers: (builder: ActionReducerMapBuilder<SocketState>): void => {
     builder
       /**
        * Join Socket Room
        */
-      .addCase(joinRoom.pending, (state: SocketState) => {
+      .addCase(joinRoom.pending, (state: SocketState): void => {
         state.isLoading = true
       })
-      .addCase(joinRoom.fulfilled, (state: SocketState, action) => {
-        const { room, isTable } = action.payload
+      .addCase(joinRoom.fulfilled, (state: SocketState, action): void => {
+        const { roomId, tableId } = action.payload
 
         state.isLoading = false
 
-        if (isTable) {
-          state.tables[room] = {
+        if (tableId) {
+          state.tables[tableId] = {
             tableInfo: null,
             isTableInfoLoading: false,
             chat: [],
@@ -113,7 +120,7 @@ const socketSlice = createSlice({
             isUsersLoading: false
           }
         } else {
-          state.rooms[room] = {
+          state.rooms[roomId] = {
             roomInfo: null,
             isRoomInfoLoading: false,
             chat: [],
@@ -123,35 +130,35 @@ const socketSlice = createSlice({
           }
         }
       })
-      .addCase(joinRoom.rejected, (state: SocketState, action) => {
+      .addCase(joinRoom.rejected, (state: SocketState, action): void => {
         state.isLoading = false
         state.errorMessage = action.payload
       })
       /**
        * Leave Socket Room
        */
-      .addCase(leaveRoom.pending, (state: SocketState) => {
+      .addCase(leaveRoom.pending, (state: SocketState): void => {
         state.isLoading = true
       })
-      .addCase(leaveRoom.fulfilled, (state: SocketState, action) => {
-        const { room, isTable } = action.payload
+      .addCase(leaveRoom.fulfilled, (state: SocketState, action): void => {
+        const { roomId, tableId } = action.payload
 
         state.isLoading = false
 
-        if (isTable) {
-          delete state.tables[room]
+        if (tableId) {
+          delete state.tables[tableId]
         } else {
-          delete state.rooms[room]
+          delete state.rooms[roomId]
         }
       })
-      .addCase(leaveRoom.rejected, (state: SocketState, action) => {
+      .addCase(leaveRoom.rejected, (state: SocketState, action): void => {
         state.isLoading = false
         state.errorMessage = action.payload
       })
       /**
        * Room info
        */
-      .addCase(fetchRoomInfo.pending, (state: SocketState, action) => {
+      .addCase(fetchRoomInfo.pending, (state: SocketState, action): void => {
         const roomId: string = action.meta.arg.roomId
 
         state.isLoading = true
@@ -160,7 +167,7 @@ const socketSlice = createSlice({
           state.rooms[roomId].isRoomInfoLoading = true
         }
       })
-      .addCase(fetchRoomInfo.fulfilled, (state: SocketState, action) => {
+      .addCase(fetchRoomInfo.fulfilled, (state: SocketState, action): void => {
         const roomId: string = action.meta.arg.roomId
 
         state.isLoading = false
@@ -170,7 +177,7 @@ const socketSlice = createSlice({
           isRoomInfoLoading: false
         }
       })
-      .addCase(fetchRoomInfo.rejected, (state: SocketState, action) => {
+      .addCase(fetchRoomInfo.rejected, (state: SocketState, action): void => {
         const roomId: string = action.meta.arg.roomId
 
         state.isLoading = false
@@ -184,7 +191,7 @@ const socketSlice = createSlice({
       /**
        * Room chat
        */
-      .addCase(fetchRoomChat.pending, (state: SocketState, action) => {
+      .addCase(fetchRoomChat.pending, (state: SocketState, action): void => {
         const roomId: string = action.meta.arg.roomId
 
         state.isLoading = true
@@ -193,7 +200,7 @@ const socketSlice = createSlice({
           state.rooms[roomId].isChatLoading = true
         }
       })
-      .addCase(fetchRoomChat.fulfilled, (state: SocketState, action) => {
+      .addCase(fetchRoomChat.fulfilled, (state: SocketState, action): void => {
         const roomId: string = action.meta.arg.roomId
 
         state.isLoading = false
@@ -203,7 +210,7 @@ const socketSlice = createSlice({
           isChatLoading: false
         }
       })
-      .addCase(fetchRoomChat.rejected, (state: SocketState, action) => {
+      .addCase(fetchRoomChat.rejected, (state: SocketState, action): void => {
         const roomId: string = action.meta.arg.roomId
 
         state.isLoading = false
@@ -217,7 +224,7 @@ const socketSlice = createSlice({
       /**
        * Room users
        */
-      .addCase(fetchRoomUsers.pending, (state: SocketState, action) => {
+      .addCase(fetchRoomUsers.pending, (state: SocketState, action): void => {
         const roomId: string = action.meta.arg.roomId
 
         state.isLoading = true
@@ -226,7 +233,7 @@ const socketSlice = createSlice({
           state.rooms[roomId].isUsersLoading = true
         }
       })
-      .addCase(fetchRoomUsers.fulfilled, (state: SocketState, action) => {
+      .addCase(fetchRoomUsers.fulfilled, (state: SocketState, action): void => {
         const roomId: string = action.meta.arg.roomId
 
         state.isLoading = false
@@ -236,7 +243,7 @@ const socketSlice = createSlice({
           isUsersLoading: false
         }
       })
-      .addCase(fetchRoomUsers.rejected, (state: SocketState, action) => {
+      .addCase(fetchRoomUsers.rejected, (state: SocketState, action): void => {
         const roomId: string = action.meta.arg.roomId
 
         state.isLoading = false
@@ -250,7 +257,7 @@ const socketSlice = createSlice({
       /**
        * Table info
        */
-      .addCase(fetchTableInfo.pending, (state: SocketState, action) => {
+      .addCase(fetchTableInfo.pending, (state: SocketState, action): void => {
         const tableId: string = action.meta.arg.tableId
 
         state.isLoading = true
@@ -259,7 +266,7 @@ const socketSlice = createSlice({
           state.tables[tableId].isTableInfoLoading = true
         }
       })
-      .addCase(fetchTableInfo.fulfilled, (state: SocketState, action) => {
+      .addCase(fetchTableInfo.fulfilled, (state: SocketState, action): void => {
         const tableId: string = action.meta.arg.tableId
 
         state.isLoading = false
@@ -269,7 +276,7 @@ const socketSlice = createSlice({
           isTableInfoLoading: false
         }
       })
-      .addCase(fetchTableInfo.rejected, (state: SocketState, action) => {
+      .addCase(fetchTableInfo.rejected, (state: SocketState, action): void => {
         const tableId: string = action.meta.arg.tableId
 
         state.isLoading = false
@@ -283,7 +290,7 @@ const socketSlice = createSlice({
       /**
        * Table chat
        */
-      .addCase(fetchTableChat.pending, (state: SocketState, action) => {
+      .addCase(fetchTableChat.pending, (state: SocketState, action): void => {
         const tableId: string = action.meta.arg.tableId
 
         state.isLoading = true
@@ -292,7 +299,7 @@ const socketSlice = createSlice({
           state.tables[tableId].isChatLoading = true
         }
       })
-      .addCase(fetchTableChat.fulfilled, (state: SocketState, action) => {
+      .addCase(fetchTableChat.fulfilled, (state: SocketState, action): void => {
         const tableId: string = action.meta.arg.tableId
 
         state.isLoading = false
@@ -302,7 +309,7 @@ const socketSlice = createSlice({
           isChatLoading: false
         }
       })
-      .addCase(fetchTableChat.rejected, (state: SocketState, action) => {
+      .addCase(fetchTableChat.rejected, (state: SocketState, action): void => {
         const tableId: string = action.meta.arg.tableId
 
         state.isLoading = false
@@ -316,7 +323,7 @@ const socketSlice = createSlice({
       /**
        * Table users
        */
-      .addCase(fetchTableUsers.pending, (state: SocketState, action) => {
+      .addCase(fetchTableUsers.pending, (state: SocketState, action): void => {
         const tableId: string = action.meta.arg.tableId
 
         state.isLoading = true
@@ -325,7 +332,7 @@ const socketSlice = createSlice({
           state.tables[tableId].isUsersLoading = true
         }
       })
-      .addCase(fetchTableUsers.fulfilled, (state: SocketState, action) => {
+      .addCase(fetchTableUsers.fulfilled, (state: SocketState, action): void => {
         const tableId: string = action.meta.arg.tableId
 
         state.isLoading = false
@@ -335,7 +342,7 @@ const socketSlice = createSlice({
           isUsersLoading: false
         }
       })
-      .addCase(fetchTableUsers.rejected, (state: SocketState, action) => {
+      .addCase(fetchTableUsers.rejected, (state: SocketState, action): void => {
         const tableId: string = action.meta.arg.tableId
 
         state.isLoading = false
@@ -354,6 +361,7 @@ export const {
   destroySocket,
   connectionEstablished,
   connectionLost,
+  serverError,
   joinSocketRoom,
   beforeLeaveSocketRoom,
   sendMessageToRoomChat,

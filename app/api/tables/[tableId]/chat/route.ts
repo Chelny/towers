@@ -1,16 +1,14 @@
 import { NextRequest, NextResponse } from "next/server"
-import { TableChat } from "@prisma/client"
+import { TableChat, TableMessage, TowersUserProfile } from "@prisma/client"
 import DOMPurify from "isomorphic-dompurify"
 import { Session } from "next-auth"
-import { TableChatWithTowersGameUser } from "@/interfaces/table-chat"
 import prisma from "@/lib/prisma"
 import { updateLastActiveAt } from "@/lib/user"
-import { removeNullUndefined } from "@/utils/object-utils"
 
 export async function GET(request: NextRequest, context: { params: { tableId: string } }): Promise<NextResponse> {
   const { tableId } = context.params
   const searchParams: URLSearchParams = request.nextUrl.searchParams
-  const towersUserId: string | null = searchParams.get("towersUserId")
+  const towersUserProfileId: string | null = searchParams.get("towersUserProfileId")
 
   if (!tableId) {
     return NextResponse.json(
@@ -22,16 +20,16 @@ export async function GET(request: NextRequest, context: { params: { tableId: st
     )
   }
 
-  const chat: TableChatWithTowersGameUser[] = await prisma.tableChat.findMany({
+  const chat: TableMessage[] = await prisma.tableChat.findMany({
     where: {
       tableId: tableId,
-      OR: [{ visibleToTowersUserId: null }, { visibleToTowersUserId: towersUserId }],
+      OR: [{ visibleToTowersUserId: null }, { visibleToTowersUserId: towersUserProfileId }],
       createdAt: {
         gte: new Date(Date.now() - 24 * 60 * 60 * 1000) // 24 hours ago
       }
     },
     include: {
-      towersGameUser: {
+      towersUserProfile: {
         include: {
           user: true
         }
@@ -67,6 +65,20 @@ export async function POST(request: NextRequest, context: { params: { tableId: s
     )
   }
 
+  const towersUserProfile: TowersUserProfile | null = await prisma.towersUserProfile.findUnique({
+    where: { id: session.user.towersUserProfileId }
+  })
+
+  if (!towersUserProfile) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Unable to find the requested user profile."
+      },
+      { status: 404 }
+    )
+  }
+
   let message: string = DOMPurify.sanitize(data.message)
 
   if (message.trim().length === 0) {
@@ -80,16 +92,16 @@ export async function POST(request: NextRequest, context: { params: { tableId: s
   }
 
   const chatData = {
-    tableId: tableId,
-    towersUserId: data.towersUserId,
+    tableId,
+    towersUserProfileId: session.user.towersUserProfileId,
     message,
     type: data.type
   }
 
   const chatMessage: TableChat = await prisma.tableChat.create({
-    data: removeNullUndefined(chatData),
+    data: chatData,
     include: {
-      towersGameUser: {
+      towersUserProfile: {
         include: {
           user: true
         }

@@ -6,8 +6,8 @@ import {
   API_AUTH_PREFIX,
   PROTECTED_ROUTES,
   PUBLIC_ROUTES,
+  ROUTE_GAMES,
   ROUTE_RESET_PASSWORD,
-  ROUTE_ROOMS,
   ROUTE_SIGN_IN,
   ROUTE_TOWERS
 } from "@/constants/routes"
@@ -75,7 +75,7 @@ export default auth(async (request): Promise<NextResponse> => {
 
   if (request.auth) {
     if (PUBLIC_ROUTES.includes(request.nextUrl.pathname)) {
-      const newUrl: URL = new URL(ROUTE_ROOMS.PATH, request.nextUrl.origin)
+      const newUrl: URL = new URL(ROUTE_GAMES.PATH, request.nextUrl.origin)
       return NextResponse.redirect(newUrl)
     }
   } else {
@@ -85,9 +85,9 @@ export default auth(async (request): Promise<NextResponse> => {
     }
   }
 
-  // Redirects "/towers" (no params) to "/rooms"
-  if (request.nextUrl.pathname === ROUTE_TOWERS.PATH && request.nextUrl.search === "") {
-    const newUrl: URL = new URL(ROUTE_ROOMS.PATH, request.nextUrl.origin)
+  // Redirects "/games" to "/games/towers" // FIXME: Not working the second time
+  if (request.nextUrl.pathname === ROUTE_GAMES.PATH) {
+    const newUrl: URL = new URL(ROUTE_TOWERS.PATH, request.nextUrl.origin)
     return NextResponse.redirect(newUrl)
   }
 

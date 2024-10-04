@@ -188,7 +188,7 @@ export function useTowers() {
     createBlock: () => BoardBlock,
     excludeCondition: (block: BoardBlock) => boolean
   ): void => {
-    // Convert adjacent blocks based on the special piece's effect
+    // Convert adjacent blocks based on the special piece’s effect
     for (let i = 0; i < PIECE_LENGTH; i++) {
       const pieceRow: number = row + i
       const pieceCol: number = col

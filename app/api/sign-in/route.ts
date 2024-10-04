@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { TowersGameUser, User, UserStatus } from "@prisma/client"
+import { TowersUserProfile, User, UserStatus } from "@prisma/client"
 import { compare } from "bcryptjs"
 import { SignInFormData } from "@/app/(auth)/sign-in/sign-in.schema"
 import { getUserByEmail } from "@/data/user"
@@ -41,7 +41,7 @@ export async function POST(body: SignInFormData): Promise<NextResponse> {
   }
 
   // Get or create Towers table entry
-  const towersGameUser: TowersGameUser | null = await prisma.towersGameUser.upsert({
+  const towersUserProfile: TowersUserProfile | null = await prisma.towersUserProfile.upsert({
     where: { userId: user.id },
     update: {},
     create: { userId: user.id }
@@ -57,7 +57,7 @@ export async function POST(body: SignInFormData): Promise<NextResponse> {
           email: user.email,
           username: user.username,
           image: user.image,
-          towersUserId: towersGameUser.id
+          towersUserProfileId: towersUserProfile.id
         }
       }
     },

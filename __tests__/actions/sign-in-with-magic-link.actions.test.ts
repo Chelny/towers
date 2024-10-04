@@ -2,12 +2,12 @@ import { AuthError } from "next-auth"
 import { Mock } from "vitest"
 import { signInWithMagicLink } from "@/app/(auth)/sign-in-with-magic-link/sign-in-with-magic-link.actions"
 import { signIn as authSignInWithMagicLink } from "@/auth"
-import { ROUTE_ROOMS } from "@/constants/routes"
+import { ROUTE_GAMES } from "@/constants/routes"
 import { mockedFormInitialState } from "@/vitest.setup"
 
 vi.mock("@/auth")
 
-describe("Sign In With Magic Link Actions", () => {
+describe("Sign In with Magic Link Actions", () => {
   afterEach(() => {
     vi.restoreAllMocks()
   })
@@ -55,7 +55,7 @@ describe("Sign In With Magic Link Actions", () => {
 
     expect(authSignInWithMagicLink).toHaveBeenCalledWith("resend", {
       email: "john.doe@example.com",
-      redirectTo: ROUTE_ROOMS.PATH
+      redirectTo: ROUTE_GAMES.PATH
     })
     expect(result).toEqual(response)
   })
@@ -69,7 +69,7 @@ describe("Sign In With Magic Link Actions", () => {
 
     expect(authSignInWithMagicLink).toHaveBeenCalledWith("resend", {
       email: "john.doe@example.com",
-      redirectTo: ROUTE_ROOMS.PATH
+      redirectTo: ROUTE_GAMES.PATH
     })
     expect(result).toEqual({
       success: true,

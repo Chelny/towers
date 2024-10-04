@@ -57,7 +57,7 @@ const html = (subject: string, body: string): string => {
   `
 }
 
-// Email Text body (fallback for email clients that don't render HTML, e.g. feature phones)
+// Email Text body (fallback for email clients that don’t render HTML, e.g. feature phones)
 const text = ({ url, host }: { url: string; host: string }): string => {
   return `Sign in to ${host}\n${url}\n\n`
 }
@@ -126,7 +126,7 @@ export const sendPasswordResetEmail = async (name: string, email: string, token:
 
   const body: string = `
     <p>Hi ${name},</p>
-    <p>We've received a request to reset the password for the account associated with the email ${email}.</p>
+    <p>We’ve received a request to reset the password for the account associated with the email ${email}.</p>
     <p>You can reset your password by clicking the following link: <a href="${resetLink}" style="color: ${color.buttonBackground}; text-decoration: none;">reset password</a> or by copy-pasting the following URL in a browser: ${resetLink}. Please note that the link will expire one hour after receiving this message.</p>
     <p>If you did not request a new password or if you believe your account has been compromised, please contact our support team immediately.</p>
     <p>If you did not request this email, you can safely ignore it.</p>

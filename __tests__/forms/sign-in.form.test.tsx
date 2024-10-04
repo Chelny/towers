@@ -36,7 +36,7 @@ describe("Sign In Form", () => {
     expect(screen.getByText(/Forgot Password/i)).toBeInTheDocument()
     expect(screen.getByTestId("sign-in-submit-button")).toBeInTheDocument()
     expect(screen.getByText(/Sign Up/i)).toBeInTheDocument()
-    // expect(screen.getByTestId("sign-in-magic-link-button")).toBeInTheDocument()
+    expect(screen.getByTestId("sign-in-magic-link-button")).toBeInTheDocument()
     // expect(screen.getByTestId("sign-up-passkey-button")).toBeInTheDocument()
     // expect(screen.getByTestId("sign-in-passkey-button")).toBeInTheDocument()
   })
@@ -59,8 +59,8 @@ describe("Sign In Form", () => {
     expect(signUpLink).toBeInTheDocument()
     expect(signUpLink.closest("a")).toHaveAttribute("href", ROUTE_SIGN_UP.PATH)
 
-    // fireEvent.click(screen.getByTestId("sign-in-magic-link-button"))
-    // expect(mockedRouter.push).toHaveBeenCalledWith(ROUTE_SIGN_IN_WITH_MAGIC_LINK.PATH)
+    fireEvent.click(screen.getByTestId("sign-in-magic-link-button"))
+    expect(mockedRouter.push).toHaveBeenCalledWith(ROUTE_SIGN_IN_WITH_MAGIC_LINK.PATH)
   })
 
   it("should show error messages when submitting an empty form", () => {
@@ -98,10 +98,10 @@ describe("Sign In Form", () => {
     render(<SignInForm />)
 
     expect(screen.getByTestId("sign-in-submit-button")).toBeDisabled()
-    expect(screen.getByTestId("sign-in-google-button")).toBeDisabled()
-    expect(screen.getByTestId("sign-in-github-button")).toBeDisabled()
-    // expect(screen.getByTestId("sign-in-magic-link-button")).toBeDisabled()
+    expect(screen.getByTestId("sign-in-magic-link-button")).toBeDisabled()
     // expect(screen.getByTestId("sign-up-passkey-button")).toBeDisabled()
     // expect(screen.getByTestId("sign-in-passkey-button")).toBeDisabled()
+    expect(screen.getByTestId("sign-in-github-button")).toBeDisabled()
+    expect(screen.getByTestId("sign-in-google-button")).toBeDisabled()
   })
 })

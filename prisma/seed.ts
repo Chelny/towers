@@ -78,9 +78,8 @@ async function main() {
       const users = await prisma.user.findMany()
 
       // Set user game data
-      const towersGameUsersData = users.map((user) => ({
+      const towersUserProfileData = users.map((user) => ({
         userId: user.id,
-        roomId: room1.id,
         rating: Math.floor(Math.random() * 4000) + 1000,
         gamesCompleted: Math.floor(Math.random() * 100),
         wins: Math.floor(Math.random() * 50),
@@ -88,27 +87,27 @@ async function main() {
         streak: Math.floor(Math.random() * 5)
       }))
 
-      await prisma.towersGameUser.createMany({ data: towersGameUsersData })
+      await prisma.towersUserProfile.createMany({ data: towersUserProfileData })
 
-      const towersGameUsers = await prisma.towersGameUser.findMany()
+      const towersUserProfiles = await prisma.towersUserProfile.findMany()
 
       // Create tables in room 1
       const tablesData = [
         {
           tableNumber: 1,
-          hostId: towersGameUsers[0].id,
+          hostId: towersUserProfiles[0].id,
           tableType: TableType.PUBLIC,
           rated: true
         },
         {
           tableNumber: 2,
-          hostId: towersGameUsers[1].id,
+          hostId: towersUserProfiles[1].id,
           tableType: TableType.PROTECTED,
           rated: false
         },
         {
           tableNumber: 3,
-          hostId: towersGameUsers[2].id,
+          hostId: towersUserProfiles[2].id,
           tableType: TableType.PRIVATE,
           rated: true
         }
@@ -124,26 +123,29 @@ async function main() {
       const tables = await prisma.table.findMany()
 
       // Add users to the tables in room 1
-      for (let i = 0; i < towersGameUsers.length; i++) {
+      for (let i = 0; i < towersUserProfiles.length; i++) {
         if (i < 3) {
-          await prisma.towersGameUser.update({
-            where: { userId: towersGameUsers[i].userId },
+          await prisma.towersUserRoomTable.create({
             data: {
-              seatNumber: i + 1,
-              tableId: tables[0].id
+              towersUserProfileId: towersUserProfiles[i].id,
+              roomId: tables[0].roomId,
+              tableId: tables[0].id,
+              seatNumber: i + 1
             }
           })
         } else if (i === 3) {
-          await prisma.towersGameUser.update({
-            where: { userId: towersGameUsers[i].userId },
+          await prisma.towersUserRoomTable.create({
             data: {
+              towersUserProfileId: towersUserProfiles[i].id,
+              roomId: tables[1].roomId,
               tableId: tables[1].id
             }
           })
         } else if (i === 4) {
-          await prisma.towersGameUser.update({
-            where: { userId: towersGameUsers[i].userId },
+          await prisma.towersUserRoomTable.create({
             data: {
+              towersUserProfileId: towersUserProfiles[i].id,
+              roomId: tables[2].roomId,
               tableId: tables[2].id
             }
           })
@@ -153,16 +155,16 @@ async function main() {
       // Create chat messages for room 1
       const roomChatMessages = [
         {
-          towersUserId: towersGameUsers[4].id,
+          towersUserProfileId: towersUserProfiles[4].id,
           message: "Hello from Room 1!"
         },
         {
-          towersUserId: towersGameUsers[1].id,
+          towersUserProfileId: towersUserProfiles[1].id,
           message: "Hey everyone!"
         },
         {
-          towersUserId: towersGameUsers[2].id,
-          message: "Let's play!"
+          towersUserProfileId: towersUserProfiles[2].id,
+          message: "Let’s play!"
         }
       ]
 
@@ -175,24 +177,24 @@ async function main() {
 
       const tableChatMessages = [
         {
-          towersUserId: towersGameUsers[1].id,
+          towersUserProfileId: towersUserProfiles[1].id,
           message: "Hello from Room 1!"
         },
         {
-          towersUserId: towersGameUsers[4].id,
+          towersUserProfileId: towersUserProfiles[4].id,
           message: "Hey everyone!"
         },
         {
-          towersUserId: towersGameUsers[1].id,
-          message: "Let's play!"
+          towersUserProfileId: towersUserProfiles[1].id,
+          message: "Let’s play!"
         },
         {
-          towersUserId: towersGameUsers[3].id,
+          towersUserProfileId: towersUserProfiles[3].id,
           message: "Hi!! Let the game begin!"
         },
         {
-          towersUserId: towersGameUsers[4].id,
-          message: "Let's GOOOOO!"
+          towersUserProfileId: towersUserProfiles[4].id,
+          message: "Let’s GOOOOO!"
         }
       ]
 

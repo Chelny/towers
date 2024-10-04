@@ -8,17 +8,25 @@ type AuthLayoutProps = {
 
 export default function AuthLayout({ children }: AuthLayoutProps): ReactNode {
   return (
-    <div className="h-full bg-white">
-      <h1 className="p-4 bg-amber-400 text-4xl">Towers Game</h1>
+    <div className={clsx("flex flex-col h-full bg-white", "md:flex-row md:gap-4")}>
       <div
         className={clsx(
-          "flex flex-col px-4 pb-8 mx-auto bg-white",
-          "sm:px-0 sm:max-w-sm sm:bg-transparent",
-          "md:max-w-md"
+          "p-4 bg-teal-900 text-teal-100",
+          "md:flex-1 md:flex md:justify-center md:items-center md:h-full"
         )}
       >
-        <Breadcrumb />
-        {children}
+        <h1 className={clsx("text-4xl", "md:text-5xl")}>Towers Game</h1>
+      </div>
+      <div
+        className={clsx(
+          "flex flex-col h-full p-4 pb-8 overflow-y-auto",
+          "md:flex-1 md:flex md:justify-center md:items-center md:pb-4"
+        )}
+      >
+        <div className={clsx("sm:w-96 sm:mx-auto", "md:w-full md:max-w-md")}>
+          <Breadcrumb />
+          {children}
+        </div>
       </div>
     </div>
   )

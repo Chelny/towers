@@ -12,7 +12,8 @@ export async function signUp(prevState: ApiResponse, formData: FormData): Promis
     email: formData.get("email") as string,
     username: formData.get("username") as string,
     password: formData.get("password") as string,
-    confirmPassword: formData.get("confirmPassword") as string
+    confirmPassword: formData.get("confirmPassword") as string,
+    termsAndConditions: formData.get("termsAndConditions") as string
   }
 
   const errors: ValueError[] = Array.from(Value.Errors(signUpSchema, rawFormData))
@@ -39,6 +40,9 @@ export async function signUp(prevState: ApiResponse, formData: FormData): Promis
         break
       case "confirmPassword":
         errorMessages.confirmPassword = "The password confirmation is invalid."
+        break
+      case "termsAndConditions":
+        errorMessages.termsAndConditions = "You must accept the terms and conditions."
         break
       default:
         console.error(`Sign Up Action: Unknown error at ${error.path}`)
