@@ -3,9 +3,9 @@ import { render, screen } from "@testing-library/react"
 import { Mock } from "vitest"
 import { VerifyEmailForm } from "@/app/(auth)/verify-email/verify-email.form"
 
-const { useRouter, mockedRouterPush, useSearchParams, mockedSearchParams } = vi.hoisted(() => {
-  const mockedRouterPush: Mock = vi.fn()
-  const mockedSearchParams = {
+const { useRouter, mockRouterPush, useSearchParams, mockSearchParams } = vi.hoisted(() => {
+  const mockRouterPush: Mock = vi.fn()
+  const mockSearchParams = {
     get: vi.fn(),
     getAll: vi.fn(),
     has: vi.fn(),
@@ -22,10 +22,10 @@ const { useRouter, mockedRouterPush, useSearchParams, mockedSearchParams } = vi.
   }
 
   return {
-    useRouter: () => ({ push: mockedRouterPush }),
-    mockedRouterPush,
-    useSearchParams: () => mockedSearchParams,
-    mockedSearchParams
+    useRouter: () => ({ push: mockRouterPush }),
+    mockRouterPush,
+    useSearchParams: () => mockSearchParams,
+    mockSearchParams
   }
 })
 
@@ -70,7 +70,7 @@ describe("Verify Email Form", () => {
   it("should pass the email and token from URL params to the hidden input fields", () => {
     const token: string = "YjY1ZWYwYzEtYWU2My00YWIwLTljZmQtMzcxYjdiY2UwODRifGNoZWxueTFAZXhhbXBsZS5kZXY="
 
-    mockedSearchParams.get.mockImplementation((key: string) => {
+    mockSearchParams.get.mockImplementation((key: string) => {
       if (key === "token") return token
       return null
     })

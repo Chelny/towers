@@ -1,17 +1,17 @@
 import { render, screen } from "@testing-library/react"
+import { mockDefaultTowersBlockProps } from "@/__mocks__/data/board"
 import GridRow from "@/components/towers/GridRow"
 import { BoardRow } from "@/interfaces/game"
-import { mockedDefaultTowersBlockProps } from "@/vitest.setup"
 
 describe("GridRow Component", () => {
-  const mockedRow: BoardRow = [
-    { ...mockedDefaultTowersBlockProps, letter: "T", powerType: "defense" },
-    { ...mockedDefaultTowersBlockProps, letter: "O", powerType: null },
-    { ...mockedDefaultTowersBlockProps, letter: "W", powerType: "attack" }
+  const mockRow: BoardRow = [
+    { ...mockDefaultTowersBlockProps, letter: "T", powerType: "defense" },
+    { ...mockDefaultTowersBlockProps, letter: "O", powerType: null },
+    { ...mockDefaultTowersBlockProps, letter: "W", powerType: "attack" }
   ]
 
   it("should render a row with the correct number of cells", () => {
-    render(<GridRow rowIndex={2} row={mockedRow} />)
+    render(<GridRow rowIndex={2} row={mockRow} />)
 
     const cells: HTMLDivElement[] = screen.getAllByText(/T|O/)
     expect(cells).toHaveLength(5)
@@ -20,9 +20,9 @@ describe("GridRow Component", () => {
   it("should hide rows that are below the hidden row threshold", () => {
     render(
       <>
-        <GridRow rowIndex={0} row={mockedRow} />
-        <GridRow rowIndex={1} row={mockedRow} />
-        <GridRow rowIndex={2} row={mockedRow} />
+        <GridRow rowIndex={0} row={mockRow} />
+        <GridRow rowIndex={1} row={mockRow} />
+        <GridRow rowIndex={2} row={mockRow} />
       </>
     )
 
@@ -33,7 +33,7 @@ describe("GridRow Component", () => {
   })
 
   it("should render cells correctly for opponent board", () => {
-    render(<GridRow rowIndex={2} row={mockedRow} isOpponentBoard={true} />)
+    render(<GridRow rowIndex={2} row={mockRow} isOpponentBoard={true} />)
 
     const cells: HTMLDivElement[] = screen.getAllByRole("gridcell")
     cells.forEach((cell: HTMLDivElement) => {

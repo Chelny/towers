@@ -14,32 +14,36 @@ datasource db {
 }
 
 model User {
-  id                     String             @id @default(uuid())
-  name                   String
-  birthdate              DateTime?
-  email                  String             @unique
-  emailVerified          DateTime?
-  pendingEmail           String?
-  username               String?            @unique
-  password               String?
-  image                  String?
-  language               String             @default("en")
-  isOnline               Boolean            @default(false)
-  lastActiveAt           DateTime           @default(now())
-  status                 UserStatus         @default(PENDING_EMAIL_VERIFICATION)
-  bannedAt               DateTime?
-  deletionScheduledAt    DateTime?
-  createdAt              DateTime           @default(now())
-  updatedAt              DateTime           @updatedAt
-  accounts               Account[]
-  sessions               Session[]
-  towersUserProfile      TowersUserProfile?
-  authenticators         Authenticator[]
-  loginHistoryRecords    LoginHistory[]
-  sentFriendRequests     Friendship[]       @relation("FriendshipsSent")
-  receivedFriendRequests Friendship[]       @relation("FriendshipsReceived")
-  sentDirectMessages     DirectMessage[]    @relation("DirectMessagesSent")
-  receivedDirectMessages DirectMessage[]    @relation("DirectMessagesReceived")
+  id                  String     @id @default(uuid())
+  name                String
+  birthdate           DateTime?
+  email               String     @unique
+  emailVerified       DateTime?
+  pendingEmail        String?
+  username            String?    @unique
+  password            String?
+  image               String?
+  language            String     @default("en")
+  isOnline            Boolean    @default(false)
+  lastActiveAt        DateTime   @default(now())
+  status              UserStatus @default(PENDING_EMAIL_VERIFICATION)
+  bannedAt            DateTime?
+  deletionScheduledAt DateTime?
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+
+  accounts            Account[]
+  sessions            Session[]
+  authenticators      Authenticator[]
+  loginHistoryRecords LoginHistory[]
+  friendshipUser1     Friendship[]             @relation("FriendshipUser1")
+  friendshipUser2     Friendship[]             @relation("FriendshipUser2")
+  directMessageUser1  DirectMessage[]          @relation("DirectMessageSender")
+  directMessageUser2  DirectMessage[]          @relation("DirectMessageReceiver")
+  towersUserProfile   TowersUserProfile?
+  roomChatMessages    TowersRoomChatMessage[]
+  hostedTables        TowersTable[]            @relation("TableHost")
+  tableChatMessages   TowersTableChatMessage[]
 }
 
 model Account {
@@ -57,18 +61,20 @@ model Account {
   session_state     String?  @map("sessionState")
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
-  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
 
 model Session {
-  id                  String         @id @default(uuid())
-  sessionToken        String         @unique
-  userId              String
-  expires             DateTime
-  createdAt           DateTime       @default(now())
-  updatedAt           DateTime       @updatedAt
+  id           String   @id @default(uuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
   user                User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   loginHistoryRecords LoginHistory[]
 }
@@ -95,7 +101,8 @@ model Authenticator {
   transports           String?
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt
-  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, credentialID])
 }
@@ -120,8 +127,9 @@ model LoginHistory {
   sessionId String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  session   Session? @relation(fields: [sessionId], references: [id])
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  session Session? @relation(fields: [sessionId], references: [id])
 }
 
 model Friendship {
@@ -131,137 +139,139 @@ model Friendship {
   status    FriendshipStatus
   createdAt DateTime         @default(now())
   updatedAt DateTime         @updatedAt
-  user1     User             @relation("FriendshipsSent", fields: [userId1], references: [id], onDelete: Cascade)
-  user2     User             @relation("FriendshipsReceived", fields: [userId2], references: [id], onDelete: Cascade)
+
+  user1 User @relation("FriendshipUser1", fields: [userId1], references: [id], onDelete: Cascade)
+  user2 User @relation("FriendshipUser2", fields: [userId2], references: [id], onDelete: Cascade)
 
   @@unique([userId1, userId2])
+  @@index([userId1])
+  @@index([userId2])
+}
+
+model DirectMessage {
+  id         String   @id @default(uuid())
+  senderId   String
+  receiverId String
+  message    String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  sender   User @relation("DirectMessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver User @relation("DirectMessageReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  @@index([senderId, receiverId])
 }
 
 model TowersUserProfile {
-  id                   String                @id @default(uuid())
-  userId               String                @unique
-  rating               Int                   @default(0)
-  gamesCompleted       Int                   @default(0)
-  wins                 Int                   @default(0)
-  loses                Int                   @default(0)
-  streak               Int                   @default(0)
-  createdAt            DateTime              @default(now())
-  updatedAt            DateTime              @updatedAt
-  user                 User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  roomChatMessages     RoomChat[]
-  towersUserRoomTables TowersUserRoomTable[] @relation("UserProfileToRoomTables")
-  tableSettings        TableSettings[]
-  tableChatMessages    TableChat[]
-  hostedTables         Table[]               @relation("TableHost")
-  bootedTables         TableBoot[]           @relation("TableBooted")
-  bootedByTables       TableBoot[]           @relation("TableBootedBy")
+  id             String   @id @default(uuid())
+  userId         String   @unique
+  rating         Int      @default(0)
+  gamesCompleted Int      @default(0)
+  wins           Int      @default(0)
+  loses          Int      @default(0)
+  streak         Int      @default(0)
+  roomId         String?
+  tableId        String?
+  seatNumber     Int?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  user           User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  room           TowersRoom?           @relation(fields: [roomId], references: [id])
+  table          TowersTable?          @relation(fields: [tableId], references: [id])
+  tableSettings  TowersTableSettings[]
+  bootedTables   TowersTableBoot[]     @relation("TableBootedUser")
+  bootedByTables TowersTableBoot[]     @relation("TableBootedBy")
+
+  @@unique([userId, roomId])
+  @@unique([userId, tableId])
+  @@unique([userId, tableId, seatNumber])
 }
 
-model TowersUserRoomTable {
-  id                  String            @id @default(uuid())
-  towersUserProfileId String
-  roomId              String
-  tableId             String?
-  seatNumber          Int?
-  createdAt           DateTime          @default(now())
-  updatedAt           DateTime          @updatedAt
-  towersUserProfile   TowersUserProfile @relation("UserProfileToRoomTables", fields: [towersUserProfileId], references: [id], onDelete: Cascade)
-  room                Room              @relation(fields: [roomId], references: [id])
-  table               Table?            @relation(fields: [tableId], references: [id])
+model TowersRoom {
+  id         String    @id @default(uuid())
+  name       String    @unique
+  difficulty RoomLevel @default(SOCIAL)
+  full       Boolean   @default(false)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 
-  @@unique([roomId, tableId, seatNumber])
+  tables       TowersTable[]
+  chatMessages TowersRoomChatMessage[]
+  userProfiles TowersUserProfile[]
 }
 
-model Room {
-  id                   String                @id @default(uuid())
-  name                 String                @unique
-  difficulty           RoomLevel             @default(SOCIAL)
-  full                 Boolean               @default(false)
-  createdAt            DateTime              @default(now())
-  updatedAt            DateTime              @updatedAt
-  chatMessages         RoomChat[]
-  tables               Table[]
-  towersUserRoomTables TowersUserRoomTable[]
+model TowersRoomChatMessage {
+  id        String   @id @default(uuid())
+  roomId    String
+  userId    String
+  message   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  room TowersRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  user User       @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model RoomChat {
-  id                  String              @id @default(uuid())
-  roomId              String
-  towersUserProfileId String
-  message             String
-  type                RoomChatMessageType @default(CHAT)
-  createdAt           DateTime            @default(now())
-  updatedAt           DateTime            @updatedAt
-  room                Room                @relation(fields: [roomId], references: [id], onDelete: Cascade)
-  towersUserProfile   TowersUserProfile   @relation(fields: [towersUserProfileId], references: [id])
-}
+model TowersTable {
+  id          String    @id @default(uuid())
+  roomId      String
+  tableNumber Int
+  hostId      String
+  tableType   TableType @default(PUBLIC)
+  rated       Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
-model Table {
-  id                   String                @id @default(uuid())
-  roomId               String
-  tableNumber          Int
-  hostId               String
-  tableType            TableType             @default(PUBLIC)
-  rated                Boolean               @default(true)
-  createdAt            DateTime              @default(now())
-  updatedAt            DateTime              @updatedAt
-  room                 Room                  @relation(fields: [roomId], references: [id], onDelete: Cascade)
-  host                 TowersUserProfile     @relation("TableHost", fields: [hostId], references: [id])
-  chatMessages         TableChat[]
-  bootedPlayers        TableBoot[]
-  towersUserRoomTables TowersUserRoomTable[]
+  room         TowersRoom               @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  host         User                     @relation("TableHost", fields: [hostId], references: [id])
+  chatMessages TowersTableChatMessage[]
+  bootedUsers  TowersTableBoot[]
+  userProfiles TowersUserProfile[]
 
   @@unique([roomId, tableNumber])
 }
 
-model TableSettings {
-  id                  String            @id @default(uuid())
-  towersUserProfileId String
-  sound               Boolean           @default(true)
-  upKey               String            @default("ArrowUp")
-  downKey             String            @default("ArrowDown")
-  leftKey             String            @default("ArrowLeft")
-  rightKey            String            @default("ArrowRight")
-  spaceKey            String            @default("Space")
-  createdAt           DateTime          @default(now())
-  updatedAt           DateTime          @updatedAt
-  towersUserProfile   TowersUserProfile @relation(fields: [towersUserProfileId], references: [id], onDelete: Cascade)
+model TowersTableSettings {
+  id            String   @id @default(uuid())
+  userProfileId String
+  sound         Boolean  @default(true)
+  upKey         String   @default("ArrowUp")
+  downKey       String   @default("ArrowDown")
+  leftKey       String   @default("ArrowLeft")
+  rightKey      String   @default("ArrowRight")
+  spaceKey      String   @default("Space")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  userProfile TowersUserProfile @relation(fields: [userProfileId], references: [id], onDelete: Cascade)
 }
 
-model TableChat {
-  id                    String               @id @default(uuid())
-  tableId               String
-  towersUserProfileId   String
-  message               String
-  type                  TableChatMessageType @default(CHAT)
-  visibleToTowersUserId String?
-  createdAt             DateTime             @default(now())
-  updatedAt             DateTime             @updatedAt
-  table                 Table                @relation(fields: [tableId], references: [id], onDelete: Cascade)
-  towersUserProfile     TowersUserProfile    @relation(fields: [towersUserProfileId], references: [id])
+model TowersTableChatMessage {
+  id              String               @id @default(uuid())
+  tableId         String
+  userId          String
+  message         String
+  type            TableChatMessageType @default(CHAT)
+  privateToUserId String?
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+
+  table TowersTable @relation(fields: [tableId], references: [id], onDelete: Cascade)
+  user  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model TableBoot {
-  id                   String            @id @default(uuid())
-  tableId              String
-  towersUserProfileId  String
-  bootedByTowersUserId String
-  createdAt            DateTime          @default(now())
-  updatedAt            DateTime          @updatedAt
-  table                Table             @relation(fields: [tableId], references: [id], onDelete: Cascade)
-  bootedUser           TowersUserProfile @relation("TableBooted", fields: [towersUserProfileId], references: [id], onDelete: Cascade)
-  bootedBy             TowersUserProfile @relation("TableBootedBy", fields: [bootedByTowersUserId], references: [id], onDelete: Cascade)
-}
+model TowersTableBoot {
+  id                          String   @id @default(uuid())
+  tableId                     String
+  userProfileId               String
+  bootedByTowersUserProfileId String
+  createdAt                   DateTime @default(now())
+  updatedAt                   DateTime @updatedAt
 
-model DirectMessage {
-  id        String   @id @default(uuid())
-  userId1   String
-  userId2   String
-  message   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  User1     User     @relation("DirectMessagesSent", fields: [userId1], references: [id])
-  User2     User     @relation("DirectMessagesReceived", fields: [userId2], references: [id])
+  table      TowersTable       @relation(fields: [tableId], references: [id], onDelete: Cascade)
+  bootedUser TowersUserProfile @relation("TableBootedUser", fields: [userProfileId], references: [id], onDelete: Cascade)
+  bootedBy   TowersUserProfile @relation("TableBootedBy", fields: [bootedByTowersUserProfileId], references: [id], onDelete: Cascade)
 }
 
 enum UserStatus {
@@ -274,7 +284,6 @@ enum UserStatus {
 enum FriendshipStatus {
   PENDING
   ACCEPTED
-  DECLINED
   BLOCKED
 }
 
@@ -283,10 +292,6 @@ enum RoomLevel {
   BEGINNER
   INTERMEDIATE
   ADVANCED
-}
-
-enum RoomChatMessageType {
-  CHAT
 }
 
 enum TableType {
@@ -299,8 +304,8 @@ enum TableChatMessageType {
   CHAT
   USER_ACTION
   SCORE_UPDATE
-  TABLE_HOST
-  TABLE_TYPE
+  TABLE_HOST_UPDATE
+  TABLE_TYPE_UPDATE
   CIPHER_KEY
   HERO_TEXT
 }

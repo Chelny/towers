@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from "next/server"
-import { RoomChat, RoomMessage, TowersUserProfile } from "@prisma/client"
+import { TowersRoomChatMessage, TowersUserProfile } from "@prisma/client"
 import DOMPurify from "isomorphic-dompurify"
 import { Session } from "next-auth"
 import prisma from "@/lib/prisma"
 import { updateLastActiveAt } from "@/lib/user"
 
-export async function GET(_: NextRequest, context: { params: { roomId: string } }): Promise<NextResponse> {
+export async function GET(request: NextRequest, context: { params: { roomId: string } }): Promise<NextResponse> {
   const { roomId } = context.params
-  const chat: RoomMessage[] = await prisma.roomChat.findMany({
+
+  const chat: TowersRoomChatMessage[] = await prisma.towersRoomChatMessage.findMany({
     where: {
       roomId: roomId,
       createdAt: {
@@ -15,11 +16,7 @@ export async function GET(_: NextRequest, context: { params: { roomId: string } 
       }
     },
     include: {
-      towersUserProfile: {
-        include: {
-          user: true
-        }
-      }
+      user: true
     },
     orderBy: {
       createdAt: "asc"
@@ -45,14 +42,14 @@ export async function POST(request: NextRequest, context: { params: { roomId: st
     return NextResponse.json(
       {
         success: false,
-        message: "Please sign in to access your account."
+        message: "Sorry, your request could not be processed."
       },
       { status: 401 }
     )
   }
 
   const towersUserProfile: TowersUserProfile | null = await prisma.towersUserProfile.findUnique({
-    where: { id: session.user.towersUserProfileId }
+    where: { userId: session.user.id }
   })
 
   if (!towersUserProfile) {
@@ -77,18 +74,14 @@ export async function POST(request: NextRequest, context: { params: { roomId: st
     )
   }
 
-  const chatMessage: RoomChat = await prisma.roomChat.create({
+  const chatMessage: TowersRoomChatMessage = await prisma.towersRoomChatMessage.create({
     data: {
-      roomId: roomId,
-      towersUserProfileId: session.user.towersUserProfileId,
+      roomId,
+      userId: session.user.id,
       message
     },
     include: {
-      towersUserProfile: {
-        include: {
-          user: true
-        }
-      }
+      user: true
     }
   })
 

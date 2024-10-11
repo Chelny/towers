@@ -1,17 +1,17 @@
 import { render, screen } from "@testing-library/react"
+import { mockDefaultTowersBlockProps } from "@/__mocks__/data/board"
 import PowerBar from "@/components/towers/PowerBar"
 import { PowerBarBlock } from "@/interfaces/game"
-import { mockedDefaultTowersBlockProps } from "@/vitest.setup"
 
 describe("PowerBar Component", () => {
-  const mockedBlocks: PowerBarBlock[] = [
-    { ...mockedDefaultTowersBlockProps, letter: "T", powerType: "defense", powerLevel: "minor" },
-    { ...mockedDefaultTowersBlockProps, letter: "O", powerType: "attack", powerLevel: "minor" },
+  const mockBlocks: PowerBarBlock[] = [
+    { ...mockDefaultTowersBlockProps, letter: "T", powerType: "defense", powerLevel: "minor" },
+    { ...mockDefaultTowersBlockProps, letter: "O", powerType: "attack", powerLevel: "minor" },
     { letter: "SD", specialDiamondType: "speed drop" }
   ]
 
   it("should render all blocks in the power bar", () => {
-    render(<PowerBar blocks={mockedBlocks} />)
+    render(<PowerBar blocks={mockBlocks} />)
 
     const defenseBlocks: HTMLDivElement[] = screen.getAllByText("T")
     expect(defenseBlocks).toHaveLength(4)

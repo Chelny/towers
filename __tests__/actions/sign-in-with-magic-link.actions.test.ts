@@ -2,8 +2,8 @@ import { AuthError } from "next-auth"
 import { Mock } from "vitest"
 import { signInWithMagicLink } from "@/app/(auth)/sign-in-with-magic-link/sign-in-with-magic-link.actions"
 import { signIn as authSignInWithMagicLink } from "@/auth"
-import { ROUTE_GAMES } from "@/constants/routes"
-import { mockedFormInitialState } from "@/vitest.setup"
+import { ROUTE_TOWERS } from "@/constants/routes"
+import { mockFormInitialState } from "@/vitest.setup"
 
 vi.mock("@/auth")
 
@@ -16,7 +16,7 @@ describe("Sign In with Magic Link Actions", () => {
     const formData = new FormData()
     formData.append("email", "")
 
-    const result = await signInWithMagicLink(mockedFormInitialState, formData)
+    const result = await signInWithMagicLink(mockFormInitialState, formData)
 
     expect(result).toEqual({
       success: false,
@@ -30,7 +30,7 @@ describe("Sign In with Magic Link Actions", () => {
     const formData = new FormData()
     formData.append("email", "john.doe.com")
 
-    const result = await signInWithMagicLink(mockedFormInitialState, formData)
+    const result = await signInWithMagicLink(mockFormInitialState, formData)
 
     expect(result).toEqual({
       success: false,
@@ -51,11 +51,11 @@ describe("Sign In with Magic Link Actions", () => {
     }
     ;(authSignInWithMagicLink as Mock).mockRejectedValueOnce(authError)
 
-    const result = await signInWithMagicLink(mockedFormInitialState, formData)
+    const result = await signInWithMagicLink(mockFormInitialState, formData)
 
     expect(authSignInWithMagicLink).toHaveBeenCalledWith("resend", {
       email: "john.doe@example.com",
-      redirectTo: ROUTE_GAMES.PATH
+      redirectTo: ROUTE_TOWERS.PATH
     })
     expect(result).toEqual(response)
   })
@@ -65,11 +65,11 @@ describe("Sign In with Magic Link Actions", () => {
     formData.append("email", "john.doe@example.com")
     ;(authSignInWithMagicLink as Mock).mockResolvedValueOnce({})
 
-    const result = await signInWithMagicLink(mockedFormInitialState, formData)
+    const result = await signInWithMagicLink(mockFormInitialState, formData)
 
     expect(authSignInWithMagicLink).toHaveBeenCalledWith("resend", {
       email: "john.doe@example.com",
-      redirectTo: ROUTE_GAMES.PATH
+      redirectTo: ROUTE_TOWERS.PATH
     })
     expect(result).toEqual({
       success: true,

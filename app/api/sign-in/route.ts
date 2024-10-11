@@ -40,13 +40,6 @@ export async function POST(body: SignInFormData): Promise<NextResponse> {
       break
   }
 
-  // Get or create Towers table entry
-  const towersUserProfile: TowersUserProfile | null = await prisma.towersUserProfile.upsert({
-    where: { userId: user.id },
-    update: {},
-    create: { userId: user.id }
-  })
-
   return NextResponse.json(
     {
       success: true,
@@ -56,8 +49,7 @@ export async function POST(body: SignInFormData): Promise<NextResponse> {
           name: user.name,
           email: user.email,
           username: user.username,
-          image: user.image,
-          towersUserProfileId: towersUserProfile.id
+          image: user.image
         }
       }
     },

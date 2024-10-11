@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { TableChat, TableMessage, TowersUserProfile } from "@prisma/client"
+import { ITowersTableChatMessage, TowersTableChatMessage, TowersUserProfile } from "@prisma/client"
 import DOMPurify from "isomorphic-dompurify"
 import { Session } from "next-auth"
 import prisma from "@/lib/prisma"
@@ -8,7 +8,7 @@ import { updateLastActiveAt } from "@/lib/user"
 export async function GET(request: NextRequest, context: { params: { tableId: string } }): Promise<NextResponse> {
   const { tableId } = context.params
   const searchParams: URLSearchParams = request.nextUrl.searchParams
-  const towersUserProfileId: string | null = searchParams.get("towersUserProfileId")
+  const userId: string | null = searchParams.get("userId")
 
   if (!tableId) {
     return NextResponse.json(
@@ -20,20 +20,16 @@ export async function GET(request: NextRequest, context: { params: { tableId: st
     )
   }
 
-  const chat: TableMessage[] = await prisma.tableChat.findMany({
+  const chatMessages: ITowersTableChatMessage[] = await prisma.towersTableChatMessage.findMany({
     where: {
-      tableId: tableId,
-      OR: [{ visibleToTowersUserId: null }, { visibleToTowersUserId: towersUserProfileId }],
+      tableId,
+      OR: [{ privateToUserId: null }, { privateToUserId: userId }],
       createdAt: {
         gte: new Date(Date.now() - 24 * 60 * 60 * 1000) // 24 hours ago
       }
     },
     include: {
-      towersUserProfile: {
-        include: {
-          user: true
-        }
-      }
+      user: true
     },
     orderBy: {
       createdAt: "asc"
@@ -44,7 +40,7 @@ export async function GET(request: NextRequest, context: { params: { tableId: st
   return NextResponse.json(
     {
       success: true,
-      data: chat
+      data: chatMessages
     },
     { status: 200 }
   )
@@ -59,14 +55,14 @@ export async function POST(request: NextRequest, context: { params: { tableId: s
     return NextResponse.json(
       {
         success: false,
-        message: "Please sign in to access your account."
+        message: "Sorry, your request could not be processed."
       },
       { status: 401 }
     )
   }
 
   const towersUserProfile: TowersUserProfile | null = await prisma.towersUserProfile.findUnique({
-    where: { id: session.user.towersUserProfileId }
+    where: { userId: session.user.id }
   })
 
   if (!towersUserProfile) {
@@ -91,22 +87,14 @@ export async function POST(request: NextRequest, context: { params: { tableId: s
     )
   }
 
-  const chatData = {
-    tableId,
-    towersUserProfileId: session.user.towersUserProfileId,
-    message,
-    type: data.type
-  }
-
-  const chatMessage: TableChat = await prisma.tableChat.create({
-    data: chatData,
-    include: {
-      towersUserProfile: {
-        include: {
-          user: true
-        }
-      }
-    }
+  const chatMessage: TowersTableChatMessage = await prisma.towersTableChatMessage.create({
+    data: {
+      tableId,
+      userId: session.user.id,
+      message,
+      type: data.type
+    },
+    include: { user: true }
   })
 
   await updateLastActiveAt(session.user.id)

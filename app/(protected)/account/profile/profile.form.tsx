@@ -12,7 +12,7 @@ import AlertMessage from "@/components/ui/AlertMessage"
 import Button from "@/components/ui/Button"
 import Calendar from "@/components/ui/Calendar"
 import Input from "@/components/ui/Input"
-import { ROUTE_GAMES } from "@/constants/routes"
+import { ROUTE_TOWERS } from "@/constants/routes"
 import { useSessionData } from "@/hooks/useSessionData"
 
 type ProfileProps = {
@@ -47,7 +47,7 @@ export function ProfileForm({ user, isNewUser }: ProfileProps): ReactNode {
       if (isNewUser) {
         setIsNewUserSuccess(true)
         setTimeout(() => {
-          router.push(ROUTE_GAMES.PATH)
+          router.push(ROUTE_TOWERS.PATH)
         }, 5000)
       }
     }

@@ -1,30 +1,33 @@
-import { RoomMessage, TableMessage } from "@prisma/client"
 import { render, screen } from "@testing-library/react"
+import { mockRoom1Chat, mockRoom1Table1Chat } from "@/__mocks__/data/socketState"
 import Chat from "@/components/game/Chat"
 
 describe("Chat Component", () => {
   it("should render room chat messages correctly", () => {
-    const roomMessages: RoomMessage[] = [
-      { towersUserProfile: { user: { username: "Alice" } }, message: "Hello" },
-      { towersUserProfile: { user: { username: "Bob" } }, message: "Hi" }
-    ] as RoomMessage[]
+    render(<Chat messages={mockRoom1Chat} />)
 
-    render(<Chat messages={roomMessages} />)
-
-    expect(screen.getByText("Alice: Hello")).toBeInTheDocument()
-    expect(screen.getByText("Bob: Hi")).toBeInTheDocument()
+    expect(screen.getByText(`${mockRoom1Chat[0].user.username}: ${mockRoom1Chat[0].message}`)).toBeInTheDocument()
+    expect(screen.getByText(`${mockRoom1Chat[1].user.username}: ${mockRoom1Chat[1].message}`)).toBeInTheDocument()
   })
 
   it("should render table chat messages correctly when isTableChat is true", () => {
-    const tableMessages = [
-      { towersUserProfile: { user: { username: "Charlie" } }, message: "Ready to play" },
-      { towersUserProfile: { user: { username: "David" } }, message: "Let’s go" }
-    ] as TableMessage[]
+    render(<Chat messages={mockRoom1Table1Chat} isTableChat />)
 
-    render(<Chat messages={tableMessages} isTableChat />)
-
-    expect(screen.getByText("Charlie: Ready to play")).toBeInTheDocument()
-    expect(screen.getByText("David: Let’s go")).toBeInTheDocument()
+    expect(screen.getByText(`${mockRoom1Table1Chat[0].message}`)).toBeInTheDocument()
+    expect(
+      screen.getByText(`${mockRoom1Table1Chat[1].user?.username}: ${mockRoom1Table1Chat[1].message}`)
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText(`${mockRoom1Table1Chat[2].user?.username}: ${mockRoom1Table1Chat[2].message}`)
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText(`${mockRoom1Table1Chat[3].user?.username}: ${mockRoom1Table1Chat[3].message}`)
+    ).toBeInTheDocument()
+    expect(screen.getByText(`${mockRoom1Table1Chat[4].message}`)).toBeInTheDocument()
+    expect(screen.getByText(`${mockRoom1Table1Chat[5].message}`)).toBeInTheDocument()
+    expect(screen.getByText(`${mockRoom1Table1Chat[6].message}`)).toBeInTheDocument()
+    expect(screen.getByText(`${mockRoom1Table1Chat[7].message}`)).toBeInTheDocument()
+    expect(screen.getByText(`${mockRoom1Table1Chat[8].message}`)).toBeInTheDocument()
   })
 
   it("should handle an empty message array without crashing", () => {

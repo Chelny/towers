@@ -4,10 +4,13 @@
 
 - Add localization
 - Add predefined avatars or let users upload their picture
-- Sign in with passkey
+- Sign in with passkey (currently experimental and not yet recommended for production use)
 - Double check account deletion date (timezone) in email
+- Change favicon.ico
 
 ## Room
+
+- Hide ratings for users in "social" rooms (eg.: Eiffel Tower)
 
 ### Invitation Request
 
@@ -16,7 +19,7 @@
 
 ### Create Table
 
-- Endpoint + socket event
+- Update: endpoint + socket event
 
 ### Player Information
 

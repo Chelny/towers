@@ -2,16 +2,16 @@ import { useFormState, useFormStatus } from "react-dom"
 import { Account, User } from "@prisma/client"
 import { render, screen } from "@testing-library/react"
 import { Mock } from "vitest"
+import { mockUnauthenticatedSession, mockUser1 } from "@/__mocks__/data/users"
 import { ProfileForm } from "@/app/(protected)/account/profile/profile.form"
 import { useSessionData } from "@/hooks/useSessionData"
-import { mockedUnauthenticatedSession, mockedUser1 } from "@/vitest.setup"
 
-const { useRouter, mockedRouterPush } = vi.hoisted(() => {
-  const mockedRouterPush: Mock = vi.fn()
+const { useRouter, mockRouterPush } = vi.hoisted(() => {
+  const mockRouterPush: Mock = vi.fn()
 
   return {
-    useRouter: () => ({ push: mockedRouterPush }),
-    mockedRouterPush
+    useRouter: () => ({ push: mockRouterPush }),
+    mockRouterPush
   }
 })
 
@@ -39,7 +39,7 @@ vi.mock("@/app/(protected)/account/profile/profile.actions", () => ({
 
 describe("Sign Up Form", () => {
   const user: User & { accounts: Account[] } = {
-    ...mockedUser1,
+    ...mockUser1,
     accounts: []
   }
 
@@ -62,7 +62,7 @@ describe("Sign Up Form", () => {
       action: null
     })
 
-    vi.mocked(useSessionData).mockReturnValue(mockedUnauthenticatedSession)
+    vi.mocked(useSessionData).mockReturnValue(mockUnauthenticatedSession)
   })
 
   afterEach(() => {

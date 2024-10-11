@@ -1,23 +1,20 @@
 import { render, screen } from "@testing-library/react"
 import { Mock } from "vitest"
+import { mockSocketRoom1Id, mockSocketRoom1Table1Id } from "@/__mocks__/data/socketState"
+import { mockRoom1Table1 } from "@/__mocks__/data/tables"
+import { mockAuthenticatedSession } from "@/__mocks__/data/users"
 import TowersPageContent from "@/components/game/TowersPageContent"
 import { useSessionData } from "@/hooks/useSessionData"
 import { useAppDispatch, useAppSelector } from "@/lib/hooks"
 import { SidebarState } from "@/redux/features/sidebar-slice"
 import { destroySocket, initSocket, SocketState } from "@/redux/features/socket-slice"
-import {
-  mockedAuthenticatedSession,
-  mockedRoom1Table1,
-  mockedSocketRoom1Id,
-  mockedSocketRoom1Table1Id
-} from "@/vitest.setup"
 
 const { useRouter } = vi.hoisted(() => {
-  const mockedRouterPush: Mock = vi.fn()
+  const mockRouterPush: Mock = vi.fn()
 
   return {
-    useRouter: () => ({ push: mockedRouterPush }),
-    mockedRouterPush
+    useRouter: () => ({ push: mockRouterPush }),
+    mockRouterPush
   }
 })
 
@@ -45,19 +42,19 @@ vi.mock("@/lib/hooks", async () => {
 })
 
 describe("TowersPageContent Component", () => {
-  const mockedAppDispatch: Mock = vi.fn()
+  const mockAppDispatch: Mock = vi.fn()
 
   beforeAll(() => {
     Element.prototype.scrollIntoView = vi.fn()
   })
 
   beforeEach(() => {
-    vi.mocked(useAppDispatch).mockReturnValue(mockedAppDispatch)
-    vi.mocked(useSessionData).mockReturnValue(mockedAuthenticatedSession)
+    vi.mocked(useAppDispatch).mockReturnValue(mockAppDispatch)
+    vi.mocked(useSessionData).mockReturnValue(mockAuthenticatedSession)
     // eslint-disable-next-line no-unused-vars
     vi.mocked(useAppSelector).mockImplementation(
       (selectorFn: (state: { socket: SocketState; sidebar: SidebarState }) => unknown) => {
-        if (selectorFn.toString().includes("state.socket.tables")) return mockedRoom1Table1
+        if (selectorFn.toString().includes("state.socket.tables")) return mockRoom1Table1
         return undefined
       }
     )
@@ -68,36 +65,36 @@ describe("TowersPageContent Component", () => {
   })
 
   it("should render Room component if tableId is not provided", () => {
-    render(<TowersPageContent roomId={mockedSocketRoom1Id} tableId="" />)
+    render(<TowersPageContent roomId={mockSocketRoom1Id} tableId="" />)
 
     expect(screen.getByText("Play Now")).toBeInTheDocument()
     expect(screen.getByText("Exit Room")).toBeInTheDocument()
   })
 
   it("should render Table component if tableId is provided", () => {
-    render(<TowersPageContent roomId={mockedSocketRoom1Id} tableId={mockedSocketRoom1Table1Id} />)
+    render(<TowersPageContent roomId={mockSocketRoom1Id} tableId={mockSocketRoom1Table1Id} />)
 
     expect(screen.getByText("Start")).toBeInTheDocument()
     expect(screen.getByText("Quit")).toBeInTheDocument()
   })
 
   it("should dispatch initSocket when not connected and session is authenticated", () => {
-    render(<TowersPageContent roomId={mockedSocketRoom1Id} tableId="" />)
+    render(<TowersPageContent roomId={mockSocketRoom1Id} tableId="" />)
 
-    expect(mockedAppDispatch).toHaveBeenCalledWith(initSocket())
+    expect(mockAppDispatch).toHaveBeenCalledWith(initSocket())
   })
 
   it("should dispatche destroySocket when offline event is triggered", () => {
-    render(<TowersPageContent roomId={mockedSocketRoom1Id} tableId="" />)
+    render(<TowersPageContent roomId={mockSocketRoom1Id} tableId="" />)
 
     window.dispatchEvent(new Event("offline"))
-    expect(mockedAppDispatch).toHaveBeenCalledWith(destroySocket())
+    expect(mockAppDispatch).toHaveBeenCalledWith(destroySocket())
   })
 
   it("should update session on online event", () => {
-    render(<TowersPageContent roomId={mockedSocketRoom1Id} tableId="" />)
+    render(<TowersPageContent roomId={mockSocketRoom1Id} tableId="" />)
 
     window.dispatchEvent(new Event("online"))
-    expect(mockedAuthenticatedSession.update).toHaveBeenCalled()
+    expect(mockAuthenticatedSession.update).toHaveBeenCalled()
   })
 })

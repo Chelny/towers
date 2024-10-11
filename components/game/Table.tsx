@@ -4,7 +4,15 @@ import { ChangeEvent, KeyboardEvent, MouseEvent, ReactNode, useEffect, useRef, u
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime"
 import dynamic from "next/dynamic"
 import { useRouter } from "next/navigation"
-import { TableInfo, TableMessage, TableType, TowersUser } from "@prisma/client"
+import {
+  ITowersTable,
+  ITowersTableChatMessage,
+  ITowersUserProfile,
+  ITowersUserProfileWithRelations,
+  IUserWithRelations,
+  TableChatMessageType,
+  TableType
+} from "@prisma/client"
 import clsx from "clsx/lite"
 import { v4 as uuidv4 } from "uuid"
 import ServerMessage from "@/components/game/ServerMessage"
@@ -22,7 +30,26 @@ import { ROUTE_TOWERS } from "@/constants/routes"
 import { useSessionData } from "@/hooks/useSessionData"
 import { useAppDispatch, useAppSelector } from "@/lib/hooks"
 import { addLink, removeLink } from "@/redux/features/sidebar-slice"
-import { beforeLeaveSocketRoom, joinSocketRoom, sendMessageToTableChat } from "@/redux/features/socket-slice"
+import {
+  addTable,
+  beforeLeaveTableAction,
+  joinTableAction,
+  removeTable,
+  sendTableChatMessage,
+  sendTablePrivateChatMessage,
+  updateTable
+} from "@/redux/features/socket-slice"
+import {
+  selectIsTableChatLoading,
+  selectIsTableInfoLoading,
+  selectNextTableHost,
+  selectRoomUsersInvite,
+  selectTableByIdInRoom,
+  selectTableChat,
+  selectTableInfo,
+  selectTableUsers,
+  selectTableUsersBoot
+} from "@/redux/selectors/socket-selectors"
 import { AppDispatch, RootState } from "@/redux/store"
 import { fetchRoomUsers } from "@/redux/thunks/room-thunks"
 import { leaveRoom } from "@/redux/thunks/socket-thunks"
@@ -58,33 +85,74 @@ type TableProps = {
 export default function Table({ roomId, tableId }: TableProps): ReactNode {
   const router: AppRouterInstance = useRouter()
   const { data: session } = useSessionData()
-  const roomUsers: TowersUser[] = useAppSelector((state: RootState) => state.socket.rooms[roomId]?.users)
-  const tableInfo: TableInfo | null = useAppSelector((state: RootState) => state.socket.tables[tableId]?.tableInfo)
-  const isTableInfoLoading: boolean = useAppSelector(
-    (state: RootState) => state.socket.tables[tableId]?.isTableInfoLoading
+  const isConnected: boolean = useAppSelector((state: RootState) => state.socket.isConnected)
+  // const roomTable: ITowersTable | null = useAppSelector((state: RootState) =>
+  //   selectTableByIdInRoom(state, roomId, tableId)
+  // )
+  const tableInfo: ITowersTable | null = useAppSelector((state: RootState) => selectTableInfo(state, tableId))
+  const isTableInfoLoading: boolean = useAppSelector((state: RootState) => selectIsTableInfoLoading(state, tableId))
+  const chat: ITowersTableChatMessage[] = useAppSelector((state: RootState) => selectTableChat(state, tableId))
+  const isChatLoading: boolean = useAppSelector((state: RootState) => selectIsTableChatLoading(state, tableId))
+  const tableUsers: ITowersUserProfile[] = useAppSelector((state: RootState) => selectTableUsers(state, tableId))
+  const roomUsersInvite: ITowersUserProfile[] = useAppSelector((state: RootState) =>
+    selectRoomUsersInvite(state, roomId, tableId)
   )
-  const chat: TableMessage[] = useAppSelector((state: RootState) => state.socket.tables[tableId]?.chat)
-  const isChatLoading: boolean = useAppSelector((state: RootState) => state.socket.tables[tableId]?.isChatLoading)
-  const tableUsers: TowersUser[] = useAppSelector((state: RootState) => state.socket.tables[tableId]?.users)
+  const tableUsersBoot: ITowersUserProfile[] = useAppSelector((state: RootState) =>
+    selectTableUsersBoot(state, tableId, session)
+  )
+  const nextTableHost: IUserWithRelations | null = useAppSelector((state: RootState) =>
+    selectNextTableHost(state, tableId)
+  )
   const dispatch: AppDispatch = useAppDispatch()
   const messageInputRef = useRef<HTMLInputElement>(null)
   const chatEndRef = useRef<HTMLDivElement>(null)
   const [tableType, setTableType] = useState<string>(TableType.PUBLIC)
-  const [isRated, setIsRated] = useState<boolean>(false)
+  const [isRated, setIsRated] = useState<boolean>(true)
   const [isInviteUserModalOpen, setIsInviteUserModalOpen] = useState<boolean>(false)
   const [isBootUserModalOpen, setIsBootUserModalOpen] = useState<boolean>(false)
   const [seatsCss, setSeatsCss] = useState<SeatsCss[]>(INITIAL_SEATS_CSS)
   const [seatedSeats, setSeatedSeats] = useState<Set<number>>(new Set())
   const [isGameState, setGameState] = useState<GameState>(GameState.WAITING_FOR_PLAYERS)
   const [seatUnavailable, setSeatUnavailable] = useState<boolean>(false)
+  const [previousTableUsersCount, setPreviousTableUsersCount] = useState<number>(0)
 
   useEffect(() => {
-    dispatch(joinSocketRoom({ roomId, tableId, username: session?.user.username }))
-    dispatch(fetchRoomUsers({ roomId }))
-    dispatch(fetchTableInfo({ tableId }))
-    dispatch(fetchTableChat({ tableId, towersUserProfileId: session?.user.towersUserProfileId }))
-    dispatch(fetchTableUsers({ tableId }))
-  }, [])
+    if (isConnected) {
+      dispatch(joinTableAction({ tableId }))
+    }
+  }, [tableId, isConnected])
+
+  useEffect(() => {
+    if (isConnected) {
+      const abortController: AbortController = new AbortController()
+      const { signal } = abortController
+
+      dispatch(fetchRoomUsers({ roomId, signal }))
+
+      return () => {
+        abortController.abort()
+      }
+    }
+  }, [roomId, isConnected])
+
+  useEffect(() => {
+    if (isConnected) {
+      const abortController: AbortController = new AbortController()
+      const { signal } = abortController
+
+      dispatch(fetchTableInfo({ tableId, signal }))
+
+      if (session?.user.id) {
+        dispatch(fetchTableChat({ tableId, userId: session?.user.id, signal }))
+      }
+
+      dispatch(fetchTableUsers({ tableId, signal }))
+
+      return () => {
+        abortController.abort()
+      }
+    }
+  }, [tableId, isConnected])
 
   useEffect(() => {
     if (tableInfo?.room?.name) {
@@ -103,6 +171,42 @@ export default function Table({ roomId, tableId }: TableProps): ReactNode {
       setTableType(tableInfo.tableType)
     }
   }, [tableInfo])
+
+  useEffect(() => {
+    if (isConnected) {
+      if (nextTableHost && tableUsers.length > 0 && tableUsers.length < previousTableUsersCount) {
+        const userProfiles: ITowersUserProfileWithRelations[] = tableUsers.map(({ room, table, ...rest }) => rest)
+
+        // Update table's host and users list
+        dispatch(
+          updateTable({
+            roomId,
+            tableId,
+            table: {
+              ...tableInfo,
+              host: nextTableHost,
+              userProfiles
+            } as ITowersTable
+          })
+        )
+      }
+
+      setPreviousTableUsersCount(tableUsers.length)
+    }
+  }, [isConnected, tableUsers])
+
+  useEffect(() => {
+    if (nextTableHost?.id === session?.user.id && nextTableHost && tableInfo?.host !== nextTableHost) {
+      // Send table host message to new host
+      dispatch(
+        sendTablePrivateChatMessage({
+          tableId,
+          username: session?.user.username!,
+          chatMessageType: TableChatMessageType.TABLE_HOST_UPDATE
+        })
+      )
+    }
+  }, [tableUsers])
 
   useEffect(() => {
     scrollChatToBottom()
@@ -171,7 +275,7 @@ export default function Table({ roomId, tableId }: TableProps): ReactNode {
       const message: string = messageInputRef.current.value.trim()
 
       if (message !== "") {
-        dispatch(sendMessageToTableChat({ tableId, message }))
+        dispatch(sendTableChatMessage({ tableId, message }))
         messageInputRef.current.value = ""
       }
     }
@@ -182,12 +286,19 @@ export default function Table({ roomId, tableId }: TableProps): ReactNode {
   }
 
   const handleQuitTable = (): void => {
-    dispatch(leaveRoom({ roomId, tableId, username: session?.user.username }))
+    dispatch(leaveRoom({ roomId, tableId }))
       .unwrap()
       .then(() => {
-        dispatch(beforeLeaveSocketRoom({ roomId, tableId, username: session?.user.username }))
+        const usersCount: number = tableInfo?.userProfiles.length ?? 0
+
+        dispatch(beforeLeaveTableAction({ tableId, isLastUser: usersCount === 1 ? true : false }))
+
+        if (usersCount === 1) {
+          dispatch(removeTable({ roomId, tableId }))
+        }
+
         dispatch(removeLink(`${ROUTE_TOWERS.PATH}?room=${roomId}&table=${tableId}`))
-        router.push(`?room=${roomId}`)
+        router.push(`${ROUTE_TOWERS.PATH}?room=${roomId}`)
       })
       .catch((error) => {
         console.error("Error leaving table:", error)
@@ -196,7 +307,7 @@ export default function Table({ roomId, tableId }: TableProps): ReactNode {
 
   return (
     <>
-      <div className="grid [grid-template-areas:'banner_banner_banner''sidebar_game_game''sidebar_chat_chat'] grid-rows-table grid-cols-table h-full bg-gray-100 text-black">
+      <div className="grid [grid-template-areas:'banner_banner_banner''sidebar_game_game''sidebar_chat_chat'] grid-rows-table grid-cols-table h-screen -m-4 bg-gray-100 text-black">
         <TableHeader table={tableInfo} />
 
         {/* Left sidebar */}
@@ -230,7 +341,7 @@ export default function Table({ roomId, tableId }: TableProps): ReactNode {
             <Select
               id="tableType"
               defaultValue={tableType}
-              disabled={isTableInfoLoading || session?.user.id !== tableInfo?.host.user.id}
+              disabled={isTableInfoLoading || session?.user.id !== tableInfo?.host.id}
               onChange={setTableType}
             >
               <Select.Option value={TableType.PUBLIC}>Public</Select.Option>
@@ -239,14 +350,14 @@ export default function Table({ roomId, tableId }: TableProps): ReactNode {
             </Select>
             <Button
               className="w-full"
-              disabled={isTableInfoLoading || session?.user.id !== tableInfo?.host.user.id}
+              disabled={isTableInfoLoading || session?.user.id !== tableInfo?.host.id}
               onClick={handleOpenInviteUserModal}
             >
               Invite
             </Button>
             <Button
               className="w-full"
-              disabled={isTableInfoLoading || session?.user.id !== tableInfo?.host.user.id}
+              disabled={isTableInfoLoading || session?.user.id !== tableInfo?.host.id}
               onClick={handleOpenBootUserModal}
             >
               Boot
@@ -258,7 +369,7 @@ export default function Table({ roomId, tableId }: TableProps): ReactNode {
               id="ratedGame"
               label="Rated Game"
               defaultChecked={isRated}
-              disabled={isTableInfoLoading || session?.user.id !== tableInfo?.host.user.id}
+              disabled={isTableInfoLoading || session?.user.id !== tableInfo?.host.id}
               onChange={(event: ChangeEvent<HTMLInputElement>) => setIsRated(event.target.checked)}
             />
             <Checkbox
@@ -353,7 +464,6 @@ export default function Table({ roomId, tableId }: TableProps): ReactNode {
                 </div>
               ))}
 
-              {/* TODO: Remove */}
               {/* <div className="row-span-5 flex flex-row justify-center items-center">
                 <PlayerBoard boardNumber={1} />
                 <PlayerBoard boardNumber={2} isReversed />
@@ -419,16 +529,14 @@ export default function Table({ roomId, tableId }: TableProps): ReactNode {
       <TableInviteUser
         key={uuidv4()}
         isOpen={isInviteUserModalOpen}
-        users={
-          Array.isArray(roomUsers) ? roomUsers.filter((roomsUser: TowersUser) => roomsUser.tableId !== tableId) : []
-        }
+        users={roomUsersInvite}
         onCancel={handleCloseInviteUserModal}
       />
 
       <TableBootUser
         key={uuidv4()}
         isOpen={isBootUserModalOpen}
-        users={tableUsers}
+        users={tableUsersBoot}
         onCancel={handleCloseBootUserModal}
       />
     </>

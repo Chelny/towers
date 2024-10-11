@@ -1,7 +1,7 @@
 import { renderHook } from "@testing-library/react"
+import { mockAuthenticatedSession, mockUnauthenticatedSession } from "@/__mocks__/data/users"
 import { SessionContext } from "@/context/session-context"
 import { useSessionData } from "@/hooks/useSessionData"
-import { mockedAuthenticatedSession, mockedUnauthenticatedSession } from "@/vitest.setup"
 
 vi.mock("@/hooks/useSessionData", () => ({
   useSessionData: vi.fn()
@@ -9,29 +9,29 @@ vi.mock("@/hooks/useSessionData", () => ({
 
 describe("useSessionData Hook", () => {
   beforeEach(() => {
-    vi.mocked(useSessionData).mockReturnValue(mockedUnauthenticatedSession)
+    vi.mocked(useSessionData).mockReturnValue(mockUnauthenticatedSession)
   })
 
   it("should return session data when SessionContext provides data", () => {
-    vi.mocked(useSessionData).mockReturnValue(mockedAuthenticatedSession)
+    vi.mocked(useSessionData).mockReturnValue(mockAuthenticatedSession)
 
     const { result } = renderHook(() => useSessionData(), {
       wrapper: ({ children }) => (
-        <SessionContext.Provider value={mockedAuthenticatedSession}>{children}</SessionContext.Provider>
+        <SessionContext.Provider value={mockAuthenticatedSession}>{children}</SessionContext.Provider>
       )
     })
 
-    expect(result.current).toEqual(mockedAuthenticatedSession)
+    expect(result.current).toEqual(mockAuthenticatedSession)
   })
 
   it("should return default session data when SessionContext is null", () => {
     const { result } = renderHook(() => useSessionData(), {
       wrapper: ({ children }) => (
-        <SessionContext.Provider value={mockedUnauthenticatedSession}>{children}</SessionContext.Provider>
+        <SessionContext.Provider value={mockUnauthenticatedSession}>{children}</SessionContext.Provider>
       )
     })
 
-    expect(result.current).toEqual(mockedUnauthenticatedSession)
+    expect(result.current).toEqual(mockUnauthenticatedSession)
   })
 
   it("should throw an error if SessionContext is undefined", () => {

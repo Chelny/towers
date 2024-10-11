@@ -14,7 +14,6 @@ export const MAX_PLAYERS = 8
  * Game
  **************************************************/
 
-export const PROVISIONAL_MAX_COMPLETED_GAMES = 20
 export const BOARD_ROWS = 15
 export const BOARD_COLS = 6
 export const HIDDEN_ROWS_COUNT = 2
@@ -39,3 +38,14 @@ export const DIRECTIONS = [
   { row: 1, col: -1 }, // Bottom-left
   { row: 1, col: 1 } // Bottom-right
 ]
+
+/**************************************************
+ * Game Ratings
+ **************************************************/
+
+export const RATING_MASTER = 2100 // 2100+
+export const RATING_DIAMOND = 1800 // 1800 - 2099
+export const RATING_PLATINUM = 1500 // 1500 - 1799
+export const RATING_GOLD = 1200 // 1200 - 1499
+export const RATING_SILVER = 0 // minimum - 1199
+export const PROVISIONAL_MAX_COMPLETED_GAMES = 20

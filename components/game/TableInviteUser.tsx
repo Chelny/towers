@@ -2,13 +2,13 @@
 
 import { ReactNode, useState } from "react"
 import dynamic from "next/dynamic"
-import { TowersUser } from "@prisma/client"
+import { ITowersUserProfile } from "@prisma/client"
 import PlayersListSkeleton from "@/components/skeleton/PlayersListSkeleton"
 import Modal from "@/components/ui/Modal"
 
 type TableInviteUserProps = {
   isOpen: boolean
-  users: TowersUser[]
+  users: ITowersUserProfile[]
   onCancel: () => void
 }
 
@@ -16,7 +16,6 @@ export default function TableInviteUser({ isOpen, users, onCancel }: TableInvite
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null)
 
   const handleSelectedPlayer = (): void => {
-    // TODO: Emit socket event
     onCancel()
   }
 
@@ -25,6 +24,7 @@ export default function TableInviteUser({ isOpen, users, onCancel }: TableInvite
       title="Invite User"
       isOpen={isOpen}
       confirmText="Invite"
+      isConfirmButtonDisabled={users?.length == 0}
       dataTestId="table-invite-user-modal"
       onConfirm={handleSelectedPlayer}
       onCancel={onCancel}

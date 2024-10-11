@@ -28,12 +28,10 @@ export default function TableInvitation({
   const [declineAll, setDeclineAll] = useState<boolean>(false)
 
   const handleDeclineInvitation = (): void => {
-    // TODO: Emit socket event + decline reason to the other user’s socket id
     onCancel()
   }
 
   const handleAcceptInvitation = (): void => {
-    // TODO: Pass table id (data.table.id) to parent compoment
     onAcceptInvitation("test-34")
   }
 

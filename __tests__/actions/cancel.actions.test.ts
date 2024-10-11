@@ -1,7 +1,7 @@
 import { Mock } from "vitest"
 import { cancelAccount } from "@/app/(protected)/account/cancel/cancel.actions"
 import { DELETE } from "@/app/api/account/route"
-import { mockedFormInitialState } from "@/vitest.setup"
+import { mockFormInitialState } from "@/vitest.setup"
 
 vi.mock("@/app/api/account/route", () => ({
   DELETE: vi.fn()
@@ -27,7 +27,7 @@ describe("Cancel Account Actions", () => {
       json: async () => response
     })
 
-    const result = await cancelAccount(mockedFormInitialState, formData)
+    const result = await cancelAccount(mockFormInitialState, formData)
 
     expect(DELETE).not.toHaveBeenCalled()
     expect(result).toEqual(response)
@@ -48,7 +48,7 @@ describe("Cancel Account Actions", () => {
       json: async () => response
     })
 
-    const result = await cancelAccount(mockedFormInitialState, formData)
+    const result = await cancelAccount(mockFormInitialState, formData)
 
     expect(DELETE).not.toHaveBeenCalled()
     expect(result).toEqual(response)
@@ -68,7 +68,7 @@ describe("Cancel Account Actions", () => {
       json: async () => response
     })
 
-    const result = await cancelAccount(mockedFormInitialState, formData)
+    const result = await cancelAccount(mockFormInitialState, formData)
 
     expect(DELETE).toHaveBeenCalledWith({
       email: "john.doe@example.com"

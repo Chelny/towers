@@ -2,8 +2,8 @@ import { useFormState, useFormStatus } from "react-dom"
 import { render, screen } from "@testing-library/react"
 import { ResetPasswordForm } from "@/app/(auth)/reset-password/reset-password.form"
 
-const { useSearchParams, mockedSearchParams } = vi.hoisted(() => {
-  const mockedSearchParams = {
+const { useSearchParams, mockSearchParams } = vi.hoisted(() => {
+  const mockSearchParams = {
     get: vi.fn(),
     getAll: vi.fn(),
     has: vi.fn(),
@@ -20,8 +20,8 @@ const { useSearchParams, mockedSearchParams } = vi.hoisted(() => {
   }
 
   return {
-    useSearchParams: () => mockedSearchParams,
-    mockedSearchParams
+    useSearchParams: () => mockSearchParams,
+    mockSearchParams
   }
 })
 
@@ -74,7 +74,7 @@ describe("Reset Password Form", () => {
   it("should pass the token from URL params to the hidden input field", () => {
     const token: string = "d457775d-9123-4922-84de-cf535a63484e"
 
-    mockedSearchParams.get.mockImplementation((key: string) => {
+    mockSearchParams.get.mockImplementation((key: string) => {
       if (key === "token") return token
       return null
     })

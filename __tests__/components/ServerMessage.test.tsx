@@ -1,11 +1,11 @@
-import { act, ReactNode } from "react"
+import { act } from "react"
 import { render, screen } from "@testing-library/react"
+import { mockAuthenticatedSession, mockUnauthenticatedSession } from "@/__mocks__/data/users"
 import ServerMessage from "@/components/game/ServerMessage"
 import { useSessionData } from "@/hooks/useSessionData"
 import { useAppSelector } from "@/lib/hooks"
 import { SidebarState } from "@/redux/features/sidebar-slice"
 import { SocketState } from "@/redux/features/socket-slice"
-import { mockedAuthenticatedSession, mockedUnauthenticatedSession } from "@/vitest.setup"
 
 vi.mock("@/hooks/useSessionData", () => ({
   useSessionData: vi.fn()
@@ -13,10 +13,6 @@ vi.mock("@/hooks/useSessionData", () => ({
 
 vi.mock("@/lib/hooks", () => ({
   useAppSelector: vi.fn()
-}))
-
-vi.mock("@/components/ui/AlertMessage", () => ({
-  default: ({ children }: { children: ReactNode }) => <div>{children}</div>
 }))
 
 describe("ServerMessage Component", () => {
@@ -30,7 +26,7 @@ describe("ServerMessage Component", () => {
   })
 
   it("should render nothing when not initialized", () => {
-    vi.mocked(useSessionData).mockReturnValue(mockedUnauthenticatedSession)
+    vi.mocked(useSessionData).mockReturnValue(mockUnauthenticatedSession)
     vi.mocked(useAppSelector).mockImplementation(
       (selectorFn: (state: { socket: SocketState; sidebar: SidebarState }) => unknown) => {
         if (selectorFn.toString().includes("state.socket.isConnected")) return false
@@ -44,7 +40,7 @@ describe("ServerMessage Component", () => {
   })
 
   it("should render \"You are not logged in\" when unauthenticated and connected", () => {
-    vi.mocked(useSessionData).mockReturnValue(mockedUnauthenticatedSession)
+    vi.mocked(useSessionData).mockReturnValue(mockUnauthenticatedSession)
     vi.mocked(useAppSelector).mockImplementation(
       (selectorFn: (state: { socket: SocketState; sidebar: SidebarState }) => unknown) => {
         if (selectorFn.toString().includes("state.socket.isConnected")) return true
@@ -63,7 +59,7 @@ describe("ServerMessage Component", () => {
   })
 
   it("should render user connected message when authenticated and connected", () => {
-    vi.mocked(useSessionData).mockReturnValue(mockedAuthenticatedSession)
+    vi.mocked(useSessionData).mockReturnValue(mockAuthenticatedSession)
     vi.mocked(useAppSelector).mockImplementation(
       (selectorFn: (state: { socket: SocketState; sidebar: SidebarState }) => unknown) => {
         if (selectorFn.toString().includes("state.socket.isConnected")) return true
@@ -79,12 +75,12 @@ describe("ServerMessage Component", () => {
     })
 
     expect(
-      screen.getByText(`Connected to the game as ${mockedAuthenticatedSession.data?.user.username}`)
+      screen.getByText(`Connected to the game as ${mockAuthenticatedSession.data?.user.username}`)
     ).toBeInTheDocument()
   })
 
   it("should render \"Disconnected from server\" when not connected", () => {
-    vi.mocked(useSessionData).mockReturnValue(mockedUnauthenticatedSession)
+    vi.mocked(useSessionData).mockReturnValue(mockUnauthenticatedSession)
     vi.mocked(useAppSelector).mockImplementation(
       (selectorFn: (state: { socket: SocketState; sidebar: SidebarState }) => unknown) => {
         if (selectorFn.toString().includes("state.socket.isConnected")) return false
@@ -105,7 +101,7 @@ describe("ServerMessage Component", () => {
   it("should render error message when errorMessage exists", () => {
     const errorMessage: string = "Connection error occurred"
 
-    vi.mocked(useSessionData).mockReturnValue(mockedUnauthenticatedSession)
+    vi.mocked(useSessionData).mockReturnValue(mockUnauthenticatedSession)
     vi.mocked(useAppSelector).mockImplementation(
       (selectorFn: (state: { socket: SocketState; sidebar: SidebarState }) => unknown) => {
         if (selectorFn.toString().includes("state.socket.isConnected")) return true

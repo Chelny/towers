@@ -1,12 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit"
 import { render, screen } from "@testing-library/react"
 import { Provider } from "react-redux"
+import { mockRoom1 } from "@/__mocks__/data/rooms"
+import { mockSocketInitialState, mockSocketRoom1Id, mockSocketStateRooms } from "@/__mocks__/data/socketState"
 import RoomHeader from "@/components/game/RoomHeader"
 import socketReducer, { SocketState } from "@/redux/features/socket-slice"
-import { mockedRoom1, mockedSocketInitialState, mockedSocketRoom1Id, mockedSocketStateRooms } from "@/vitest.setup"
 
 const initialState: SocketState = {
-  ...mockedSocketInitialState,
+  ...mockSocketInitialState,
   isConnected: true
 }
 
@@ -23,10 +24,10 @@ describe("RoomHeader Component", () => {
   it("should render room name and socket status", () => {
     render(
       <Provider store={store}>
-        <RoomHeader room={mockedSocketStateRooms[mockedSocketRoom1Id].roomInfo} />
+        <RoomHeader room={mockSocketStateRooms[mockSocketRoom1Id].roomInfo} />
       </Provider>
     )
 
-    expect(screen.getByText(mockedRoom1.name)).toBeInTheDocument()
+    expect(screen.getByText(mockRoom1.name)).toBeInTheDocument()
   })
 })

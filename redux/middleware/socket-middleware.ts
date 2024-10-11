@@ -1,21 +1,33 @@
-/* eslint-disable no-unused-vars */
 import { Middleware, MiddlewareAPI } from "redux"
 import { SocketFactory, SocketInterface } from "@/lib/socket-factory"
 import {
-  beforeLeaveSocketRoom,
+  addMessageToRoomChat,
+  addMessageToTableChat,
+  addTable,
+  addTableToRoom,
+  addUserToRoom,
+  addUserToTable,
+  beforeLeaveTableAction,
   connectionEstablished,
   connectionLost,
   destroySocket,
   initSocket,
-  joinSocketRoom,
-  sendMessageToRoomChat,
-  sendMessageToTableChat,
+  joinRoomAction,
+  joinTableAction,
+  leaveRoomAction,
+  removeTable,
+  removeTableFromRoom,
+  removeUserFromRoom,
+  removeUserFromTable,
+  sendRoomChatMessage,
+  sendTableChatMessage,
   serverError,
-  setRoomChatMessage,
-  setTableChatMessage
+  updateTable,
+  updateTableInRoom
 } from "@/redux/features/socket-slice"
 
-enum SocketEvent {
+export enum SocketEvent {
+  // Socket IO Listeners
   Connect = "connect",
   ConnectError = "connect_error",
   Disconnect = "disconnect",
@@ -24,24 +36,34 @@ enum SocketEvent {
   ReconnectError = "reconnect_error",
   ReconnectFailed = "reconnect_failed",
   Error = "error",
-  // Emit events
-  JoinRoom = "room:join",
-  LeaveRoom = "room:leave",
-  JoinTable = "table:join",
-  LeaveTable = "table:leave",
-  LeaveMultipleTables = "table:leave-multiple",
-  SendRoomMessage = "room:send-message",
-  SendTableMessage = "table:send-message",
-  // On events
-  SetRoomChatMessage = "room:set-message",
-  SetRoomErrorMessage = "room:error",
-  SetTableChatMessage = "table:set-message",
-  SendUserJoinedTableMessage = "table:send-user-joined-message",
-  SendUserLeftTableMessage = "table:send-user-left-message",
-  SetTableErrorMessage = "table:error",
-  SignOut = "user:sign-out",
-  SignOutSuccess = "user:sign-out-success",
-  ServerError = "err",
+
+  // Custom Listeners
+  RoomReceiveChatMessage = "[room] receive new chat message",
+  TableAddForAllRoomUsers = "[table] add for all room users",
+  TableUpdateForAllRoomUsers = "[table] update for all room users",
+  TableDeleteForAllRoomUsers = "[table] remove for all room users",
+  TableReceiveChatMessage = "[table] receive new chat message",
+  TableDisplayUserJoinedMessage = "[table] display user joined message",
+  TableDisplayUserLeftMessage = "[table] display user left message",
+  UserSignOutSuccess = "[user] sign out success",
+  ServerError = "[server] error",
+
+  // Emitters
+  RoomJoin = "[room] join",
+  RoomLeaveAllTables = "[room] leave all room tables",
+  RoomLeave = "[room] leave",
+  RoomSendMessage = "[room] send message",
+  RoomUserJoined = "[room] user joined",
+  RoomUserLeft = "[room] user left",
+  TableJoin = "[table] join",
+  TableLeave = "[table] leave",
+  TableCreate = "[table] create",
+  TableUpdate = "[table] update",
+  TableDelete = "[table] delete",
+  TableSendMessage = "[table] send message",
+  TableUserJoined = "[table] user joined",
+  TableUserLeft = "[table] user left",
+  UserSignOut = "[user] sign out",
 }
 
 const socketMiddleware: Middleware = (store: MiddlewareAPI) => {
@@ -51,6 +73,10 @@ const socketMiddleware: Middleware = (store: MiddlewareAPI) => {
     if (initSocket.match(action)) {
       if (!socket && typeof window !== "undefined") {
         socket = await SocketFactory.create()
+
+        // **************************************************
+        // * Socket IO Events
+        // **************************************************
 
         socket.socket.on(SocketEvent.Connect, (): void => {
           store.dispatch(connectionEstablished())
@@ -90,67 +116,128 @@ const socketMiddleware: Middleware = (store: MiddlewareAPI) => {
           console.error(`Socket error: ${error.message}.`)
         })
 
+        socket.socket.on(SocketEvent.UserSignOutSuccess, (): void => {
+          SocketFactory.destroy()
+        })
+
+        // **************************************************
+        // * Server.js Error Events
+        // **************************************************
+
         socket.socket.on(SocketEvent.ServerError, (message: string): void => {
           console.error(`Server error: ${message}.`)
           store.dispatch(serverError(message))
         })
 
-        socket.socket.on(SocketEvent.LeaveMultipleTables, ({ roomId, tableId, username }): void => {
-          store.dispatch(beforeLeaveSocketRoom({ roomId, tableId, username }))
+        // **************************************************
+        // * Room Events
+        // **************************************************
+
+        socket.socket.on(SocketEvent.RoomLeaveAllTables, ({ tableId, isLastUser }): void => {
+          store.dispatch(beforeLeaveTableAction({ tableId, isLastUser }))
         })
 
-        socket.socket.on(SocketEvent.SetRoomChatMessage, ({ roomId, data }): void => {
-          store.dispatch(setRoomChatMessage({ roomId, data }))
+        socket.socket.on(SocketEvent.RoomReceiveChatMessage, ({ roomId, message }): void => {
+          store.dispatch(addMessageToRoomChat({ roomId, message }))
         })
 
-        socket.socket.on(SocketEvent.SetTableChatMessage, ({ tableId, data }): void => {
-          store.dispatch(setTableChatMessage({ tableId, data }))
+        socket.socket.on(SocketEvent.RoomUserJoined, ({ roomId, towersUserProfile }): void => {
+          store.dispatch(addUserToRoom({ roomId, towersUserProfile }))
         })
 
-        socket.socket.on(SocketEvent.SendUserJoinedTableMessage, ({ tableId, data }): void => {
-          store.dispatch(setTableChatMessage({ tableId, data }))
+        socket.socket.on(SocketEvent.RoomUserLeft, ({ roomId, userId }): void => {
+          store.dispatch(removeUserFromRoom({ roomId, userId }))
         })
 
-        socket.socket.on(SocketEvent.SendUserLeftTableMessage, ({ tableId, data }): void => {
-          store.dispatch(setTableChatMessage({ tableId, data }))
+        // **************************************************
+        // * Table Events
+        // **************************************************
+
+        socket.socket.on(SocketEvent.TableAddForAllRoomUsers, ({ roomId, userId, table }): void => {
+          store.dispatch(addTableToRoom({ roomId, userId, table }))
         })
 
-        socket.socket.on(SocketEvent.SignOutSuccess, (): void => {
-          SocketFactory.destroy()
+        socket.socket.on(SocketEvent.TableUpdateForAllRoomUsers, ({ roomId, tableId, table }): void => {
+          store.dispatch(updateTableInRoom({ roomId, tableId, table }))
+        })
+
+        socket.socket.on(SocketEvent.TableDeleteForAllRoomUsers, ({ roomId, tableId }): void => {
+          store.dispatch(removeTableFromRoom({ roomId, tableId }))
+        })
+
+        socket.socket.on(SocketEvent.TableDisplayUserJoinedMessage, ({ tableId, message }): void => {
+          store.dispatch(addMessageToTableChat({ tableId, message }))
+        })
+
+        socket.socket.on(SocketEvent.TableDisplayUserLeftMessage, ({ tableId, message }): void => {
+          store.dispatch(addMessageToTableChat({ tableId, message }))
+        })
+
+        socket.socket.on(SocketEvent.TableReceiveChatMessage, ({ tableId, message }): void => {
+          store.dispatch(addMessageToTableChat({ tableId, message }))
+        })
+
+        socket.socket.on(SocketEvent.TableUserJoined, ({ tableId, towersUserProfile }): void => {
+          store.dispatch(addUserToTable({ tableId, towersUserProfile }))
+        })
+
+        socket.socket.on(SocketEvent.TableUserLeft, ({ tableId, userId }): void => {
+          store.dispatch(removeUserFromTable({ tableId, userId }))
         })
       }
     }
 
     if (socket) {
-      if (joinSocketRoom.match(action)) {
-        const { roomId, tableId, username } = action.payload
-        socket.socket.emit(tableId ? SocketEvent.JoinTable : SocketEvent.JoinRoom, {
-          room: tableId ?? roomId,
-          username
-        })
-      }
-
-      if (beforeLeaveSocketRoom.match(action)) {
-        const { roomId, tableId, tableIds, username } = action.payload
-        socket.socket.emit(tableId ? SocketEvent.LeaveTable : SocketEvent.LeaveRoom, {
-          room: tableId ?? roomId,
-          tableIds,
-          username
-        })
-      }
-
-      if (sendMessageToRoomChat.match(action)) {
-        const { roomId, message } = action.payload
-        socket.socket.emit(SocketEvent.SendRoomMessage, { roomId, message })
-      }
-
-      if (sendMessageToTableChat.match(action)) {
-        const { tableId, message } = action.payload
-        socket.socket.emit(SocketEvent.SendTableMessage, { tableId, message })
-      }
+      // **************************************************
+      // * Socket IO Actions
+      // **************************************************
 
       if (destroySocket.match(action)) {
-        socket.socket.emit(SocketEvent.SignOut)
+        socket.socket.emit(SocketEvent.UserSignOut)
+      }
+
+      // **************************************************
+      // * Room Actions
+      // **************************************************
+
+      if (joinRoomAction.match(action)) {
+        socket.socket.emit(SocketEvent.RoomJoin, action.payload)
+      }
+
+      if (leaveRoomAction.match(action)) {
+        socket.socket.emit(SocketEvent.RoomLeave, action.payload)
+      }
+
+      if (sendRoomChatMessage.match(action)) {
+        socket.socket.emit(SocketEvent.RoomSendMessage, action.payload)
+      }
+
+      // **************************************************
+      // * Table Actions
+      // **************************************************
+
+      if (joinTableAction.match(action)) {
+        socket.socket.emit(SocketEvent.TableJoin, action.payload)
+      }
+
+      if (beforeLeaveTableAction.match(action)) {
+        socket.socket.emit(SocketEvent.TableLeave, action.payload)
+      }
+
+      if (addTable.match(action)) {
+        socket.socket.emit(SocketEvent.TableCreate, action.payload)
+      }
+
+      if (updateTable.match(action)) {
+        socket.socket.emit(SocketEvent.TableUpdate, action.payload)
+      }
+
+      if (removeTable.match(action)) {
+        socket.socket.emit(SocketEvent.TableDelete, action.payload)
+      }
+
+      if (sendTableChatMessage.match(action)) {
+        socket.socket.emit(SocketEvent.TableSendMessage, action.payload)
       }
     }
 

@@ -12,7 +12,7 @@ import { TbTower } from "react-icons/tb"
 import { useDispatch } from "react-redux"
 import SidebarMenuItem, { AccordionLink } from "@/components/SidebarMenuItem"
 import UserAvatar from "@/components/UserAvatar"
-import { ROUTE_CANCEL_ACCOUNT, ROUTE_GAMES, ROUTE_PROFILE, ROUTE_UPDATE_PASSWORD } from "@/constants/routes"
+import { ROUTE_CANCEL_ACCOUNT, ROUTE_PROFILE, ROUTE_TOWERS, ROUTE_UPDATE_PASSWORD } from "@/constants/routes"
 import { useSessionData } from "@/hooks/useSessionData"
 import { useAppSelector } from "@/lib/hooks"
 import { destroySocket } from "@/redux/features/socket-slice"
@@ -89,7 +89,7 @@ export default function RoomSidebar(): ReactNode {
           ariaLabel="Rooms"
           isExpanded={isExpanded}
           isLinkTextVisible={isLinkTextVisible}
-          href={ROUTE_GAMES.PATH}
+          href={ROUTE_TOWERS.PATH}
           disabled
         >
           Rooms

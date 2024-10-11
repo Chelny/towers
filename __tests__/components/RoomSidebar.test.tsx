@@ -2,9 +2,9 @@ import { fireEvent, render, screen } from "@testing-library/react"
 import { signOut } from "next-auth/react"
 import { useDispatch } from "react-redux"
 import { Mock } from "vitest"
+import { mockAuthenticatedSession } from "@/__mocks__/data/users"
 import RoomSidebar from "@/components/game/RoomSidebar"
 import { useSessionData } from "@/hooks/useSessionData"
-import { mockedAuthenticatedSession } from "@/vitest.setup"
 
 vi.mock("next-auth/react", () => ({
   signOut: vi.fn()
@@ -27,11 +27,11 @@ vi.mock("@/lib/hooks", () => ({
 }))
 
 describe("RoomSidebar Component", () => {
-  const mockedDispatch: Mock = vi.fn()
+  const mockDispatch: Mock = vi.fn()
 
   beforeEach(() => {
-    vi.mocked(useDispatch).mockReturnValue(mockedDispatch)
-    vi.mocked(useSessionData).mockReturnValue(mockedAuthenticatedSession)
+    vi.mocked(useDispatch).mockReturnValue(mockDispatch)
+    vi.mocked(useSessionData).mockReturnValue(mockAuthenticatedSession)
   })
 
   afterEach(() => {
@@ -53,7 +53,7 @@ describe("RoomSidebar Component", () => {
     expect(screen.getByText("John Doe")).toBeInTheDocument()
   })
 
-  it("should call mockedDispatch and signOut on sign out button click", () => {
+  it("should call mockDispatch and signOut on sign out button click", () => {
     render(<RoomSidebar />)
 
     const expandButton: HTMLButtonElement = screen.getByLabelText("Expand sidebar")
@@ -62,7 +62,7 @@ describe("RoomSidebar Component", () => {
     const signOutButton: HTMLButtonElement = screen.getByLabelText("Sign out")
     fireEvent.click(signOutButton)
 
-    expect(mockedDispatch).toHaveBeenCalled()
+    expect(mockDispatch).toHaveBeenCalled()
     expect(signOut).toHaveBeenCalled()
   })
 })

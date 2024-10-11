@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { TowersUserRoomTable } from "@prisma/client"
+import { TowersTable, TowersUserProfile } from "@prisma/client"
 import { Session } from "next-auth"
 import { auth } from "@/auth"
 import prisma from "@/lib/prisma"
@@ -18,41 +18,70 @@ export async function PATCH(request: NextRequest): Promise<NextResponse> {
     }
 
     if (tableId) {
-      const joinedTables: TowersUserRoomTable[] = await prisma.towersUserRoomTable.findMany({
+      // Get all joined tables from given roomId
+      const joinedTables: TowersUserProfile[] = await prisma.towersUserProfile.findMany({
         where: {
-          towersUserProfileId: session.user.towersUserProfileId,
-          roomId: roomId
+          userId: session.user.id,
+          roomId
+        },
+        include: {
+          user: true
         }
       })
 
-      if (joinedTables.length > 1) {
-        // User leaves one of many joined tables
-        await prisma.towersUserRoomTable.deleteMany({
-          where: {
-            towersUserProfileId: session.user.towersUserProfileId,
-            roomId: roomId,
-            tableId: tableId
-          }
+      const tableIdsToLeave: string[] = joinedTables
+        .map((joinedTable: TowersUserProfile) => joinedTable.tableId)
+        .filter((tableId: string | null): tableId is string => tableId !== null)
+
+      for (const table of tableIdsToLeave) {
+        const otherJoinedTables: TowersUserProfile[] = joinedTables.filter(
+          (joinedTable: TowersUserProfile) => joinedTable.tableId !== table
+        )
+
+        if (otherJoinedTables.length > 0) {
+          // User leaves one of many joined tables
+          await prisma.towersUserProfile.updateMany({
+            where: { userId: session.user.id, roomId, tableId: table },
+            data: { tableId: null }
+          })
+        } else {
+          // User leaves last joined table
+          await prisma.towersUserProfile.updateMany({
+            where: { userId: session.user.id, roomId },
+            data: { tableId: null }
+          })
+        }
+
+        const remainingUsers: number = await prisma.towersUserProfile.count({
+          where: { roomId, tableId: table }
         })
-      } else {
-        // User leaves last table
-        await prisma.towersUserRoomTable.updateMany({
-          where: {
-            towersUserProfileId: session.user.towersUserProfileId,
-            roomId: roomId
-          },
-          data: {
-            tableId: null
+
+        if (remainingUsers === 0) {
+          // No users in the table; delete the table
+          await prisma.towersTable.delete({ where: { id: table } })
+        } else {
+          const isTableHost: TowersTable | null = await prisma.towersTable.findFirst({
+            where: { id: table, roomId, hostId: session.user.id }
+          })
+
+          if (isTableHost) {
+            const nextHost: TowersUserProfile | null = await prisma.towersUserProfile.findFirst({
+              where: { userId: { not: session.user.id }, roomId, tableId: table },
+              orderBy: { createdAt: "asc" }
+            })
+
+            if (nextHost) {
+              // Assign the new table  host
+              await prisma.towersTable.update({ where: { id: table }, data: { hostId: nextHost.userId } })
+            }
           }
-        })
+        }
       }
     } else {
       // User leaves room
-      await prisma.towersUserRoomTable.deleteMany({
-        where: {
-          towersUserProfileId: session.user.towersUserProfileId,
-          roomId: roomId
-        }
+      await prisma.towersUserProfile.updateMany({
+        where: { userId: session.user.id, roomId },
+        data: { roomId: null }
       })
     }
 

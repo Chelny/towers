@@ -1,11 +1,11 @@
 import { render, screen } from "@testing-library/react"
+import { mockDefaultTowersBlockProps } from "@/__mocks__/data/board"
 import GridCell from "@/components/towers/GridCell"
 import { BoardBlock } from "@/interfaces/game"
-import { mockedDefaultTowersBlockProps } from "@/vitest.setup"
 
 describe("GridCell Component", () => {
   it("should apply the correct styles for defense block", () => {
-    const defenseBlock: BoardBlock = { ...mockedDefaultTowersBlockProps, letter: "T", powerType: "defense" }
+    const defenseBlock: BoardBlock = { ...mockDefaultTowersBlockProps, letter: "T", powerType: "defense" }
 
     render(<GridCell block={defenseBlock} />)
 
@@ -16,7 +16,7 @@ describe("GridCell Component", () => {
   })
 
   it("should apply the correct styles for attack block", () => {
-    const attackBlock: BoardBlock = { ...mockedDefaultTowersBlockProps, letter: "O", powerType: "attack" }
+    const attackBlock: BoardBlock = { ...mockDefaultTowersBlockProps, letter: "O", powerType: "attack" }
 
     render(<GridCell block={attackBlock} />)
 
@@ -27,7 +27,7 @@ describe("GridCell Component", () => {
   })
 
   it("should render RegularBlock when block is not a defense type", () => {
-    const regularBlock: BoardBlock = { ...mockedDefaultTowersBlockProps, letter: "W" }
+    const regularBlock: BoardBlock = { ...mockDefaultTowersBlockProps, letter: "W" }
 
     render(<GridCell block={regularBlock} />)
 

@@ -3,7 +3,7 @@ import { Mock } from "vitest"
 import TableInvitation from "@/components/game/TableInvitation"
 
 describe("TableInvitation Component", () => {
-  const mockedTableInvitationData = {
+  const mockTableInvitationData = {
     user: { username: "jane.doe" },
     table: { tableNumber: 5, rated: true }
   }
@@ -14,15 +14,15 @@ describe("TableInvitation Component", () => {
   })
 
   it("should render the invitation details", () => {
-    const mockedHandleAcceptInvitation: Mock = vi.fn()
-    const mockedHandleCancel: Mock = vi.fn()
+    const mockHandleAcceptInvitation: Mock = vi.fn()
+    const mockHandleCancel: Mock = vi.fn()
 
     render(
       <TableInvitation
         isOpen={true}
-        data={mockedTableInvitationData}
-        onAcceptInvitation={mockedHandleAcceptInvitation}
-        onCancel={mockedHandleCancel}
+        data={mockTableInvitationData}
+        onAcceptInvitation={mockHandleAcceptInvitation}
+        onCancel={mockHandleCancel}
       />
     )
 
@@ -31,38 +31,38 @@ describe("TableInvitation Component", () => {
   })
 
   it("should handle invitation acceptance", () => {
-    const mockedHandleAcceptInvitation: Mock = vi.fn()
-    const mockedHandleCancel: Mock = vi.fn()
+    const mockHandleAcceptInvitation: Mock = vi.fn()
+    const mockHandleCancel: Mock = vi.fn()
 
     render(
       <TableInvitation
         isOpen={true}
-        data={mockedTableInvitationData}
-        onAcceptInvitation={mockedHandleAcceptInvitation}
-        onCancel={mockedHandleCancel}
+        data={mockTableInvitationData}
+        onAcceptInvitation={mockHandleAcceptInvitation}
+        onCancel={mockHandleCancel}
       />
     )
 
     fireEvent.click(screen.getByText("Accept"))
 
-    expect(mockedHandleAcceptInvitation).toHaveBeenCalledWith("test-34")
+    expect(mockHandleAcceptInvitation).toHaveBeenCalledWith("test-34")
   })
 
   it("should handle invitation decline", () => {
-    const mockedHandleAcceptInvitation: Mock = vi.fn()
-    const mockedHandleCancel: Mock = vi.fn()
+    const mockHandleAcceptInvitation: Mock = vi.fn()
+    const mockHandleCancel: Mock = vi.fn()
 
     render(
       <TableInvitation
         isOpen={true}
-        data={mockedTableInvitationData}
-        onAcceptInvitation={mockedHandleAcceptInvitation}
-        onCancel={mockedHandleCancel}
+        data={mockTableInvitationData}
+        onAcceptInvitation={mockHandleAcceptInvitation}
+        onCancel={mockHandleCancel}
       />
     )
 
     fireEvent.click(screen.getByText("Decline"))
 
-    expect(mockedHandleCancel).toHaveBeenCalled()
+    expect(mockHandleCancel).toHaveBeenCalled()
   })
 })

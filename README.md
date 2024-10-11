@@ -26,7 +26,8 @@ git clone git@github.com:Chelny/towers.git
 Navigate to the root directory of the project. Create a new file named `.env` and fill it with the required environment variables based on the provided `.env.example` file.
 
 ```
-BASE_URL=http://localhost:3000
+HOSTNAME="localhost"
+BASE_URL="http://localhost:3000"
 DATABASE_URL="postgresql://johndoe:randompassword@localhost:5432/mydb?schema=public&serverTimezone=UTC"
 AUTH_SECRET=
 AUTH_GITHUB_ID=

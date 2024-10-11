@@ -1,27 +1,20 @@
 "use client"
 
-import { RoomMessage, TableMessage } from "@prisma/client"
+import { ITowersRoomChatMessage, ITowersTableChatMessage, TableChatMessageType } from "@prisma/client"
 
 type ChatProps = {
-  messages: RoomMessage[] | TableMessage[]
+  messages: ITowersRoomChatMessage[] | ITowersTableChatMessage[]
   isTableChat?: boolean
 }
 
 export default function Chat({ messages, isTableChat = false }: ChatProps) {
   return (
     <>
-      {messages?.map((message: RoomMessage | TableMessage, index: number) => (
+      {messages?.map((message: ITowersRoomChatMessage | ITowersTableChatMessage, index: number) => (
         <div key={index}>
-          {isTableChat ? (
-            <>
-              {message.towersUserProfile?.user?.username && <>{message.towersUserProfile?.user?.username}:&nbsp;</>}
-              {message.message}
-            </>
-          ) : (
-            <>
-              {message.towersUserProfile?.user?.username}: {message.message}
-            </>
-          )}
+          {((isTableChat && (message as ITowersTableChatMessage).type === TableChatMessageType.CHAT) ||
+            !isTableChat) && <>{message.user?.username}:&nbsp;</>}
+          {message.message}
         </div>
       ))}
     </>

@@ -1,26 +1,26 @@
 import { fireEvent, render, screen } from "@testing-library/react"
 import { Mock } from "vitest"
+import { mockRoom1 } from "@/__mocks__/data/rooms"
+import {
+  mockRoom1Table1Chat,
+  mockRoom1Table1Info,
+  mockRoom1Table1Users,
+  mockRoom1Users
+} from "@/__mocks__/data/socketState"
+import { mockRoom1Table1 } from "@/__mocks__/data/tables"
+import { mockAuthenticatedSession } from "@/__mocks__/data/users"
 import Table from "@/components/game/Table"
 import { useSessionData } from "@/hooks/useSessionData"
 import { useAppDispatch, useAppSelector } from "@/lib/hooks"
 import { SidebarState } from "@/redux/features/sidebar-slice"
 import { SocketState } from "@/redux/features/socket-slice"
-import {
-  mockedAuthenticatedSession,
-  mockedRoom1,
-  mockedRoom1Table1,
-  mockedRoom1Table1Chat,
-  mockedRoom1Table1Info,
-  mockedRoom1Table1Users,
-  mockedRoom1Users
-} from "@/vitest.setup"
 
 const { useRouter } = vi.hoisted(() => {
-  const mockedRouterPush: Mock = vi.fn()
+  const mockRouterPush: Mock = vi.fn()
 
   return {
-    useRouter: () => ({ push: mockedRouterPush }),
-    mockedRouterPush
+    useRouter: () => ({ push: mockRouterPush }),
+    mockRouterPush
   }
 })
 
@@ -43,25 +43,25 @@ vi.mock("@/lib/hooks", () => ({
 }))
 
 describe("Table Component", () => {
-  const mockedAppDispatch: Mock = vi.fn()
+  const mockAppDispatch: Mock = vi.fn()
 
   beforeAll(() => {
     Element.prototype.scrollIntoView = vi.fn()
   })
 
   beforeEach(() => {
-    vi.mocked(useAppDispatch).mockReturnValue(mockedAppDispatch)
-    vi.mocked(useSessionData).mockReturnValue(mockedAuthenticatedSession)
+    vi.mocked(useAppDispatch).mockReturnValue(mockAppDispatch)
+    vi.mocked(useSessionData).mockReturnValue(mockAuthenticatedSession)
     // eslint-disable-next-line no-unused-vars
     vi.mocked(useAppSelector).mockImplementation(
       (selectorFn: (state: { socket: SocketState; sidebar: SidebarState }) => unknown) => {
-        if (selectorFn.toString().includes("state.socket.rooms[roomId]?.users")) return mockedRoom1Users
-        if (selectorFn.toString().includes("state.socket.tables")) return mockedRoom1Table1
-        if (selectorFn.toString().includes("state.socket.tables[tableId]?.tableInfo")) return mockedRoom1Table1Info
+        if (selectorFn.toString().includes("state.socket.rooms[roomId]?.users")) return mockRoom1Users
+        if (selectorFn.toString().includes("state.socket.tables")) return mockRoom1Table1
+        if (selectorFn.toString().includes("state.socket.tables[tableId]?.tableInfo")) return mockRoom1Table1Info
         if (selectorFn.toString().includes("state.socket.tables[tableId]?.isTableInfoLoading")) return false
-        if (selectorFn.toString().includes("state.socket.tables[tableId]?.chat")) return mockedRoom1Table1Chat
+        if (selectorFn.toString().includes("state.socket.tables[tableId]?.chat")) return mockRoom1Table1Chat
         if (selectorFn.toString().includes("state.socket.tables[tableId]?.isChatLoading")) return false
-        if (selectorFn.toString().includes("state.socket.tables[tableId]?.users")) return mockedRoom1Table1Users
+        if (selectorFn.toString().includes("state.socket.tables[tableId]?.users")) return mockRoom1Table1Users
         return undefined
       }
     )
@@ -72,23 +72,23 @@ describe("Table Component", () => {
   })
 
   it("should render the chat input and allows message sending", () => {
-    render(<Table roomId={mockedRoom1.id} tableId={mockedRoom1Table1.id} />)
+    render(<Table roomId={mockRoom1.id} tableId={mockRoom1Table1.id} />)
 
     const messageInput: HTMLInputElement = screen.getByPlaceholderText("Write something...")
     fireEvent.change(messageInput, { target: { value: "Hello!" } })
     fireEvent.keyDown(messageInput, { key: "Enter" })
 
-    expect(mockedAppDispatch).toHaveBeenCalled()
+    expect(mockAppDispatch).toHaveBeenCalled()
   })
 
   it("should render the correct table type and rated status", () => {
-    render(<Table roomId={mockedRoom1.id} tableId={mockedRoom1Table1.id} />)
+    render(<Table roomId={mockRoom1.id} tableId={mockRoom1Table1.id} />)
 
     expect(screen.getByText("Public")).toBeInTheDocument()
     expect(screen.getByLabelText("Rated Game")).toBeChecked()
   })
 
   it.todo("should handle seat click correctly", () => {
-    render(<Table roomId={mockedRoom1.id} tableId={mockedRoom1Table1.id} />)
+    render(<Table roomId={mockRoom1.id} tableId={mockRoom1Table1.id} />)
   })
 })

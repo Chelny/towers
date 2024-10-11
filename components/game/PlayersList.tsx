@@ -1,16 +1,22 @@
 "use client"
 
 import { ReactNode, useMemo, useState } from "react"
-import { TowersUser } from "@prisma/client"
+import { ITowersUserProfile } from "@prisma/client"
 import clsx from "clsx/lite"
 import { BsSortAlphaDown, BsSortAlphaDownAlt, BsSortNumericDown, BsSortNumericDownAlt } from "react-icons/bs"
 import { v4 as uuidv4 } from "uuid"
 import PlayerInformation from "@/components/game/PlayerInformation"
-import { PROVISIONAL_MAX_COMPLETED_GAMES } from "@/constants/game"
+import {
+  PROVISIONAL_MAX_COMPLETED_GAMES,
+  RATING_DIAMOND,
+  RATING_GOLD,
+  RATING_MASTER,
+  RATING_PLATINUM
+} from "@/constants/game"
 import { useSessionData } from "@/hooks/useSessionData"
 
 type PlayersListProps = {
-  users: TowersUser[]
+  users: ITowersUserProfile[]
   full?: boolean
   onSelectedPlayer?: (_userId: string) => void
 }
@@ -34,34 +40,34 @@ export default function PlayersList({ users, full = false, onSelectedPlayer }: P
   const sortedPlayersList = useMemo(() => {
     if (!users) return []
 
-    const uniqueUsersMap: Map<string, TowersUser> = new Map<string, TowersUser>()
+    const uniqueUsersMap: Map<string, ITowersUserProfile> = new Map<string, ITowersUserProfile>()
 
-    users.forEach((user: TowersUser) => {
-      const key: string = `${user.room?.id}_${user.towersUserProfile?.id}`
-      const existingUser: TowersUser | undefined = uniqueUsersMap.get(key)
+    users.forEach((user: ITowersUserProfile) => {
+      const key: string = `${user.room?.id}_${user.userId}`
+      const existingUser: ITowersUserProfile | undefined = uniqueUsersMap.get(key)
 
       if (!existingUser || new Date(user.updatedAt) > new Date(existingUser.updatedAt)) {
         uniqueUsersMap.set(key, user)
       }
     })
 
-    const uniqueUsers: TowersUser[] = Array.from(uniqueUsersMap.values())
+    const uniqueUsers: ITowersUserProfile[] = Array.from(uniqueUsersMap.values())
 
-    return uniqueUsers.slice().sort((a: TowersUser, b: TowersUser) => {
-      const isProvisionalA: boolean = a.towersUserProfile?.gamesCompleted < PROVISIONAL_MAX_COMPLETED_GAMES
-      const isProvisionalB: boolean = b.towersUserProfile?.gamesCompleted < PROVISIONAL_MAX_COMPLETED_GAMES
+    return uniqueUsers.slice().sort((a: ITowersUserProfile, b: ITowersUserProfile) => {
+      const isProvisionalA: boolean = a.gamesCompleted < PROVISIONAL_MAX_COMPLETED_GAMES
+      const isProvisionalB: boolean = b.gamesCompleted < PROVISIONAL_MAX_COMPLETED_GAMES
 
       if (sortKey === "name") {
-        const nameA: string = a.towersUserProfile?.user?.username || ""
-        const nameB: string = b.towersUserProfile?.user?.username || ""
+        const nameA: string = a.user?.username || ""
+        const nameB: string = b.user?.username || ""
         return sortOrder === "asc" ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA)
       } else if (sortKey === "rating") {
         // Add "provisional" first in ASC order
         if (isProvisionalA && !isProvisionalB) return sortOrder === "asc" ? -1 : 1
         if (!isProvisionalA && isProvisionalB) return sortOrder === "asc" ? 1 : -1
 
-        const ratingA: number = a.towersUserProfile?.rating || 0
-        const ratingB: number = b.towersUserProfile?.rating || 0
+        const ratingA: number = a.rating || 0
+        const ratingB: number = b.rating || 0
         return sortOrder === "asc" ? ratingA - ratingB : ratingB - ratingA
       } else {
         const tableNumberA: number = a.table?.tableNumber || 0
@@ -114,14 +120,14 @@ export default function PlayersList({ users, full = false, onSelectedPlayer }: P
           </div>
         )}
         <div className={clsx("overflow-y-scroll", full ? "flex-1 max-h-80" : "min-w-60 h-full")}>
-          {sortedPlayersList?.map((player: TowersUser) => (
+          {sortedPlayersList?.map((player: ITowersUserProfile) => (
             <div
               key={player.id}
               className={clsx(
                 "flex divide-gray-200",
                 full ? "divide-x-2 select-none" : "divide-x",
                 selectedPlayerId === player.id ? "bg-blue-100" : "bg-white",
-                player.towersUserProfile.user.id === session?.user?.id && "text-blue-700"
+                player.userId === session?.user.id && "text-blue-700"
               )}
               role="button"
               tabIndex={0}
@@ -134,28 +140,20 @@ export default function PlayersList({ users, full = false, onSelectedPlayer }: P
                     <div
                       className={clsx(
                         "flex-shrink-0 w-4 h-4",
-                        player.towersUserProfile?.rating >= 2100 && "bg-red-400",
-                        player.towersUserProfile?.rating >= 1800 &&
-                          player.towersUserProfile?.rating <= 2099 &&
-                          "bg-orange-400",
-                        player.towersUserProfile?.rating >= 1500 &&
-                          player.towersUserProfile?.rating <= 1799 &&
-                          "bg-purple-400",
-                        player.towersUserProfile?.rating >= 1200 &&
-                          player.towersUserProfile?.rating <= 1499 &&
-                          "bg-cyan-600",
-                        player.towersUserProfile?.rating <= 1199 && "bg-green-600",
-                        player.towersUserProfile?.gamesCompleted < PROVISIONAL_MAX_COMPLETED_GAMES && "!bg-gray-400"
+                        player.rating >= RATING_MASTER && "bg-red-400",
+                        player.rating >= RATING_DIAMOND && player.rating < RATING_MASTER && "bg-orange-400",
+                        player.rating >= RATING_PLATINUM && player.rating < RATING_DIAMOND && "bg-purple-400",
+                        player.rating >= RATING_GOLD && player.rating < RATING_PLATINUM && "bg-cyan-600",
+                        player.rating < RATING_GOLD && "bg-green-600",
+                        player.gamesCompleted < PROVISIONAL_MAX_COMPLETED_GAMES && "!bg-gray-400"
                       )}
                     />
                   )}
-                  <div className="truncate">{player.towersUserProfile?.user.username}</div>
+                  <div className="truncate">{player.user?.username}</div>
                 </div>
               </div>
               <div className={clsx("w-1/4 text-end truncate", full ? "p-2" : "p-1")}>
-                {player.towersUserProfile?.gamesCompleted >= PROVISIONAL_MAX_COMPLETED_GAMES
-                  ? player.towersUserProfile?.rating
-                  : "provisional"}
+                {player.gamesCompleted >= PROVISIONAL_MAX_COMPLETED_GAMES ? player.rating : "provisional"}
               </div>
               {full && <div className="w-1/4 p-2 text-end truncate">{player.table?.tableNumber}</div>}
             </div>
@@ -166,7 +164,7 @@ export default function PlayersList({ users, full = false, onSelectedPlayer }: P
       <PlayerInformation
         key={uuidv4()}
         isOpen={isPlayerInfoModalOpen}
-        player={sortedPlayersList?.find((player: TowersUser) => player.id === selectedPlayerId)}
+        player={sortedPlayersList?.find((player: ITowersUserProfile) => player.id === selectedPlayerId)}
         onCancel={handleClosePlayerInfoModal}
       />
     </>

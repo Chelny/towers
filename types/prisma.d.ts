@@ -1,64 +1,66 @@
-import { Prisma, Room, RoomChat, Table, TableChat, TowersUserProfile, TowersUserRoomTable, User } from "@prisma/client"
+import {
+  Prisma,
+  TowersRoom,
+  TowersRoomChatMessage,
+  TowersTable,
+  TowersTableChatMessage,
+  TowersUserProfile,
+  User,
+} from "@prisma/client"
 
 declare module "@prisma/client" {
-  interface TowersUserProfileWithRelations extends TowersUserProfile {
+  interface IUserWithRelations extends User {
+    towersUserProfile?: TowersUserProfile
+  }
+
+  interface ITowersTableWithRelations extends TowersTable {
+    room?: TowersRoom
+  }
+
+  interface ITowersUserProfileWithRelations extends TowersUserProfile {
     user: User
+    room?: TowersRoom | null
+    table?: TowersTable | null
   }
 
-  interface TowersUserRoomTableWithRelations extends TowersUserRoomTable {
-    towersUserProfile: TowersUserProfileWithRelations
+  // **************************************************
+  // * Socket Room API
+  // **************************************************
+
+  interface IRoomListItem extends TowersRoom {
+    userProfiles: { id: string }[]
   }
 
-  /**
-   * Room API
-   */
-
-  interface RoomListItem extends Room {
-    towersUserRoomTables: { towersUserProfileId: string }[]
-  }
-
-  interface RoomListItemWithUsersCount extends RoomListItem {
+  interface IRoomListItemWithUsersCount extends IRoomListItem {
     usersCount: number
   }
 
-  /**
-   * Socket Room
-   */
+  // **************************************************
+  // * Socket Room
+  // **************************************************
 
-  interface RoomInfo extends Room {
-    tables: TableInfo[]
+  interface ITowersRoom extends TowersRoom {}
+
+  interface ITowersRoomChatMessage extends TowersRoomChatMessage {
+    user: IUserWithRelations
   }
 
-  interface RoomInfoWithTablesCount {
-    room: RoomInfo
-    tablesCount: number
+  // **************************************************
+  // * Socket Table
+  // **************************************************
+
+  interface ITowersTable extends ITowersTableWithRelations {
+    host: IUserWithRelations
+    userProfiles: ITowersUserProfileWithRelations[]
   }
 
-  interface RoomMessage extends RoomChat {
-    towersUserProfile: TowersUserProfileWithRelations
+  interface ITowersTableChatMessage extends TowersTableChatMessage {
+    user: IUserWithRelations | null
   }
 
-  /**
-   * Socket Table
-   */
+  // **************************************************
+  // * Socket Room + Table
+  // **************************************************
 
-  interface TableInfo extends Table {
-    room?: Room
-    host: TowersUserProfileWithRelations
-    towersUserRoomTables: (TowersUserRoomTable & { towersUserProfile: TowersUserProfileWithRelations })[]
-  }
-
-  interface TableMessage extends TableChat {
-    towersUserProfile: TowersUserProfileWithRelations
-  }
-
-  /**
-   * Socket Room + Table
-   */
-
-  interface TowersUser extends TowersUserRoomTable {
-    towersUserProfile: TowersUserProfileWithRelations
-    room: Room
-    table: Table | null
-  }
+  interface ITowersUserProfile extends ITowersUserProfileWithRelations {}
 }

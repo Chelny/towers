@@ -2,7 +2,7 @@ import { ReadonlyRequestCookies } from "next/dist/server/web/spec-extension/adap
 import { cookies } from "next/headers"
 import { NextResponse } from "next/server"
 import { PrismaAdapter } from "@auth/prisma-adapter"
-import { TowersUserProfile, User, UserStatus } from "@prisma/client"
+import { User, UserStatus } from "@prisma/client"
 import NextAuth from "next-auth"
 import Credentials from "next-auth/providers/credentials"
 import GitHub from "next-auth/providers/github"
@@ -78,26 +78,6 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         token.username = user.username
         token.picture = user.image
         token.account = account
-
-        if (user.id && !user.towersUserProfileId) {
-          const towersUserProfile: TowersUserProfile | null = await prisma.towersUserProfile.findUnique({
-            where: { userId: user.id }
-          })
-
-          if (towersUserProfile) {
-            token.towersUserProfileId = towersUserProfile.id
-          } else {
-            const newTowersUserProfile: TowersUserProfile = await prisma.towersUserProfile.create({
-              data: {
-                userId: user.id
-              }
-            })
-
-            token.towersUserProfileId = newTowersUserProfile.id
-          }
-        } else {
-          token.towersUserProfileId = user.towersUserProfileId
-        }
       }
 
       if (trigger === "signUp") {
@@ -132,7 +112,6 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         session.user.email = token.email
         session.user.username = token.username
         session.user.image = token.picture
-        session.user.towersUserProfileId = token.towersUserProfileId
         session.account = token.account
         session.isNewUser = token.isNewUser
       }
@@ -148,7 +127,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         user.username = generateRandomUsername(emailPrefix)
       }
 
-      const updatedUser: User = await prisma.user.update({
+      await prisma.user.update({
         where: { id: user.id },
         data: {
           emailVerified: new Date(),
@@ -157,15 +136,6 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
           status: UserStatus.ACTIVE
         }
       })
-
-      // Create Towers table entry
-      const towersUserProfile: TowersUserProfile = await prisma.towersUserProfile.create({
-        data: {
-          userId: updatedUser.id
-        }
-      })
-
-      user.towersUserProfileId = towersUserProfile.id
     },
     async signIn({ user }) {
       if (user.id) {

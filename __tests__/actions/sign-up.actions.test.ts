@@ -1,7 +1,7 @@
 import { Mock } from "vitest"
 import { signUp } from "@/app/(auth)/sign-up/sign-up.actions"
 import { POST } from "@/app/api/sign-up/route"
-import { mockedFormInitialState } from "@/vitest.setup"
+import { mockFormInitialState } from "@/vitest.setup"
 
 vi.mock("@/app/api/sign-up/route", () => ({
   POST: vi.fn()
@@ -37,7 +37,7 @@ describe("Sign Up Actions", () => {
       json: async () => response
     })
 
-    const result = await signUp(mockedFormInitialState, formData)
+    const result = await signUp(mockFormInitialState, formData)
 
     expect(POST).not.toHaveBeenCalled()
     expect(result).toEqual(response)
@@ -68,7 +68,7 @@ describe("Sign Up Actions", () => {
       json: async () => response
     })
 
-    const result = await signUp(mockedFormInitialState, formData)
+    const result = await signUp(mockFormInitialState, formData)
 
     expect(POST).not.toHaveBeenCalled()
     expect(result).toEqual(response)
@@ -95,7 +95,7 @@ describe("Sign Up Actions", () => {
       json: async () => response
     })
 
-    const result = await signUp(mockedFormInitialState, formData)
+    const result = await signUp(mockFormInitialState, formData)
 
     expect(POST).not.toHaveBeenCalled()
     expect(result).toEqual(response)
@@ -120,7 +120,7 @@ describe("Sign Up Actions", () => {
       json: async () => response
     })
 
-    const result = await signUp(mockedFormInitialState, formData)
+    const result = await signUp(mockFormInitialState, formData)
 
     expect(POST).toHaveBeenCalledWith({
       name: "John Doe",
@@ -129,7 +129,7 @@ describe("Sign Up Actions", () => {
       username: "john.doe",
       password: "Password123!",
       confirmPassword: "Password123!",
-      termsAndConditions: "on"
+      termsAndConditions: true
     })
     expect(result).toEqual(response)
   })

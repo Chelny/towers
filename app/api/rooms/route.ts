@@ -1,22 +1,22 @@
 import { NextResponse } from "next/server"
-import { RoomListItem, TowersUserRoomTable } from "@prisma/client"
+import { IRoomListItem, IRoomListItemWithUsersCount } from "@prisma/client"
 import prisma from "@/lib/prisma"
 
 export async function GET(): Promise<NextResponse> {
-  const rooms: RoomListItem[] = await prisma.room.findMany({
+  const rooms: IRoomListItem[] = await prisma.towersRoom.findMany({
     include: {
-      towersUserRoomTables: {
+      userProfiles: {
         select: {
-          towersUserProfileId: true
+          id: true
         },
-        distinct: ["towersUserProfileId"]
+        distinct: ["id"]
       }
     }
   })
 
-  const roomsWithUsersCount = rooms.map((room: RoomListItem) => ({
+  const roomsWithUsersCount: IRoomListItemWithUsersCount[] = rooms.map((room: IRoomListItem) => ({
     ...room,
-    usersCount: room.towersUserRoomTables.length
+    usersCount: room.userProfiles.length
   }))
 
   return NextResponse.json(

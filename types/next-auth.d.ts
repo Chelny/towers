@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server"
 import { JWT } from "next-auth/jwt"
+import NextAuth, { DefaultSession } from "next-auth"
 
 declare module "next-auth" {
   /**
@@ -8,7 +9,6 @@ declare module "next-auth" {
    */
   interface User {
     username: string
-    towersUserProfileId: string
   }
   /**
    * The shape of the account object returned in the OAuth providers' `account` callback,
@@ -23,7 +23,6 @@ declare module "next-auth" {
     user: {
       id: string
       username: string
-      towersUserProfileId: string
       /**
        * By default, TypeScript merges new interface properties and overwrites existing ones.
        * In this case, the default session user properties will be overwritten,
@@ -45,8 +44,9 @@ declare module "next-auth/jwt" {
   interface JWT {
     /** OpenID ID Token */
     idToken?: string
+    sub: string
+    email: string
     username: string
-    towersUserProfileId: string
     account: Account | null
     isNewUser: boolean
   }

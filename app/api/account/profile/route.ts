@@ -69,7 +69,7 @@ export async function PATCH(body: ProfileFormData): Promise<NextResponse> {
     return NextResponse.json(
       {
         success: false,
-        message: "Please sign in to access your account."
+        message: "Sorry, your request could not be processed."
       },
       { status: 401 }
     )

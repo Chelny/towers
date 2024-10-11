@@ -15,7 +15,7 @@ export async function DELETE(body: CancelAccountFormData): Promise<NextResponse>
     return NextResponse.json(
       {
         success: false,
-        message: "Please sign in to access your account."
+        message: "Sorry, your request could not be processed."
       },
       { status: 401 }
     )

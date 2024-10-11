@@ -2,7 +2,7 @@ import { useFormState, useFormStatus } from "react-dom"
 import { useRouter } from "next/navigation"
 import { render, screen } from "@testing-library/react"
 import { CancelAccountForm } from "@/app/(protected)/account/cancel/cancel.form"
-import { mockedRouter } from "@/vitest.setup"
+import { mockRouter } from "@/vitest.setup"
 
 vi.mock("next/navigation")
 
@@ -13,7 +13,7 @@ vi.mock("react-dom", () => ({
 
 describe("Cancel Account Form", () => {
   beforeEach(() => {
-    vi.mocked(useRouter).mockReturnValue(mockedRouter)
+    vi.mocked(useRouter).mockReturnValue(mockRouter)
     vi.mocked(useFormState).mockReturnValue([{ success: false, message: "", error: {} }, vi.fn(), false])
     vi.mocked(useFormStatus).mockReturnValue({
       pending: false,

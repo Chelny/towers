@@ -2,13 +2,13 @@
 
 import { ReactNode, useState } from "react"
 import dynamic from "next/dynamic"
-import { TowersUser } from "@prisma/client"
+import { ITowersUserProfile } from "@prisma/client"
 import PlayersListSkeleton from "@/components/skeleton/PlayersListSkeleton"
 import Modal from "@/components/ui/Modal"
 
 type TableBootUserProps = {
   isOpen: boolean
-  users: TowersUser[]
+  users: ITowersUserProfile[]
   onCancel: () => void
 }
 
@@ -16,7 +16,6 @@ export default function TableBootUser({ isOpen, users, onCancel }: TableBootUser
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null)
 
   const handleSelectedPlayer = (): void => {
-    // TODO: Emit socket event
     onCancel()
   }
 
@@ -25,6 +24,7 @@ export default function TableBootUser({ isOpen, users, onCancel }: TableBootUser
       title="Boot User"
       isOpen={isOpen}
       confirmText="Boot"
+      isConfirmButtonDisabled={users?.length === 0}
       dataTestId="table-boot-user-modal"
       onConfirm={handleSelectedPlayer}
       onCancel={onCancel}

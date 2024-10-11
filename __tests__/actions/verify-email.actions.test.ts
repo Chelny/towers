@@ -1,7 +1,7 @@
 import { Mock } from "vitest"
 import { verifyEmail } from "@/app/(auth)/verify-email/verify-email.actions"
 import { PATCH } from "@/app/api/verify-email/route"
-import { mockedFormInitialState } from "@/vitest.setup"
+import { mockFormInitialState } from "@/vitest.setup"
 
 vi.mock("@/app/api/verify-email/route", () => ({
   PATCH: vi.fn()
@@ -28,7 +28,7 @@ describe("Verify Email Actions", () => {
       json: async () => response
     })
 
-    const result = await verifyEmail(mockedFormInitialState, formData)
+    const result = await verifyEmail(mockFormInitialState, formData)
 
     expect(PATCH).not.toHaveBeenCalled()
     expect(result).toEqual(response)
@@ -44,7 +44,7 @@ describe("Verify Email Actions", () => {
       json: async () => response
     })
 
-    const result = await verifyEmail(mockedFormInitialState, formData)
+    const result = await verifyEmail(mockFormInitialState, formData)
 
     expect(PATCH).toHaveBeenCalledWith({
       token: "YjY1ZWYwYzEtYWU2My00YWIwLTljZmQtMzcxYjdiY2UwODRifGNoZWxueTFAZXhhbXBsZS5kZXY="

@@ -1,14 +1,14 @@
 import { render, screen } from "@testing-library/react"
+import { mockRoom1Table1Info } from "@/__mocks__/data/socketState"
 import TableHeader from "@/components/game/TableHeader"
-import { mockedRoom1, mockedRoom1Table1, mockedRoom1Table1Info, mockedUser1 } from "@/vitest.setup"
 
 describe("TableHeader Component", () => {
   it("should render the table number and host username", () => {
-    render(<TableHeader table={mockedRoom1Table1Info} />)
+    render(<TableHeader table={mockRoom1Table1Info} />)
 
     expect(
-      screen.getByText(`Table: ${mockedRoom1Table1.tableNumber} - Host: ${mockedUser1.username}`)
+      screen.getByText(`Table: ${mockRoom1Table1Info.tableNumber} - Host: ${mockRoom1Table1Info.host.username}`)
     ).toBeInTheDocument()
-    expect(screen.getByText(mockedRoom1.name)).toBeInTheDocument()
+    expect(screen.getByText(mockRoom1Table1Info.room!.name)).toBeInTheDocument()
   })
 })

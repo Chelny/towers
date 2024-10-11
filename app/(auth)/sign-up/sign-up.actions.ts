@@ -13,7 +13,7 @@ export async function signUp(prevState: ApiResponse, formData: FormData): Promis
     username: formData.get("username") as string,
     password: formData.get("password") as string,
     confirmPassword: formData.get("confirmPassword") as string,
-    termsAndConditions: formData.get("termsAndConditions") as string
+    termsAndConditions: formData.get("termsAndConditions") === "on"
   }
 
   const errors: ValueError[] = Array.from(Value.Errors(signUpSchema, rawFormData))

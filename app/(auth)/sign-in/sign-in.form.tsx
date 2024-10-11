@@ -87,7 +87,7 @@ export function SignInForm(): ReactNode {
           <PiMagicWandFill className="w-5 h-5" />
           <span>Sign In with Magic Link</span>
         </Button>
-        {/* TODO: The WebAuthn / Passkeys provider is experimental and not yet recommended for production use. */}
+        {/* NOTE: The WebAuthn / Passkeys provider is experimental and not yet recommended for production use. */}
         {/* {status === "authenticated" ? (
           <Button
             className="flex justify-center items-center w-full gap-x-2"

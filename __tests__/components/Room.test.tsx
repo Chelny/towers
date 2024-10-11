@@ -1,19 +1,21 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { Mock } from "vitest"
+import { mockRoom1 } from "@/__mocks__/data/rooms"
+import { mockSocketRoom1Id } from "@/__mocks__/data/socketState"
+import { mockAuthenticatedSession } from "@/__mocks__/data/users"
 import Room from "@/components/game/Room"
 import { ROUTE_TOWERS } from "@/constants/routes"
 import { useSessionData } from "@/hooks/useSessionData"
 import { useAppDispatch } from "@/lib/hooks"
-import { beforeLeaveSocketRoom } from "@/redux/features/socket-slice"
-import { leaveRoom, SocketRoomThunk } from "@/redux/thunks/socket-thunks"
-import { mockedAuthenticatedSession, mockedRoom1, mockedSocketRoom1Id, mockedUser1 } from "@/vitest.setup"
+import { leaveRoomAction } from "@/redux/features/socket-slice"
+import { leaveRoom } from "@/redux/thunks/socket-thunks"
 
-const { useRouter, mockedRouterPush } = vi.hoisted(() => {
-  const mockedRouterPush: Mock = vi.fn()
+const { useRouter, mockRouterPush } = vi.hoisted(() => {
+  const mockRouterPush: Mock = vi.fn()
 
   return {
-    useRouter: () => ({ push: mockedRouterPush }),
-    mockedRouterPush
+    useRouter: () => ({ push: mockRouterPush }),
+    mockRouterPush
   }
 })
 
@@ -40,10 +42,10 @@ vi.mock("@/redux/features/socket-slice")
 vi.mock("@/redux/thunks/socket-thunks")
 
 describe("Room Component", () => {
-  const mockedAppDispatch: Mock = vi.fn()
-  const mockedSocketRoomThunkParams: SocketRoomThunk = {
-    roomId: mockedSocketRoom1Id,
-    username: mockedUser1.username!
+  const mockAppDispatch: Mock = vi.fn()
+  const mockSocketRoomThunkParams: { roomId: string; tablesToQuit: { id: string; isLastUser: boolean }[] } = {
+    roomId: mockSocketRoom1Id,
+    tablesToQuit: []
   }
 
   beforeAll(() => {
@@ -51,8 +53,8 @@ describe("Room Component", () => {
   })
 
   beforeEach(() => {
-    vi.mocked(useAppDispatch).mockReturnValue(mockedAppDispatch)
-    vi.mocked(useSessionData).mockReturnValue(mockedAuthenticatedSession)
+    vi.mocked(useAppDispatch).mockReturnValue(mockAppDispatch)
+    vi.mocked(useSessionData).mockReturnValue(mockAuthenticatedSession)
   })
 
   afterEach(() => {
@@ -60,60 +62,58 @@ describe("Room Component", () => {
   })
 
   it("should render room correctly", () => {
-    render(<Room roomId={mockedSocketRoom1Id} />)
+    render(<Room roomId={mockSocketRoom1Id} />)
     expect(screen.getByPlaceholderText("Write something...")).toBeInTheDocument()
   })
 
   it("should send a message when Enter is pressed", () => {
-    render(<Room roomId={mockedSocketRoom1Id} />)
+    render(<Room roomId={mockSocketRoom1Id} />)
 
     const input: HTMLInputElement = screen.getByPlaceholderText("Write something...")
     fireEvent.change(input, { target: { value: "Hello World!" } })
     fireEvent.keyDown(input, { key: "Enter", code: "Enter" })
 
-    expect(mockedAppDispatch).toHaveBeenCalled()
+    expect(mockAppDispatch).toHaveBeenCalled()
   })
 
   it("should not navigate to rooms list if room exit fails", async () => {
-    const mockedAppDispatchBeforeLeaveSocketRoom: Mock = vi.fn()
+    const mockAppDispatchBeforeLeaveSocketRoom: Mock = vi.fn()
 
-    mockedAppDispatch.mockReturnValue({
+    mockAppDispatch.mockReturnValue({
       unwrap: () => Promise.reject(new Error("Failed to leave room"))
     })
 
-    mockedAppDispatchBeforeLeaveSocketRoom.mockReturnValue({
-      unwrap: () => Promise.resolve(mockedSocketRoomThunkParams)
+    mockAppDispatchBeforeLeaveSocketRoom.mockReturnValue({
+      unwrap: () => Promise.resolve(mockSocketRoomThunkParams)
     })
 
-    render(<Room roomId={mockedRoom1.id} />)
+    render(<Room roomId={mockRoom1.id} />)
 
     const exitRoomButton: HTMLButtonElement = screen.getByText("Exit Room")
     fireEvent.click(exitRoomButton)
 
     await waitFor(() => {
-      expect(mockedAppDispatch).toHaveBeenCalledWith(leaveRoom(mockedSocketRoomThunkParams))
-      expect(mockedAppDispatchBeforeLeaveSocketRoom).not.toHaveBeenCalledWith(
-        beforeLeaveSocketRoom(mockedSocketRoomThunkParams)
-      )
-      expect(mockedRouterPush).not.toHaveBeenCalled()
+      expect(mockAppDispatch).toHaveBeenCalledWith(leaveRoom(mockSocketRoomThunkParams))
+      expect(mockAppDispatchBeforeLeaveSocketRoom).not.toHaveBeenCalledWith(leaveRoomAction(mockSocketRoomThunkParams))
+      expect(mockRouterPush).not.toHaveBeenCalled()
     })
   })
 
   it("should navigate to the rooms list on successful room exit", async () => {
-    mockedAppDispatch.mockReturnValue({
-      unwrap: () => Promise.resolve(mockedSocketRoomThunkParams)
+    mockAppDispatch.mockReturnValue({
+      unwrap: () => Promise.resolve(mockSocketRoomThunkParams)
     })
 
-    render(<Room roomId={mockedRoom1.id} />)
+    render(<Room roomId={mockRoom1.id} />)
 
     const exitRoomButton: HTMLButtonElement = screen.getByText("Exit Room")
     fireEvent.click(exitRoomButton)
 
-    expect(mockedAppDispatch).toHaveBeenCalledWith(leaveRoom(mockedSocketRoomThunkParams))
-    expect(mockedAppDispatch).toHaveBeenCalledWith(beforeLeaveSocketRoom(mockedSocketRoomThunkParams))
+    expect(mockAppDispatch).toHaveBeenCalledWith(leaveRoom(mockSocketRoomThunkParams))
+    expect(mockAppDispatch).toHaveBeenCalledWith(leaveRoomAction(mockSocketRoomThunkParams))
 
     await waitFor(() => {
-      expect(mockedRouterPush).toHaveBeenCalledWith(ROUTE_TOWERS.PATH)
+      expect(mockRouterPush).toHaveBeenCalledWith(ROUTE_TOWERS.PATH)
     })
   })
 })

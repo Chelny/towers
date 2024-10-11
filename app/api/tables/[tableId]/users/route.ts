@@ -1,18 +1,14 @@
 import { NextRequest, NextResponse } from "next/server"
-import { TowersUser } from "@prisma/client"
+import { ITowersUserProfile } from "@prisma/client"
 import prisma from "@/lib/prisma"
 
 export async function GET(request: NextRequest, context: { params: { tableId: string } }): Promise<NextResponse> {
   const { tableId } = context.params
-  const towersUsers: TowersUser[] = await prisma.towersUserRoomTable.findMany({
+
+  const towersUserProfiles: ITowersUserProfile[] = await prisma.towersUserProfile.findMany({
     where: { tableId },
     include: {
-      towersUserProfile: {
-        include: {
-          user: true,
-          towersUserRoomTables: true
-        }
-      },
+      user: true,
       room: true,
       table: true
     },
@@ -24,7 +20,7 @@ export async function GET(request: NextRequest, context: { params: { tableId: st
   return NextResponse.json(
     {
       success: true,
-      data: towersUsers
+      data: towersUserProfiles
     },
     { status: 200 }
   )

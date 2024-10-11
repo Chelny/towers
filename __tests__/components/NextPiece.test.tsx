@@ -1,17 +1,17 @@
 import { render, screen } from "@testing-library/react"
+import { mockDefaultTowersBlockProps } from "@/__mocks__/data/board"
 import NextPiece from "@/components/towers/NextPiece"
 import { Piece } from "@/interfaces/game"
-import { mockedDefaultTowersBlockProps } from "@/vitest.setup"
 
 describe("NextPiece Component", () => {
-  const mockedNextPiece: Piece = [
-    { ...mockedDefaultTowersBlockProps, letter: "T", powerType: "defense" },
-    { ...mockedDefaultTowersBlockProps, letter: "O", powerType: null },
-    { ...mockedDefaultTowersBlockProps, letter: "W", powerType: "attack" }
+  const mockNextPiece: Piece = [
+    { ...mockDefaultTowersBlockProps, letter: "T", powerType: "defense" },
+    { ...mockDefaultTowersBlockProps, letter: "O", powerType: null },
+    { ...mockDefaultTowersBlockProps, letter: "W", powerType: "attack" }
   ]
 
   it("should render all blocks in the next piece", () => {
-    render(<NextPiece nextPiece={mockedNextPiece} />)
+    render(<NextPiece nextPiece={mockNextPiece} />)
 
     expect(screen.getAllByText("T")).toHaveLength(4)
     expect(screen.getByText("O")).toBeInTheDocument()

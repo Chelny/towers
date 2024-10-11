@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation"
 import { fireEvent, render, screen } from "@testing-library/react"
 import { SignInForm } from "@/app/(auth)/sign-in/sign-in.form"
 import { ROUTE_FORGOT_PASSWORD, ROUTE_SIGN_IN_WITH_MAGIC_LINK, ROUTE_SIGN_UP } from "@/constants/routes"
-import { mockedRouter } from "@/vitest.setup"
+import { mockRouter } from "@/vitest.setup"
 
 vi.mock("next/navigation")
 
@@ -14,7 +14,7 @@ vi.mock("react-dom", () => ({
 
 describe("Sign In Form", () => {
   beforeEach(() => {
-    vi.mocked(useRouter).mockReturnValue(mockedRouter)
+    vi.mocked(useRouter).mockReturnValue(mockRouter)
     vi.mocked(useFormState).mockReturnValue([{ success: false, message: "", error: {} }, vi.fn(), false])
     vi.mocked(useFormStatus).mockReturnValue({
       pending: false,
@@ -60,7 +60,7 @@ describe("Sign In Form", () => {
     expect(signUpLink.closest("a")).toHaveAttribute("href", ROUTE_SIGN_UP.PATH)
 
     fireEvent.click(screen.getByTestId("sign-in-magic-link-button"))
-    expect(mockedRouter.push).toHaveBeenCalledWith(ROUTE_SIGN_IN_WITH_MAGIC_LINK.PATH)
+    expect(mockRouter.push).toHaveBeenCalledWith(ROUTE_SIGN_IN_WITH_MAGIC_LINK.PATH)
   })
 
   it("should show error messages when submitting an empty form", () => {
