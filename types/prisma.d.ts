@@ -9,7 +9,7 @@ import {
 } from "@prisma/client"
 
 declare module "@prisma/client" {
-  interface IUserWithRelations extends User {
+  interface IUserWithRelations extends Omit<User, "password"> {
     towersUserProfile?: TowersUserProfile
   }
 
@@ -18,7 +18,7 @@ declare module "@prisma/client" {
   }
 
   interface ITowersUserProfileWithRelations extends TowersUserProfile {
-    user: User
+    user: Omit<User, "password">
     room?: TowersRoom | null
     table?: TowersTable | null
   }
