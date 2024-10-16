@@ -34,10 +34,17 @@ describe("PlayerInformation Component", () => {
   it("should display player information correctly when the modal is open", () => {
     const handleCancel: Mock = vi.fn()
 
-    render(<PlayerInformation isOpen={true} player={mockRoom1Table1TowersUserProfile2} onCancel={handleCancel} />)
+    render(
+      <PlayerInformation
+        isOpen={true}
+        player={mockRoom1Table1TowersUserProfile2}
+        isRatingsVisible
+        onCancel={handleCancel}
+      />
+    )
 
     expect(
-      screen.getByText(`Player information for ${mockRoom1Table1TowersUserProfile2.user.username}`)
+      screen.getByText(`Player information of ${mockRoom1Table1TowersUserProfile2.user.username}`)
     ).toBeInTheDocument()
     expect(screen.getByText(new RegExp(`Rating: ${mockRoom1Table1TowersUserProfile2.rating}`))).toBeInTheDocument()
     expect(

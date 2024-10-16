@@ -18,10 +18,16 @@ import { useSessionData } from "@/hooks/useSessionData"
 type PlayersListProps = {
   users: ITowersUserProfile[]
   full?: boolean
-  onSelectedPlayer?: (_userId: string) => void
+  isRatingsVisible?: boolean
+  onSelectedPlayer?: (userId: string) => void
 }
 
-export default function PlayersList({ users, full = false, onSelectedPlayer }: PlayersListProps): ReactNode {
+export default function PlayersList({
+  users,
+  full = false,
+  isRatingsVisible = false,
+  onSelectedPlayer
+}: PlayersListProps): ReactNode {
   const { data: session } = useSessionData()
   const [sortKey, setSortKey] = useState<"name" | "rating" | "table">("name")
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
@@ -91,7 +97,7 @@ export default function PlayersList({ users, full = false, onSelectedPlayer }: P
         {full && (
           <div className="flex border-b border-gray-200 divide-x-2 divide-gray-200 bg-gray-50">
             <div
-              className="flex items-center gap-2 w-1/2 p-2 cursor-pointer"
+              className={clsx("flex items-center gap-2 p-2 cursor-pointer", isRatingsVisible ? "w-1/2" : "w-3/4")}
               role="buton"
               tabIndex={0}
               onClick={() => handleSort("name")}
@@ -99,15 +105,17 @@ export default function PlayersList({ users, full = false, onSelectedPlayer }: P
               <span>Name</span>
               {sortKey === "name" && (sortOrder === "asc" ? <BsSortAlphaDown /> : <BsSortAlphaDownAlt />)}
             </div>
-            <div
-              className="flex items-center gap-2 w-1/4 p-2 cursor-pointer"
-              role="buton"
-              tabIndex={0}
-              onClick={() => handleSort("rating")}
-            >
-              <span>Rating</span>
-              {sortKey === "rating" && (sortOrder === "asc" ? <BsSortNumericDown /> : <BsSortNumericDownAlt />)}
-            </div>
+            {isRatingsVisible && (
+              <div
+                className="flex items-center gap-2 w-1/4 p-2 cursor-pointer"
+                role="buton"
+                tabIndex={0}
+                onClick={() => handleSort("rating")}
+              >
+                <span>Rating</span>
+                {sortKey === "rating" && (sortOrder === "asc" ? <BsSortNumericDown /> : <BsSortNumericDownAlt />)}
+              </div>
+            )}
             <div
               className="flex items-center gap-2 w-1/4 p-2 me-4 cursor-pointer"
               role="buton"
@@ -134,9 +142,9 @@ export default function PlayersList({ users, full = false, onSelectedPlayer }: P
               onClick={() => handlePlayersRowClick(player.id)}
               onDoubleClick={handleOpenPlayerInfoModal}
             >
-              <div className={clsx(full ? "w-1/2 p-2" : "w-3/4 p-1")}>
+              <div className={clsx("p-2", full && isRatingsVisible ? "w-1/2" : "w-3/4")}>
                 <div className="flex items-center gap-1">
-                  {full && (
+                  {full && isRatingsVisible && (
                     <div
                       className={clsx(
                         "flex-shrink-0 w-4 h-4",
@@ -152,9 +160,11 @@ export default function PlayersList({ users, full = false, onSelectedPlayer }: P
                   <div className="truncate">{player.user?.username}</div>
                 </div>
               </div>
-              <div className={clsx("w-1/4 text-end truncate", full ? "p-2" : "p-1")}>
-                {player.gamesCompleted >= PROVISIONAL_MAX_COMPLETED_GAMES ? player.rating : "provisional"}
-              </div>
+              {isRatingsVisible && (
+                <div className={clsx("p-2 text-end truncate", full ? "w-1/4" : "w-1/2")}>
+                  {player.gamesCompleted >= PROVISIONAL_MAX_COMPLETED_GAMES ? player.rating : "provisional"}
+                </div>
+              )}
               {full && <div className="w-1/4 p-2 text-end truncate">{player.table?.tableNumber}</div>}
             </div>
           ))}
@@ -165,6 +175,7 @@ export default function PlayersList({ users, full = false, onSelectedPlayer }: P
         key={uuidv4()}
         isOpen={isPlayerInfoModalOpen}
         player={sortedPlayersList?.find((player: ITowersUserProfile) => player.id === selectedPlayerId)}
+        isRatingsVisible={isRatingsVisible}
         onCancel={handleClosePlayerInfoModal}
       />
     </>

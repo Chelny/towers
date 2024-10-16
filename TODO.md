@@ -10,8 +10,6 @@
 
 ## Room
 
-- Hide ratings for users in "social" rooms (eg.: Eiffel Tower)
-
 ### Invitation Request
 
 - Accept table invitation
@@ -49,3 +47,7 @@
 - Table type:
   - Protected table text: "\*\*\* Only people you have invited may play now."
   - Private table text: "\*\*\* Only people you have invited may play or watch your table now."
+
+## Server
+
+- Manage errors for specific user in a specific room

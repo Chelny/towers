@@ -10,6 +10,7 @@ import {
   ITowersUserProfile,
   ITowersUserProfileWithRelations,
   IUserWithRelations,
+  RoomLevel,
   TableChatMessageType,
   TableType
 } from "@prisma/client"
@@ -522,7 +523,7 @@ export default function Table({ roomId, tableId }: TableProps): ReactNode {
             </div>
           </div>
 
-          <PlayersList users={tableUsers} />
+          <PlayersList users={tableUsers} isRatingsVisible={tableInfo?.room?.difficulty !== RoomLevel.SOCIAL} />
         </div>
       </div>
 
@@ -530,6 +531,7 @@ export default function Table({ roomId, tableId }: TableProps): ReactNode {
         key={uuidv4()}
         isOpen={isInviteUserModalOpen}
         users={roomUsersInvite}
+        isRatingsVisible={tableInfo?.room?.difficulty !== RoomLevel.SOCIAL}
         onCancel={handleCloseInviteUserModal}
       />
 
@@ -537,6 +539,7 @@ export default function Table({ roomId, tableId }: TableProps): ReactNode {
         key={uuidv4()}
         isOpen={isBootUserModalOpen}
         users={tableUsersBoot}
+        isRatingsVisible={tableInfo?.room?.difficulty !== RoomLevel.SOCIAL}
         onCancel={handleCloseBootUserModal}
       />
     </>

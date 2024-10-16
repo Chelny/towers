@@ -10,10 +10,16 @@ import { useSessionData } from "@/hooks/useSessionData"
 type PlayerInformationProps = {
   isOpen: boolean
   player: ITowersUserProfile | undefined
+  isRatingsVisible?: boolean
   onCancel: () => void
 }
 
-export default function PlayerInformation({ isOpen, player, onCancel }: PlayerInformationProps): ReactNode {
+export default function PlayerInformation({
+  isOpen,
+  player,
+  isRatingsVisible = false,
+  onCancel
+}: PlayerInformationProps): ReactNode {
   const { data: session } = useSessionData()
   const [isCurrentUser, setIsCurrentUser] = useState<boolean>(false)
   const [reason, setReason] = useState<string>("")
@@ -37,7 +43,7 @@ export default function PlayerInformation({ isOpen, player, onCancel }: PlayerIn
 
   return (
     <Modal
-      title={`Player information for ${player?.user.username}`}
+      title={`Player information of ${player?.user.username}`}
       isOpen={isOpen}
       confirmText={isCurrentUser ? undefined : "Send"}
       dataTestId="player-information-modal"
@@ -46,11 +52,15 @@ export default function PlayerInformation({ isOpen, player, onCancel }: PlayerIn
     >
       <div className="flex flex-col gap-2">
         <div>
-          Rating: {player?.rating} <br />
-          Games Completed: {player?.gamesCompleted} <br />
-          Wins: {player?.wins} <br />
-          Loses: {player?.loses} <br />
-          Streak: {player?.streak} <br />
+          {isRatingsVisible && (
+            <>
+              Rating: {player?.rating} <br />
+              Games Completed: {player?.gamesCompleted} <br />
+              Wins: {player?.wins} <br />
+              Loses: {player?.loses} <br />
+              Streak: {player?.streak} <br />
+            </>
+          )}
         </div>
         {!isCurrentUser && (
           <Input

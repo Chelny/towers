@@ -9,7 +9,8 @@ import {
   ITowersRoomChatMessage,
   ITowersTable,
   ITowersUserProfile,
-  ITowersUserProfileWithRelations
+  ITowersUserProfileWithRelations,
+  RoomLevel
 } from "@prisma/client"
 import { v4 as uuidv4 } from "uuid"
 import CreateTable from "@/components/game/CreateTable"
@@ -189,43 +190,47 @@ export default function Room({ roomId }: RoomProps): ReactNode {
               </Button>
             </div>
             <div className="mt-4">
-              <div>
-                <span className="p-1 rounded-tl rounded-tr bg-sky-700 text-white text-sm">Ratings</span>
-              </div>
-              <div className="flex flex-col gap-4 p-2 bg-white text-gray-600 mb-4">
-                <div className="flex items-center gap-1">
-                  <div className="w-4 h-4 bg-red-400"></div>
-                  <div>{RATING_MASTER}+</div>
-                </div>
-                <div className="flex items-center gap-1">
-                  <div className="w-4 h-4 bg-orange-400"></div>
+              {roomInfo?.difficulty !== RoomLevel.SOCIAL && (
+                <>
                   <div>
-                    {RATING_DIAMOND}-{RATING_MASTER - 1}
+                    <span className="p-1 rounded-tl rounded-tr bg-sky-700 text-white text-sm">Ratings</span>
                   </div>
-                </div>
-                <div className="flex items-center gap-1">
-                  <div className="w-4 h-4 bg-purple-400"></div>
-                  <div>
-                    {RATING_PLATINUM}-{RATING_DIAMOND - 1}
+                  <div className="flex flex-col gap-4 p-2 bg-white text-gray-600 mb-4">
+                    <div className="flex items-center gap-1">
+                      <div className="w-4 h-4 bg-red-400"></div>
+                      <div>{RATING_MASTER}+</div>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <div className="w-4 h-4 bg-orange-400"></div>
+                      <div>
+                        {RATING_DIAMOND}-{RATING_MASTER - 1}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <div className="w-4 h-4 bg-purple-400"></div>
+                      <div>
+                        {RATING_PLATINUM}-{RATING_DIAMOND - 1}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <div className="w-4 h-4 bg-cyan-600"></div>
+                      <div>
+                        {RATING_GOLD}-{RATING_PLATINUM - 1}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <div className="w-4 h-4 bg-green-600"></div>
+                      <div>
+                        {RATING_SILVER}-{RATING_GOLD - 1}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <div className="w-4 h-4 bg-gray-400"></div>
+                      <div>provisional</div>
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-center gap-1">
-                  <div className="w-4 h-4 bg-cyan-600"></div>
-                  <div>
-                    {RATING_GOLD}-{RATING_PLATINUM - 1}
-                  </div>
-                </div>
-                <div className="flex items-center gap-1">
-                  <div className="w-4 h-4 bg-green-600"></div>
-                  <div>
-                    {RATING_SILVER}-{RATING_GOLD - 1}
-                  </div>
-                </div>
-                <div className="flex items-center gap-1">
-                  <div className="w-4 h-4 bg-gray-400"></div>
-                  <div>provisional</div>
-                </div>
-              </div>
+                </>
+              )}
               <Button className="w-full py-2 mb-2" disabled onClick={(event: MouseEvent<HTMLButtonElement>) => {}}>
                 Options
               </Button>
@@ -278,7 +283,7 @@ export default function Room({ roomId }: RoomProps): ReactNode {
               </div>
 
               <div className="w-1/4 lg:w-96 overflow-hidden">
-                <PlayersList users={roomUsers} full />
+                <PlayersList users={roomUsers} full isRatingsVisible={roomInfo?.difficulty !== RoomLevel.SOCIAL} />
               </div>
             </div>
           </div>

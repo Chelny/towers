@@ -9,10 +9,16 @@ import Modal from "@/components/ui/Modal"
 type TableInviteUserProps = {
   isOpen: boolean
   users: ITowersUserProfile[]
+  isRatingsVisible: boolean
   onCancel: () => void
 }
 
-export default function TableInviteUser({ isOpen, users, onCancel }: TableInviteUserProps): ReactNode {
+export default function TableInviteUser({
+  isOpen,
+  users,
+  isRatingsVisible,
+  onCancel
+}: TableInviteUserProps): ReactNode {
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null)
 
   const handleSelectedPlayer = (): void => {
@@ -30,7 +36,7 @@ export default function TableInviteUser({ isOpen, users, onCancel }: TableInvite
       onCancel={onCancel}
     >
       <div className="overflow-y-auto h-72">
-        <PlayersList users={users} full onSelectedPlayer={setSelectedPlayerId} />
+        <PlayersList users={users} full isRatingsVisible={isRatingsVisible} onSelectedPlayer={setSelectedPlayerId} />
       </div>
     </Modal>
   )
