@@ -193,6 +193,24 @@ app.prepare().then(() => {
       }
     });
 
+    socket.on("[table] send automated message", async ({tableId, userId, message, type}) => {
+      const session = socket.handshake.auth.session;
+
+      try {
+        const chatResponse = await axios.post(`${process.env.BASE_URL}/api/tables/${tableId}/chat`, {
+          session,
+          userId,
+          message,
+          type,
+          privateToUserId: userId
+        });
+
+        io.to(tableId).emit("[table] receive new chat message", {tableId, message: chatResponse.data.data});
+      } catch (error) {
+        console.error(`Error sending automated message in table ${tableId}. Error description:`, error);
+      }
+    });
+
     // **************************************************
     // * User Events
     // **************************************************

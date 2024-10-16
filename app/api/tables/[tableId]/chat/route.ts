@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { ITowersTableChatMessage, TowersTableChatMessage, TowersUserProfile } from "@prisma/client"
 import DOMPurify from "isomorphic-dompurify"
 import { Session } from "next-auth"
+import { auth } from "@/auth"
 import prisma from "@/lib/prisma"
 import { updateLastActiveAt } from "@/lib/user"
 
@@ -9,6 +10,7 @@ export async function GET(request: NextRequest, context: { params: { tableId: st
   const { tableId } = context.params
   const searchParams: URLSearchParams = request.nextUrl.searchParams
   const userId: string | null = searchParams.get("userId")
+  const session: Session | null = await auth()
 
   if (!tableId) {
     return NextResponse.json(
@@ -20,20 +22,40 @@ export async function GET(request: NextRequest, context: { params: { tableId: st
     )
   }
 
+  if (!session) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Sorry, your request could not be processed."
+      },
+      { status: 401 }
+    )
+  }
+
+  const towersUserProfile: { updatedAt: Date } | null = await prisma.towersUserProfile.findFirst({
+    where: { userId: session.user.id, tableId },
+    select: { updatedAt: true },
+    orderBy: { updatedAt: "asc" }
+  })
+
+  if (!towersUserProfile) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: "The user has not yet joined the table"
+      },
+      { status: 404 }
+    )
+  }
+
   const chatMessages: ITowersTableChatMessage[] = await prisma.towersTableChatMessage.findMany({
     where: {
       tableId,
-      OR: [{ privateToUserId: null }, { privateToUserId: userId }],
-      createdAt: {
-        gte: new Date(Date.now() - 24 * 60 * 60 * 1000) // 24 hours ago
-      }
+      AND: [{ privateToUserId: null }, { privateToUserId: userId }],
+      updatedAt: { gt: towersUserProfile.updatedAt }
     },
-    include: {
-      user: true
-    },
-    orderBy: {
-      createdAt: "asc"
-    },
+    include: { user: true },
+    orderBy: { updatedAt: "asc" },
     take: 100
   })
 

@@ -187,42 +187,6 @@ const socketSlice = createSlice({
         (table: ITowersTable) => table.id !== tableId
       )
     },
-    sendTablePrivateChatMessage: (
-      state: SocketState,
-      action: PayloadAction<{ tableId: string; username: string; chatMessageType: TableChatMessageType }>
-    ): void => {
-      const { tableId, username, chatMessageType } = action.payload
-
-      let message: string = ""
-
-      switch (chatMessageType) {
-        case TableChatMessageType.CIPHER_KEY:
-          message = "*** V ==> M"
-          break
-        case TableChatMessageType.SCORE_UPDATE:
-          message = `*** ${username}’s old rating: 2050; new rating: 2040`
-          break
-        case TableChatMessageType.TABLE_HOST_UPDATE:
-          message =
-            "*** You are the host of the table. This gives you the power to invite to [or boot people from] your table. You may also limit other player’s access to your table by selecting its \"Table Type\"."
-          break
-        case TableChatMessageType.TABLE_TYPE_UPDATE:
-          message = "*** Only people you have invited may play now."
-          // message = "*** Only people you have invited may play or watch your table now."
-          break
-        default:
-          break
-      }
-
-      const tableChatMessage: ITowersTableChatMessage = {
-        message
-      } as ITowersTableChatMessage
-
-      state.tables[tableId] = {
-        ...state.tables[tableId],
-        chat: [...state.tables[tableId].chat, tableChatMessage]
-      }
-    },
     sendTableChatMessage: (state: SocketState, action: PayloadAction<{ tableId: string; message: string }>): void => {},
     addMessageToTableChat: (
       state: SocketState,
@@ -235,6 +199,10 @@ const socketSlice = createSlice({
         chat: [...state.tables[tableId]?.chat, message]
       }
     },
+    sendTableAutomatedChatMessage: (
+      state: SocketState,
+      action: PayloadAction<{ tableId: string; userId: string; message: string; type: string }>
+    ): void => {},
     addUserToTable: (
       state: SocketState,
       action: PayloadAction<{ tableId: string; towersUserProfile: ITowersUserProfile }>
@@ -585,9 +553,9 @@ export const {
   updateTableInRoom,
   removeTable,
   removeTableFromRoom,
-  sendTablePrivateChatMessage,
   sendTableChatMessage,
   addMessageToTableChat,
+  sendTableAutomatedChatMessage,
   addUserToTable,
   removeUserFromTable
 } = socketSlice.actions

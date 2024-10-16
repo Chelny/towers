@@ -31,12 +31,11 @@ import { useSessionData } from "@/hooks/useSessionData"
 import { useAppDispatch, useAppSelector } from "@/lib/hooks"
 import { addLink, removeLink } from "@/redux/features/sidebar-slice"
 import {
-  addTable,
   beforeLeaveTableAction,
   joinTableAction,
   removeTable,
+  sendTableAutomatedChatMessage,
   sendTableChatMessage,
-  sendTablePrivateChatMessage,
   updateTable
 } from "@/redux/features/socket-slice"
 import {
@@ -44,7 +43,6 @@ import {
   selectIsTableInfoLoading,
   selectNextTableHost,
   selectRoomUsersInvite,
-  selectTableByIdInRoom,
   selectTableChat,
   selectTableInfo,
   selectTableUsers,
@@ -174,39 +172,41 @@ export default function Table({ roomId, tableId }: TableProps): ReactNode {
 
   useEffect(() => {
     if (isConnected) {
-      if (nextTableHost && tableUsers.length > 0 && tableUsers.length < previousTableUsersCount) {
-        const userProfiles: ITowersUserProfileWithRelations[] = tableUsers.map(({ room, table, ...rest }) => rest)
+      if (tableUsers.length > 0 && tableUsers.length < previousTableUsersCount) {
+        if (nextTableHost && tableInfo?.host.id !== nextTableHost.id) {
+          const userProfiles: ITowersUserProfileWithRelations[] = tableUsers.map(({ room, table, ...rest }) => rest)
 
-        // Update table's host and users list
-        dispatch(
-          updateTable({
-            roomId,
-            tableId,
-            table: {
-              ...tableInfo,
-              host: nextTableHost,
-              userProfiles
-            } as ITowersTable
-          })
-        )
+          // Update table's host and users list
+          dispatch(
+            updateTable({
+              roomId,
+              tableId,
+              table: {
+                ...tableInfo,
+                host: nextTableHost,
+                userProfiles
+              } as ITowersTable
+            })
+          )
+
+          if (nextTableHost?.id === session?.user.id) {
+            // Send table host message to new host
+            dispatch(
+              sendTableAutomatedChatMessage({
+                tableId,
+                userId: nextTableHost.id,
+                message:
+                  "*** You are the host of the table. This gives you the power to invite to [or boot people from] your table. You may also limit other player’s access to your table by selecting its \"Table Type\".",
+                type: TableChatMessageType.TABLE_HOST
+              })
+            )
+          }
+        }
       }
 
       setPreviousTableUsersCount(tableUsers.length)
     }
   }, [isConnected, tableUsers])
-
-  useEffect(() => {
-    if (nextTableHost?.id === session?.user.id && nextTableHost && tableInfo?.host !== nextTableHost) {
-      // Send table host message to new host
-      dispatch(
-        sendTablePrivateChatMessage({
-          tableId,
-          username: session?.user.username!,
-          chatMessageType: TableChatMessageType.TABLE_HOST_UPDATE
-        })
-      )
-    }
-  }, [tableUsers])
 
   useEffect(() => {
     scrollChatToBottom()

@@ -20,6 +20,7 @@ import {
   removeUserFromRoom,
   removeUserFromTable,
   sendRoomChatMessage,
+  sendTableAutomatedChatMessage,
   sendTableChatMessage,
   serverError,
   updateTable,
@@ -61,6 +62,7 @@ export enum SocketEvent {
   TableUpdate = "[table] update",
   TableDelete = "[table] delete",
   TableSendMessage = "[table] send message",
+  TableSendAutomatedMessage = "[table] send automated message",
   TableUserJoined = "[table] user joined",
   TableUserLeft = "[table] user left",
   UserSignOut = "[user] sign out",
@@ -238,6 +240,10 @@ const socketMiddleware: Middleware = (store: MiddlewareAPI) => {
 
       if (sendTableChatMessage.match(action)) {
         socket.socket.emit(SocketEvent.TableSendMessage, action.payload)
+      }
+
+      if (sendTableAutomatedChatMessage.match(action)) {
+        socket.socket.emit(SocketEvent.TableSendAutomatedMessage, action.payload)
       }
     }
 

@@ -10,8 +10,8 @@ type ChatProps = {
 export default function Chat({ messages, isTableChat = false }: ChatProps) {
   return (
     <>
-      {messages?.map((message: ITowersRoomChatMessage | ITowersTableChatMessage, index: number) => (
-        <div key={index}>
+      {messages?.map((message: ITowersRoomChatMessage | ITowersTableChatMessage) => (
+        <div key={message.id}>
           {((isTableChat && (message as ITowersTableChatMessage).type === TableChatMessageType.CHAT) ||
             !isTableChat) && <>{message.user?.username}:&nbsp;</>}
           {message.message}
