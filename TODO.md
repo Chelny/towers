@@ -6,7 +6,6 @@
 - Add predefined avatars or let users upload their picture
 - Sign in with passkey (currently experimental and not yet recommended for production use)
 - Double check account deletion date (timezone) in email
-- Change favicon.ico
 
 ## Room
 

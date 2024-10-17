@@ -92,3 +92,9 @@ npm run dev
 This command starts the development server, allowing you to access your application locally at http://localhost:3000.
 
 <p align="end">(<a href="#readme-top">back to top</a>)</p>
+
+## Credits
+
+<a target="_blank" href="https://icons8.com/icon/R71NwS69rCee/apple-arcade">Apple Arcade</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
+
+<p align="end">(<a href="#readme-top">back to top</a>)</p>
