@@ -67,7 +67,7 @@ export const fetchRoomTables = createAsyncThunk<
 
   try {
     const response: AxiosResponse<ApiResponse<ITowersTable[]>> = await axios.get(`/api/rooms/${roomId}/tables`, {
-      signal,
+      signal
     })
 
     if (!response.data.data) {
@@ -124,7 +124,7 @@ export const fetchRoomUsers = createAsyncThunk<
 
   try {
     const response: AxiosResponse<ApiResponse<ITowersUserProfile[]>> = await axios.get(`/api/rooms/${roomId}/users`, {
-      signal,
+      signal
     })
 
     if (!response.data.data) {

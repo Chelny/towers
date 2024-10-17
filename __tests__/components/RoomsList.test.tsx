@@ -17,7 +17,7 @@ const { useRouter, mockRouterPush } = vi.hoisted(() => {
 
   return {
     useRouter: () => ({ push: mockRouterPush }),
-    mockRouterPush,
+    mockRouterPush
   }
 })
 
@@ -26,17 +26,17 @@ vi.mock("next/navigation", async () => {
 
   return {
     ...actual,
-    useRouter,
+    useRouter
   }
 })
 
 vi.mock("@/hooks/useSessionData", () => ({
-  useSessionData: vi.fn(),
+  useSessionData: vi.fn()
 }))
 
 vi.mock("@/lib/hooks", () => ({
   useAppDispatch: vi.fn(),
-  useAppSelector: vi.fn(),
+  useAppSelector: vi.fn()
 }))
 
 vi.mock("@/redux/features/socket-slice")
@@ -46,19 +46,19 @@ vi.mock("@/redux/thunks/room-thunks")
 describe("RoomsList Component", () => {
   const mockAppDispatch: Mock = vi.fn()
   const mockSocketRoomThunkParams: SocketRoomThunk = {
-    roomId: mockSocketRoom1Id,
+    roomId: mockSocketRoom1Id
   }
   const mockRooms: IRoomListItemWithUsersCount[] = [
     {
       ...mockRoom1,
       userProfiles: [],
-      usersCount: 123,
+      usersCount: 123
     },
     {
       ...mockRoom2,
       userProfiles: [],
-      usersCount: 301,
-    },
+      usersCount: 301
+    }
   ]
 
   beforeEach(() => {
@@ -102,7 +102,7 @@ describe("RoomsList Component", () => {
 
   it("should navigate to the correct room when join button is clicked", async () => {
     mockAppDispatch.mockReturnValue({
-      unwrap: () => Promise.resolve(mockSocketRoomThunkParams),
+      unwrap: () => Promise.resolve(mockSocketRoomThunkParams)
     })
 
     render(<RoomsList rooms={mockRooms} />)

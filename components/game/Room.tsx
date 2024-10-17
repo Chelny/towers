@@ -10,7 +10,7 @@ import {
   ITowersTable,
   ITowersUserProfile,
   ITowersUserProfileWithRelations,
-  RoomLevel,
+  RoomLevel
 } from "@prisma/client"
 import { v4 as uuidv4 } from "uuid"
 import CreateTable from "@/components/game/CreateTable"
@@ -27,7 +27,7 @@ import {
   RATING_GOLD,
   RATING_MASTER,
   RATING_PLATINUM,
-  RATING_SILVER,
+  RATING_SILVER
 } from "@/constants/game"
 import { ROUTE_TOWERS } from "@/constants/routes"
 import { useSessionData } from "@/hooks/useSessionData"
@@ -41,7 +41,7 @@ import {
   selectRoomChat,
   selectRoomInfo,
   selectRoomTables,
-  selectRoomUsers,
+  selectRoomUsers
 } from "@/redux/selectors/socket-selectors"
 import { AppDispatch, RootState } from "@/redux/store"
 import { fetchRoomChat, fetchRoomInfo, fetchRoomTables, fetchRoomUsers, leaveRoom } from "@/redux/thunks/room-thunks"
@@ -155,7 +155,7 @@ export default function Room({ roomId }: RoomProps): ReactNode {
       )
       .map((table: ITowersTable) => ({
         id: table.id,
-        isLastUser: table.userProfiles.length === 1,
+        isLastUser: table.userProfiles.length === 1
       }))
 
     dispatch(leaveRoom({ roomId }))
@@ -306,17 +306,17 @@ export default function Room({ roomId }: RoomProps): ReactNode {
 }
 
 const RoomHeader = dynamic(() => import("@/components/game/RoomHeader"), {
-  loading: () => <RoomHeaderSkeleton />,
+  loading: () => <RoomHeaderSkeleton />
 })
 
 const RoomTable = dynamic(() => import("@/components/game/RoomTable"), {
-  loading: () => <RoomTableSkeleton />,
+  loading: () => <RoomTableSkeleton />
 })
 
 const Chat = dynamic(() => import("@/components/game/Chat"), {
-  loading: () => <ChatSkeleton />,
+  loading: () => <ChatSkeleton />
 })
 
 const PlayersList = dynamic(() => import("@/components/game/PlayersList"), {
-  loading: () => <PlayersListSkeleton full />,
+  loading: () => <PlayersListSkeleton full />
 })

@@ -24,7 +24,7 @@ import {
   sendTableChatMessage,
   serverError,
   updateTable,
-  updateTableInRoom,
+  updateTableInRoom
 } from "@/redux/features/socket-slice"
 
 export enum SocketEvent {

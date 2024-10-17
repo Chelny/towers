@@ -12,7 +12,7 @@ import {
   IUserWithRelations,
   RoomLevel,
   TableChatMessageType,
-  TableType,
+  TableType
 } from "@prisma/client"
 import clsx from "clsx/lite"
 import { v4 as uuidv4 } from "uuid"
@@ -37,7 +37,7 @@ import {
   removeTable,
   sendTableAutomatedChatMessage,
   sendTableChatMessage,
-  updateTable,
+  updateTable
 } from "@/redux/features/socket-slice"
 import {
   selectIsTableChatLoading,
@@ -47,7 +47,7 @@ import {
   selectTableChat,
   selectTableInfo,
   selectTableUsers,
-  selectTableUsersBoot,
+  selectTableUsersBoot
 } from "@/redux/selectors/socket-selectors"
 import { AppDispatch, RootState } from "@/redux/store"
 import { fetchRoomUsers } from "@/redux/thunks/room-thunks"
@@ -72,7 +72,7 @@ const INITIAL_SEATS_CSS = [
   { rowSpan: 5, seatNumbers: [1, 2], team: 1 },
   { rowSpan: 3, seatNumbers: [5, 6], team: 3 },
   { rowSpan: 3, seatNumbers: [3, 4], team: 2 },
-  { rowSpan: 3, seatNumbers: [7, 8], team: 4 },
+  { rowSpan: 3, seatNumbers: [7, 8], team: 4 }
 ]
 
 type TableProps = {
@@ -157,7 +157,7 @@ export default function Table({ roomId, tableId }: TableProps): ReactNode {
       dispatch(
         addLink({
           href: `${ROUTE_TOWERS.PATH}?room=${roomId}&table=${tableId}`,
-          label: `${tableInfo.room.name} - Table ${tableInfo.tableNumber}`,
+          label: `${tableInfo.room.name} - Table ${tableInfo.tableNumber}`
         })
       )
     }
@@ -184,8 +184,8 @@ export default function Table({ roomId, tableId }: TableProps): ReactNode {
               table: {
                 ...tableInfo,
                 host: nextTableHost,
-                userProfiles,
-              } as ITowersTable,
+                userProfiles
+              } as ITowersTable
             })
           )
 
@@ -196,8 +196,8 @@ export default function Table({ roomId, tableId }: TableProps): ReactNode {
                 tableId,
                 userId: nextTableHost.id,
                 message:
-                  '*** You are the host of the table. This gives you the power to invite to [or boot people from] your table. You may also limit other player’s access to your table by selecting its "Table Type".',
-                type: TableChatMessageType.TABLE_HOST,
+                  "*** You are the host of the table. This gives you the power to invite to [or boot people from] your table. You may also limit other player’s access to your table by selecting its \"Table Type\".",
+                type: TableChatMessageType.TABLE_HOST
               })
             )
           }
@@ -265,7 +265,7 @@ export default function Table({ roomId, tableId }: TableProps): ReactNode {
 
       return prevSeatsCss.map((group: SeatsCss) => ({
         ...group,
-        seatNumbers: group.seatNumbers.map((seat: number) => newSeatsMapping[seat] || seat),
+        seatNumbers: group.seatNumbers.map((seat: number) => newSeatsMapping[seat] || seat)
       }))
     })
   }
@@ -543,13 +543,13 @@ export default function Table({ roomId, tableId }: TableProps): ReactNode {
 }
 
 const TableHeader = dynamic(() => import("@/components/game/TableHeader"), {
-  loading: () => <TableHeaderSkeleton />,
+  loading: () => <TableHeaderSkeleton />
 })
 
 const Chat = dynamic(() => import("@/components/game/Chat"), {
-  loading: () => <ChatSkeleton />,
+  loading: () => <ChatSkeleton />
 })
 
 const PlayersList = dynamic(() => import("@/components/game/PlayersList"), {
-  loading: () => <PlayersListSkeleton />,
+  loading: () => <PlayersListSkeleton />
 })

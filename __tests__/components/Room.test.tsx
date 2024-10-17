@@ -15,7 +15,7 @@ const { useRouter, mockRouterPush } = vi.hoisted(() => {
 
   return {
     useRouter: () => ({ push: mockRouterPush }),
-    mockRouterPush,
+    mockRouterPush
   }
 })
 
@@ -24,17 +24,17 @@ vi.mock("next/navigation", async () => {
 
   return {
     ...actual,
-    useRouter,
+    useRouter
   }
 })
 
 vi.mock("@/hooks/useSessionData", () => ({
-  useSessionData: vi.fn(),
+  useSessionData: vi.fn()
 }))
 
 vi.mock("@/lib/hooks", () => ({
   useAppDispatch: vi.fn(),
-  useAppSelector: vi.fn(),
+  useAppSelector: vi.fn()
 }))
 
 vi.mock("@/redux/features/socket-slice")
@@ -45,7 +45,7 @@ describe("Room Component", () => {
   const mockAppDispatch: Mock = vi.fn()
   const mockSocketRoomThunkParams: { roomId: string; tablesToQuit: { id: string; isLastUser: boolean }[] } = {
     roomId: mockSocketRoom1Id,
-    tablesToQuit: [],
+    tablesToQuit: []
   }
 
   beforeAll(() => {
@@ -80,11 +80,11 @@ describe("Room Component", () => {
     const mockAppDispatchBeforeLeaveSocketRoom: Mock = vi.fn()
 
     mockAppDispatch.mockReturnValue({
-      unwrap: () => Promise.resolve(),
+      unwrap: () => Promise.resolve()
     })
 
     mockAppDispatchBeforeLeaveSocketRoom.mockReturnValue({
-      unwrap: () => Promise.resolve(mockSocketRoomThunkParams),
+      unwrap: () => Promise.resolve(mockSocketRoomThunkParams)
     })
 
     render(<Room roomId={mockRoom1.id} />)
@@ -103,7 +103,7 @@ describe("Room Component", () => {
 
   it("should navigate to the rooms list on successful room exit", async () => {
     mockAppDispatch.mockReturnValue({
-      unwrap: () => Promise.resolve(mockSocketRoomThunkParams),
+      unwrap: () => Promise.resolve(mockSocketRoomThunkParams)
     })
 
     render(<Room roomId={mockRoom1.id} />)

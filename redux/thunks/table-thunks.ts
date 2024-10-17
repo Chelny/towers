@@ -97,7 +97,7 @@ export const fetchTableUsers = createAsyncThunk<
 
   try {
     const response: AxiosResponse<ApiResponse<ITowersUserProfile[]>> = await axios.get(`/api/tables/${tableId}/users`, {
-      signal,
+      signal
     })
 
     if (!response.data.data) {

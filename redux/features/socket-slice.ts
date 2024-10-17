@@ -3,7 +3,7 @@ import {
   ITowersRoomChatMessage,
   ITowersTable,
   ITowersTableChatMessage,
-  ITowersUserProfile,
+  ITowersUserProfile
 } from "@prisma/client"
 import { ActionReducerMapBuilder, createSlice, PayloadAction } from "@reduxjs/toolkit"
 import {
@@ -12,7 +12,7 @@ import {
   fetchRoomTables,
   fetchRoomUsers,
   joinRoom,
-  leaveRoom,
+  leaveRoom
 } from "@/redux/thunks/room-thunks"
 import { fetchTableChat, fetchTableInfo, fetchTableUsers, joinTable, leaveTable } from "@/redux/thunks/table-thunks"
 
@@ -51,7 +51,7 @@ const initialState: SocketState = {
   isLoading: false,
   rooms: {},
   tables: {},
-  errorMessage: undefined,
+  errorMessage: undefined
 }
 
 const socketSlice = createSlice({
@@ -105,7 +105,7 @@ const socketSlice = createSlice({
 
       state.rooms[roomId] = {
         ...state.rooms[roomId],
-        chat: [...state.rooms[roomId]?.chat, message],
+        chat: [...state.rooms[roomId]?.chat, message]
       }
     },
     addUserToRoom: (
@@ -116,7 +116,7 @@ const socketSlice = createSlice({
 
       state.rooms[roomId] = {
         ...state.rooms[roomId],
-        users: [...state.rooms[roomId]?.users, towersUserProfile],
+        users: [...state.rooms[roomId]?.users, towersUserProfile]
       }
     },
     removeUserFromRoom: (state: SocketState, action: PayloadAction<{ roomId: string; userId: string }>): void => {
@@ -131,7 +131,7 @@ const socketSlice = createSlice({
 
       state.rooms[roomId] = {
         ...state.rooms[roomId],
-        errorMessage: message,
+        errorMessage: message
       }
     },
 
@@ -161,7 +161,7 @@ const socketSlice = createSlice({
       if (userIndex !== -1) {
         state.rooms[roomId].users[userIndex] = {
           ...state.rooms[roomId].users[userIndex],
-          table,
+          table
         }
       }
     },
@@ -183,7 +183,7 @@ const socketSlice = createSlice({
       if (tableIndex !== -1) {
         state.rooms[roomId].roomTables[tableIndex] = {
           ...state.rooms[roomId].roomTables[tableIndex],
-          ...table,
+          ...table
         }
       }
 
@@ -191,7 +191,7 @@ const socketSlice = createSlice({
       if (state.tables[tableId]?.tableInfo) {
         state.tables[tableId].tableInfo = {
           ...state.tables[tableId].tableInfo,
-          ...table,
+          ...table
         }
       }
     },
@@ -212,7 +212,7 @@ const socketSlice = createSlice({
 
       state.tables[tableId] = {
         ...state.tables[tableId],
-        chat: [...state.tables[tableId]?.chat, message],
+        chat: [...state.tables[tableId]?.chat, message]
       }
     },
     sendTableAutomatedChatMessage: (
@@ -227,7 +227,7 @@ const socketSlice = createSlice({
 
       state.tables[tableId] = {
         ...state.tables[tableId],
-        users: [...state.tables[tableId]?.users, towersUserProfile],
+        users: [...state.tables[tableId]?.users, towersUserProfile]
       }
     },
     removeUserFromTable: (state: SocketState, action: PayloadAction<{ tableId: string; userId: string }>): void => {
@@ -242,9 +242,9 @@ const socketSlice = createSlice({
 
       state.tables[tableId] = {
         ...state.tables[tableId],
-        errorMessage: message,
+        errorMessage: message
       }
-    },
+    }
   },
   extraReducers: (builder: ActionReducerMapBuilder<SocketState>): void => {
     builder
@@ -269,7 +269,7 @@ const socketSlice = createSlice({
           isChatLoading: false,
           users: [],
           isUsersLoading: false,
-          errorMessage: undefined,
+          errorMessage: undefined
         }
       })
       .addCase(joinRoom.rejected, (state: SocketState, action): void => {
@@ -307,7 +307,7 @@ const socketSlice = createSlice({
         state.rooms[roomId] = {
           ...state.rooms[roomId],
           isRoomInfoLoading: true,
-          errorMessage: undefined,
+          errorMessage: undefined
         }
         state.errorMessage = undefined
       })
@@ -318,7 +318,7 @@ const socketSlice = createSlice({
         state.rooms[roomId] = {
           ...state.rooms[roomId],
           roomInfo: action.payload,
-          isRoomInfoLoading: false,
+          isRoomInfoLoading: false
         }
       })
       .addCase(fetchRoomInfo.rejected, (state: SocketState, action): void => {
@@ -328,7 +328,7 @@ const socketSlice = createSlice({
         state.rooms[roomId] = {
           ...state.rooms[roomId],
           isRoomInfoLoading: false,
-          errorMessage: action.payload,
+          errorMessage: action.payload
         }
       })
 
@@ -342,7 +342,7 @@ const socketSlice = createSlice({
         state.isLoading = true
         state.rooms[roomId] = {
           ...state.rooms[roomId],
-          isRoomTablesLoading: true,
+          isRoomTablesLoading: true
         }
         state.errorMessage = undefined
       })
@@ -353,7 +353,7 @@ const socketSlice = createSlice({
         state.rooms[roomId] = {
           ...state.rooms[roomId],
           roomTables: action.payload,
-          isRoomTablesLoading: false,
+          isRoomTablesLoading: false
         }
       })
       .addCase(fetchRoomTables.rejected, (state: SocketState, action): void => {
@@ -363,7 +363,7 @@ const socketSlice = createSlice({
         state.rooms[roomId] = {
           ...state.rooms[roomId],
           isRoomTablesLoading: false,
-          errorMessage: action.payload,
+          errorMessage: action.payload
         }
       })
 
@@ -377,7 +377,7 @@ const socketSlice = createSlice({
         state.isLoading = true
         state.rooms[roomId] = {
           ...state.rooms[roomId],
-          isChatLoading: true,
+          isChatLoading: true
         }
         state.errorMessage = undefined
       })
@@ -388,7 +388,7 @@ const socketSlice = createSlice({
         state.rooms[roomId] = {
           ...state.rooms[roomId],
           chat: action.payload,
-          isChatLoading: false,
+          isChatLoading: false
         }
       })
       .addCase(fetchRoomChat.rejected, (state: SocketState, action): void => {
@@ -398,7 +398,7 @@ const socketSlice = createSlice({
         state.rooms[roomId] = {
           ...state.rooms[roomId],
           isChatLoading: false,
-          errorMessage: action.payload,
+          errorMessage: action.payload
         }
       })
 
@@ -412,7 +412,7 @@ const socketSlice = createSlice({
         state.isLoading = true
         state.rooms[roomId] = {
           ...state.rooms[roomId],
-          isUsersLoading: true,
+          isUsersLoading: true
         }
         state.errorMessage = undefined
       })
@@ -423,7 +423,7 @@ const socketSlice = createSlice({
         state.rooms[roomId] = {
           ...state.rooms[roomId],
           users: action.payload,
-          isUsersLoading: false,
+          isUsersLoading: false
         }
       })
       .addCase(fetchRoomUsers.rejected, (state: SocketState, action): void => {
@@ -433,7 +433,7 @@ const socketSlice = createSlice({
         state.rooms[roomId] = {
           ...state.rooms[roomId],
           isUsersLoading: false,
-          errorMessage: action.payload,
+          errorMessage: action.payload
         }
       })
 
@@ -456,7 +456,7 @@ const socketSlice = createSlice({
           isChatLoading: false,
           users: [],
           isUsersLoading: false,
-          errorMessage: undefined,
+          errorMessage: undefined
         }
       })
       .addCase(joinTable.rejected, (state: SocketState, action): void => {
@@ -493,7 +493,7 @@ const socketSlice = createSlice({
         state.isLoading = true
         state.tables[tableId] = {
           ...state.tables[tableId],
-          isTableInfoLoading: true,
+          isTableInfoLoading: true
         }
         state.errorMessage = undefined
       })
@@ -504,7 +504,7 @@ const socketSlice = createSlice({
         state.tables[tableId] = {
           ...state.tables[tableId],
           tableInfo: action.payload,
-          isTableInfoLoading: false,
+          isTableInfoLoading: false
         }
       })
       .addCase(fetchTableInfo.rejected, (state: SocketState, action): void => {
@@ -514,7 +514,7 @@ const socketSlice = createSlice({
         state.tables[tableId] = {
           ...state.tables[tableId],
           isTableInfoLoading: false,
-          errorMessage: action.payload,
+          errorMessage: action.payload
         }
       })
 
@@ -528,7 +528,7 @@ const socketSlice = createSlice({
         state.isLoading = true
         state.tables[tableId] = {
           ...state.tables[tableId],
-          isChatLoading: true,
+          isChatLoading: true
         }
         state.errorMessage = undefined
       })
@@ -539,7 +539,7 @@ const socketSlice = createSlice({
         state.tables[tableId] = {
           ...state.tables[tableId],
           chat: action.payload,
-          isChatLoading: false,
+          isChatLoading: false
         }
       })
       .addCase(fetchTableChat.rejected, (state: SocketState, action): void => {
@@ -549,7 +549,7 @@ const socketSlice = createSlice({
         state.tables[tableId] = {
           ...state.tables[tableId],
           isChatLoading: false,
-          errorMessage: action.payload,
+          errorMessage: action.payload
         }
       })
 
@@ -563,7 +563,7 @@ const socketSlice = createSlice({
         state.isLoading = true
         state.tables[tableId] = {
           ...state.tables[tableId],
-          isUsersLoading: true,
+          isUsersLoading: true
         }
         state.errorMessage = undefined
       })
@@ -574,7 +574,7 @@ const socketSlice = createSlice({
         state.tables[tableId] = {
           ...state.tables[tableId],
           users: action.payload,
-          isUsersLoading: false,
+          isUsersLoading: false
         }
       })
       .addCase(fetchTableUsers.rejected, (state: SocketState, action): void => {
@@ -584,10 +584,10 @@ const socketSlice = createSlice({
         state.tables[tableId] = {
           ...state.tables[tableId],
           isUsersLoading: false,
-          errorMessage: action.payload,
+          errorMessage: action.payload
         }
       })
-  },
+  }
 })
 
 export const {
@@ -616,7 +616,7 @@ export const {
   sendTableAutomatedChatMessage,
   addUserToTable,
   removeUserFromTable,
-  tableErrorMessage,
+  tableErrorMessage
 } = socketSlice.actions
 
 export default socketSlice.reducer

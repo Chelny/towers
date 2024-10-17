@@ -24,7 +24,7 @@ export default function Modal({
   isConfirmButtonDisabled = false,
   dataTestId = undefined,
   onCancel,
-  onConfirm,
+  onConfirm
 }: ModalProps): ReactNode {
   const dialogRef = useRef<HTMLDialogElement>(null)
 
