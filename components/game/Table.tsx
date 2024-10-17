@@ -12,7 +12,7 @@ import {
   IUserWithRelations,
   RoomLevel,
   TableChatMessageType,
-  TableType
+  TableType,
 } from "@prisma/client"
 import clsx from "clsx/lite"
 import { v4 as uuidv4 } from "uuid"
@@ -32,12 +32,12 @@ import { useSessionData } from "@/hooks/useSessionData"
 import { useAppDispatch, useAppSelector } from "@/lib/hooks"
 import { addLink, removeLink } from "@/redux/features/sidebar-slice"
 import {
-  beforeLeaveTableAction,
-  joinTableAction,
+  beforeLeaveTableSocketRoom,
+  joinTableSocketRoom,
   removeTable,
   sendTableAutomatedChatMessage,
   sendTableChatMessage,
-  updateTable
+  updateTable,
 } from "@/redux/features/socket-slice"
 import {
   selectIsTableChatLoading,
@@ -47,12 +47,11 @@ import {
   selectTableChat,
   selectTableInfo,
   selectTableUsers,
-  selectTableUsersBoot
+  selectTableUsersBoot,
 } from "@/redux/selectors/socket-selectors"
 import { AppDispatch, RootState } from "@/redux/store"
 import { fetchRoomUsers } from "@/redux/thunks/room-thunks"
-import { leaveRoom } from "@/redux/thunks/socket-thunks"
-import { fetchTableChat, fetchTableInfo, fetchTableUsers } from "@/redux/thunks/table-thunks"
+import { fetchTableChat, fetchTableInfo, fetchTableUsers, leaveTable } from "@/redux/thunks/table-thunks"
 
 enum GameState {
   WAITING_FOR_PLAYERS = 0,
@@ -73,7 +72,7 @@ const INITIAL_SEATS_CSS = [
   { rowSpan: 5, seatNumbers: [1, 2], team: 1 },
   { rowSpan: 3, seatNumbers: [5, 6], team: 3 },
   { rowSpan: 3, seatNumbers: [3, 4], team: 2 },
-  { rowSpan: 3, seatNumbers: [7, 8], team: 4 }
+  { rowSpan: 3, seatNumbers: [7, 8], team: 4 },
 ]
 
 type TableProps = {
@@ -117,7 +116,7 @@ export default function Table({ roomId, tableId }: TableProps): ReactNode {
 
   useEffect(() => {
     if (isConnected) {
-      dispatch(joinTableAction({ tableId }))
+      dispatch(joinTableSocketRoom({ tableId }))
     }
   }, [tableId, isConnected])
 
@@ -158,7 +157,7 @@ export default function Table({ roomId, tableId }: TableProps): ReactNode {
       dispatch(
         addLink({
           href: `${ROUTE_TOWERS.PATH}?room=${roomId}&table=${tableId}`,
-          label: `${tableInfo.room.name} - Table ${tableInfo.tableNumber}`
+          label: `${tableInfo.room.name} - Table ${tableInfo.tableNumber}`,
         })
       )
     }
@@ -185,8 +184,8 @@ export default function Table({ roomId, tableId }: TableProps): ReactNode {
               table: {
                 ...tableInfo,
                 host: nextTableHost,
-                userProfiles
-              } as ITowersTable
+                userProfiles,
+              } as ITowersTable,
             })
           )
 
@@ -197,8 +196,8 @@ export default function Table({ roomId, tableId }: TableProps): ReactNode {
                 tableId,
                 userId: nextTableHost.id,
                 message:
-                  "*** You are the host of the table. This gives you the power to invite to [or boot people from] your table. You may also limit other player’s access to your table by selecting its \"Table Type\".",
-                type: TableChatMessageType.TABLE_HOST
+                  '*** You are the host of the table. This gives you the power to invite to [or boot people from] your table. You may also limit other player’s access to your table by selecting its "Table Type".',
+                type: TableChatMessageType.TABLE_HOST,
               })
             )
           }
@@ -266,7 +265,7 @@ export default function Table({ roomId, tableId }: TableProps): ReactNode {
 
       return prevSeatsCss.map((group: SeatsCss) => ({
         ...group,
-        seatNumbers: group.seatNumbers.map((seat: number) => newSeatsMapping[seat] || seat)
+        seatNumbers: group.seatNumbers.map((seat: number) => newSeatsMapping[seat] || seat),
       }))
     })
   }
@@ -287,12 +286,12 @@ export default function Table({ roomId, tableId }: TableProps): ReactNode {
   }
 
   const handleQuitTable = (): void => {
-    dispatch(leaveRoom({ roomId, tableId }))
+    dispatch(leaveTable({ roomId, tableId }))
       .unwrap()
       .then(() => {
         const usersCount: number = tableInfo?.userProfiles.length ?? 0
 
-        dispatch(beforeLeaveTableAction({ tableId, isLastUser: usersCount === 1 ? true : false }))
+        dispatch(beforeLeaveTableSocketRoom({ tableId, isLastUser: usersCount === 1 ? true : false }))
 
         if (usersCount === 1) {
           dispatch(removeTable({ roomId, tableId }))
@@ -300,9 +299,6 @@ export default function Table({ roomId, tableId }: TableProps): ReactNode {
 
         dispatch(removeLink(`${ROUTE_TOWERS.PATH}?room=${roomId}&table=${tableId}`))
         router.push(`${ROUTE_TOWERS.PATH}?room=${roomId}`)
-      })
-      .catch((error) => {
-        console.error("Error leaving table:", error)
       })
   }
 
@@ -503,7 +499,7 @@ export default function Table({ roomId, tableId }: TableProps): ReactNode {
         {/* Chat and users list */}
         <div className="[grid-area:chat] flex gap-2 px-2 pb-2">
           <div className="flex-1 flex flex-col">
-            <ServerMessage />
+            <ServerMessage socketRoom={tableId} />
 
             {/* Chat */}
             <div className="flex-1 flex flex-col p-2 border bg-white">
@@ -547,13 +543,13 @@ export default function Table({ roomId, tableId }: TableProps): ReactNode {
 }
 
 const TableHeader = dynamic(() => import("@/components/game/TableHeader"), {
-  loading: () => <TableHeaderSkeleton />
+  loading: () => <TableHeaderSkeleton />,
 })
 
 const Chat = dynamic(() => import("@/components/game/Chat"), {
-  loading: () => <ChatSkeleton />
+  loading: () => <ChatSkeleton />,
 })
 
 const PlayersList = dynamic(() => import("@/components/game/PlayersList"), {
-  loading: () => <PlayersListSkeleton />
+  loading: () => <PlayersListSkeleton />,
 })

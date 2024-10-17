@@ -1,11 +1,6 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { Mock } from "vitest"
-import {
-  mockRoom1Info,
-  mockRoom1Table1Info,
-  mockSocketRoom1Id,
-  mockSocketRoom1Table1Id
-} from "@/__mocks__/data/socketState"
+import { mockRoom1Info, mockRoom1Table1Info, mockSocketRoom1Id } from "@/__mocks__/data/socketState"
 import { mockAuthenticatedSession } from "@/__mocks__/data/users"
 import RoomTable from "@/components/game/RoomTable"
 import { ROUTE_TOWERS } from "@/constants/routes"
@@ -13,14 +8,14 @@ import { useSessionData } from "@/hooks/useSessionData"
 import { useAppDispatch, useAppSelector } from "@/lib/hooks"
 import { SidebarState } from "@/redux/features/sidebar-slice"
 import { SocketState } from "@/redux/features/socket-slice"
-import { SocketRoomThunk } from "@/redux/thunks/socket-thunks"
+import { SocketRoomThunk } from "@/redux/thunks/room-thunks"
 
 const { useRouter, mockRouterPush } = vi.hoisted(() => {
   const mockRouterPush: Mock = vi.fn()
 
   return {
     useRouter: () => ({ push: mockRouterPush }),
-    mockRouterPush
+    mockRouterPush,
   }
 })
 
@@ -29,27 +24,27 @@ vi.mock("next/navigation", async () => {
 
   return {
     ...actual,
-    useRouter
+    useRouter,
   }
 })
 
 vi.mock("@/hooks/useSessionData", () => ({
-  useSessionData: vi.fn()
+  useSessionData: vi.fn(),
 }))
 
 vi.mock("@/lib/hooks", () => ({
   useAppDispatch: vi.fn(),
-  useAppSelector: vi.fn()
+  useAppSelector: vi.fn(),
 }))
 
 vi.mock("@/redux/features/socket-slice")
 
-vi.mock("@/redux/thunks/socket-thunks")
+vi.mock("@/redux/thunks/room-thunks")
 
 describe("RoomTable Component", () => {
   const mockAppDispatch: Mock = vi.fn()
   const mockSocketRoomThunkParams: SocketRoomThunk = {
-    roomId: mockSocketRoom1Id
+    roomId: mockSocketRoom1Id,
   }
 
   beforeEach(() => {
@@ -76,7 +71,7 @@ describe("RoomTable Component", () => {
 
   it("should navigate to the correct table on watch button click", async () => {
     mockAppDispatch.mockReturnValue({
-      unwrap: () => Promise.resolve(mockSocketRoomThunkParams)
+      unwrap: () => Promise.resolve(mockSocketRoomThunkParams),
     })
 
     render(<RoomTable roomId={mockSocketRoom1Id} table={mockRoom1Table1Info} isRoomTablesLoading={false} />)

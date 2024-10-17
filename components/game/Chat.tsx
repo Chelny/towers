@@ -1,5 +1,6 @@
 "use client"
 
+import { ReactNode } from "react"
 import { ITowersRoomChatMessage, ITowersTableChatMessage, TableChatMessageType } from "@prisma/client"
 
 type ChatProps = {
@@ -7,7 +8,7 @@ type ChatProps = {
   isTableChat?: boolean
 }
 
-export default function Chat({ messages, isTableChat = false }: ChatProps) {
+export default function Chat({ messages, isTableChat = false }: ChatProps): ReactNode {
   return (
     <>
       {messages?.map((message: ITowersRoomChatMessage | ITowersTableChatMessage) => (

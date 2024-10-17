@@ -7,14 +7,14 @@ import {
   addTableToRoom,
   addUserToRoom,
   addUserToTable,
-  beforeLeaveTableAction,
+  beforeLeaveTableSocketRoom,
   connectionEstablished,
   connectionLost,
   destroySocket,
   initSocket,
-  joinRoomAction,
-  joinTableAction,
-  leaveRoomAction,
+  joinRoomSocketRoom,
+  joinTableSocketRoom,
+  leaveRoomSocketRoom,
   removeTable,
   removeTableFromRoom,
   removeUserFromRoom,
@@ -24,7 +24,7 @@ import {
   sendTableChatMessage,
   serverError,
   updateTable,
-  updateTableInRoom
+  updateTableInRoom,
 } from "@/redux/features/socket-slice"
 
 export enum SocketEvent {
@@ -136,7 +136,7 @@ const socketMiddleware: Middleware = (store: MiddlewareAPI) => {
         // **************************************************
 
         socket.socket.on(SocketEvent.RoomLeaveAllTables, ({ tableId, isLastUser }): void => {
-          store.dispatch(beforeLeaveTableAction({ tableId, isLastUser }))
+          store.dispatch(beforeLeaveTableSocketRoom({ tableId, isLastUser }))
         })
 
         socket.socket.on(SocketEvent.RoomReceiveChatMessage, ({ roomId, message }): void => {
@@ -202,11 +202,11 @@ const socketMiddleware: Middleware = (store: MiddlewareAPI) => {
       // * Room Actions
       // **************************************************
 
-      if (joinRoomAction.match(action)) {
+      if (joinRoomSocketRoom.match(action)) {
         socket.socket.emit(SocketEvent.RoomJoin, action.payload)
       }
 
-      if (leaveRoomAction.match(action)) {
+      if (leaveRoomSocketRoom.match(action)) {
         socket.socket.emit(SocketEvent.RoomLeave, action.payload)
       }
 
@@ -218,11 +218,11 @@ const socketMiddleware: Middleware = (store: MiddlewareAPI) => {
       // * Table Actions
       // **************************************************
 
-      if (joinTableAction.match(action)) {
+      if (joinTableSocketRoom.match(action)) {
         socket.socket.emit(SocketEvent.TableJoin, action.payload)
       }
 
-      if (beforeLeaveTableAction.match(action)) {
+      if (beforeLeaveTableSocketRoom.match(action)) {
         socket.socket.emit(SocketEvent.TableLeave, action.payload)
       }
 

@@ -11,7 +11,7 @@ import { useSessionData } from "@/hooks/useSessionData"
 import { useAppDispatch, useAppSelector } from "@/lib/hooks"
 import { RoomState } from "@/redux/features/socket-slice"
 import { AppDispatch, RootState } from "@/redux/store"
-import { joinRoom } from "@/redux/thunks/socket-thunks"
+import { joinRoom } from "@/redux/thunks/room-thunks"
 
 type RoomsListProps = {
   rooms: IRoomListItemWithUsersCount[]
@@ -28,9 +28,6 @@ export default function RoomsList({ rooms }: RoomsListProps): ReactNode {
       .unwrap()
       .then(() => {
         router.push(`${ROUTE_TOWERS.PATH}?room=${roomId}`)
-      })
-      .catch((error) => {
-        console.error("Error joining room:", error)
       })
   }
 

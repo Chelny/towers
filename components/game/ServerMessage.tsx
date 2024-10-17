@@ -1,22 +1,30 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { ReactNode, useEffect, useState } from "react"
 import AlertMessage from "@/components/ui/AlertMessage"
 import { useSessionData } from "@/hooks/useSessionData"
 import { useAppSelector } from "@/lib/hooks"
 import { RootState } from "@/redux/store"
 
-export default function ServerMessage() {
+type ServerMessageProps = {
+  socketRoom: string
+}
+
+export default function ServerMessage({ socketRoom }: ServerMessageProps): ReactNode {
   const { data: session, status } = useSessionData()
   const isConnected: boolean = useAppSelector((state: RootState) => state.socket.isConnected)
-  const errorMessage: string | undefined = useAppSelector((state: RootState) => state.socket.errorMessage)
+  const errorMessage: string | undefined = useAppSelector(
+    (state: RootState) =>
+      state.socket.errorMessage ??
+      (socketRoom && (state.socket.rooms[socketRoom]?.errorMessage ?? state.socket.tables[socketRoom]?.errorMessage))
+  )
   const [isInitialized, setIsInitialized] = useState<boolean>(false)
 
   useEffect(() => {
     if (status !== "loading") {
       const timer: NodeJS.Timeout = setTimeout(() => {
         setIsInitialized(true)
-      }, 100)
+      }, 1000)
 
       return () => clearTimeout(timer)
     }

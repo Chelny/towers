@@ -8,7 +8,7 @@ import Button from "@/components/ui/Button"
 import { ROUTE_TOWERS } from "@/constants/routes"
 import { useAppDispatch } from "@/lib/hooks"
 import { AppDispatch } from "@/redux/store"
-import { joinRoom } from "@/redux/thunks/socket-thunks"
+import { joinTable } from "@/redux/thunks/table-thunks"
 
 type RoomTableProps = {
   roomId: string
@@ -21,17 +21,14 @@ export default function RoomTable({ roomId, table, isRoomTablesLoading }: RoomTa
   const dispatch: AppDispatch = useAppDispatch()
   const seatMapping: number[][] = [
     [1, 3, 5, 7],
-    [2, 4, 6, 8]
+    [2, 4, 6, 8],
   ]
 
   const handleJoinTable = (roomId: string, tableId: string): void => {
-    dispatch(joinRoom({ roomId, tableId }))
+    dispatch(joinTable({ roomId, tableId }))
       .unwrap()
       .then(() => {
         router.push(`${ROUTE_TOWERS.PATH}?room=${roomId}&table=${tableId}`)
-      })
-      .catch((error) => {
-        console.error("Error joining table:", error)
       })
   }
 

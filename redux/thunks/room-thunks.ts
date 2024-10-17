@@ -2,6 +2,36 @@ import { ITowersRoom, ITowersRoomChatMessage, ITowersTable, ITowersUserProfile }
 import { createAsyncThunk } from "@reduxjs/toolkit"
 import axios, { AxiosResponse } from "axios"
 
+export interface SocketRoomThunk {
+  roomId: string
+}
+
+export const joinRoom = createAsyncThunk<SocketRoomThunk, SocketRoomThunk, { rejectValue: string }>(
+  "socket/joinRoom",
+  async ({ roomId }: SocketRoomThunk, { rejectWithValue }) => {
+    try {
+      await axios.patch("/api/socket/room/join", { roomId })
+      return { roomId }
+    } catch (error) {
+      console.error(error)
+      return rejectWithValue("Failed to join room")
+    }
+  }
+)
+
+export const leaveRoom = createAsyncThunk<SocketRoomThunk, SocketRoomThunk, { rejectValue: string }>(
+  "socket/leaveRoom",
+  async ({ roomId }: SocketRoomThunk, { rejectWithValue }) => {
+    try {
+      await axios.patch("/api/socket/room/leave", { roomId })
+      return { roomId }
+    } catch (error) {
+      console.error(error)
+      return rejectWithValue("Failed to leave room")
+    }
+  }
+)
+
 export const fetchRoomInfo = createAsyncThunk<
   ITowersRoom,
   { roomId: string; signal?: AbortSignal },
@@ -37,7 +67,7 @@ export const fetchRoomTables = createAsyncThunk<
 
   try {
     const response: AxiosResponse<ApiResponse<ITowersTable[]>> = await axios.get(`/api/rooms/${roomId}/tables`, {
-      signal
+      signal,
     })
 
     if (!response.data.data) {
@@ -94,7 +124,7 @@ export const fetchRoomUsers = createAsyncThunk<
 
   try {
     const response: AxiosResponse<ApiResponse<ITowersUserProfile[]>> = await axios.get(`/api/rooms/${roomId}/users`, {
-      signal
+      signal,
     })
 
     if (!response.data.data) {

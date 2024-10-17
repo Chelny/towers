@@ -2,6 +2,37 @@ import { ITowersTable, ITowersTableChatMessage, ITowersUserProfile } from "@pris
 import { createAsyncThunk } from "@reduxjs/toolkit"
 import axios, { AxiosResponse } from "axios"
 
+export interface SocketTableThunk {
+  roomId: string
+  tableId: string
+}
+
+export const joinTable = createAsyncThunk<SocketTableThunk, SocketTableThunk, { rejectValue: string }>(
+  "socket/joinTable",
+  async ({ roomId, tableId }: SocketTableThunk, { rejectWithValue }) => {
+    try {
+      await axios.patch("/api/socket/room/join", { roomId, tableId })
+      return { roomId, tableId }
+    } catch (error) {
+      console.error(error)
+      return rejectWithValue("Failed to join room")
+    }
+  }
+)
+
+export const leaveTable = createAsyncThunk<SocketTableThunk, SocketTableThunk, { rejectValue: string }>(
+  "socket/leaveTable",
+  async ({ roomId, tableId }: SocketTableThunk, { rejectWithValue }) => {
+    try {
+      await axios.patch("/api/socket/room/leave", { roomId, tableId })
+      return { roomId, tableId }
+    } catch (error) {
+      console.error(error)
+      return rejectWithValue("Failed to leave room")
+    }
+  }
+)
+
 export const fetchTableInfo = createAsyncThunk<
   ITowersTable,
   { tableId: string; signal?: AbortSignal },
@@ -66,7 +97,7 @@ export const fetchTableUsers = createAsyncThunk<
 
   try {
     const response: AxiosResponse<ApiResponse<ITowersUserProfile[]>> = await axios.get(`/api/tables/${tableId}/users`, {
-      signal
+      signal,
     })
 
     if (!response.data.data) {

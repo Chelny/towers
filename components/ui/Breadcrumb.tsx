@@ -1,12 +1,11 @@
 "use client"
 
-import Link from "next/link"
+import { ReactNode } from "react"
 import { usePathname } from "next/navigation"
-import clsx from "clsx/lite"
 import Anchor from "@/components/ui/Anchor"
 import { ROUTE_HOME } from "@/constants/routes"
 
-export default function Breadcrumb() {
+export default function Breadcrumb(): ReactNode {
   const pathname: string = usePathname()
   const pathSegments: string[] = pathname.split("/").filter((path: string) => path)
 

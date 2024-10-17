@@ -10,7 +10,7 @@ import {
   ITowersTable,
   ITowersUserProfile,
   ITowersUserProfileWithRelations,
-  RoomLevel
+  RoomLevel,
 } from "@prisma/client"
 import { v4 as uuidv4 } from "uuid"
 import CreateTable from "@/components/game/CreateTable"
@@ -27,13 +27,13 @@ import {
   RATING_GOLD,
   RATING_MASTER,
   RATING_PLATINUM,
-  RATING_SILVER
+  RATING_SILVER,
 } from "@/constants/game"
 import { ROUTE_TOWERS } from "@/constants/routes"
 import { useSessionData } from "@/hooks/useSessionData"
 import { useAppDispatch, useAppSelector } from "@/lib/hooks"
 import { addLink, removeLink } from "@/redux/features/sidebar-slice"
-import { addTable, joinRoomAction, leaveRoomAction, sendRoomChatMessage } from "@/redux/features/socket-slice"
+import { addTable, joinRoomSocketRoom, leaveRoomSocketRoom, sendRoomChatMessage } from "@/redux/features/socket-slice"
 import {
   selectIsRoomChatLoading,
   selectIsRoomInfoLoading,
@@ -41,11 +41,11 @@ import {
   selectRoomChat,
   selectRoomInfo,
   selectRoomTables,
-  selectRoomUsers
+  selectRoomUsers,
 } from "@/redux/selectors/socket-selectors"
 import { AppDispatch, RootState } from "@/redux/store"
-import { fetchRoomChat, fetchRoomInfo, fetchRoomTables, fetchRoomUsers } from "@/redux/thunks/room-thunks"
-import { joinRoom, leaveRoom } from "@/redux/thunks/socket-thunks"
+import { fetchRoomChat, fetchRoomInfo, fetchRoomTables, fetchRoomUsers, leaveRoom } from "@/redux/thunks/room-thunks"
+import { joinTable } from "@/redux/thunks/table-thunks"
 
 type RoomProps = {
   roomId: string
@@ -72,7 +72,7 @@ export default function Room({ roomId }: RoomProps): ReactNode {
 
   useEffect(() => {
     if (isConnected) {
-      dispatch(joinRoomAction({ roomId }))
+      dispatch(joinRoomSocketRoom({ roomId }))
     }
   }, [roomId, isConnected])
 
@@ -122,14 +122,11 @@ export default function Room({ roomId }: RoomProps): ReactNode {
 
   const handleCreateTableSuccess = (table: ITowersTable): void => {
     handleCloseCreateTableModal()
-    dispatch(joinRoom({ roomId, tableId: table.id }))
+    dispatch(joinTable({ roomId, tableId: table.id }))
       .unwrap()
       .then(() => {
         dispatch(addTable({ roomId, table }))
         router.push(`${ROUTE_TOWERS.PATH}?room=${roomId}&table=${table.id}`)
-      })
-      .catch((error) => {
-        console.error("Error joining created table:", error)
       })
   }
 
@@ -158,18 +155,15 @@ export default function Room({ roomId }: RoomProps): ReactNode {
       )
       .map((table: ITowersTable) => ({
         id: table.id,
-        isLastUser: table.userProfiles.length === 1
+        isLastUser: table.userProfiles.length === 1,
       }))
 
     dispatch(leaveRoom({ roomId }))
       .unwrap()
       .then(() => {
-        dispatch(leaveRoomAction({ roomId, tablesToQuit }))
+        dispatch(leaveRoomSocketRoom({ roomId, tablesToQuit }))
         dispatch(removeLink(`${ROUTE_TOWERS.PATH}?room=${roomId}`))
         router.push(ROUTE_TOWERS.PATH)
-      })
-      .catch((error) => {
-        console.error("Error leaving room:", error)
       })
   }
 
@@ -262,7 +256,7 @@ export default function Room({ roomId }: RoomProps): ReactNode {
             {/* Chat and users list */}
             <div className="flex gap-2 h-96 p-2 border bg-white">
               <div className="flex-1 flex flex-col">
-                <ServerMessage />
+                <ServerMessage socketRoom={roomId} />
 
                 {/* Chat */}
                 <div className="flex-1 flex flex-col overflow-hidden">
@@ -312,17 +306,17 @@ export default function Room({ roomId }: RoomProps): ReactNode {
 }
 
 const RoomHeader = dynamic(() => import("@/components/game/RoomHeader"), {
-  loading: () => <RoomHeaderSkeleton />
+  loading: () => <RoomHeaderSkeleton />,
 })
 
 const RoomTable = dynamic(() => import("@/components/game/RoomTable"), {
-  loading: () => <RoomTableSkeleton />
+  loading: () => <RoomTableSkeleton />,
 })
 
 const Chat = dynamic(() => import("@/components/game/Chat"), {
-  loading: () => <ChatSkeleton />
+  loading: () => <ChatSkeleton />,
 })
 
 const PlayersList = dynamic(() => import("@/components/game/PlayersList"), {
-  loading: () => <PlayersListSkeleton full />
+  loading: () => <PlayersListSkeleton full />,
 })
