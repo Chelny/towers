@@ -34,7 +34,7 @@ export const useSessionData = (): TSessionContextValue => {
   }
 
   if (!sessionContent && process.env.NODE_ENV !== "production") {
-    throw new Error("[auth-wrapper-error]: `useSessionData` must be wrapped in a <SessionDataProvider />")
+    throw new Error("`useSessionData` must be wrapped in a <SessionDataProvider />")
   }
 
   return sessionContent

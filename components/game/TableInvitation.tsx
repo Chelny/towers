@@ -1,49 +1,46 @@
 "use client"
 
 import { ChangeEvent, ReactNode, useState } from "react"
-import { Table, User } from "@prisma/client"
+import { TowersTable, User } from "@prisma/client"
 import Checkbox from "@/components/ui/Checkbox"
 import Input from "@/components/ui/Input"
 import Modal from "@/components/ui/Modal"
 
 export interface TableInvitationData {
   user: Partial<User>
-  table: Partial<Table>
+  table: Partial<TowersTable>
 }
 
 type TableInvitationProps = {
   isOpen: boolean
   data: TableInvitationData
-  onCancel: () => void
   onAcceptInvitation: (tableId: string) => void
+  onCancel: () => void
 }
 
 export default function TableInvitation({
   isOpen,
   data,
-  onCancel,
-  onAcceptInvitation
+  onAcceptInvitation,
+  onCancel
 }: TableInvitationProps): ReactNode {
   const [reason, setReason] = useState<string>("")
   const [declineAll, setDeclineAll] = useState<boolean>(false)
 
-  const handleDeclineInvitation = (): void => {
-    onCancel()
-  }
-
   const handleAcceptInvitation = (): void => {
     onAcceptInvitation("test-34")
+    onCancel?.()
   }
 
   return (
     <Modal
-      title="Invited"
       isOpen={isOpen}
+      title="Invited"
       confirmText="Accept"
       cancelText="Decline"
       dataTestId="table-invitation-modal"
       onConfirm={handleAcceptInvitation}
-      onCancel={handleDeclineInvitation}
+      onCancel={onCancel}
     >
       <div className="flex flex-col gap-4">
         <div>

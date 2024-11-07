@@ -35,6 +35,7 @@ app.prepare().then(() => {
 
     if (session) {
       socket.session = session;
+      socket.id = session.user.id;
       next();
     } else {
       console.error("No session found. Disconnecting socket...");
@@ -61,14 +62,10 @@ app.prepare().then(() => {
     // * Room Events
     // **************************************************
 
-    socket.on("[room] join", async ({roomId}) => {
-      const session = socket.session;
-
+    socket.on("[room] join", async ({roomId, towersUserRoomTable}) => {
       try {
         socket.join(roomId);
-
-        const towersUserProfileResponse = await axios.get(`${process.env.BASE_URL}/api/towers-user-profiles/${session.user.id}`)
-        socket.broadcast.to(roomId).emit("[room] user joined", {roomId, towersUserProfile: towersUserProfileResponse.data.data});
+        socket.broadcast.to(roomId).emit("[room] user joined", {roomId, towersUserRoomTable});
       } catch (error) {
         console.error(`Error joining the room ${roomId}. Error description:`, error);
       }
@@ -80,7 +77,11 @@ app.prepare().then(() => {
       try {
         // Loop through each tableId and leave the corresponding socket room
         for (const tableToQuit of tablesToQuit) {
-          socket.emit("[room] leave all room tables", { roomId, tableToQuit });
+          socket.emit("[room] leave all room tables", { roomId, tableId: tableToQuit.id });
+
+          if (tableToQuit.isLastUser) {
+            socket.broadcast.to(roomId).emit("[room] remove table for room users", {roomId, tableId: tableToQuit.id});
+          }
         }
 
         socket.leave(roomId);
@@ -91,7 +92,7 @@ app.prepare().then(() => {
     });
 
     socket.on("[room] send message", async ({roomId, message}) => {
-      const session = socket.handshake.auth.session;
+      const session = socket.session;
 
       try {
         const chatResponse = await axios.post(`${process.env.BASE_URL}/api/rooms/${roomId}/chat`, {session, message});
@@ -110,75 +111,52 @@ app.prepare().then(() => {
       }
     });
 
+    socket.on("[room] update users", ({roomId, users}) => {
+      io.to(roomId).emit("[room] update users for room users", {roomId, users});
+    });
+
     // **************************************************
     // * Table Events
     // **************************************************
 
-    socket.on("[table] join", async ({tableId}) => {
-      const session = socket.session;
-
+    socket.on("[table] join", async ({roomId, tableId, towersUserRoomTable}) => {
       try {
         socket.join(tableId);
-
-        const towersUserProfileResponse = await axios.get(`${process.env.BASE_URL}/api/towers-user-profiles/${session.user.id}`)
-        socket.broadcast.to(tableId).emit("[table] user joined", {tableId, towersUserProfile: towersUserProfileResponse.data.data});
-
-        const username = session.user.username;
-        const message = `*** ${username} joined the table.`;
-        const chatResponse = await axios.post(`${process.env.BASE_URL}/api/tables/${tableId}/chat`, {
-          session,
-          message,
-          type: TableChatMessageType.USER_ACTION
-        });
-
-        io.to(tableId).emit("[table] display user joined message", {tableId, message: chatResponse.data.data});
+        socket.broadcast.to(tableId).emit("[table] user joined", {roomId, tableId, towersUserRoomTable});
       } catch (error) {
         console.error(`Error joining the table ${tableId}. Error description:`, error);
       }
     });
 
-    socket.on("[table] leave", async ({tableId, isLastUser}) => {
+    socket.on("[table] leave", async ({roomId, tableId}) => {
       const session = socket.session;
 
       try {
-        socket.broadcast.to(tableId).emit("[table] user left", {tableId, userId: session.user.id});
+        socket.broadcast.to(tableId).emit("[table] user left", {roomId, tableId, user: session.user});
         socket.leave(tableId);
-
-        if (!isLastUser) {
-          const username = session.user.username;
-          const message = `*** ${username} left the table.`;
-          const chatResponse = await axios.post(`${process.env.BASE_URL}/api/tables/${tableId}/chat`, {
-            session,
-            message,
-            type: TableChatMessageType.USER_ACTION
-          });
-
-          socket.broadcast.to(tableId).emit("[table] display user left message", {tableId, message: chatResponse.data.data});
-        }
       } catch (error) {
-         console.error(`Error leaving the table ${tableId}. Error description:`, error);
+        console.error(`Error leaving the table ${tableId}. Error description:`, error);
       }
     });
 
-    socket.on("[table] create", ({roomId, table}) => {
-      const session = socket.session;
-      io.to(roomId).emit("[table] add for all room users", {roomId, userId: session.user.id, table});
+    socket.on("[table] create", ({roomId, info}) => {
+      io.to(roomId).emit("[room] add table for room users", {roomId, info});
     });
 
-    socket.on("[table] update", ({roomId, tableId, table}) => {
-      io.to(roomId).emit("[table] update for all room users", {roomId, tableId, table});
+    socket.on("[table] update", ({roomId, tableId, info, users}) => {
+      io.to(roomId).emit("[room] update table for room users", {roomId, tableId, info, users});
     });
 
     socket.on("[table] delete", ({roomId, tableId}) => {
-      io.to(roomId).emit("[table] remove for all room users", {roomId, tableId});
+      io.to(roomId).emit("[room] remove table for room users", {roomId, tableId});
     });
 
-    socket.on("[table] send message", async ({tableId, message}) => {
-      const session = socket.handshake.auth.session;
+    socket.on("[table] send message", async ({roomId, tableId, message}) => {
+      const session = socket.session;
 
       try {
         const chatResponse = await axios.post(`${process.env.BASE_URL}/api/tables/${tableId}/chat`, {session, message});
-        io.to(tableId).emit("[table] receive new chat message", {tableId, message: chatResponse.data.data});
+        io.to(tableId).emit("[table] receive new chat message", {roomId, tableId, message: chatResponse.data.data});
       } catch (error) {
         console.error(`Error sending message in table ${tableId}. Error description:`, error);
 
@@ -193,21 +171,30 @@ app.prepare().then(() => {
       }
     });
 
-    socket.on("[table] send automated message", async ({tableId, userId, message, type}) => {
-      const session = socket.handshake.auth.session;
+    socket.on("[table] send automated message", async ({roomId, tableId, message, type, privateToUserId}) => {
+      const session = socket.session;
+
+      if (type !== TableChatMessageType.HERO_CODE) {
+        message = `*** ${message}`
+      }
 
       try {
         const chatResponse = await axios.post(`${process.env.BASE_URL}/api/tables/${tableId}/chat`, {
           session,
-          userId,
           message,
           type,
-          privateToUserId: userId
+          privateToUserId
         });
 
-        io.to(tableId).emit("[table] receive new chat message", {tableId, message: chatResponse.data.data});
+        io.to(tableId).emit("[table] receive new chat message", {roomId, tableId, message: chatResponse.data.data});
       } catch (error) {
-        console.error(`Error sending automated message in table ${tableId}. Error description:`, error);
+        if (axios.isAxiosError(error) && error.response) {
+          socket.to(socket.id).emit("[server] error", error.response.data.message || "An error occurred while sending the message.");
+        } else if (error instanceof Error) {
+          socket.to(socket.id).emit("[server] error", error.message || "An unexpected error occurred.");
+        } else {
+          socket.to(socket.id).emit("[server] error", "An unexpected error occurred.");
+        }
       }
     });
 
@@ -216,26 +203,26 @@ app.prepare().then(() => {
     // **************************************************
 
     socket.on("[user] sign out", () => {
-      console.info(`User with socket ID ${socket.id} signed out.`);
       socket.emit("[user] sign out success");
-      socket.disconnect();
+      socket.disconnect(true);
+      console.info(`Socket ${socket.id} signed out.`);
     });
   });
 
   io.of("/").adapter.on("create-room", (room) => {
-    console.info(`Room ${room} was created`);
+    console.info(`Room ${room} was created.`);
   });
 
   io.of("/").adapter.on("join-room", (room, id) => {
-    console.info(`Socket ${id} has joined room ${room}`);
+    console.info(`Socket ${id} has joined room ${room}.`);
   });
 
   io.of("/").adapter.on("leave-room", (room, id) => {
-    console.info(`Socket ${id} has left room ${room}`);
+    console.info(`Socket ${id} has left room ${room}.`);
   });
 
   io.of("/").adapter.on("delete-room", (room) => {
-    console.info(`Room ${room} was deleted`);
+    console.info(`Room ${room} was deleted.`);
   });
 
   // Scheduler

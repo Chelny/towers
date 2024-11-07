@@ -3,81 +3,105 @@ import {
   ITowersRoomChatMessage,
   ITowersTable,
   ITowersTableChatMessage,
-  ITowersUserProfile,
-  TableChatMessageType
+  ITowersUserRoomTable
 } from "@prisma/client"
 import { mockRoom1, mockRoom2, mockRoom3 } from "@/__mocks__/data/rooms"
 import { mockRoom1Table1, mockRoom1Table2, mockRoom1Table3 } from "@/__mocks__/data/tables"
 import {
-  mockRoom1Table1ChatUser1,
-  mockRoom1Table1ChatUser2,
+  mockRoom1TowersRoomChatMessage1,
+  mockRoom1TowersRoomChatMessage2
+} from "@/__mocks__/data/towersRoomChatMessages"
+import {
+  mockRoom1Table1TowersChatMessage1,
+  mockRoom1Table1TowersChatMessage2,
+  mockRoom1Table1TowersChatMessage3,
+  mockRoom1Table1TowersChatMessage4,
+  mockRoom1Table1TowersChatMessage5,
+  mockRoom1Table1TowersChatMessage6,
+  mockRoom1Table1TowersChatMessage7,
+  mockRoom1Table1TowersChatMessage8,
+  mockRoom1Table1TowersChatMessage9
+} from "@/__mocks__/data/towersTableChatMessages"
+import {
   mockRoom1Table1TowersUserProfile1,
   mockRoom1Table1TowersUserProfile2,
   mockRoom1Table1TowersUserProfile3,
   mockRoom1Table1TowersUserProfile4,
   mockRoom1Table1TowersUserProfile5
 } from "@/__mocks__/data/towersUserProfiles"
+import {
+  mockRoom1Table1TowersUserRoomTable1,
+  mockRoom1Table1TowersUserRoomTable2,
+  mockRoom1Table1TowersUserRoomTable3,
+  mockRoom1Table1TowersUserRoomTable4,
+  mockRoom1Table1TowersUserRoomTable5
+} from "@/__mocks__/data/towersUserRoomTables"
 import { mockUser1, mockUser2, mockUser3, mockUser4, mockUser5 } from "@/__mocks__/data/users"
-import { RoomState, SocketState, TableState } from "@/redux/features/socket-slice"
+import { SocketState } from "@/interfaces/socket"
+import { SidebarState } from "@/redux/features/sidebar-slice"
 
 /**
  * Rooms Socket Data
  */
 
-export const mockRoom1Info: ITowersRoom = {
-  ...mockRoom1
-}
+const mockRoom1Info: ITowersRoom = mockRoom1
 
-export const mockRoom1Chat: ITowersRoomChatMessage[] = [
+const mockRoom1Chat: ITowersRoomChatMessage[] = [
   {
-    id: "",
-    roomId: mockRoom1.id,
-    userId: mockRoom1Table1ChatUser1.id,
-    message: "Hey!",
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    user: mockRoom1Table1ChatUser1
+    ...mockRoom1TowersRoomChatMessage1,
+    userProfile: {
+      ...mockRoom1Table1TowersUserProfile1,
+      user: mockUser1
+    }
   },
   {
-    id: "",
-    roomId: mockRoom1.id,
-    userId: mockRoom1Table1ChatUser2.id,
-    message: "Wazzup?",
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    user: mockRoom1Table1ChatUser2
+    ...mockRoom1TowersRoomChatMessage2,
+    userProfile: {
+      ...mockRoom1Table1TowersUserProfile2,
+      user: mockUser2
+    }
   }
 ]
 
-export const mockRoom1Users: ITowersUserProfile[] = [
+const mockRoom1Users: ITowersUserRoomTable[] = [
   {
-    ...mockRoom1Table1TowersUserProfile1,
-    user: mockUser1,
-    room: mockRoom1,
+    ...mockRoom1Table1TowersUserRoomTable1,
+    userProfile: {
+      ...mockRoom1Table1TowersUserProfile1,
+      user: mockUser1
+    },
     table: mockRoom1Table1
   },
   {
-    ...mockRoom1Table1TowersUserProfile2,
-    user: mockUser2,
-    room: mockRoom1,
+    ...mockRoom1Table1TowersUserRoomTable2,
+    userProfile: {
+      ...mockRoom1Table1TowersUserProfile2,
+      user: mockUser2
+    },
     table: mockRoom1Table1
   },
   {
-    ...mockRoom1Table1TowersUserProfile3,
-    user: mockUser3,
-    room: mockRoom1,
+    ...mockRoom1Table1TowersUserRoomTable3,
+    userProfile: {
+      ...mockRoom1Table1TowersUserProfile3,
+      user: mockUser3
+    },
     table: mockRoom1Table1
   },
   {
-    ...mockRoom1Table1TowersUserProfile4,
-    user: mockUser4,
-    room: mockRoom1,
+    ...mockRoom1Table1TowersUserRoomTable4,
+    userProfile: {
+      ...mockRoom1Table1TowersUserProfile4,
+      user: mockUser4
+    },
     table: mockRoom1Table2
   },
   {
-    ...mockRoom1Table1TowersUserProfile5,
-    user: mockUser5,
-    room: mockRoom1,
+    ...mockRoom1Table1TowersUserRoomTable5,
+    userProfile: {
+      ...mockRoom1Table1TowersUserProfile5,
+      user: mockUser5
+    },
     table: mockRoom1Table3
   }
 ]
@@ -86,149 +110,103 @@ export const mockRoom1Users: ITowersUserProfile[] = [
  * Tables Socket Data
  */
 
-export const mockRoom1Table1Info: ITowersTable = {
+const mockRoom1Table1Info: ITowersTable = {
   ...mockRoom1Table1,
-  room: mockRoom1,
   host: {
-    ...mockUser1,
-    towersUserProfile: mockRoom1Table1TowersUserProfile1
-  },
-  userProfiles: [
-    {
-      ...mockRoom1Table1TowersUserProfile1,
-      user: mockUser1
-    },
-    {
-      ...mockRoom1Table1TowersUserProfile2,
-      user: mockUser2
-    },
-    {
-      ...mockRoom1Table1TowersUserProfile3,
-      user: mockUser3
-    }
-  ]
+    ...mockRoom1Table1TowersUserProfile1,
+    user: mockUser1
+  }
 }
 
-export const mockRoom1Table1Chat: ITowersTableChatMessage[] = [
+const mockRoom1Table1Chat: ITowersTableChatMessage[] = [
   {
-    id: "",
-    tableId: mockRoom1Table1.id,
-    userId: mockRoom1Table1ChatUser1.id,
-    message: `*** ${mockRoom1Table1ChatUser1.username} joined the table.`,
-    type: TableChatMessageType.USER_ACTION,
-    privateToUserId: mockRoom1Table1ChatUser1.id,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    user: mockRoom1Table1ChatUser1
+    ...mockRoom1Table1TowersChatMessage1,
+    userProfile: {
+      ...mockRoom1Table1TowersUserProfile1,
+      user: mockUser1
+    }
   },
   {
-    id: "",
-    tableId: mockRoom1Table1.id,
-    userId: mockRoom1Table1ChatUser2.id,
-    message: `*** ${mockRoom1Table1ChatUser2.username}’s old rating: 1100; new rating: 1110`,
-    type: TableChatMessageType.CHAT,
-    privateToUserId: mockRoom1Table1ChatUser2.id,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    user: mockRoom1Table1ChatUser2
+    ...mockRoom1Table1TowersChatMessage2,
+    userProfile: {
+      ...mockRoom1Table1TowersUserProfile2,
+      user: mockUser2
+    }
   },
   {
-    id: "",
-    tableId: mockRoom1Table1.id,
-    userId: mockRoom1Table1ChatUser2.id,
-    message: "Hey!",
-    type: TableChatMessageType.CHAT,
-    privateToUserId: null,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    user: mockRoom1Table1ChatUser2
+    ...mockRoom1Table1TowersChatMessage3,
+    userProfile: {
+      ...mockRoom1Table1TowersUserProfile1,
+      user: mockUser1
+    }
   },
   {
-    id: "",
-    tableId: mockRoom1Table1.id,
-    userId: mockRoom1Table1ChatUser2.id,
-    message: "Wazzup?",
-    type: TableChatMessageType.CHAT,
-    privateToUserId: null,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    user: mockRoom1Table1ChatUser2
+    ...mockRoom1Table1TowersChatMessage4,
+    userProfile: {
+      ...mockRoom1Table1TowersUserProfile2,
+      user: mockUser2
+    }
   },
   {
-    id: "",
-    tableId: mockRoom1Table1.id,
-    userId: mockRoom1Table1ChatUser1.id,
-    message: `*** ${mockRoom1Table1ChatUser1.username}’s old rating: 2050; new rating: 2040`,
-    type: TableChatMessageType.SCORE_UPDATE,
-    privateToUserId: mockRoom1Table1ChatUser1.id,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    user: mockRoom1Table1ChatUser1
+    ...mockRoom1Table1TowersChatMessage5,
+    userProfile: {
+      ...mockRoom1Table1TowersUserProfile1,
+      user: mockUser1
+    }
   },
   {
-    id: "",
-    tableId: mockRoom1Table1.id,
-    userId: mockRoom1Table1ChatUser1.id,
-    message:
-      "*** You are the host of the table. This gives you the power to invite to [or boot people from] your table. You may also limit other player’s access to your table by selecting its \"Table Type\".",
-    type: TableChatMessageType.TABLE_HOST_UPDATE,
-    privateToUserId: mockRoom1Table1ChatUser1.id,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    user: mockRoom1Table1ChatUser1
+    ...mockRoom1Table1TowersChatMessage6,
+    userProfile: {
+      ...mockRoom1Table1TowersUserProfile1,
+      user: mockUser1
+    }
   },
   {
-    id: "",
-    tableId: mockRoom1Table1.id,
-    userId: mockRoom1Table1ChatUser1.id,
-    message: "*** Only people you have invited may play now.",
-    type: TableChatMessageType.TABLE_TYPE_UPDATE,
-    privateToUserId: mockRoom1Table1ChatUser1.id,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    user: mockRoom1Table1ChatUser1
+    ...mockRoom1Table1TowersChatMessage7,
+    userProfile: {
+      ...mockRoom1Table1TowersUserProfile1,
+      user: mockUser1
+    }
   },
   {
-    id: "",
-    tableId: mockRoom1Table1.id,
-    userId: mockRoom1Table1ChatUser1.id,
-    message: "*** V ==> M",
-    type: TableChatMessageType.CIPHER_KEY,
-    privateToUserId: mockRoom1Table1ChatUser1.id,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    user: mockRoom1Table1ChatUser1
+    ...mockRoom1Table1TowersChatMessage8,
+    userProfile: {
+      ...mockRoom1Table1TowersUserProfile1,
+      user: mockUser1
+    }
   },
   {
-    id: "",
-    tableId: mockRoom1Table1.id,
-    userId: mockRoom1Table1ChatUser1.id,
-    message: "2FKK 2OF W1VAM2FO 91MO 8EWOF2 NF9 7HW3FE",
-    type: TableChatMessageType.HERO_TEXT,
-    privateToUserId: mockRoom1Table1ChatUser1.id,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    user: mockRoom1Table1ChatUser1
+    ...mockRoom1Table1TowersChatMessage9,
+    userProfile: {
+      ...mockRoom1Table1TowersUserProfile1,
+      user: mockUser1
+    }
   }
 ]
 
-export const mockRoom1Table1Users: ITowersUserProfile[] = [
+const mockRoom1Table1Users: ITowersUserRoomTable[] = [
   {
-    ...mockRoom1Table1TowersUserProfile1,
-    user: mockUser1,
-    room: mockRoom1,
+    ...mockRoom1Table1TowersUserRoomTable1,
+    userProfile: {
+      ...mockRoom1Table1TowersUserProfile1,
+      user: mockUser1
+    },
     table: mockRoom1Table1
   },
   {
-    ...mockRoom1Table1TowersUserProfile1,
-    user: mockUser2,
-    room: mockRoom1,
+    ...mockRoom1Table1TowersUserRoomTable2,
+    userProfile: {
+      ...mockRoom1Table1TowersUserProfile2,
+      user: mockUser2
+    },
     table: mockRoom1Table1
   },
   {
-    ...mockRoom1Table1TowersUserProfile3,
-    user: mockUser3,
-    room: mockRoom1,
+    ...mockRoom1Table1TowersUserRoomTable3,
+    userProfile: {
+      ...mockRoom1Table1TowersUserProfile3,
+      user: mockUser3
+    },
     table: mockRoom1Table1
   }
 ]
@@ -237,46 +215,76 @@ export const mockRoom1Table1Users: ITowersUserProfile[] = [
  * Socket State
  */
 
+export const mockSocketInitialState: SocketState = {
+  isConnected: false,
+  isLoading: false,
+  towers: {},
+  errorMessage: null
+}
+
 export const mockSocketRoom1Id: string = mockRoom1.id
 export const mockSocketRoom2Id: string = mockRoom2.id
 export const mockSocketRoom3Id: string = mockRoom3.id
-
-export const mockSocketStateRooms: Record<string, RoomState> = {
-  [mockSocketRoom1Id]: {
-    roomInfo: mockRoom1Info,
-    isRoomInfoLoading: false,
-    roomTables: [],
-    isRoomTablesLoading: false,
-    chat: mockRoom1Chat,
-    isChatLoading: false,
-    users: mockRoom1Users,
-    isUsersLoading: false
-  }
-  // [mockSocketRoom2Id]: {},
-  // [mockSocketRoom3Id]: {},
-}
 
 export const mockSocketRoom1Table1Id: string = mockRoom1Table1.id
 export const mockSocketRoom1Table2Id: string = mockRoom1Table2.id
 export const mockSocketRoom1Table3Id: string = mockRoom1Table3.id
 
-export const mockSocketStateTables: Record<string, TableState> = {
-  [mockSocketRoom1Table1Id]: {
-    tableInfo: mockRoom1Table1Info,
-    isTableInfoLoading: false,
-    chat: mockRoom1Table1Chat,
-    isChatLoading: false,
-    users: mockRoom1Users,
-    isUsersLoading: false
-  }
-  // [mockSocketRoom1Table2Id]: {},
-  // [mockSocketRoom1Table3Id]: {},
+export const mockSocketState: SocketState = {
+  isConnected: true,
+  isLoading: false,
+  towers: {
+    [mockSocketRoom1Id]: {
+      isJoined: false,
+      info: mockRoom1Info,
+      isInfoLoading: false,
+      chat: mockRoom1Chat,
+      isChatLoading: false,
+      users: mockRoom1Users,
+      isUsersLoading: false,
+      tables: {
+        [mockSocketRoom1Table1Id]: {
+          isJoined: false,
+          info: mockRoom1Table1Info,
+          isInfoLoading: false,
+          chat: mockRoom1Table1Chat,
+          isChatLoading: false,
+          users: mockRoom1Table1Users,
+          isUsersLoading: false,
+          errorMessage: null
+        }
+        // [mockSocketRoom1Table2Id]: {},
+        // [mockSocketRoom1Table3Id]: {},
+      },
+      isTablesLoading: false,
+      errorMessage: null
+    }
+  },
+  errorMessage: null
 }
 
-export const mockSocketInitialState: SocketState = {
-  isLoading: false,
-  isConnected: false,
-  rooms: {},
-  tables: {},
-  errorMessage: undefined
+export const mockTowers = mockSocketState.towers
+
+export const mockTowersRoomState1 = mockSocketState.towers[mockSocketRoom1Id]
+export const mockTowersRoomState1IsJoined = mockSocketState.towers[mockSocketRoom1Id].isJoined
+export const mockTowersRoomState1Info = mockSocketState.towers[mockSocketRoom1Id].info
+export const mockTowersRoomState1Chat = mockSocketState.towers[mockSocketRoom1Id].chat
+export const mockTowersRoomState1Users = mockSocketState.towers[mockSocketRoom1Id].users
+export const mockTowersRoomState1Tables = mockSocketState.towers[mockSocketRoom1Id].tables
+
+export const mockTowersTableState11 = mockSocketState.towers[mockSocketRoom1Id].tables[mockSocketRoom1Table1Id]
+export const mockTowersTableState11IsJoined =
+  mockSocketState.towers[mockSocketRoom1Id].tables[mockSocketRoom1Table1Id].isJoined
+export const mockTowersTableState11Info = mockSocketState.towers[mockSocketRoom1Id].tables[mockSocketRoom1Table1Id].info
+export const mockTowersTableState11Chat = mockSocketState.towers[mockSocketRoom1Id].tables[mockSocketRoom1Table1Id].chat
+export const mockTowersTableState11Users =
+  mockSocketState.towers[mockSocketRoom1Id].tables[mockSocketRoom1Table1Id].users
+
+/**
+ * Redux States
+ */
+
+export const mockStoreReducers = {
+  socket: mockSocketInitialState,
+  sidebar: {} as SidebarState
 }

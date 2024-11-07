@@ -37,14 +37,11 @@ model User {
   sessions            Session[]
   authenticators      Authenticator[]
   loginHistoryRecords LoginHistory[]
-  friendshipUser1     Friendship[]             @relation("FriendshipUser1")
-  friendshipUser2     Friendship[]             @relation("FriendshipUser2")
-  directMessageUser1  DirectMessage[]          @relation("DirectMessageSender")
-  directMessageUser2  DirectMessage[]          @relation("DirectMessageReceiver")
+  friendshipUser1     Friendship[]       @relation("FriendshipUser1")
+  friendshipUser2     Friendship[]       @relation("FriendshipUser2")
+  directMessageUser1  DirectMessage[]    @relation("DirectMessageSender")
+  directMessageUser2  DirectMessage[]    @relation("DirectMessageReceiver")
   towersUserProfile   TowersUserProfile?
-  roomChatMessages    TowersRoomChatMessage[]
-  hostedTables        TowersTable[]            @relation("TableHost")
-  tableChatMessages   TowersTableChatMessage[]
 }
 
 model Account {
@@ -163,32 +160,6 @@ model DirectMessage {
   @@index([senderId, receiverId])
 }
 
-model TowersUserProfile {
-  id             String   @id @default(uuid())
-  userId         String   @unique
-  rating         Int      @default(0)
-  gamesCompleted Int      @default(0)
-  wins           Int      @default(0)
-  loses          Int      @default(0)
-  streak         Int      @default(0)
-  roomId         String?
-  tableId        String?
-  seatNumber     Int?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-
-  user           User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  room           TowersRoom?           @relation(fields: [roomId], references: [id])
-  table          TowersTable?          @relation(fields: [tableId], references: [id])
-  tableSettings  TowersTableSettings[]
-  bootedTables   TowersTableBoot[]     @relation("TableBootedUser")
-  bootedByTables TowersTableBoot[]     @relation("TableBootedBy")
-
-  @@unique([userId, roomId])
-  @@unique([userId, tableId])
-  @@unique([userId, tableId, seatNumber])
-}
-
 model TowersRoom {
   id         String    @id @default(uuid())
   name       String    @unique
@@ -197,21 +168,21 @@ model TowersRoom {
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
 
-  tables       TowersTable[]
-  chatMessages TowersRoomChatMessage[]
-  userProfiles TowersUserProfile[]
+  tables         TowersTable[]
+  chatMessages   TowersRoomChatMessage[]
+  userRoomTables TowersUserRoomTable[]
 }
 
 model TowersRoomChatMessage {
-  id        String   @id @default(uuid())
-  roomId    String
-  userId    String
-  message   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            String   @id @default(uuid())
+  roomId        String
+  userProfileId String
+  message       String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
-  room TowersRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
-  user User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  room        TowersRoom        @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  userProfile TowersUserProfile @relation(fields: [userProfileId], references: [id], onDelete: Cascade)
 }
 
 model TowersTable {
@@ -224,11 +195,11 @@ model TowersTable {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
-  room         TowersRoom               @relation(fields: [roomId], references: [id], onDelete: Cascade)
-  host         User                     @relation("TableHost", fields: [hostId], references: [id])
-  chatMessages TowersTableChatMessage[]
-  bootedUsers  TowersTableBoot[]
-  userProfiles TowersUserProfile[]
+  room           TowersRoom               @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  host           TowersUserProfile        @relation("TableHost", fields: [hostId], references: [id])
+  chatMessages   TowersTableChatMessage[]
+  bootedUsers    TowersTableBoot[]
+  userRoomTables TowersUserRoomTable[]
 
   @@unique([roomId, tableNumber])
 }
@@ -236,7 +207,6 @@ model TowersTable {
 model TowersTableSettings {
   id            String   @id @default(uuid())
   userProfileId String
-  sound         Boolean  @default(true)
   upKey         String   @default("ArrowUp")
   downKey       String   @default("ArrowDown")
   leftKey       String   @default("ArrowLeft")
@@ -251,15 +221,15 @@ model TowersTableSettings {
 model TowersTableChatMessage {
   id              String               @id @default(uuid())
   tableId         String
-  userId          String
+  userProfileId   String
   message         String
   type            TableChatMessageType @default(CHAT)
   privateToUserId String?
   createdAt       DateTime             @default(now())
   updatedAt       DateTime             @updatedAt
 
-  table TowersTable @relation(fields: [tableId], references: [id], onDelete: Cascade)
-  user  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  table       TowersTable       @relation(fields: [tableId], references: [id], onDelete: Cascade)
+  userProfile TowersUserProfile @relation(fields: [userProfileId], references: [id], onDelete: Cascade)
 }
 
 model TowersTableBoot {
@@ -273,6 +243,44 @@ model TowersTableBoot {
   table      TowersTable       @relation(fields: [tableId], references: [id], onDelete: Cascade)
   bootedUser TowersUserProfile @relation("TableBootedUser", fields: [userProfileId], references: [id], onDelete: Cascade)
   bootedBy   TowersUserProfile @relation("TableBootedBy", fields: [bootedByTowersUserProfileId], references: [id], onDelete: Cascade)
+}
+
+model TowersUserProfile {
+  id             String   @id @default(uuid())
+  userId         String   @unique
+  rating         Int      @default(0)
+  gamesCompleted Int      @default(0)
+  wins           Int      @default(0)
+  loses          Int      @default(0)
+  streak         Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  user              User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  hostedTables      TowersTable[]            @relation("TableHost")
+  tableSettings     TowersTableSettings[]
+  roomChatMessages  TowersRoomChatMessage[]
+  tableChatMessages TowersTableChatMessage[]
+  bootedTables      TowersTableBoot[]        @relation("TableBootedUser")
+  bootedByTables    TowersTableBoot[]        @relation("TableBootedBy")
+  userRoomTables    TowersUserRoomTable[]
+}
+
+model TowersUserRoomTable {
+  id            String   @id @default(uuid())
+  userProfileId String
+  roomId        String?
+  tableId       String?
+  seatNumber    Int?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  userProfile TowersUserProfile @relation(fields: [userProfileId], references: [id], onDelete: Cascade)
+  room        TowersRoom?       @relation(fields: [roomId], references: [id])
+  table       TowersTable?      @relation(fields: [tableId], references: [id])
+
+  @@unique([userProfileId, roomId, tableId])
+  @@unique([roomId, tableId, seatNumber])
 }
 
 enum UserStatus {
@@ -303,10 +311,11 @@ enum TableType {
 
 enum TableChatMessageType {
   CHAT
-  CIPHER_KEY
-  GAME_RATING
-  HERO_TEXT
+  USER_ACTION
   TABLE_HOST
   TABLE_TYPE
-  USER_ACTION
+  GAME_RATING
+  CIPHER_KEY
+  HERO_CODE
+  HERO_MESSAGE
 }

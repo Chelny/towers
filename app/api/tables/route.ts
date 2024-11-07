@@ -1,52 +1,77 @@
 import { NextRequest, NextResponse } from "next/server"
-import { ITowersTable } from "@prisma/client"
+import { TowersTable, TowersUserProfile } from "@prisma/client"
 import prisma from "@/lib/prisma"
+import { getPrismaError } from "@/utils/api"
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
-  const data = await request.json()
-  const { roomId, hostId, tableType, rated } = data
+  try {
+    const { roomId, userId, tableType, rated } = await request.json()
 
-  // Retrieve all table numbers in the room
-  const roomTables: { tableNumber: number }[] = await prisma.towersTable.findMany({
-    where: { roomId },
-    select: { tableNumber: true },
-    orderBy: { tableNumber: "asc" }
-  })
+    let towersUserProfile: TowersUserProfile | null = await prisma.towersUserProfile.findUnique({
+      where: {
+        userId
+      }
+    })
 
-  // Find the lowest available table number
-  let availableTableNumber: number = 1
-
-  for (const { tableNumber } of roomTables) {
-    if (tableNumber === availableTableNumber) {
-      availableTableNumber++
-    } else {
-      break
+    if (!towersUserProfile) {
+      return NextResponse.json(
+        {
+          success: true,
+          message: "The user profile was not found"
+        },
+        { status: 404 }
+      )
     }
-  }
 
-  const table: ITowersTable = await prisma.towersTable.create({
-    data: {
-      roomId,
-      tableNumber: availableTableNumber,
-      hostId,
-      tableType,
-      rated
-    },
-    include: {
-      host: true,
-      userProfiles: {
-        include: {
-          user: true
-        }
+    // Retrieve all table numbers in the room
+    const roomTables: { tableNumber: number }[] = await prisma.towersTable.findMany({
+      where: {
+        roomId
+      },
+      select: {
+        tableNumber: true
+      },
+      orderBy: {
+        tableNumber: "asc"
+      }
+    })
+
+    // Find the lowest available table number
+    let availableTableNumber: number = 1
+
+    for (const { tableNumber } of roomTables) {
+      if (tableNumber === availableTableNumber) {
+        availableTableNumber++
+      } else {
+        break
       }
     }
-  })
 
-  return NextResponse.json(
-    {
-      success: true,
-      data: table
-    },
-    { status: 201 }
-  )
+    const table: TowersTable = await prisma.towersTable.create({
+      data: {
+        roomId,
+        tableNumber: availableTableNumber,
+        hostId: towersUserProfile.id,
+        tableType,
+        rated
+      },
+      include: {
+        host: {
+          include: {
+            user: true
+          }
+        }
+      }
+    })
+
+    return NextResponse.json(
+      {
+        success: true,
+        data: table
+      },
+      { status: 201 }
+    )
+  } catch (error) {
+    return getPrismaError(error)
+  }
 }

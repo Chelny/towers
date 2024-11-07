@@ -4,11 +4,9 @@ import React, { Context, createContext, type PropsWithChildren, ReactNode, useEf
 import { usePathname } from "next/navigation"
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios"
 import { getCsrfToken } from "next-auth/react"
+import { getAxiosError } from "@/utils/api"
 import type { Session } from "next-auth"
 
-/**
- * Provider props
- */
 type TSessionProviderProps = PropsWithChildren<{
   session?: Session | null
 }>
@@ -44,7 +42,7 @@ export const SessionDataProvider = ({ session: initialSession = null, children }
 
           setSession(fetchedSession)
         } catch (error) {
-          console.error("Error fetching session:", error)
+          getAxiosError(error)
         } finally {
           setLoading(false)
         }
@@ -87,7 +85,7 @@ export const SessionDataProvider = ({ session: initialSession = null, children }
 
           return fetchedSession
         } catch (error) {
-          console.error("Error fetching session:", error)
+          getAxiosError(error)
         } finally {
           setLoading(false)
         }

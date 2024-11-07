@@ -31,13 +31,12 @@ export default function TowersPageContent({ roomId, tableId }: TowersPageContent
       dispatch(destroySocket())
     }
 
-    const updateSession = (): void => {
-      if (navigator.onLine) {
-        update()
-      }
-    }
-
-    const interval: NodeJS.Timeout = setInterval(updateSession, 1000 * 60 * 60)
+    const interval: NodeJS.Timeout = setInterval(
+      () => {
+        if (navigator.onLine) update()
+      },
+      1000 * 60 * 60
+    )
 
     window.addEventListener("online", handleOnline)
     window.addEventListener("offline", handleOffline)
@@ -62,7 +61,9 @@ export default function TowersPageContent({ roomId, tableId }: TowersPageContent
 
     window.addEventListener("visibilitychange", handleVisibility, false)
 
-    return () => window.removeEventListener("visibilitychange", handleVisibility, false)
+    return () => {
+      window.removeEventListener("visibilitychange", handleVisibility, false)
+    }
   }, [update])
 
   useEffect(() => {
@@ -70,10 +71,8 @@ export default function TowersPageContent({ roomId, tableId }: TowersPageContent
   }, [status, isConnected])
 
   const connectToSocket = (): void => {
-    if (status === "authenticated") {
-      if (!isConnected) {
-        dispatch(initSocket())
-      }
+    if (status === "authenticated" && !isConnected) {
+      dispatch(initSocket())
     }
   }
 

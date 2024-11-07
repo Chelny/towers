@@ -1,4 +1,5 @@
 import axios, { AxiosResponse } from "axios"
+import { getAxiosError } from "@/utils/api"
 
 export async function getLocation(ipAddress: string | null): Promise<string | null> {
   if (!ipAddress) return null
@@ -13,7 +14,7 @@ export async function getLocation(ipAddress: string | null): Promise<string | nu
       return `${data.city || "[unknown city]"}, ${data.regionName || "[unknown region]"}, ${data.country || "[unknown country]"}`
     }
   } catch (error) {
-    console.error("Error fetching location data:", error)
+    getAxiosError(error)
   }
 
   return null

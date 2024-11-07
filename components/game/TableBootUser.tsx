@@ -2,14 +2,14 @@
 
 import { ReactNode, useState } from "react"
 import dynamic from "next/dynamic"
-import { ITowersUserProfile } from "@prisma/client"
+import { ITowersUserRoomTable } from "@prisma/client"
 import PlayersListSkeleton from "@/components/skeleton/PlayersListSkeleton"
 import Modal from "@/components/ui/Modal"
 
 type TableBootUserProps = {
   isOpen: boolean
-  users: ITowersUserProfile[]
-  isRatingsVisible: boolean
+  users: ITowersUserRoomTable[]
+  isRatingsVisible: boolean | null
   onCancel: () => void
 }
 
@@ -17,13 +17,13 @@ export default function TableBootUser({ isOpen, users, isRatingsVisible, onCance
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null)
 
   const handleSelectedPlayer = (): void => {
-    onCancel()
+    onCancel?.()
   }
 
   return (
     <Modal
-      title="Boot User"
       isOpen={isOpen}
+      title="Boot User"
       confirmText="Boot"
       isConfirmButtonDisabled={users?.length === 0}
       dataTestId="table-boot-user-modal"

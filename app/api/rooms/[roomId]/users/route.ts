@@ -1,27 +1,40 @@
 import { NextRequest, NextResponse } from "next/server"
-import { ITowersUserProfile } from "@prisma/client"
+import { TowersUserRoomTable } from "@prisma/client"
 import prisma from "@/lib/prisma"
+import { badRequestMissingRoomId, getPrismaError } from "@/utils/api"
 
 export async function GET(request: NextRequest, context: { params: { roomId: string } }): Promise<NextResponse> {
-  const { roomId } = context.params
+  try {
+    const { roomId } = context.params
 
-  const userProfiles: ITowersUserProfile[] = await prisma.towersUserProfile.findMany({
-    where: { roomId },
-    include: {
-      user: true,
-      room: true,
-      table: true
-    },
-    orderBy: {
-      updatedAt: "asc"
-    }
-  })
+    if (!roomId) return badRequestMissingRoomId()
 
-  return NextResponse.json(
-    {
-      success: true,
-      data: userProfiles
-    },
-    { status: 200 }
-  )
+    const towersUserRoomTables: TowersUserRoomTable[] = await prisma.towersUserRoomTable.findMany({
+      where: { roomId },
+      include: {
+        userProfile: {
+          include: {
+            user: true
+          }
+        },
+        table: true
+      },
+      distinct: ["userProfileId"],
+      orderBy: {
+        table: {
+          updatedAt: "desc"
+        }
+      }
+    })
+
+    return NextResponse.json(
+      {
+        success: true,
+        data: towersUserRoomTables
+      },
+      { status: 200 }
+    )
+  } catch (error) {
+    return getPrismaError(error)
+  }
 }

@@ -13,7 +13,7 @@ class SocketConnection implements SocketInterface {
 
   get socket(): Socket {
     if (!this._socket) {
-      throw new Error("Socket is not initialized yet.")
+      throw new Error("Socket is not initialized.")
     }
 
     return this._socket

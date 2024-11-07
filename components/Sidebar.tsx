@@ -18,7 +18,7 @@ import { useAppSelector } from "@/lib/hooks"
 import { destroySocket } from "@/redux/features/socket-slice"
 import { RootState } from "@/redux/store"
 
-export default function RoomSidebar(): ReactNode {
+export default function Sidebar(): ReactNode {
   const [isExpanded, setIsExpanded] = useState<boolean>(false)
   const [isLinkTextVisible, setIsLinkTextVisible] = useState<boolean>(false)
   const { data: session, status } = useSessionData()

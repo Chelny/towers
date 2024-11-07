@@ -14,7 +14,7 @@ export default function Chat({ messages, isTableChat = false }: ChatProps): Reac
       {messages?.map((message: ITowersRoomChatMessage | ITowersTableChatMessage) => (
         <div key={message.id}>
           {((isTableChat && (message as ITowersTableChatMessage).type === TableChatMessageType.CHAT) ||
-            !isTableChat) && <>{message.user?.username}:&nbsp;</>}
+            !isTableChat) && <>{message.userProfile?.user?.username}:&nbsp;</>}
           {message.message}
         </div>
       ))}

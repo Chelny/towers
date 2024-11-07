@@ -2,9 +2,10 @@ import { configureStore } from "@reduxjs/toolkit"
 import { render, screen } from "@testing-library/react"
 import { Provider } from "react-redux"
 import { mockRoom1 } from "@/__mocks__/data/rooms"
-import { mockSocketInitialState, mockSocketRoom1Id, mockSocketStateRooms } from "@/__mocks__/data/socketState"
+import { mockSocketInitialState, mockTowersRoomState1Info } from "@/__mocks__/data/socketState"
 import RoomHeader from "@/components/game/RoomHeader"
-import socketReducer, { SocketState } from "@/redux/features/socket-slice"
+import { SocketState } from "@/interfaces/socket"
+import socketReducer from "@/redux/features/socket-slice"
 
 const initialState: SocketState = {
   ...mockSocketInitialState,
@@ -24,7 +25,7 @@ describe("RoomHeader Component", () => {
   it("should render room name and socket status", () => {
     render(
       <Provider store={store}>
-        <RoomHeader room={mockSocketStateRooms[mockSocketRoom1Id].roomInfo} />
+        <RoomHeader room={mockTowersRoomState1Info} />
       </Provider>
     )
 

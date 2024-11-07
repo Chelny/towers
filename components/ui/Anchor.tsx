@@ -1,14 +1,13 @@
-import { ReactNode } from "react"
+import { PropsWithChildren, ReactNode } from "react"
 import Link from "next/link"
 import clsx from "clsx/lite"
 
-interface AnchorProps {
+type AnchorProps = PropsWithChildren<{
   href: string
-  children: ReactNode
   className?: string
-}
+}>
 
-export default function Anchor({ href, children, className = "" }: AnchorProps): ReactNode {
+export default function Anchor({ children, href, className = "" }: AnchorProps): ReactNode {
   return (
     <Link href={href} className={clsx("towers-link", className)}>
       {children}

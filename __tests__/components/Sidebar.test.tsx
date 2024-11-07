@@ -3,7 +3,7 @@ import { signOut } from "next-auth/react"
 import { useDispatch } from "react-redux"
 import { Mock } from "vitest"
 import { mockAuthenticatedSession } from "@/__mocks__/data/users"
-import RoomSidebar from "@/components/game/RoomSidebar"
+import Sidebar from "@/components/Sidebar"
 import { useSessionData } from "@/hooks/useSessionData"
 
 vi.mock("next-auth/react", () => ({
@@ -26,7 +26,7 @@ vi.mock("@/lib/hooks", () => ({
   useAppSelector: vi.fn()
 }))
 
-describe("RoomSidebar Component", () => {
+describe("Sidebar Component", () => {
   const mockDispatch: Mock = vi.fn()
 
   beforeEach(() => {
@@ -39,13 +39,13 @@ describe("RoomSidebar Component", () => {
   })
 
   it("should render the sidebar in collapsed state initially", () => {
-    render(<RoomSidebar />)
+    render(<Sidebar />)
     expect(screen.getByLabelText("Expand sidebar")).toBeInTheDocument()
     expect(screen.queryByText("John Doe")).not.toBeInTheDocument()
   })
 
   it("should expand the sidebar when expand button is clicked", () => {
-    render(<RoomSidebar />)
+    render(<Sidebar />)
 
     const expandButton: HTMLButtonElement = screen.getByLabelText("Expand sidebar")
     fireEvent.click(expandButton)
@@ -54,7 +54,7 @@ describe("RoomSidebar Component", () => {
   })
 
   it("should call mockDispatch and signOut on sign out button click", () => {
-    render(<RoomSidebar />)
+    render(<Sidebar />)
 
     const expandButton: HTMLButtonElement = screen.getByLabelText("Expand sidebar")
     fireEvent.click(expandButton)

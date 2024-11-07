@@ -1,12 +1,11 @@
 "use client"
 
-import { ChangeEvent, ReactElement, ReactNode, useState } from "react"
+import { ChangeEvent, PropsWithChildren, ReactElement, ReactNode, useState } from "react"
 import React from "react"
 import clsx from "clsx/lite"
 import RadioButton from "./RadioButton"
 
-type RadioButtonGroupProps = {
-  children: ReactNode
+type RadioButtonGroupProps = PropsWithChildren<{
   id: string
   label: string
   inline?: boolean
@@ -17,7 +16,7 @@ type RadioButtonGroupProps = {
   description?: string
   errorMessage?: string
   onChange?: (_: ChangeEvent<HTMLInputElement>) => void
-}
+}>
 
 export default function RadioButtonGroup({
   children,

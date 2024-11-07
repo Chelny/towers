@@ -5,122 +5,147 @@ import { Session } from "next-auth"
 import { auth } from "@/auth"
 import prisma from "@/lib/prisma"
 import { updateLastActiveAt } from "@/lib/user"
+import { badRequestMissingRoomId, getPrismaError, unauthorized } from "@/utils/api"
 
 export async function GET(request: NextRequest, context: { params: { roomId: string } }): Promise<NextResponse> {
-  const { roomId } = context.params
-  const session: Session | null = await auth()
+  try {
+    const { roomId } = context.params
+    const session: Session | null = await auth()
 
-  if (!roomId) {
+    if (!roomId) return badRequestMissingRoomId()
+
+    if (!session) return unauthorized()
+
+    const towersUserProfile: TowersUserProfile | null = await prisma.towersUserProfile.findUnique({
+      where: { userId: session.user.id }
+    })
+
+    if (!towersUserProfile) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "The user profile was not found"
+        },
+        { status: 404 }
+      )
+    }
+
+    const towersUserRoomTable: { updatedAt: Date } | null = await prisma.towersUserRoomTable.findFirst({
+      where: {
+        userProfileId: towersUserProfile.id,
+        roomId
+      },
+      select: {
+        updatedAt: true
+      },
+      orderBy: {
+        updatedAt: "asc"
+      }
+    })
+
+    if (!towersUserRoomTable) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "The user has not yet joined the room"
+        },
+        { status: 404 }
+      )
+    }
+
+    const chatMessages: TowersRoomChatMessage[] = await prisma.towersRoomChatMessage.findMany({
+      where: {
+        roomId,
+        updatedAt: {
+          gt: towersUserProfile.updatedAt
+        }
+      },
+      include: {
+        userProfile: {
+          include: {
+            user: true
+          }
+        }
+      },
+      orderBy: {
+        updatedAt: "asc"
+      },
+      take: 100
+    })
+
     return NextResponse.json(
       {
-        success: false,
-        error: "Please provide a room ID to proceed."
+        success: true,
+        data: chatMessages
       },
-      { status: 400 }
+      { status: 200 }
     )
+  } catch (error) {
+    return getPrismaError(error)
   }
-
-  if (!session) {
-    return NextResponse.json(
-      {
-        success: false,
-        message: "Sorry, your request could not be processed."
-      },
-      { status: 401 }
-    )
-  }
-
-  const towersUserProfile: { updatedAt: Date } | null = await prisma.towersUserProfile.findFirst({
-    where: { userId: session.user.id, roomId },
-    select: { updatedAt: true },
-    orderBy: { updatedAt: "asc" }
-  })
-
-  if (!towersUserProfile) {
-    return NextResponse.json(
-      {
-        success: false,
-        message: "The user has not yet joined the room"
-      },
-      { status: 404 }
-    )
-  }
-
-  const chatMessages: TowersRoomChatMessage[] = await prisma.towersRoomChatMessage.findMany({
-    where: { roomId, updatedAt: { gt: towersUserProfile.updatedAt } },
-    include: { user: true },
-    orderBy: { updatedAt: "asc" },
-    take: 100
-  })
-
-  return NextResponse.json(
-    {
-      success: true,
-      data: chatMessages
-    },
-    { status: 200 }
-  )
 }
 
 export async function POST(request: NextRequest, context: { params: { roomId: string } }): Promise<NextResponse> {
-  const { roomId } = context.params
-  const data = await request.json()
-  const session: Session | null = data.session
+  try {
+    const { roomId } = context.params
+    const data = await request.json()
+    const session: Session | null = data.session
 
-  if (!session) {
-    return NextResponse.json(
-      {
-        success: false,
-        message: "Sorry, your request could not be processed."
-      },
-      { status: 401 }
-    )
-  }
+    if (!roomId) return badRequestMissingRoomId()
 
-  const towersUserProfile: TowersUserProfile | null = await prisma.towersUserProfile.findUnique({
-    where: { userId: session.user.id }
-  })
+    if (!session) return unauthorized()
 
-  if (!towersUserProfile) {
-    return NextResponse.json(
-      {
-        success: false,
-        message: "Unable to find the requested user profile."
-      },
-      { status: 404 }
-    )
-  }
+    const towersUserProfile: TowersUserProfile | null = await prisma.towersUserProfile.findUnique({
+      where: { userId: session.user.id }
+    })
 
-  let message: string = DOMPurify.sanitize(data.message)
-
-  if (message.trim().length === 0) {
-    return NextResponse.json(
-      {
-        success: false,
-        message: "Invalid input. XSS attack detected."
-      },
-      { status: 400 }
-    )
-  }
-
-  const chatMessage: TowersRoomChatMessage = await prisma.towersRoomChatMessage.create({
-    data: {
-      roomId,
-      userId: session.user.id,
-      message
-    },
-    include: {
-      user: true
+    if (!towersUserProfile) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Unable to find the requested user profile."
+        },
+        { status: 404 }
+      )
     }
-  })
 
-  await updateLastActiveAt(session.user.id)
+    let message: string = DOMPurify.sanitize(data.message)
 
-  return NextResponse.json(
-    {
-      success: true,
-      data: chatMessage
-    },
-    { status: 201 }
-  )
+    if (message.trim().length === 0) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Invalid input. XSS attack detected."
+        },
+        { status: 400 }
+      )
+    }
+
+    const chatMessage: TowersRoomChatMessage = await prisma.towersRoomChatMessage.create({
+      data: {
+        roomId,
+        userProfileId: towersUserProfile.id,
+        message
+      },
+      include: {
+        userProfile: {
+          include: {
+            user: true
+          }
+        }
+      }
+    })
+
+    await updateLastActiveAt(session.user.id)
+
+    return NextResponse.json(
+      {
+        success: true,
+        data: chatMessage
+      },
+      { status: 201 }
+    )
+  } catch (error) {
+    return getPrismaError(error)
+  }
 }

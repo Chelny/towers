@@ -2,14 +2,14 @@
 
 import { ReactNode, useState } from "react"
 import dynamic from "next/dynamic"
-import { ITowersUserProfile } from "@prisma/client"
+import { ITowersUserRoomTable } from "@prisma/client"
 import PlayersListSkeleton from "@/components/skeleton/PlayersListSkeleton"
 import Modal from "@/components/ui/Modal"
 
 type TableInviteUserProps = {
   isOpen: boolean
-  users: ITowersUserProfile[]
-  isRatingsVisible: boolean
+  users: ITowersUserRoomTable[]
+  isRatingsVisible: boolean | null
   onCancel: () => void
 }
 
@@ -21,18 +21,18 @@ export default function TableInviteUser({
 }: TableInviteUserProps): ReactNode {
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null)
 
-  const handleSelectedPlayer = (): void => {
-    onCancel()
+  const handleUserToInvite = (): void => {
+    onCancel?.()
   }
 
   return (
     <Modal
-      title="Invite User"
       isOpen={isOpen}
+      title="Invite User"
       confirmText="Invite"
       isConfirmButtonDisabled={users?.length == 0}
       dataTestId="table-invite-user-modal"
-      onConfirm={handleSelectedPlayer}
+      onConfirm={handleUserToInvite}
       onCancel={onCancel}
     >
       <div className="overflow-y-auto h-72">

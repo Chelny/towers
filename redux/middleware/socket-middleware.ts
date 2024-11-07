@@ -1,4 +1,6 @@
+import { ITowersUserRoomTable, TableChatMessageType } from "@prisma/client"
 import { Middleware, MiddlewareAPI } from "redux"
+import { SocketState, TowersTableState } from "@/interfaces/socket"
 import { SocketFactory, SocketInterface } from "@/lib/socket-factory"
 import {
   addMessageToRoomChat,
@@ -7,7 +9,6 @@ import {
   addTableToRoom,
   addUserToRoom,
   addUserToTable,
-  beforeLeaveTableSocketRoom,
   connectionEstablished,
   connectionLost,
   destroySocket,
@@ -15,6 +16,7 @@ import {
   joinRoomSocketRoom,
   joinTableSocketRoom,
   leaveRoomSocketRoom,
+  leaveTableSocketRoom,
   removeTable,
   removeTableFromRoom,
   removeUserFromRoom,
@@ -24,7 +26,9 @@ import {
   sendTableChatMessage,
   serverError,
   updateTable,
-  updateTableInRoom
+  updateTableInRoom,
+  updateUsers,
+  updateUsersInRoom
 } from "@/redux/features/socket-slice"
 
 export enum SocketEvent {
@@ -39,23 +43,25 @@ export enum SocketEvent {
   Error = "error",
 
   // Custom Listeners
+  RoomLeaveAllTables = "[room] leave all room tables",
+  RoomUserJoined = "[room] user joined",
+  RoomUserLeft = "[room] user left",
+  RoomAddTableForRoomUsers = "[room] add table for room users",
+  RoomUpdateTableForRoomUsers = "[room] update table for room users",
+  RoomRemoveTableForRoomUsers = "[room] remove table for room users",
   RoomReceiveChatMessage = "[room] receive new chat message",
-  TableAddForAllRoomUsers = "[table] add for all room users",
-  TableUpdateForAllRoomUsers = "[table] update for all room users",
-  TableDeleteForAllRoomUsers = "[table] remove for all room users",
+  RoomUpdateUsersForRoomUsers = "[room] update users for room users",
   TableReceiveChatMessage = "[table] receive new chat message",
-  TableDisplayUserJoinedMessage = "[table] display user joined message",
-  TableDisplayUserLeftMessage = "[table] display user left message",
+  TableUserJoined = "[table] user joined",
+  TableUserLeft = "[table] user left",
   UserSignOutSuccess = "[user] sign out success",
   ServerError = "[server] error",
 
   // Emitters
   RoomJoin = "[room] join",
-  RoomLeaveAllTables = "[room] leave all room tables",
   RoomLeave = "[room] leave",
   RoomSendMessage = "[room] send message",
-  RoomUserJoined = "[room] user joined",
-  RoomUserLeft = "[room] user left",
+  RoomUpdateUsers = "[room] update users",
   TableJoin = "[table] join",
   TableLeave = "[table] leave",
   TableCreate = "[table] create",
@@ -63,8 +69,6 @@ export enum SocketEvent {
   TableDelete = "[table] delete",
   TableSendMessage = "[table] send message",
   TableSendAutomatedMessage = "[table] send automated message",
-  TableUserJoined = "[table] user joined",
-  TableUserLeft = "[table] user left",
   UserSignOut = "[user] sign out",
 }
 
@@ -91,7 +95,7 @@ const socketMiddleware: Middleware = (store: MiddlewareAPI) => {
         })
 
         socket.socket.on(SocketEvent.Disconnect, (reason: string): void => {
-          store.dispatch(connectionLost())
+          store.dispatch(connectionLost(reason))
           console.info(`Socket disconnected due to ${reason}.`)
         })
 
@@ -135,56 +139,101 @@ const socketMiddleware: Middleware = (store: MiddlewareAPI) => {
         // * Room Events
         // **************************************************
 
-        socket.socket.on(SocketEvent.RoomLeaveAllTables, ({ tableId, isLastUser }): void => {
-          store.dispatch(beforeLeaveTableSocketRoom({ tableId, isLastUser }))
+        socket.socket.on(SocketEvent.RoomLeaveAllTables, ({ roomId, tableId }): void => {
+          store.dispatch(leaveTableSocketRoom({ roomId, tableId }))
         })
 
         socket.socket.on(SocketEvent.RoomReceiveChatMessage, ({ roomId, message }): void => {
           store.dispatch(addMessageToRoomChat({ roomId, message }))
         })
 
-        socket.socket.on(SocketEvent.RoomUserJoined, ({ roomId, towersUserProfile }): void => {
-          store.dispatch(addUserToRoom({ roomId, towersUserProfile }))
+        socket.socket.on(SocketEvent.RoomUserJoined, ({ roomId, towersUserRoomTable }): void => {
+          store.dispatch(addUserToRoom({ roomId, towersUserRoomTable }))
         })
 
         socket.socket.on(SocketEvent.RoomUserLeft, ({ roomId, userId }): void => {
           store.dispatch(removeUserFromRoom({ roomId, userId }))
         })
 
+        socket.socket.on(SocketEvent.RoomUpdateUsersForRoomUsers, ({ roomId, users }): void => {
+          store.dispatch(updateUsersInRoom({ roomId, users }))
+        })
+
         // **************************************************
         // * Table Events
         // **************************************************
 
-        socket.socket.on(SocketEvent.TableAddForAllRoomUsers, ({ roomId, userId, table }): void => {
-          store.dispatch(addTableToRoom({ roomId, userId, table }))
+        socket.socket.on(SocketEvent.RoomAddTableForRoomUsers, ({ roomId, info }): void => {
+          store.dispatch(addTableToRoom({ roomId, info }))
         })
 
-        socket.socket.on(SocketEvent.TableUpdateForAllRoomUsers, ({ roomId, tableId, table }): void => {
-          store.dispatch(updateTableInRoom({ roomId, tableId, table }))
+        socket.socket.on(SocketEvent.RoomUpdateTableForRoomUsers, ({ roomId, tableId, info, users }): void => {
+          store.dispatch(updateTableInRoom({ roomId, tableId, info, users }))
         })
 
-        socket.socket.on(SocketEvent.TableDeleteForAllRoomUsers, ({ roomId, tableId }): void => {
+        socket.socket.on(SocketEvent.RoomRemoveTableForRoomUsers, ({ roomId, tableId }): void => {
           store.dispatch(removeTableFromRoom({ roomId, tableId }))
         })
 
-        socket.socket.on(SocketEvent.TableDisplayUserJoinedMessage, ({ tableId, message }): void => {
-          store.dispatch(addMessageToTableChat({ tableId, message }))
+        socket.socket.on(SocketEvent.TableReceiveChatMessage, ({ roomId, tableId, message }): void => {
+          store.dispatch(addMessageToTableChat({ roomId, tableId, message }))
         })
 
-        socket.socket.on(SocketEvent.TableDisplayUserLeftMessage, ({ tableId, message }): void => {
-          store.dispatch(addMessageToTableChat({ tableId, message }))
+        socket.socket.on(SocketEvent.TableUserJoined, ({ roomId, tableId, towersUserRoomTable }): void => {
+          store.dispatch(addUserToTable({ roomId, tableId, towersUserRoomTable }))
         })
 
-        socket.socket.on(SocketEvent.TableReceiveChatMessage, ({ tableId, message }): void => {
-          store.dispatch(addMessageToTableChat({ tableId, message }))
-        })
+        socket.socket.on(SocketEvent.TableUserLeft, ({ roomId, tableId, user }): void => {
+          store.dispatch(removeUserFromTable({ roomId, tableId, userId: user.id }))
 
-        socket.socket.on(SocketEvent.TableUserJoined, ({ tableId, towersUserProfile }): void => {
-          store.dispatch(addUserToTable({ tableId, towersUserProfile }))
-        })
+          // Send new host of table message to the next user in line
+          const state: SocketState = store.getState().socket
+          const table: TowersTableState = state.towers[roomId]?.tables?.[tableId]
 
-        socket.socket.on(SocketEvent.TableUserLeft, ({ tableId, userId }): void => {
-          store.dispatch(removeUserFromTable({ tableId, userId }))
+          if (table) {
+            const nextTableHost: ITowersUserRoomTable = table.users
+              ?.slice()
+              .sort(
+                (a: ITowersUserRoomTable, b: ITowersUserRoomTable) =>
+                  new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+              )?.[0]
+
+            if (table.users?.length > 0) {
+              store.dispatch(
+                sendTableAutomatedChatMessage({
+                  roomId,
+                  tableId,
+                  message: `${user.username} left the table.`,
+                  type: TableChatMessageType.USER_ACTION
+                })
+              )
+
+              if (table.info && nextTableHost && table.info?.host?.userId === user.id) {
+                store.dispatch(
+                  updateTable({
+                    roomId,
+                    tableId,
+                    info: {
+                      ...table.info,
+                      host: nextTableHost?.userProfile
+                    },
+                    users: table.users
+                  })
+                )
+
+                store.dispatch(
+                  sendTableAutomatedChatMessage({
+                    roomId,
+                    tableId,
+                    message:
+                      "You are the host of the table. This gives you the power to invite to [or boot people from] your table. You may also limit other player’s access to your table by selecting its \"Table Type\".",
+                    type: TableChatMessageType.TABLE_HOST,
+                    privateToUserId: user.id
+                  })
+                )
+              }
+            }
+          }
         })
       }
     }
@@ -214,6 +263,10 @@ const socketMiddleware: Middleware = (store: MiddlewareAPI) => {
         socket.socket.emit(SocketEvent.RoomSendMessage, action.payload)
       }
 
+      if (updateUsers.match(action)) {
+        socket.socket.emit(SocketEvent.RoomUpdateUsers, action.payload)
+      }
+
       // **************************************************
       // * Table Actions
       // **************************************************
@@ -222,7 +275,7 @@ const socketMiddleware: Middleware = (store: MiddlewareAPI) => {
         socket.socket.emit(SocketEvent.TableJoin, action.payload)
       }
 
-      if (beforeLeaveTableSocketRoom.match(action)) {
+      if (leaveTableSocketRoom.match(action)) {
         socket.socket.emit(SocketEvent.TableLeave, action.payload)
       }
 

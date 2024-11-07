@@ -1,13 +1,11 @@
-import { ReactNode } from "react"
+import { PropsWithChildren, ReactNode } from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import { StoreProvider } from "@/app/store-provider"
 import { SessionDataProvider } from "@/context/session-context"
 import "./globals.scss"
 
-type RootLayoutProps = {
-  children: ReactNode
-}
+type RootLayoutProps = PropsWithChildren<{}>
 
 const inter = Inter({ subsets: ["latin"] })
 

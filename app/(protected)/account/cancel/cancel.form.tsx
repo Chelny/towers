@@ -25,7 +25,7 @@ export function CancelAccountForm(): ReactNode {
 
   useEffect(() => {
     if (state?.success) {
-      const timer = setTimeout(async () => {
+      const timer: NodeJS.Timeout = setTimeout(async () => {
         try {
           await signOut()
           router.push(ROUTE_SIGN_IN.PATH)

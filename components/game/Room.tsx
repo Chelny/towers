@@ -1,6 +1,6 @@
 "use client"
 
-import { KeyboardEvent, MouseEvent, ReactNode, useEffect, useRef, useState } from "react"
+import { KeyboardEvent, memo, MouseEvent, ReactNode, useCallback, useEffect, useRef, useState } from "react"
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime"
 import dynamic from "next/dynamic"
 import { useRouter } from "next/navigation"
@@ -8,11 +8,10 @@ import {
   ITowersRoom,
   ITowersRoomChatMessage,
   ITowersTable,
-  ITowersUserProfile,
-  ITowersUserProfileWithRelations,
+  ITowersTableWithRelations,
+  ITowersUserRoomTable,
   RoomLevel
 } from "@prisma/client"
-import { v4 as uuidv4 } from "uuid"
 import CreateTable from "@/components/game/CreateTable"
 import ServerMessage from "@/components/game/ServerMessage"
 import TableInvitation, { TableInvitationData } from "@/components/game/TableInvitation"
@@ -31,72 +30,99 @@ import {
 } from "@/constants/game"
 import { ROUTE_TOWERS } from "@/constants/routes"
 import { useSessionData } from "@/hooks/useSessionData"
+import { TowersTableState } from "@/interfaces/socket"
 import { useAppDispatch, useAppSelector } from "@/lib/hooks"
 import { addLink, removeLink } from "@/redux/features/sidebar-slice"
 import { addTable, joinRoomSocketRoom, leaveRoomSocketRoom, sendRoomChatMessage } from "@/redux/features/socket-slice"
 import {
   selectIsRoomChatLoading,
   selectIsRoomInfoLoading,
-  selectIsRoomTablesLoading,
   selectRoomChat,
   selectRoomInfo,
+  selectRoomIsJoined,
   selectRoomTables,
   selectRoomUsers
 } from "@/redux/selectors/socket-selectors"
 import { AppDispatch, RootState } from "@/redux/store"
-import { fetchRoomChat, fetchRoomInfo, fetchRoomTables, fetchRoomUsers, leaveRoom } from "@/redux/thunks/room-thunks"
-import { joinTable } from "@/redux/thunks/table-thunks"
+import {
+  fetchRoomChat,
+  fetchRoomInfo,
+  fetchRoomTables,
+  fetchRoomUsers,
+  joinRoom,
+  leaveRoom,
+  SocketRoomThunkResponse
+} from "@/redux/thunks/room-thunks"
 
 type RoomProps = {
   roomId: string
 }
 
-export default function Room({ roomId }: RoomProps): ReactNode {
+const areEqual = (prevProps: RoomProps, nextProps: RoomProps): boolean => {
+  return prevProps.roomId === nextProps.roomId
+}
+
+export default memo(function Room({ roomId }: RoomProps): ReactNode {
   const router: AppRouterInstance = useRouter()
   const { data: session } = useSessionData()
   const isConnected: boolean = useAppSelector((state: RootState) => state.socket.isConnected)
+  const isJoinedRoom: boolean = useAppSelector((state: RootState) => selectRoomIsJoined(state, roomId))
   const roomInfo: ITowersRoom | null = useAppSelector((state: RootState) => selectRoomInfo(state, roomId))
-  const isRoomInfoLoading: boolean = useAppSelector((state: RootState) => selectIsRoomInfoLoading(state, roomId))
-  const roomTables: ITowersTable[] = useAppSelector((state: RootState) => selectRoomTables(state, roomId))
-  const isRoomTablesLoading: boolean = useAppSelector((state: RootState) => selectIsRoomTablesLoading(state, roomId))
+  const isInfoLoading: boolean = useAppSelector((state: RootState) => selectIsRoomInfoLoading(state, roomId))
   const chat: ITowersRoomChatMessage[] = useAppSelector((state: RootState) => selectRoomChat(state, roomId))
   const isChatLoading: boolean = useAppSelector((state: RootState) => selectIsRoomChatLoading(state, roomId))
-  const roomUsers: ITowersUserProfile[] = useAppSelector((state: RootState) => selectRoomUsers(state, roomId))
+  const roomUsers: ITowersUserRoomTable[] = useAppSelector((state: RootState) => selectRoomUsers(state, roomId))
+  const tables: TowersTableState[] = useAppSelector((state: RootState) => selectRoomTables(state, roomId))
   const dispatch: AppDispatch = useAppDispatch()
   const messageInputRef = useRef<HTMLInputElement>(null)
   const chatEndRef = useRef<HTMLDivElement>(null)
   const [isCreateTableModalOpen, setIsCreateTableModalOpen] = useState<boolean>(false)
   const [invitationModals, setInvitationModals] = useState<{ id: string; data: TableInvitationData }[]>([])
 
-  // openInvitationModal(uuidv4(), { user: { username: "the_player1" }, table: { tableId: 67 } })
+  const initializeRoom = useCallback(
+    (signal: AbortSignal): void => {
+      if (!isJoinedRoom) {
+        dispatch(joinRoom({ roomId }))
+          .unwrap()
+          .then((data: SocketRoomThunkResponse) => {
+            if (data.towersUserRoomTable) {
+              dispatch(joinRoomSocketRoom({ roomId, towersUserRoomTable: data.towersUserRoomTable }))
+            }
 
-  useEffect(() => {
-    if (isConnected) {
-      dispatch(joinRoomSocketRoom({ roomId }))
-    }
-  }, [roomId, isConnected])
-
-  useEffect(() => {
-    if (isConnected) {
-      const abortController: AbortController = new AbortController()
-      const { signal } = abortController
-
-      dispatch(fetchRoomInfo({ roomId, signal }))
-      dispatch(fetchRoomTables({ roomId, signal }))
-      dispatch(fetchRoomChat({ roomId, signal }))
-      dispatch(fetchRoomUsers({ roomId, signal }))
-
-      return () => {
-        abortController.abort()
+            // Fetch room data
+            dispatch(fetchRoomInfo({ roomId, signal }))
+            dispatch(fetchRoomChat({ roomId, signal }))
+            dispatch(fetchRoomUsers({ roomId, signal }))
+            dispatch(fetchRoomTables({ roomId, signal }))
+          })
       }
+    },
+    [isJoinedRoom]
+  )
+
+  useEffect(() => {
+    const abortController: AbortController = new AbortController()
+    const { signal } = abortController
+
+    if (roomId && isConnected) {
+      initializeRoom(signal)
+    }
+
+    return () => {
+      abortController.abort()
     }
   }, [roomId, isConnected])
 
   useEffect(() => {
-    if (isConnected && roomInfo?.name) {
-      dispatch(addLink({ href: `${ROUTE_TOWERS.PATH}?room=${roomId}`, label: roomInfo.name }))
+    if (roomInfo) {
+      dispatch(
+        addLink({
+          href: `${ROUTE_TOWERS.PATH}?room=${roomId}`,
+          label: roomInfo.name
+        })
+      )
     }
-  }, [roomId, isConnected, roomInfo])
+  }, [roomInfo])
 
   useEffect(() => {
     scrollChatToBottom()
@@ -104,6 +130,7 @@ export default function Room({ roomId }: RoomProps): ReactNode {
 
   const openInvitationModal = (id: string, data: TableInvitationData): void => {
     setInvitationModals((prev: { id: string; data: TableInvitationData }[]) => [...prev, { id, data }])
+    // openInvitationModal(uuidv4(), { user: { username: "the_player1" }, table: { tableId: 67 } })
   }
 
   const handleCloseInvitationModal = (id: string): void => {
@@ -120,14 +147,9 @@ export default function Room({ roomId }: RoomProps): ReactNode {
   const handleOpenCreateTableModal = (): void => setIsCreateTableModalOpen(true)
   const handleCloseCreateTableModal = (): void => setIsCreateTableModalOpen(false)
 
-  const handleCreateTableSuccess = (table: ITowersTable): void => {
-    handleCloseCreateTableModal()
-    dispatch(joinTable({ roomId, tableId: table.id }))
-      .unwrap()
-      .then(() => {
-        dispatch(addTable({ roomId, table }))
-        router.push(`${ROUTE_TOWERS.PATH}?room=${roomId}&table=${table.id}`)
-      })
+  const handleCreateTableSuccess = (table: ITowersTableWithRelations): void => {
+    dispatch(addTable({ roomId, info: table }))
+    router.push(`${ROUTE_TOWERS.PATH}?room=${roomId}&table=${table.id}`)
   }
 
   const handleSendMessage = (event: KeyboardEvent<HTMLInputElement>): void => {
@@ -146,16 +168,16 @@ export default function Room({ roomId }: RoomProps): ReactNode {
   }
 
   const handleExitRoom = (): void => {
-    const tablesToQuit: { id: string; isLastUser: boolean }[] | undefined = roomTables
-      ?.filter((table: ITowersTable) =>
-        table.userProfiles.some(
-          (userProfiles: ITowersUserProfileWithRelations) =>
-            userProfiles.userId === session?.user.id && userProfiles.roomId === roomId
+    const tablesToQuit: { id: string; isLastUser: boolean }[] = tables
+      ?.filter((table: TowersTableState) =>
+        table.users?.some(
+          (userRoomTable: ITowersUserRoomTable) =>
+            userRoomTable.userProfile?.userId === session?.user.id && userRoomTable.roomId === roomId
         )
       )
-      .map((table: ITowersTable) => ({
-        id: table.id,
-        isLastUser: table.userProfiles.length === 1
+      .map((table: TowersTableState) => ({
+        id: (table.info as ITowersTable).id,
+        isLastUser: table.users.length === 1
       }))
 
     dispatch(leaveRoom({ roomId }))
@@ -179,12 +201,12 @@ export default function Room({ roomId }: RoomProps): ReactNode {
               <Button className="w-full py-2 mb-2" disabled onClick={(event: MouseEvent<HTMLButtonElement>) => {}}>
                 Play Now
               </Button>
-              <Button className="w-full py-2 mb-2" disabled={isRoomInfoLoading} onClick={handleOpenCreateTableModal}>
+              <Button className="w-full py-2 mb-2" disabled={isInfoLoading} onClick={handleOpenCreateTableModal}>
                 Create Table
               </Button>
             </div>
             <div className="mt-4">
-              {roomInfo?.difficulty !== RoomLevel.SOCIAL && (
+              {roomInfo && roomInfo?.difficulty !== RoomLevel.SOCIAL && (
                 <>
                   <div>
                     <span className="p-1 rounded-tl rounded-tr bg-sky-700 text-white text-sm">Ratings</span>
@@ -247,19 +269,20 @@ export default function Room({ roomId }: RoomProps): ReactNode {
                 <div className="flex-1 px-2">Who is Watching</div>
               </div>
               <div className="flex-1 flex flex-col overflow-y-auto">
-                {roomTables?.map((table: ITowersTable) => (
-                  <RoomTable key={table.id} roomId={roomId} table={table} isRoomTablesLoading={isRoomTablesLoading} />
-                ))}
+                {tables?.map(
+                  (table: TowersTableState) =>
+                    table?.info?.id && <RoomTable key={table?.info?.id} roomId={roomId} tableId={table?.info?.id} />
+                )}
               </div>
             </div>
 
             {/* Chat and users list */}
             <div className="flex gap-2 h-96 p-2 border bg-white">
               <div className="flex-1 flex flex-col">
-                <ServerMessage socketRoom={roomId} />
+                <ServerMessage roomId={roomId} />
 
                 {/* Chat */}
-                <div className="flex-1 flex flex-col overflow-hidden">
+                <div className="flex-1 flex flex-col gap-1 overflow-hidden">
                   <input
                     ref={messageInputRef}
                     type="text"
@@ -277,7 +300,11 @@ export default function Room({ roomId }: RoomProps): ReactNode {
               </div>
 
               <div className="w-1/4 lg:w-96 overflow-hidden">
-                <PlayersList users={roomUsers} full isRatingsVisible={roomInfo?.difficulty !== RoomLevel.SOCIAL} />
+                <PlayersList
+                  users={roomUsers}
+                  full
+                  isRatingsVisible={roomInfo && roomInfo?.difficulty !== RoomLevel.SOCIAL}
+                />
               </div>
             </div>
           </div>
@@ -285,7 +312,6 @@ export default function Room({ roomId }: RoomProps): ReactNode {
       </div>
 
       <CreateTable
-        key={uuidv4()}
         isOpen={isCreateTableModalOpen}
         roomId={roomId}
         onSubmitSuccess={handleCreateTableSuccess}
@@ -303,7 +329,7 @@ export default function Room({ roomId }: RoomProps): ReactNode {
       ))}
     </>
   )
-}
+}, areEqual)
 
 const RoomHeader = dynamic(() => import("@/components/game/RoomHeader"), {
   loading: () => <RoomHeaderSkeleton />

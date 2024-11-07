@@ -1,11 +1,10 @@
 "use client"
 
-import React, { KeyboardEvent, ReactElement, ReactNode, useEffect, useRef, useState } from "react"
+import React, { KeyboardEvent, PropsWithChildren, ReactElement, ReactNode, useEffect, useRef, useState } from "react"
 import clsx from "clsx/lite"
 import { PiCaretDownDuotone, PiCaretDownFill } from "react-icons/pi"
 
-type SelectProps = {
-  children: ReactNode
+type SelectProps = PropsWithChildren<{
   id: string
   label?: string
   className?: string
@@ -17,7 +16,7 @@ type SelectProps = {
   description?: string
   errorMessage?: string
   onChange?: (value: string) => void
-}
+}>
 
 export default function Select({
   children,
@@ -168,10 +167,9 @@ export default function Select({
   )
 }
 
-type SelectOptionProps = {
-  children: ReactNode
+type SelectOptionProps = PropsWithChildren<{
   value: string
-}
+}>
 
 const Option = ({ children, value }: SelectOptionProps): ReactNode => null
 

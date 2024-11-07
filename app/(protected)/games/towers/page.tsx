@@ -1,7 +1,7 @@
 import { ReactNode } from "react"
 import type { Metadata } from "next"
 import { NextResponse } from "next/server"
-import { IRoomListItemWithUsersCount, ITowersUserProfileWithRelations, TowersRoom, TowersTable } from "@prisma/client"
+import { ITowersRoomWithUsersCount, ITowersUserProfile, TowersRoom, TowersTable } from "@prisma/client"
 import { GET } from "@/app/api/rooms/route"
 import RoomsList from "@/components/game/RoomsList"
 import TowersPageContent from "@/components/game/TowersPageContent"
@@ -29,7 +29,7 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
       })
 
       if (table) {
-        const tableHost: ITowersUserProfileWithRelations | null = await prisma.towersUserProfile.findUnique({
+        const tableHost: ITowersUserProfile | null = await prisma.towersUserProfile.findUnique({
           where: { userId: table?.hostId },
           include: { user: true }
         })
@@ -42,11 +42,7 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
   }
 
   return {
-    title,
-    robots: {
-      index: false,
-      follow: false
-    }
+    title
   }
 }
 
@@ -57,7 +53,7 @@ export default async function Towers({ searchParams }: PageProps): Promise<React
   if (!roomId) {
     const response: NextResponse = await GET()
     const data = await response.json()
-    const rooms: IRoomListItemWithUsersCount[] = data.data
+    const rooms: ITowersRoomWithUsersCount[] = data.data
 
     return (
       <>

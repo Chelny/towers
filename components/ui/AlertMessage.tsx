@@ -1,12 +1,11 @@
-import { ReactNode } from "react"
+import { PropsWithChildren, ReactNode } from "react"
 import clsx from "clsx/lite"
 
-type AlertMessageProps = {
+type AlertMessageProps = PropsWithChildren<{
   type?: "info" | "warning" | "success" | "error"
-  children: ReactNode
-}
+}>
 
-export default function AlertMessage({ type = "info", children }: AlertMessageProps): ReactNode {
+export default function AlertMessage({ children, type = "info" }: AlertMessageProps): ReactNode {
   return (
     <div
       className={clsx(

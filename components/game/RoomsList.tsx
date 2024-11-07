@@ -3,37 +3,31 @@
 import { ReactNode } from "react"
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime"
 import { useRouter } from "next/navigation"
-import { IRoomListItemWithUsersCount } from "@prisma/client"
+import { ITowersRoomWithUsersCount } from "@prisma/client"
 import clsx from "clsx/lite"
 import Button from "@/components/ui/Button"
 import { ROUTE_TOWERS } from "@/constants/routes"
 import { useSessionData } from "@/hooks/useSessionData"
-import { useAppDispatch, useAppSelector } from "@/lib/hooks"
-import { RoomState } from "@/redux/features/socket-slice"
-import { AppDispatch, RootState } from "@/redux/store"
-import { joinRoom } from "@/redux/thunks/room-thunks"
+import { TowersRoomState } from "@/interfaces/socket"
+import { useAppSelector } from "@/lib/hooks"
+import { RootState } from "@/redux/store"
 
 type RoomsListProps = {
-  rooms: IRoomListItemWithUsersCount[]
+  rooms: ITowersRoomWithUsersCount[]
 }
 
 export default function RoomsList({ rooms }: RoomsListProps): ReactNode {
   const router: AppRouterInstance = useRouter()
   const { status } = useSessionData()
-  const joinedRooms: Record<string, RoomState> = useAppSelector((state: RootState) => state.socket.rooms)
-  const dispatch: AppDispatch = useAppDispatch()
+  const joinedRooms: Record<string, TowersRoomState> = useAppSelector((state: RootState) => state.socket.towers)
 
   const handleJoinRoom = (roomId: string): void => {
-    dispatch(joinRoom({ roomId }))
-      .unwrap()
-      .then(() => {
-        router.push(`${ROUTE_TOWERS.PATH}?room=${roomId}`)
-      })
+    router.push(`${ROUTE_TOWERS.PATH}?room=${roomId}`)
   }
 
   return (
     <ul className="grid grid-cols-[repeat(auto-fill,_minmax(14rem,_1fr))] gap-8">
-      {rooms.map((room: IRoomListItemWithUsersCount) => (
+      {rooms.map((room: ITowersRoomWithUsersCount) => (
         <li
           key={room.id}
           className={clsx(

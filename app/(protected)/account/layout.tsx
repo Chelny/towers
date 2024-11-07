@@ -1,9 +1,7 @@
-import { ReactNode } from "react"
+import { PropsWithChildren, ReactNode } from "react"
 import clsx from "clsx/lite"
 
-type AccountLayoutProps = {
-  children: ReactNode
-}
+type AccountLayoutProps = PropsWithChildren<{}>
 
 export default function AccountLayout({ children }: AccountLayoutProps): ReactNode {
   return (

@@ -6,8 +6,11 @@
 - Add predefined avatars or let users upload their picture
 - Sign in with passkey (currently experimental and not yet recommended for production use)
 - Double check account deletion date (timezone) in email
+- Prevent user from accessing their account when in a game room (show prompt on click)
 
 ## Room
+
+- Prevent user from accessing a room directly by its URL (eg.: full rooms)
 
 ### Invitation Request
 
@@ -24,6 +27,10 @@
 
 ## Table
 
+- Prevent user from accessing a table directly by its URL (eg.: private tables)
+- FIXME: In HTML, <form> cannot be a descendant of <form>
+- FIXME: POST /api/tables/$tableId/chat 409
+
 ### Sidebar
 
 - Boot user endpoint + socket event
@@ -33,19 +40,15 @@
 
 - Attacks should be sent to the opponents’ board
 - Seated user from teams 2-4 must play their game from team 1’s seat
-- Should conside other team player’s board when placing pieces
+- Should consider other team player’s board when placing pieces
 
 ### Chat
 
-- \*\*\* [username]’s old rating: 2050; new rating: 2040
+- Ratings update: \*\*\* [username]’s old rating: 2050; new rating: 2040
 - Cipher key:
   - Cipher key text: for each Towers made on game board. Example: "\*\*\* V ==> M"
   - Code after winning 25 games in the space of 2 hours: "2FKK 2OF W1VAM2FO 91MO 8EWOF2 NF9 7HW3FE" (no asterisks at the beginning)
-  - Hero text: Click on chat input, click on TAB then type. Shouldn’t see it typed anywhere. Example: "\*\*\* [username] is a hero of Yahoo! Towers."
-- Host of the table text: "\*\*\* You are the host of the table. This gives you the power to invite to [or boot people from] your table. You may also limit other player’s access to your table by selecting its "Table Type"."
-- Table type:
-  - Protected table text: "\*\*\* Only people you have invited may play now."
-  - Private table text: "\*\*\* Only people you have invited may play or watch your table now."
+  - Hero message: Click on chat input, click on TAB then type. Shouldn’t see it typed anywhere. Example: "\*\*\* [username] is a hero of Yahoo! Towers."
 
 ## Server
 

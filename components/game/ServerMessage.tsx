@@ -7,17 +7,24 @@ import { useAppSelector } from "@/lib/hooks"
 import { RootState } from "@/redux/store"
 
 type ServerMessageProps = {
-  socketRoom: string
+  roomId: string
+  tableId?: string
 }
 
-export default function ServerMessage({ socketRoom }: ServerMessageProps): ReactNode {
+export default function ServerMessage({ roomId, tableId }: ServerMessageProps): ReactNode {
   const { data: session, status } = useSessionData()
   const isConnected: boolean = useAppSelector((state: RootState) => state.socket.isConnected)
-  const errorMessage: string | undefined = useAppSelector(
-    (state: RootState) =>
-      state.socket.errorMessage ??
-      (socketRoom && (state.socket.rooms[socketRoom]?.errorMessage ?? state.socket.tables[socketRoom]?.errorMessage))
-  )
+  const errorMessage: string | null = useAppSelector((state: RootState) => {
+    if (state.socket.errorMessage) {
+      return state.socket.errorMessage
+    } else {
+      if (roomId && tableId) {
+        return state.socket.towers[roomId].tables[tableId]?.errorMessage
+      }
+
+      return state.socket.towers[roomId]?.errorMessage
+    }
+  })
   const [isInitialized, setIsInitialized] = useState<boolean>(false)
 
   useEffect(() => {

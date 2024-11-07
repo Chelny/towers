@@ -3,6 +3,7 @@ import {
   TableType,
   TowersRoomChatMessage,
   TowersTable,
+  TowersTableChatMessage,
   TowersUserProfile,
   User,
   UserStatus
@@ -14,7 +15,16 @@ const options = {
   environment: { type: "string" }
 }
 
-async function createRooms(): Promise<void> {
+async function main(): Promise<void> {
+  const {
+    values: { environment }
+    // @ts-ignore
+  } = parseArgs({ options })
+
+  // **************************************************
+  // * TowersRoom
+  // **************************************************
+
   await prisma.towersRoom.createMany({
     data: [
       { name: "Eiffel Tower", difficulty: RoomLevel.SOCIAL },
@@ -22,20 +32,10 @@ async function createRooms(): Promise<void> {
       { name: "CN Tower", difficulty: RoomLevel.ADVANCED }
     ]
   })
-}
-
-async function main(): Promise<void> {
-  const {
-    values: { environment }
-    // @ts-ignore
-  } = parseArgs({ options })
-
-  createRooms()
 
   if (environment === "production") {
   } else if (environment === "staging") {
   } else {
-    // development
     // **************************************************
     // * Users
     // **************************************************
@@ -86,8 +86,10 @@ async function main(): Promise<void> {
       }))
     })
 
+    const users: User[] = await prisma.user.findMany()
+
     // **************************************************
-    // * Rooms
+    // * TowersRoom
     // **************************************************
 
     const towersRoom1 = await prisma.towersRoom.findUnique({
@@ -98,10 +100,8 @@ async function main(): Promise<void> {
 
     if (towersRoom1) {
       // **************************************************
-      // * TowersUserProfile (create)
+      // * TowersUserProfile
       // **************************************************
-
-      const users: User[] = await prisma.user.findMany()
 
       const towersUserProfileData: Partial<TowersUserProfile>[] = users.map((user: User) => ({
         userId: user.id,
@@ -117,7 +117,7 @@ async function main(): Promise<void> {
       const towersUserProfiles: TowersUserProfile[] = await prisma.towersUserProfile.findMany()
 
       // **************************************************
-      // * Tables
+      // * TowersTable
       // **************************************************
 
       type TTable = Pick<TowersTable, "tableNumber" | "hostId" | "tableType" | "rated">
@@ -125,19 +125,19 @@ async function main(): Promise<void> {
       const tablesData: TTable[] = [
         {
           tableNumber: 1,
-          hostId: users[0].id,
+          hostId: towersUserProfiles[0].id,
           tableType: TableType.PUBLIC,
           rated: true
         },
         {
           tableNumber: 2,
-          hostId: users[3].id,
+          hostId: towersUserProfiles[3].id,
           tableType: TableType.PROTECTED,
           rated: false
         },
         {
           tableNumber: 3,
-          hostId: users[4].id,
+          hostId: towersUserProfiles[4].id,
           tableType: TableType.PRIVATE,
           rated: true
         }
@@ -153,32 +153,31 @@ async function main(): Promise<void> {
       const tables: TowersTable[] = await prisma.towersTable.findMany()
 
       // **************************************************
-      // * TowersUserProfile (update)
+      // * TowersUserRoomTable
       // **************************************************
 
-      // Add users to the tables
       for (let i = 0; i < towersUserProfiles.length; i++) {
         if (i < 3) {
-          await prisma.towersUserProfile.update({
-            where: { userId: users[i].id },
+          await prisma.towersUserRoomTable.create({
             data: {
+              userProfileId: towersUserProfiles[i].id,
               roomId: tables[0].roomId,
               tableId: tables[0].id,
               seatNumber: i + 1
             }
           })
         } else if (i === 3) {
-          await prisma.towersUserProfile.update({
-            where: { userId: users[i].id },
+          await prisma.towersUserRoomTable.create({
             data: {
+              userProfileId: towersUserProfiles[i].id,
               roomId: tables[1].roomId,
               tableId: tables[1].id
             }
           })
         } else if (i === 4) {
-          await prisma.towersUserProfile.update({
-            where: { userId: users[i].id },
+          await prisma.towersUserRoomTable.create({
             data: {
+              userProfileId: towersUserProfiles[i].id,
               roomId: tables[2].roomId,
               tableId: tables[2].id
             }
@@ -187,22 +186,22 @@ async function main(): Promise<void> {
       }
 
       // **************************************************
-      // * Room Chat Message
+      // * TowersRoomChatMessage
       // **************************************************
 
-      type TRoomChatMessage = Pick<TowersRoomChatMessage, "userId" | "message">
+      type TRoomChatMessage = Pick<TowersRoomChatMessage, "userProfileId" | "message">
 
       const roomChatMessages: TRoomChatMessage[] = [
         {
-          userId: users[0].id,
+          userProfileId: towersUserProfiles[0].id,
           message: "Hello from Room 1!"
         },
         {
-          userId: users[1].id,
+          userProfileId: towersUserProfiles[1].id,
           message: "Hey everyone!"
         },
         {
-          userId: users[2].id,
+          userProfileId: towersUserProfiles[2].id,
           message: "Let’s play!"
         }
       ]
@@ -215,30 +214,30 @@ async function main(): Promise<void> {
       })
 
       // **************************************************
-      // * Table Chat Message
+      // * TowersTableChatMessage
       // **************************************************
 
-      type TTableChatMessage = Pick<TowersRoomChatMessage, "userId" | "message">
+      type TTableChatMessage = Pick<TowersTableChatMessage, "userProfileId" | "message">
 
       const tableChatMessages: TTableChatMessage[] = [
         {
-          userId: users[0].id,
+          userProfileId: towersUserProfiles[0].id,
           message: "Hello from Room 1!"
         },
         {
-          userId: users[1].id,
+          userProfileId: towersUserProfiles[1].id,
           message: "Hey everyone!"
         },
         {
-          userId: users[2].id,
+          userProfileId: towersUserProfiles[2].id,
           message: "Let’s play!"
         },
         {
-          userId: users[0].id,
+          userProfileId: towersUserProfiles[0].id,
           message: "Hi!! Let the game begin!"
         },
         {
-          userId: users[1].id,
+          userProfileId: towersUserProfiles[1].id,
           message: "Let’s GOOOOO!"
         }
       ]

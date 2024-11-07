@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react"
 import { Mock } from "vitest"
-import { mockSocketRoom1Table1Id, mockSocketStateTables } from "@/__mocks__/data/socketState"
+import { mockTowersTableState11Users } from "@/__mocks__/data/socketState"
 import TableInviteUser from "@/components/game/TableInviteUser"
 
 describe("TableInviteUser Component", () => {
@@ -13,11 +13,7 @@ describe("TableInviteUser Component", () => {
     const mockHandleCancel: Mock = vi.fn()
 
     render(
-      <TableInviteUser
-        isOpen={true}
-        users={mockSocketStateTables[mockSocketRoom1Table1Id].users}
-        onCancel={mockHandleCancel}
-      />
+      <TableInviteUser isOpen={true} users={mockTowersTableState11Users} isRatingsVisible onCancel={mockHandleCancel} />
     )
 
     expect(screen.getByText("Invite User")).toBeInTheDocument()
@@ -27,11 +23,7 @@ describe("TableInviteUser Component", () => {
     const mockHandleCancel: Mock = vi.fn()
 
     render(
-      <TableInviteUser
-        isOpen={true}
-        users={mockSocketStateTables[mockSocketRoom1Table1Id].users}
-        onCancel={mockHandleCancel}
-      />
+      <TableInviteUser isOpen={true} users={mockTowersTableState11Users} isRatingsVisible onCancel={mockHandleCancel} />
     )
 
     fireEvent.click(screen.getByText("Invite"))
@@ -42,11 +34,7 @@ describe("TableInviteUser Component", () => {
     const mockHandleCancel: Mock = vi.fn()
 
     render(
-      <TableInviteUser
-        isOpen={true}
-        users={mockSocketStateTables[mockSocketRoom1Table1Id].users}
-        onCancel={mockHandleCancel}
-      />
+      <TableInviteUser isOpen={true} users={mockTowersTableState11Users} isRatingsVisible onCancel={mockHandleCancel} />
     )
 
     fireEvent.click(screen.getByText("Cancel"))

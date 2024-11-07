@@ -1,7 +1,7 @@
 "use client"
 
 import { FormEvent, ReactNode, useState } from "react"
-import { ITowersTable, TableType } from "@prisma/client"
+import { ITowersTableWithRelations, TableType } from "@prisma/client"
 import { Type } from "@sinclair/typebox"
 import { Value, ValueError } from "@sinclair/typebox/value"
 import axios, { AxiosResponse } from "axios"
@@ -9,28 +9,21 @@ import Checkbox from "@/components/ui/Checkbox"
 import Modal from "@/components/ui/Modal"
 import Select from "@/components/ui/Select"
 import { useSessionData } from "@/hooks/useSessionData"
-
-export const createTableSchema = Type.Object({
-  tableType: Type.Union([
-    Type.Literal(TableType.PUBLIC),
-    Type.Literal(TableType.PROTECTED),
-    Type.Literal(TableType.PRIVATE)
-  ]),
-  rated: Type.Boolean()
-})
-
-export type CreateTableFormData = SchemaFormData<typeof createTableSchema>
-export type CreateTableFormErrorMessages = SchemaFormErrorMessages<keyof CreateTableFormData>
+import { useAppDispatch } from "@/lib/hooks"
+import { roomErrorMessage } from "@/redux/features/socket-slice"
+import { AppDispatch } from "@/redux/store"
+import { getAxiosError } from "@/utils/api"
 
 type CreateTableProps = {
   isOpen: boolean
   roomId: string
-  onSubmitSuccess: (table: ITowersTable) => void
+  onSubmitSuccess: (table: ITowersTableWithRelations) => void
   onCancel: () => void
 }
 
 export default function CreateTable({ isOpen, roomId, onSubmitSuccess, onCancel }: CreateTableProps): ReactNode {
   const { data: session } = useSessionData()
+  const dispatch: AppDispatch = useAppDispatch()
   const [errorMessages, setErrorMessages] = useState<CreateTableFormErrorMessages>({})
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
 
@@ -75,14 +68,13 @@ export default function CreateTable({ isOpen, roomId, onSubmitSuccess, onCancel 
       const response: AxiosResponse = await axios.post("/api/tables", {
         ...body,
         roomId,
-        hostId: session?.user.id
+        userId: session?.user.id
       })
 
-      if (response.status === 201) {
-        onSubmitSuccess(response.data.data)
-      }
+      onSubmitSuccess(response.data.data)
+      onCancel?.()
     } catch (error) {
-      console.error("Error creating table:", error)
+      dispatch(roomErrorMessage({ roomId, message: getAxiosError(error).message }))
     } finally {
       setIsSubmitting(false)
     }
@@ -90,29 +82,39 @@ export default function CreateTable({ isOpen, roomId, onSubmitSuccess, onCancel 
 
   return (
     <Modal
-      title="Create Table"
       isOpen={isOpen}
+      title="Create Table"
       confirmText="Create"
       isConfirmButtonDisabled={isSubmitting}
       dataTestId="create-table-modal"
       onConfirm={handleFormValidation}
       onCancel={onCancel}
     >
-      <div className="h-full mb-2">
-        <Select
-          id="tableType"
-          label="Table Type"
-          defaultValue={TableType.PUBLIC}
-          required
-          errorMessage={errorMessages.tableType}
-        >
-          <Select.Option value={TableType.PUBLIC}>Public</Select.Option>
-          <Select.Option value={TableType.PROTECTED}>Protected</Select.Option>
-          <Select.Option value={TableType.PRIVATE}>Private</Select.Option>
-        </Select>
+      <Select
+        id="tableType"
+        label="Table Type"
+        defaultValue={TableType.PUBLIC}
+        required
+        errorMessage={errorMessages.tableType}
+      >
+        <Select.Option value={TableType.PUBLIC}>Public</Select.Option>
+        <Select.Option value={TableType.PROTECTED}>Protected</Select.Option>
+        <Select.Option value={TableType.PRIVATE}>Private</Select.Option>
+      </Select>
 
-        <Checkbox id="rated" label="Rated Game" defaultChecked={true} errorMessage={errorMessages.rated} />
-      </div>
+      <Checkbox id="rated" label="Rated Game" defaultChecked={true} errorMessage={errorMessages.rated} />
     </Modal>
   )
 }
+
+export const createTableSchema = Type.Object({
+  tableType: Type.Union([
+    Type.Literal(TableType.PUBLIC),
+    Type.Literal(TableType.PROTECTED),
+    Type.Literal(TableType.PRIVATE)
+  ]),
+  rated: Type.Boolean()
+})
+
+export type CreateTableFormData = SchemaFormData<typeof createTableSchema>
+export type CreateTableFormErrorMessages = SchemaFormErrorMessages<keyof CreateTableFormData>

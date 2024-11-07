@@ -1,6 +1,6 @@
 "use client"
 
-import { ReactNode, useState } from "react"
+import { PropsWithChildren, ReactNode, useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import clsx from "clsx/lite"
@@ -9,8 +9,7 @@ import { IconType } from "react-icons/lib"
 
 export type AccordionLink = { href: string; label: string }
 
-type SidebarMenuItemProps = {
-  children: ReactNode
+type SidebarMenuItemProps = PropsWithChildren<{
   Icon: IconType
   ariaLabel: string
   isExpanded: boolean
@@ -19,7 +18,7 @@ type SidebarMenuItemProps = {
   accordionLinks?: AccordionLink[]
   disabled?: boolean
   onClick?: () => void
-}
+}>
 
 export default function SidebarMenuItem({
   children,
@@ -65,6 +64,7 @@ export default function SidebarMenuItem({
             "disabled:opacity-50 disabled:cursor-not-allowed",
             href && pathname === href && "font-semibold"
           )}
+          aria-label={ariaLabel}
         >
           <span
             className={clsx(
@@ -152,6 +152,7 @@ export default function SidebarMenuItem({
                 "flex items-center gap-4 w-full p-2 rounded-md ms-2",
                 pathname?.includes(link.href) && "text-white/90 font-semibold"
               )}
+              aria-label={ariaLabel}
             >
               {link.label}
             </Link>

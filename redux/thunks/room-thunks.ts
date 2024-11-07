@@ -1,32 +1,50 @@
-import { ITowersRoom, ITowersRoomChatMessage, ITowersTable, ITowersUserProfile } from "@prisma/client"
+import { ITowersRoom, ITowersRoomChatMessage, ITowersTable, ITowersUserRoomTable } from "@prisma/client"
 import { createAsyncThunk } from "@reduxjs/toolkit"
-import axios, { AxiosResponse } from "axios"
+import axios, { AxiosResponse, CancelTokenSource } from "axios"
+import { getAxiosError } from "@/utils/api"
 
-export interface SocketRoomThunk {
+export interface SocketRoomThunkProps {
   roomId: string
 }
 
-export const joinRoom = createAsyncThunk<SocketRoomThunk, SocketRoomThunk, { rejectValue: string }>(
+export interface SocketRoomThunkResponse {
+  roomId: string
+  towersUserRoomTable?: ITowersUserRoomTable
+}
+
+export const joinRoom = createAsyncThunk<SocketRoomThunkResponse, SocketRoomThunkProps, { rejectValue: string }>(
   "socket/joinRoom",
-  async ({ roomId }: SocketRoomThunk, { rejectWithValue }) => {
+  async ({ roomId }: SocketRoomThunkProps, { signal, rejectWithValue }) => {
     try {
-      await axios.patch("/api/socket/room/join", { roomId })
-      return { roomId }
+      const source: CancelTokenSource = axios.CancelToken.source()
+
+      signal.addEventListener("abort", () => {
+        source.cancel()
+      })
+
+      const response = await axios.patch("/api/socket/room/join", { roomId })
+      return { roomId, towersUserRoomTable: response.data.data }
     } catch (error) {
-      console.error(error)
+      getAxiosError(error)
       return rejectWithValue("Failed to join room")
     }
   }
 )
 
-export const leaveRoom = createAsyncThunk<SocketRoomThunk, SocketRoomThunk, { rejectValue: string }>(
+export const leaveRoom = createAsyncThunk<SocketRoomThunkResponse, SocketRoomThunkProps, { rejectValue: string }>(
   "socket/leaveRoom",
-  async ({ roomId }: SocketRoomThunk, { rejectWithValue }) => {
+  async ({ roomId }: SocketRoomThunkProps, { signal, rejectWithValue }) => {
     try {
+      const source: CancelTokenSource = axios.CancelToken.source()
+
+      signal.addEventListener("abort", () => {
+        source.cancel()
+      })
+
       await axios.patch("/api/socket/room/leave", { roomId })
       return { roomId }
     } catch (error) {
-      console.error(error)
+      getAxiosError(error)
       return rejectWithValue("Failed to leave room")
     }
   }
@@ -51,35 +69,7 @@ export const fetchRoomInfo = createAsyncThunk<
     if (axios.isCancel(error)) {
       console.log("Fetch room info request was cancelled")
     } else {
-      console.error(error)
-    }
-
-    return rejectWithValue(errorMessage)
-  }
-})
-
-export const fetchRoomTables = createAsyncThunk<
-  ITowersTable[],
-  { roomId: string; signal?: AbortSignal },
-  { rejectValue: string }
->("socket/fetchRoomTables", async ({ roomId, signal }, { rejectWithValue }) => {
-  const errorMessage: string = "Failed to fetch room tables"
-
-  try {
-    const response: AxiosResponse<ApiResponse<ITowersTable[]>> = await axios.get(`/api/rooms/${roomId}/tables`, {
-      signal
-    })
-
-    if (!response.data.data) {
-      return rejectWithValue(errorMessage)
-    }
-
-    return response.data.data
-  } catch (error) {
-    if (axios.isCancel(error)) {
-      console.log("Fetch room tables request was cancelled")
-    } else {
-      console.error(error)
+      getAxiosError(error)
     }
 
     return rejectWithValue(errorMessage)
@@ -108,7 +98,7 @@ export const fetchRoomChat = createAsyncThunk<
     if (axios.isCancel(error)) {
       console.log("Fetch room chat request was cancelled")
     } else {
-      console.error(error)
+      getAxiosError(error)
     }
 
     return rejectWithValue(errorMessage)
@@ -116,14 +106,14 @@ export const fetchRoomChat = createAsyncThunk<
 })
 
 export const fetchRoomUsers = createAsyncThunk<
-  ITowersUserProfile[],
+  ITowersUserRoomTable[],
   { roomId: string; signal?: AbortSignal },
   { rejectValue: string }
 >("socket/fetchRoomUsers", async ({ roomId, signal }, { rejectWithValue }) => {
   const errorMessage: string = "Failed to fetch room users"
 
   try {
-    const response: AxiosResponse<ApiResponse<ITowersUserProfile[]>> = await axios.get(`/api/rooms/${roomId}/users`, {
+    const response: AxiosResponse<ApiResponse<ITowersUserRoomTable[]>> = await axios.get(`/api/rooms/${roomId}/users`, {
       signal
     })
 
@@ -136,7 +126,35 @@ export const fetchRoomUsers = createAsyncThunk<
     if (axios.isCancel(error)) {
       console.log("Fetch room users request was cancelled")
     } else {
-      console.error(error)
+      getAxiosError(error)
+    }
+
+    return rejectWithValue(errorMessage)
+  }
+})
+
+export const fetchRoomTables = createAsyncThunk<
+  ITowersTable[],
+  { roomId: string; signal?: AbortSignal },
+  { rejectValue: string }
+>("socket/fetchRoomTables", async ({ roomId, signal }, { rejectWithValue }) => {
+  const errorMessage: string = "Failed to fetch room tables"
+
+  try {
+    const response: AxiosResponse<ApiResponse<ITowersTable[]>> = await axios.get(`/api/rooms/${roomId}/tables`, {
+      signal
+    })
+
+    if (!response.data.data) {
+      return rejectWithValue(errorMessage)
+    }
+
+    return response.data.data
+  } catch (error) {
+    if (axios.isCancel(error)) {
+      console.log("Fetch room tables request was cancelled")
+    } else {
+      getAxiosError(error)
     }
 
     return rejectWithValue(errorMessage)

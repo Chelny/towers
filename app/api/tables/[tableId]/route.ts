@@ -1,30 +1,71 @@
 import { NextRequest, NextResponse } from "next/server"
-import { ITowersTable } from "@prisma/client"
+import { TowersTable } from "@prisma/client"
+import { Session } from "next-auth"
+import { auth } from "@/auth"
 import prisma from "@/lib/prisma"
+import { badRequestMissingTableId, getPrismaError, unauthorized } from "@/utils/api"
 
 export async function GET(request: NextRequest, context: { params: { tableId: string } }): Promise<NextResponse> {
-  const { tableId } = context.params
+  try {
+    const { tableId } = context.params
 
-  const table: ITowersTable | null = await prisma.towersTable.findUnique({
-    where: {
-      id: tableId
-    },
-    include: {
-      room: true,
-      host: true,
-      userProfiles: {
-        include: {
-          user: true
+    if (!tableId) return badRequestMissingTableId()
+
+    const table: TowersTable | null = await prisma.towersTable.findUnique({
+      where: {
+        id: tableId
+      },
+      include: {
+        host: {
+          include: {
+            user: true
+          }
+        },
+        userRoomTables: {
+          include: {
+            userProfile: {
+              include: {
+                user: true
+              }
+            }
+          }
         }
       }
-    }
-  })
+    })
 
-  return NextResponse.json(
-    {
-      success: true,
-      data: table
-    },
-    { status: 200 }
-  )
+    return NextResponse.json(
+      {
+        success: true,
+        data: table
+      },
+      { status: 200 }
+    )
+  } catch (error) {
+    return getPrismaError(error)
+  }
+}
+
+export async function PATCH(request: NextRequest, context: { params: { tableId: string } }): Promise<NextResponse> {
+  try {
+    const session: Session | null = await auth()
+
+    if (!session) return unauthorized()
+
+    const { tableType, rated } = await request.json()
+
+    const table: TowersTable = await prisma.towersTable.update({
+      where: { id: context.params.tableId },
+      data: { tableType, rated }
+    })
+
+    return NextResponse.json(
+      {
+        success: true,
+        data: table
+      },
+      { status: 200 }
+    )
+  } catch (error) {
+    return getPrismaError(error)
+  }
 }

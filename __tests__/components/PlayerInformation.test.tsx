@@ -1,9 +1,7 @@
+import { ITowersUserRoomTable } from "@prisma/client"
 import { fireEvent, render, screen } from "@testing-library/react"
 import { Mock } from "vitest"
-import {
-  mockRoom1Table1TowersUserProfile1,
-  mockRoom1Table1TowersUserProfile2
-} from "@/__mocks__/data/towersUserProfiles"
+import { mockTowersRoomState1Users } from "@/__mocks__/data/socketState"
 import { mockAuthenticatedSession } from "@/__mocks__/data/users"
 import PlayerInformation from "@/components/game/PlayerInformation"
 import { useSessionData } from "@/hooks/useSessionData"
@@ -13,6 +11,9 @@ vi.mock("@/hooks/useSessionData", () => ({
 }))
 
 describe("PlayerInformation Component", () => {
+  const player1: ITowersUserRoomTable = mockTowersRoomState1Users[0]
+  const player2: ITowersUserRoomTable = mockTowersRoomState1Users[1]
+
   beforeAll(() => {
     HTMLDialogElement.prototype.showModal = vi.fn()
     HTMLDialogElement.prototype.close = vi.fn()
@@ -25,7 +26,7 @@ describe("PlayerInformation Component", () => {
   it("should hide message input and \"Send\" button when viewing current user's information", () => {
     const handleCancel: Mock = vi.fn()
 
-    render(<PlayerInformation isOpen={true} player={mockRoom1Table1TowersUserProfile1} onCancel={handleCancel} />)
+    render(<PlayerInformation isOpen={true} player={player1} onCancel={handleCancel} />)
 
     expect(screen.queryByLabelText("Send instant message (optional)")).not.toBeInTheDocument()
     expect(screen.queryByText("Send")).not.toBeInTheDocument()
@@ -34,31 +35,20 @@ describe("PlayerInformation Component", () => {
   it("should display player information correctly when the modal is open", () => {
     const handleCancel: Mock = vi.fn()
 
-    render(
-      <PlayerInformation
-        isOpen={true}
-        player={mockRoom1Table1TowersUserProfile2}
-        isRatingsVisible
-        onCancel={handleCancel}
-      />
-    )
+    render(<PlayerInformation isOpen={true} player={player2} isRatingsVisible onCancel={handleCancel} />)
 
-    expect(
-      screen.getByText(`Player information of ${mockRoom1Table1TowersUserProfile2.user.username}`)
-    ).toBeInTheDocument()
-    expect(screen.getByText(new RegExp(`Rating: ${mockRoom1Table1TowersUserProfile2.rating}`))).toBeInTheDocument()
-    expect(
-      screen.getByText(new RegExp(`Games Completed: ${mockRoom1Table1TowersUserProfile2.gamesCompleted}`))
-    ).toBeInTheDocument()
-    expect(screen.getByText(new RegExp(`Wins: ${mockRoom1Table1TowersUserProfile2.wins}`))).toBeInTheDocument()
-    expect(screen.getByText(new RegExp(`Loses: ${mockRoom1Table1TowersUserProfile2.loses}`))).toBeInTheDocument()
-    expect(screen.getByText(new RegExp(`Streak: ${mockRoom1Table1TowersUserProfile2.streak}`))).toBeInTheDocument()
+    expect(screen.getByText(`Player information of ${player2.userProfile?.user?.username}`)).toBeInTheDocument()
+    expect(screen.getByText(new RegExp(`Rating: ${player2.userProfile?.rating}`))).toBeInTheDocument()
+    expect(screen.getByText(new RegExp(`Games Completed: ${player2.userProfile?.gamesCompleted}`))).toBeInTheDocument()
+    expect(screen.getByText(new RegExp(`Wins: ${player2.userProfile?.wins}`))).toBeInTheDocument()
+    expect(screen.getByText(new RegExp(`Loses: ${player2.userProfile?.loses}`))).toBeInTheDocument()
+    expect(screen.getByText(new RegExp(`Streak: ${player2.userProfile?.streak}`))).toBeInTheDocument()
   })
 
   it("should update the reason input when typed into", () => {
     const handleCancel: Mock = vi.fn()
 
-    render(<PlayerInformation isOpen={true} player={mockRoom1Table1TowersUserProfile2} onCancel={handleCancel} />)
+    render(<PlayerInformation isOpen={true} player={player2} onCancel={handleCancel} />)
 
     const input: HTMLInputElement = screen.getByLabelText("Send instant message (optional)")
     fireEvent.input(input, { target: { value: "Test reason" } })
@@ -69,7 +59,7 @@ describe("PlayerInformation Component", () => {
   it("should call onCancel when the \"Send\" button is clicked", () => {
     const handleCancel: Mock = vi.fn()
 
-    render(<PlayerInformation isOpen={true} player={mockRoom1Table1TowersUserProfile2} onCancel={handleCancel} />)
+    render(<PlayerInformation isOpen={true} player={player2} onCancel={handleCancel} />)
 
     fireEvent.click(screen.getByText("Send"))
 

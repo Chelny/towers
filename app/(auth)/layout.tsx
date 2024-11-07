@@ -1,10 +1,8 @@
-import { ReactNode } from "react"
+import { PropsWithChildren, ReactNode } from "react"
 import clsx from "clsx/lite"
 import Breadcrumb from "@/components/ui/Breadcrumb"
 
-type AuthLayoutProps = {
-  children: ReactNode
-}
+type AuthLayoutProps = PropsWithChildren<{}>
 
 export default function AuthLayout({ children }: AuthLayoutProps): ReactNode {
   return (

@@ -1,23 +1,39 @@
 import { NextRequest, NextResponse } from "next/server"
-import { TowersUserProfile } from "@prisma/client"
+import { TowersUserProfile, TowersUserRoomTable } from "@prisma/client"
 import { Session } from "next-auth"
 import { auth } from "@/auth"
 import prisma from "@/lib/prisma"
 import { updateLastActiveAt } from "@/lib/user"
+import { getPrismaError } from "@/utils/api"
 
 export async function PATCH(request: NextRequest): Promise<NextResponse> {
-  const session: Session | null = await auth()
-
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-
-  const { roomId, tableId } = await request.json()
-
   try {
+    const session: Session | null = await auth()
+    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+
+    const { roomId, tableId } = await request.json()
+
+    let towersUserProfile: TowersUserProfile | null = await prisma.towersUserProfile.findUnique({
+      where: {
+        userId: session.user.id
+      }
+    })
+
+    if (!towersUserProfile) {
+      towersUserProfile = await prisma.towersUserProfile.create({
+        data: {
+          userId: session.user.id
+        }
+      })
+    }
+
+    let towersUserRoomTable: TowersUserRoomTable | null = null
+
     if (tableId) {
       // User is in the given room but hasn't joined any table
-      const inRoomNotInTable: TowersUserProfile | null = await prisma.towersUserProfile.findFirst({
+      const inRoomNotInTable: TowersUserRoomTable | null = await prisma.towersUserRoomTable.findFirst({
         where: {
-          userId: session.user.id,
+          userProfileId: towersUserProfile.id,
           roomId,
           tableId: null
         }
@@ -25,15 +41,23 @@ export async function PATCH(request: NextRequest): Promise<NextResponse> {
 
       if (inRoomNotInTable) {
         // Join first table
-        await prisma.towersUserProfile.update({
+        towersUserRoomTable = await prisma.towersUserRoomTable.update({
           where: { id: inRoomNotInTable.id },
-          data: { tableId }
+          data: { tableId },
+          include: {
+            userProfile: {
+              include: {
+                user: true
+              }
+            },
+            table: true
+          }
         })
       } else {
-        // User is in the given room and in given table
-        const inRoomAndInTable: TowersUserProfile | null = await prisma.towersUserProfile.findFirst({
+        // User is in the given room and in the given table
+        const inRoomAndInTable: TowersUserRoomTable | null = await prisma.towersUserRoomTable.findFirst({
           where: {
-            userId: session.user.id,
+            userProfileId: towersUserProfile.id,
             roomId,
             tableId
           }
@@ -41,30 +65,80 @@ export async function PATCH(request: NextRequest): Promise<NextResponse> {
 
         if (!inRoomAndInTable) {
           // Join table in given room
-          await prisma.towersUserProfile.upsert({
-            where: { userId: session.user.id },
-            update: { roomId, tableId },
-            create: {
-              userId: session.user.id,
+          towersUserRoomTable = await prisma.towersUserRoomTable.create({
+            data: {
+              userProfile: {
+                connect: { id: towersUserProfile.id }
+              },
               roomId,
               tableId
+            },
+            include: {
+              userProfile: {
+                include: {
+                  user: true
+                }
+              },
+              table: true
             }
           })
         }
       }
     } else {
       // Join a room
-      await prisma.towersUserProfile.upsert({
-        where: { userId: session.user.id },
-        update: { roomId },
-        create: { userId: session.user.id, roomId }
+      const joinedRoom: TowersUserRoomTable | null = await prisma.towersUserRoomTable.findFirst({
+        where: {
+          userProfileId: towersUserProfile.id,
+          roomId,
+          tableId: tableId ?? null
+        }
       })
+
+      if (joinedRoom) {
+        towersUserRoomTable = await prisma.towersUserRoomTable.update({
+          where: { id: joinedRoom.id },
+          data: {
+            roomId,
+            tableId: tableId ?? null
+          },
+          include: {
+            userProfile: {
+              include: {
+                user: true
+              }
+            },
+            table: true
+          }
+        })
+      } else {
+        towersUserRoomTable = await prisma.towersUserRoomTable.create({
+          data: {
+            userProfileId: towersUserProfile.id,
+            roomId,
+            tableId: tableId ?? null
+          },
+          include: {
+            userProfile: {
+              include: {
+                user: true
+              }
+            },
+            table: true
+          }
+        })
+      }
     }
 
     await updateLastActiveAt(session.user.id)
 
-    return NextResponse.json({ success: true }, { status: 200 })
+    return NextResponse.json(
+      {
+        success: true,
+        data: towersUserRoomTable
+      },
+      { status: 200 }
+    )
   } catch (error) {
-    return NextResponse.json({ success: false, message: error }, { status: 500 })
+    return getPrismaError(error)
   }
 }

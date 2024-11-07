@@ -1,7 +1,7 @@
 "use client"
 
 import { ChangeEvent, ReactNode, useEffect, useState } from "react"
-import { ITowersUserProfile } from "@prisma/client"
+import { ITowersUserRoomTable } from "@prisma/client"
 import { formatDistanceToNow } from "date-fns"
 import Input from "@/components/ui/Input"
 import Modal from "@/components/ui/Modal"
@@ -9,8 +9,8 @@ import { useSessionData } from "@/hooks/useSessionData"
 
 type PlayerInformationProps = {
   isOpen: boolean
-  player: ITowersUserProfile | undefined
-  isRatingsVisible?: boolean
+  player: ITowersUserRoomTable | undefined
+  isRatingsVisible?: boolean | null
   onCancel: () => void
 }
 
@@ -26,25 +26,25 @@ export default function PlayerInformation({
   const [idleTime, setIdleTime] = useState<string>("")
 
   useEffect(() => {
-    setIsCurrentUser(player?.userId === session?.user.id)
+    setIsCurrentUser(player?.userProfile?.userId === session?.user.id)
   }, [player, session])
 
   useEffect(() => {
-    if (player?.user.lastActiveAt) {
-      const lastActiveAt: Date = new Date(player.user.lastActiveAt)
+    if (player?.userProfile?.user.lastActiveAt) {
+      const lastActiveAt: Date = new Date(player.userProfile?.user?.lastActiveAt)
       const relativeTime: string = formatDistanceToNow(lastActiveAt, { addSuffix: true })
       setIdleTime(relativeTime)
     }
-  }, [player?.user.lastActiveAt])
+  }, [player?.userProfile?.user?.lastActiveAt])
 
   const handleSendMessage = (): void => {
-    onCancel()
+    onCancel?.()
   }
 
   return (
     <Modal
-      title={`Player information of ${player?.user.username}`}
       isOpen={isOpen}
+      title={`Player information of ${player?.userProfile?.user?.username}`}
       confirmText={isCurrentUser ? undefined : "Send"}
       dataTestId="player-information-modal"
       onConfirm={isCurrentUser ? undefined : handleSendMessage}
@@ -54,11 +54,11 @@ export default function PlayerInformation({
         <div>
           {isRatingsVisible && (
             <>
-              Rating: {player?.rating} <br />
-              Games Completed: {player?.gamesCompleted} <br />
-              Wins: {player?.wins} <br />
-              Loses: {player?.loses} <br />
-              Streak: {player?.streak} <br />
+              Rating: {player?.userProfile?.rating} <br />
+              Games Completed: {player?.userProfile?.gamesCompleted} <br />
+              Wins: {player?.userProfile?.wins} <br />
+              Loses: {player?.userProfile?.loses} <br />
+              Streak: {player?.userProfile?.streak} <br />
             </>
           )}
         </div>

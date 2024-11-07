@@ -1,12 +1,10 @@
 "use client"
 
-import { ReactNode, useRef } from "react"
+import { PropsWithChildren, ReactNode, useRef } from "react"
 import { Provider } from "react-redux"
 import { AppStore, makeStore } from "@/redux/store"
 
-type ReduxProviderProps = {
-  children: ReactNode
-}
+type ReduxProviderProps = PropsWithChildren<{}>
 
 export const StoreProvider = ({ children }: ReduxProviderProps): ReactNode => {
   const storeRef = useRef<AppStore>()
