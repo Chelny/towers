@@ -34,7 +34,7 @@ export default function PlayerBoard(props: PlayerBoardProps): ReactNode {
           src={`https://picsum.photos/${props.isOpponentBoard ? 16 : 24}`}
           width={props.isOpponentBoard ? 16 : 24}
           height={props.isOpponentBoard ? 16 : 24}
-          alt=""
+          alt="" // TODO: Set username here
         />
         <p className={clsx("line-clamp-1", props.isOpponentBoard ? "text-sm" : "text-base")}>
           the_player{props.seatNumber} ({score})
@@ -51,7 +51,7 @@ export default function PlayerBoard(props: PlayerBoardProps): ReactNode {
           props.isOpponentBoard ? "" : "grid-rows-[max-content_auto] grid-cols-[max-content_auto]",
           props.isReversed
             ? "border-s-2 border-s-gray-300 border-e-8 border-e-gray-300"
-            : "border-s-8 border-s-gray-300 border-e-2 border-e-gray-300"
+            : "border-s-8 border-s-gray-300 border-e-2 border-e-gray-300",
         )}
       >
         <div
@@ -61,7 +61,7 @@ export default function PlayerBoard(props: PlayerBoardProps): ReactNode {
             props.isOpponentBoard
               ? "grid-rows-grid-container-opponent w-grid-container-opponent"
               : "grid-rows-grid-container w-grid-container",
-            styles.BoardContainer
+            styles.BoardContainer,
           )}
           data-seat-number={props.seatNumber}
           data-testid="player-board-grid-container"
@@ -72,14 +72,14 @@ export default function PlayerBoard(props: PlayerBoardProps): ReactNode {
                 "absolute left-1/2 -translate-x-1/2 z-20 flex flex-col gap-2 shadow-md bg-neutral-800 text-center",
                 props.isOpponentBoard
                   ? "top-[90%] -translate-y-[90%] px-1 py-2 w-full"
-                  : "top-1/2 -translate-y-1/2 px-3 py-2 w-11/12"
+                  : "top-1/2 -translate-y-1/2 px-3 py-2 w-11/12",
               )}
             >
               {props.isSeatOccupied ? (
                 <p
                   className={clsx(
                     "flex justify-center items-center text-neutral-50",
-                    props.isOpponentBoard ? "h-8 text-sm line-clamp-2" : "h-16 text-xl"
+                    props.isOpponentBoard ? "h-8 text-sm line-clamp-2" : "h-16 text-xl",
                   )}
                 >
                   <span>Waiting for more players</span>
@@ -120,7 +120,7 @@ export default function PlayerBoard(props: PlayerBoardProps): ReactNode {
             <div
               className={clsx(
                 "[grid-area:preview-piece] flex flex-col items-center justify-center h-preview-piece px-2 py-2 bg-neutral-100",
-                props.isOpponentBoard ? "" : "w-preview-piece"
+                props.isOpponentBoard ? "" : "w-preview-piece",
               )}
             >
               <NextPiece nextPiece={nextPieces[0]} />
@@ -128,7 +128,7 @@ export default function PlayerBoard(props: PlayerBoardProps): ReactNode {
             <div
               className={clsx(
                 "[grid-area:power-bar] flex flex-col items-center justify-end h-power-bar px-2 py-2 bg-neutral-100",
-                props.isOpponentBoard ? "" : "w-power-bar"
+                props.isOpponentBoard ? "" : "w-power-bar",
               )}
               data-testid="player-board-power-bar-container"
             >

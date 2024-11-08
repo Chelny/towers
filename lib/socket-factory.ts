@@ -1,7 +1,6 @@
 "use client"
 
 import { Session } from "next-auth"
-import { getSession } from "next-auth/react"
 import { io, Socket } from "socket.io-client"
 
 export interface SocketInterface {
@@ -9,7 +8,7 @@ export interface SocketInterface {
 }
 
 class SocketConnection implements SocketInterface {
-  private _socket: Socket | undefined
+  private _socket: Socket | null = null
 
   get socket(): Socket {
     if (!this._socket) {
@@ -19,30 +18,33 @@ class SocketConnection implements SocketInterface {
     return this._socket
   }
 
-  public async initialize(): Promise<void> {
-    const session: Session | null = await getSession()
-
+  public async initialize(session: Session | null): Promise<void> {
     if (session) {
-      this._socket = io({ auth: { session } })
+      this._socket = io({
+        auth: { session },
+        reconnectionDelay: 10000,
+        reconnectionDelayMax: 10000,
+      })
     } else {
       throw new Error("No session found. Cannot initialize socket.")
     }
   }
 
   public destroy(): void {
-    if (this.socket) {
-      this.socket.disconnect()
+    if (this._socket) {
+      this._socket.disconnect()
+      this._socket = null
     }
   }
 }
 
-let socketConnection: SocketConnection | undefined
+let socketConnection: SocketConnection | null
 
 export class SocketFactory {
-  public static async create(): Promise<SocketConnection> {
+  public static async create(session: Session | null): Promise<SocketConnection> {
     if (!socketConnection) {
       socketConnection = new SocketConnection()
-      await socketConnection.initialize()
+      await socketConnection.initialize(session)
     }
 
     return socketConnection
@@ -51,7 +53,7 @@ export class SocketFactory {
   public static destroy(): void {
     if (socketConnection) {
       socketConnection.destroy()
-      socketConnection = undefined
+      socketConnection = null
     }
   }
 }

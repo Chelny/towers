@@ -4,7 +4,7 @@ import { UpdatePasswordForm } from "@/app/(protected)/account/update-password/up
 import { ROUTE_UPDATE_PASSWORD } from "@/constants/routes"
 
 export const metadata: Metadata = {
-  title: ROUTE_UPDATE_PASSWORD.TITLE
+  title: ROUTE_UPDATE_PASSWORD.TITLE,
 }
 
 export default function UpdatePassword(): ReactNode {

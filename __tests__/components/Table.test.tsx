@@ -1,3 +1,4 @@
+import { ImgHTMLAttributes } from "react"
 import { fireEvent, render, screen } from "@testing-library/react"
 import { Mock } from "vitest"
 import { mockRoom1 } from "@/__mocks__/data/rooms"
@@ -12,26 +13,36 @@ const { useRouter } = vi.hoisted(() => {
 
   return {
     useRouter: () => ({ push: mockRouterPush }),
-    mockRouterPush
+    mockRouterPush,
   }
 })
+
+vi.mock("next/image", () => ({
+  __esModule: true,
+  default: (props: ImgHTMLAttributes<HTMLImageElement>) => {
+    // @ts-ignore
+    const { priority, crossOrigin, ...restProps } = props
+    // eslint-disable-next-line @next/next/no-img-element
+    return <img {...restProps} crossOrigin={crossOrigin} role="img" alt={restProps.alt} />
+  },
+}))
 
 vi.mock("next/navigation", async () => {
   const actual = await vi.importActual("next/navigation")
 
   return {
     ...actual,
-    useRouter
+    useRouter,
   }
 })
 
 vi.mock("@/hooks/useSessionData", () => ({
-  useSessionData: vi.fn()
+  useSessionData: vi.fn(),
 }))
 
 vi.mock("@/lib/hooks", () => ({
   useAppDispatch: vi.fn(),
-  useAppSelector: vi.fn()
+  useAppSelector: vi.fn(),
 }))
 
 describe("Table Component", () => {

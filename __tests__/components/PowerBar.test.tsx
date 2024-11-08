@@ -7,7 +7,7 @@ describe("PowerBar Component", () => {
   const mockBlocks: PowerBarBlock[] = [
     { ...mockDefaultTowersBlockProps, letter: "T", powerType: "defense", powerLevel: "minor" },
     { ...mockDefaultTowersBlockProps, letter: "O", powerType: "attack", powerLevel: "minor" },
-    { letter: "SD", specialDiamondType: "speed drop" }
+    { letter: "SD", specialDiamondType: "speed drop" },
   ]
 
   it("should render all blocks in the power bar", () => {

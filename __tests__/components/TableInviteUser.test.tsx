@@ -13,7 +13,12 @@ describe("TableInviteUser Component", () => {
     const mockHandleCancel: Mock = vi.fn()
 
     render(
-      <TableInviteUser isOpen={true} users={mockTowersTableState11Users} isRatingsVisible onCancel={mockHandleCancel} />
+      <TableInviteUser
+        isOpen={true}
+        users={mockTowersTableState11Users}
+        isRatingsVisible
+        onCancel={mockHandleCancel}
+      />,
     )
 
     expect(screen.getByText("Invite User")).toBeInTheDocument()
@@ -23,7 +28,12 @@ describe("TableInviteUser Component", () => {
     const mockHandleCancel: Mock = vi.fn()
 
     render(
-      <TableInviteUser isOpen={true} users={mockTowersTableState11Users} isRatingsVisible onCancel={mockHandleCancel} />
+      <TableInviteUser
+        isOpen={true}
+        users={mockTowersTableState11Users}
+        isRatingsVisible
+        onCancel={mockHandleCancel}
+      />,
     )
 
     fireEvent.click(screen.getByText("Invite"))
@@ -34,7 +44,12 @@ describe("TableInviteUser Component", () => {
     const mockHandleCancel: Mock = vi.fn()
 
     render(
-      <TableInviteUser isOpen={true} users={mockTowersTableState11Users} isRatingsVisible onCancel={mockHandleCancel} />
+      <TableInviteUser
+        isOpen={true}
+        users={mockTowersTableState11Users}
+        isRatingsVisible
+        onCancel={mockHandleCancel}
+      />,
     )
 
     fireEvent.click(screen.getByText("Cancel"))

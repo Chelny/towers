@@ -36,7 +36,7 @@ export const DIRECTIONS = [
   { row: -1, col: -1 }, // Top-left
   { row: -1, col: 1 }, // Top-right
   { row: 1, col: -1 }, // Bottom-left
-  { row: 1, col: 1 } // Bottom-right
+  { row: 1, col: 1 }, // Bottom-right
 ]
 
 /**************************************************

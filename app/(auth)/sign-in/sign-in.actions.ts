@@ -2,18 +2,18 @@
 
 import { Value, ValueError } from "@sinclair/typebox/value"
 import { AuthError } from "next-auth"
-import { SignInFormData, SignInFormErrorMessages, signInSchema } from "@/app/(auth)/sign-in/sign-in.schema"
+import { SignInFormValidationErrors, SignInPayload, signInSchema } from "@/app/(auth)/sign-in/sign-in.schema"
 import { signIn as authSignIn } from "@/auth"
 import { SIGN_IN_REDIRECT } from "@/constants/routes"
 
 export async function signIn(prevState: ApiResponse, formData: FormData): Promise<ApiResponse> {
-  const rawFormData: SignInFormData = {
+  const payload: SignInPayload = {
     email: formData.get("email") as string,
-    password: formData.get("password") as string
+    password: formData.get("password") as string,
   }
 
-  const errors: ValueError[] = Array.from(Value.Errors(signInSchema, rawFormData))
-  const errorMessages: SignInFormErrorMessages = {}
+  const errors: ValueError[] = Array.from(Value.Errors(signInSchema, payload))
+  const errorMessages: SignInFormValidationErrors = {}
 
   for (const error of errors) {
     switch (error.path.replace("/", "")) {
@@ -32,13 +32,13 @@ export async function signIn(prevState: ApiResponse, formData: FormData): Promis
   if (Object.keys(errorMessages).length === 0) {
     try {
       await authSignIn("credentials", {
-        ...rawFormData,
-        redirectTo: SIGN_IN_REDIRECT
+        ...payload,
+        redirectTo: SIGN_IN_REDIRECT,
       })
 
       return {
         success: true,
-        message: "You’re successfully signed in. Welcome back!"
+        message: "You’re successfully signed in. Welcome back!",
       }
     } catch (error) {
       if (error instanceof AuthError) {
@@ -46,12 +46,12 @@ export async function signIn(prevState: ApiResponse, formData: FormData): Promis
           case "CredentialsSignin":
             return {
               success: false,
-              message: "The email or the password is invalid."
+              message: "The email or the password is invalid.",
             }
           default:
             return {
               success: false,
-              message: error.cause?.err?.message
+              message: error.cause?.err?.message,
             }
         }
       }
@@ -63,6 +63,6 @@ export async function signIn(prevState: ApiResponse, formData: FormData): Promis
   return {
     success: false,
     message: "The email or the password is invalid.",
-    error: errorMessages
+    error: errorMessages,
   }
 }

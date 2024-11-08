@@ -15,7 +15,7 @@ const { useRouter, mockRouterPush } = vi.hoisted(() => {
 
   return {
     useRouter: () => ({ push: mockRouterPush }),
-    mockRouterPush
+    mockRouterPush,
   }
 })
 
@@ -24,17 +24,17 @@ vi.mock("next/navigation", async () => {
 
   return {
     ...actual,
-    useRouter
+    useRouter,
   }
 })
 
 vi.mock("@/hooks/useSessionData", () => ({
-  useSessionData: vi.fn()
+  useSessionData: vi.fn(),
 }))
 
 vi.mock("@/lib/hooks", () => ({
   useAppDispatch: vi.fn(),
-  useAppSelector: vi.fn()
+  useAppSelector: vi.fn(),
 }))
 
 vi.mock("@/redux/features/socket-slice")
@@ -46,16 +46,16 @@ describe("RoomsList Component", () => {
   const mockRooms: ITowersRoomWithUsersCount[] = [
     {
       ...mockRoom1,
-      usersCount: 123
+      usersCount: 123,
     },
     {
       ...mockRoom2,
-      usersCount: 300
+      usersCount: 300,
     },
     {
       ...mockRoom3,
-      usersCount: 234
-    }
+      usersCount: 234,
+    },
   ]
 
   beforeEach(() => {
@@ -64,7 +64,7 @@ describe("RoomsList Component", () => {
     vi.mocked(useAppSelector).mockImplementation((selectorFn: (state: RootState) => unknown) => {
       const mockState = {
         ...mockStoreReducers,
-        socket: mockSocketState
+        socket: mockSocketState,
       }
 
       return selectorFn(mockState)

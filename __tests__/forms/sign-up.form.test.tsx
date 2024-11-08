@@ -1,22 +1,29 @@
-import { useFormState, useFormStatus } from "react-dom"
+import { useActionState } from "react"
 import { render, screen } from "@testing-library/react"
 import { SignUpForm } from "@/app/(auth)/sign-up/sign-up.form"
 
-vi.mock("react-dom", () => ({
-  useFormState: vi.fn(),
-  useFormStatus: vi.fn()
-}))
+vi.mock("react", async (importActual) => {
+  const actual = await importActual<typeof import("react")>()
+
+  return {
+    ...actual,
+    useActionState: vi.fn(),
+  }
+})
+
+vi.mock("resend", () => {
+  return {
+    Resend: vi.fn().mockImplementation(() => {
+      return {
+        sendEmail: vi.fn().mockResolvedValue({ success: true }),
+      }
+    }),
+  }
+})
 
 describe("Sign Up Form", () => {
   beforeEach(() => {
-    vi.mocked(useFormState).mockReturnValue([{ success: false, message: "", error: {} }, vi.fn(), false])
-
-    vi.mocked(useFormStatus).mockReturnValue({
-      pending: false,
-      data: null,
-      method: null,
-      action: null
-    })
+    vi.mocked(useActionState).mockReturnValue([{ success: false, message: "", error: {} }, vi.fn(), false])
   })
 
   afterEach(() => {
@@ -47,7 +54,7 @@ describe("Sign Up Form", () => {
   })
 
   it("should show error messages when submitting an empty form", () => {
-    vi.mocked(useFormState).mockReturnValue([
+    vi.mocked(useActionState).mockReturnValue([
       {
         success: false,
         error: {
@@ -55,11 +62,11 @@ describe("Sign Up Form", () => {
           email: "The email is invalid",
           username: "The username is invalid",
           password: "The password is invalid",
-          confirmPassword: "The password confirmation is invalid"
-        }
+          confirmPassword: "The password confirmation is invalid",
+        },
       },
       vi.fn(),
-      false
+      false,
     ])
 
     render(<SignUpForm />)
@@ -72,15 +79,15 @@ describe("Sign Up Form", () => {
   })
 
   it("should show an error if the birthdate is invalid", () => {
-    vi.mocked(useFormState).mockReturnValue([
+    vi.mocked(useActionState).mockReturnValue([
       {
         success: false,
         error: {
-          birthdate: "The birthdate is invalid."
-        }
+          birthdate: "The birthdate is invalid.",
+        },
       },
       vi.fn(),
-      false
+      false,
     ])
 
     render(<SignUpForm />)
@@ -89,15 +96,15 @@ describe("Sign Up Form", () => {
   })
 
   it("should show an error if passwords do not match", () => {
-    vi.mocked(useFormState).mockReturnValue([
+    vi.mocked(useActionState).mockReturnValue([
       {
         success: false,
         error: {
-          confirmPassword: "The password and password confirmation do not match"
-        }
+          confirmPassword: "The password and password confirmation do not match",
+        },
       },
       vi.fn(),
-      false
+      false,
     ])
 
     render(<SignUpForm />)
@@ -106,12 +113,7 @@ describe("Sign Up Form", () => {
   })
 
   it("should disable the submit button when the form is submitting", () => {
-    vi.mocked(useFormStatus).mockReturnValue({
-      pending: true,
-      data: new FormData(),
-      method: "POST",
-      action: "/api/sign-up"
-    })
+    vi.mocked(useActionState).mockReturnValue([{ success: false, message: "" }, vi.fn(), true])
 
     render(<SignUpForm />)
 
@@ -119,10 +121,10 @@ describe("Sign Up Form", () => {
   })
 
   it("should display a success message on form submission success", () => {
-    vi.mocked(useFormState).mockReturnValue([
+    vi.mocked(useActionState).mockReturnValue([
       { success: true, message: "A confirmation email has been sent to john.doe@example.com." },
       vi.fn(),
-      false
+      false,
     ])
 
     render(<SignUpForm />)

@@ -8,19 +8,19 @@ import { useAppDispatch } from "@/lib/hooks"
 import { destroySocket } from "@/redux/features/socket-slice"
 
 vi.mock("next-auth/react", () => ({
-  signOut: vi.fn()
+  signOut: vi.fn(),
 }))
 
 vi.mock("@/hooks/useSessionData", () => ({
-  useSessionData: vi.fn()
+  useSessionData: vi.fn(),
 }))
 
 vi.mock("@/lib/email", () => ({
-  sendEmail: vi.fn().mockResolvedValue({ success: true })
+  sendEmail: vi.fn().mockResolvedValue({ success: true }),
 }))
 
 vi.mock("@/lib/hooks", () => ({
-  useAppDispatch: vi.fn()
+  useAppDispatch: vi.fn(),
 }))
 
 describe("SmallScreenWarning Component", () => {

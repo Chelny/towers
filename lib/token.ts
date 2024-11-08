@@ -19,9 +19,9 @@ export const generateEmailVerificationToken = async (userId: string): Promise<Ve
       where: {
         identifier_token: {
           identifier: token.identifier,
-          token: token.token
-        }
-      }
+          token: token.token,
+        },
+      },
     })
   }
 
@@ -29,8 +29,8 @@ export const generateEmailVerificationToken = async (userId: string): Promise<Ve
     data: {
       identifier: user.id,
       token: generatedToken,
-      expires
-    }
+      expires,
+    },
   })
 }
 
@@ -41,7 +41,7 @@ export const generatePasswordResetToken = async (email: string): Promise<Passwor
 
   if (token) {
     await prisma.passwordResetToken.delete({
-      where: { id: token.identifier }
+      where: { id: token.identifier },
     })
   }
 
@@ -49,8 +49,8 @@ export const generatePasswordResetToken = async (email: string): Promise<Passwor
     data: {
       email,
       token: generatedToken,
-      expires
-    }
+      expires,
+    },
   })
 }
 
@@ -70,9 +70,9 @@ export const generateEmailChangeVerificationToken = async (userId: string): Prom
       where: {
         identifier_token: {
           identifier: token.identifier,
-          token: token.token
-        }
-      }
+          token: token.token,
+        },
+      },
     })
   }
 
@@ -80,7 +80,7 @@ export const generateEmailChangeVerificationToken = async (userId: string): Prom
     data: {
       identifier: user.id,
       token: generatedToken,
-      expires
-    }
+      expires,
+    },
   })
 }

@@ -10,7 +10,7 @@ export const mockRoom1Table1TowersUserProfile1: TowersUserProfile = {
   loses: 3,
   streak: 4,
   createdAt: new Date(),
-  updatedAt: new Date()
+  updatedAt: new Date(),
 }
 
 export const mockRoom1Table1TowersUserProfile2: TowersUserProfile = {
@@ -22,7 +22,7 @@ export const mockRoom1Table1TowersUserProfile2: TowersUserProfile = {
   loses: 38,
   streak: 1,
   createdAt: new Date(),
-  updatedAt: new Date()
+  updatedAt: new Date(),
 }
 
 export const mockRoom1Table1TowersUserProfile3: TowersUserProfile = {
@@ -34,7 +34,7 @@ export const mockRoom1Table1TowersUserProfile3: TowersUserProfile = {
   loses: 49,
   streak: 0,
   createdAt: new Date(),
-  updatedAt: new Date()
+  updatedAt: new Date(),
 }
 
 export const mockRoom1Table1TowersUserProfile4: TowersUserProfile = {
@@ -46,7 +46,7 @@ export const mockRoom1Table1TowersUserProfile4: TowersUserProfile = {
   loses: 40,
   streak: 0,
   createdAt: new Date(),
-  updatedAt: new Date()
+  updatedAt: new Date(),
 }
 
 export const mockRoom1Table1TowersUserProfile5: TowersUserProfile = {
@@ -58,5 +58,5 @@ export const mockRoom1Table1TowersUserProfile5: TowersUserProfile = {
   loses: 38,
   streak: 3,
   createdAt: new Date(),
-  updatedAt: new Date()
+  updatedAt: new Date(),
 }

@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server"
-import { JWT } from "next-auth/jwt"
 import NextAuth, { DefaultSession } from "next-auth"
+import { JWT } from "next-auth/jwt"
 
 declare module "next-auth" {
   /**
@@ -32,6 +32,7 @@ declare module "next-auth" {
     } & DefaultSession["user"]
     account: Account | null
     isNewUser: boolean
+    // error?: "GoogleRefreshTokenError" | "GitHubRefreshTokenError"
   }
 
   interface NextAuthRequest extends NextRequest {
@@ -49,6 +50,7 @@ declare module "next-auth/jwt" {
     username: string
     account: Account | null
     isNewUser: boolean
+    // sessionId: string
   }
 }
 

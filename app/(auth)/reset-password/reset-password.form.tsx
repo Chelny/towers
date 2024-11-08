@@ -1,10 +1,9 @@
 "use client"
 
-import { ClipboardEvent, FormEvent, ReactNode } from "react"
-import { useFormState, useFormStatus } from "react-dom"
+import { ClipboardEvent, ReactNode, useActionState } from "react"
 import { ReadonlyURLSearchParams, useSearchParams } from "next/navigation"
 import { resetPassword } from "@/app/(auth)/reset-password/reset-password.actions"
-import { ResetPasswordFormErrorMessages } from "@/app/(auth)/reset-password/reset-password.schema"
+import { ResetPasswordFormValidationErrors } from "@/app/(auth)/reset-password/reset-password.schema"
 import AlertMessage from "@/components/ui/AlertMessage"
 import Button from "@/components/ui/Button"
 import Input from "@/components/ui/Input"
@@ -12,23 +11,16 @@ import Input from "@/components/ui/Input"
 const initialState = {
   success: false,
   message: "",
-  error: {} as ResetPasswordFormErrorMessages
+  error: {} as ResetPasswordFormValidationErrors,
 }
 
 export function ResetPasswordForm(): ReactNode {
   const searchParams: ReadonlyURLSearchParams = useSearchParams()
   const token: string | null = searchParams.get("token")
-  const { pending } = useFormStatus()
-  const [state, formAction] = useFormState<ApiResponse, FormData>(resetPassword, initialState)
-
-  const handleResetPassword = (event: FormEvent<HTMLFormElement>): void => {
-    event.preventDefault()
-    const formData: FormData = new FormData(event.currentTarget)
-    formAction(formData)
-  }
+  const [state, formAction, isPending] = useActionState<ApiResponse, FormData>(resetPassword, initialState)
 
   return (
-    <form className="w-full" noValidate onSubmit={handleResetPassword}>
+    <form className="w-full" action={formAction} noValidate>
       {state?.message && <AlertMessage type={state.success ? "success" : "error"}>{state.message}</AlertMessage>}
       <Input
         type="password"
@@ -58,7 +50,7 @@ export function ResetPasswordForm(): ReactNode {
         data-testid="reset-password-token-input"
         required
       />
-      <Button type="submit" className="w-full" disabled={pending} dataTestId="reset-password-submit-button">
+      <Button type="submit" className="w-full" disabled={isPending} dataTestId="reset-password-submit-button">
         Reset Password
       </Button>
     </form>

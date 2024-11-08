@@ -1,5 +1,13 @@
 import { PropsWithChildren, ReactNode } from "react"
+import { Metadata } from "next"
 import Sidebar from "@/components/Sidebar"
+
+export const metadata: Metadata = {
+  robots: {
+    index: false,
+    follow: true,
+  },
+}
 
 type ProtectedLayoutProps = PropsWithChildren<{}>
 

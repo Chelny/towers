@@ -1,4 +1,4 @@
-import { useFormState, useFormStatus } from "react-dom"
+import { useActionState } from "react"
 import { render, screen } from "@testing-library/react"
 import { Mock } from "vitest"
 import { ConfirmEmailChangeForm } from "@/app/(auth)/confirm-email-change/confirm-email-change.form"
@@ -18,14 +18,23 @@ const { useRouter, mockRouterPush, useSearchParams, mockSearchParams } = vi.hois
     delete: vi.fn(),
     set: vi.fn(),
     sort: vi.fn(),
-    [Symbol.iterator]: vi.fn()
+    [Symbol.iterator]: vi.fn(),
   }
 
   return {
     useRouter: () => ({ push: mockRouterPush }),
     mockRouterPush,
     useSearchParams: () => mockSearchParams,
-    mockSearchParams
+    mockSearchParams,
+  }
+})
+
+vi.mock("react", async (importActual) => {
+  const actual = await importActual<typeof import("react")>()
+
+  return {
+    ...actual,
+    useActionState: vi.fn(),
   }
 })
 
@@ -35,25 +44,13 @@ vi.mock("next/navigation", async () => {
   return {
     ...actual,
     useRouter,
-    useSearchParams
+    useSearchParams,
   }
 })
 
-vi.mock("react-dom", () => ({
-  useFormState: vi.fn(),
-  useFormStatus: vi.fn()
-}))
-
 describe("Update Email Form", () => {
   beforeEach(() => {
-    vi.mocked(useFormState).mockReturnValue([{ success: false, message: "", error: {} }, vi.fn(), false])
-
-    vi.mocked(useFormStatus).mockReturnValue({
-      pending: false,
-      data: null,
-      method: null,
-      action: null
-    })
+    vi.mocked(useActionState).mockReturnValue([{ success: false, message: "", error: {} }, vi.fn(), false])
   })
 
   afterEach(() => {
@@ -82,10 +79,10 @@ describe("Update Email Form", () => {
   })
 
   it("should show error message if the verification link is invalid", () => {
-    vi.mocked(useFormState).mockReturnValue([
+    vi.mocked(useActionState).mockReturnValue([
       { success: false, message: "The verification link is invalid!" },
       vi.fn(),
-      false
+      false,
     ])
 
     render(<ConfirmEmailChangeForm />)
@@ -95,7 +92,11 @@ describe("Update Email Form", () => {
   })
 
   it("should display a success message if email update is successful", () => {
-    vi.mocked(useFormState).mockReturnValue([{ success: true, message: "The email has been updated!" }, vi.fn(), false])
+    vi.mocked(useActionState).mockReturnValue([
+      { success: true, message: "The email has been updated!" },
+      vi.fn(),
+      false,
+    ])
 
     render(<ConfirmEmailChangeForm />)
 

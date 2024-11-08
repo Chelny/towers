@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { IRoomListItem, ITowersRoomWithUsersCount } from "@prisma/client"
+import { getPrismaError } from "@/lib/api"
 import prisma from "@/lib/prisma"
-import { getPrismaError } from "@/utils/api"
 
 export async function GET(): Promise<NextResponse> {
   try {
@@ -9,11 +9,15 @@ export async function GET(): Promise<NextResponse> {
       include: {
         userRoomTables: {
           select: {
-            userProfileId: true
+            userProfileId: true,
           },
-          distinct: ["userProfileId"]
-        }
-      }
+          distinct: ["userProfileId"],
+        },
+      },
+      cacheStrategy: {
+        ttl: 10,
+        swr: 30,
+      },
     })
 
     const roomsWithUsersCount: ITowersRoomWithUsersCount[] = rooms.map((room: IRoomListItem) => {
@@ -22,16 +26,16 @@ export async function GET(): Promise<NextResponse> {
 
       return {
         ...roomWithoutUserRoomTables,
-        usersCount
+        usersCount,
       }
     })
 
     return NextResponse.json(
       {
         success: true,
-        data: roomsWithUsersCount
+        data: roomsWithUsersCount,
       },
-      { status: 200 }
+      { status: 200 },
     )
   } catch (error) {
     return getPrismaError(error)

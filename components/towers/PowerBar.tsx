@@ -21,7 +21,7 @@ export default function PowerBar(props: PowerBarProps): ReactNode {
           className={clsx(
             "w-grid-cell h-grid-cell box-border text-center",
             styles[getClassNameForBlock(block)],
-            styles[getClassNameForBlockPowerType(block)]
+            styles[getClassNameForBlockPowerType(block)],
           )}
         >
           {isPowerBarBlock(block) &&

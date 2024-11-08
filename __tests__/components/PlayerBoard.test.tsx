@@ -1,6 +1,15 @@
+import { ImgHTMLAttributes } from "react"
 import { fireEvent, render, screen } from "@testing-library/react"
 import { Mock } from "vitest"
 import PlayerBoard from "@/components/towers/PlayerBoard"
+
+vi.mock("next/image", () => ({
+  __esModule: true,
+  default: (props: ImgHTMLAttributes<HTMLImageElement>) => {
+    // eslint-disable-next-line @next/next/no-img-element
+    return <img {...props} crossOrigin={props.crossOrigin} role="img" alt={props.alt} />
+  },
+}))
 
 const mockHandleStartGame: Mock = vi.fn()
 
@@ -12,8 +21,8 @@ vi.mock("@/hooks/useTowers", () => ({
     isGameOver: false,
     score: 100,
     nextPieces: [[]],
-    powerBar: []
-  })
+    powerBar: [],
+  }),
 }))
 
 describe("PlayerBoard Component", () => {

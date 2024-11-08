@@ -12,7 +12,7 @@ import {
   NUM_NEXT_PIECES,
   PIECE_LENGTH,
   PIECE_STARTING_COL,
-  PIECE_STARTING_ROW
+  PIECE_STARTING_ROW,
 } from "@/constants/game"
 import { TickSpeed } from "@/enums/tick-speed"
 import { useInterval } from "@/hooks/useInterval"
@@ -27,7 +27,7 @@ import {
   getRandomPiece,
   hasCollisions,
   isInBounds,
-  useTowersBoard
+  useTowersBoard,
 } from "@/hooks/useTowersBoard"
 import {
   Block,
@@ -40,7 +40,7 @@ import {
   PowerBarBlock,
   PowerBlock,
   Powers,
-  TowersLetter
+  TowersLetter,
 } from "@/interfaces/game"
 import {
   isEmptyCell,
@@ -48,7 +48,7 @@ import {
   isMidasBlock,
   isPowerBarBlock,
   isSpecialDiamond,
-  isTowersBlock
+  isTowersBlock,
 } from "@/utils/block-guards-utils"
 
 const cipherKeysMap: Record<string, string> = {
@@ -87,7 +87,7 @@ const cipherKeysMap: Record<string, string> = {
   "7": "A",
   "8": "S",
   "9": "Y",
-  "0": "H"
+  "0": "H",
 }
 
 const INITIAL_POWERS_STATE: Powers = {
@@ -96,7 +96,7 @@ const INITIAL_POWERS_STATE: Powers = {
   W: { numBrokenBlocks: 0, powerType: null, powerLevel: null, isPowerToBeApplied: false },
   E: { numBrokenBlocks: 0, powerType: null, powerLevel: null, isPowerToBeApplied: false },
   R: { numBrokenBlocks: 0, powerType: null, powerLevel: null, isPowerToBeApplied: false },
-  S: { numBrokenBlocks: 0, powerType: null, powerLevel: null, isPowerToBeApplied: false }
+  S: { numBrokenBlocks: 0, powerType: null, powerLevel: null, isPowerToBeApplied: false },
 }
 
 /**
@@ -186,7 +186,7 @@ export function useTowers() {
     row: number,
     col: number,
     createBlock: () => BoardBlock,
-    excludeCondition: (block: BoardBlock) => boolean
+    excludeCondition: (block: BoardBlock) => boolean,
   ): void => {
     // Convert adjacent blocks based on the special piece’s effect
     for (let i = 0; i < PIECE_LENGTH; i++) {
@@ -245,7 +245,7 @@ export function useTowers() {
       row,
       col,
       () => createPieceBlock("R"),
-      (cell: Block) => isMedusaBlock(cell)
+      (cell: Block) => isMedusaBlock(cell),
     )
   }
 
@@ -266,7 +266,7 @@ export function useTowers() {
         { dx: 1, dy: 0 },
         { dx: 0, dy: 1 },
         { dx: 1, dy: 1 },
-        { dx: 1, dy: -1 }
+        { dx: 1, dy: -1 },
       ]
       const blocksToDelete: BlockPosition[] = []
 
@@ -282,27 +282,27 @@ export function useTowers() {
 
       blocksToDelete.forEach(({ row, col }: BlockPosition, index: number) => {
         if (isPowerBarBlock(board[row][col])) {
-          const newPowerBarBlock: PowerBarBlock = board[row][col]
+          const newPowerBarBlock: PowerBarBlock = board[row][col] as PowerBarBlock
           dispatchBoardState({ type: "addToPowerBar", newAddedPowerBlock: newPowerBarBlock })
         }
 
         if (isTowersBlock(board[row][col])) {
-          const blockLetter: TowersLetter = board[row][col].letter
+          const blockLetter: TowersLetter = board[row][col].letter as TowersLetter
 
           if (powers[blockLetter]) {
             powers = {
               ...powers,
               [blockLetter]: {
                 ...powers[blockLetter],
-                numBrokenBlocks: powers[blockLetter].numBrokenBlocks + 1
-              }
+                numBrokenBlocks: powers[blockLetter].numBrokenBlocks + 1,
+              },
             }
           }
 
           board[row][col] = {
             ...board[row][col],
             isToBeRemoved: true,
-            brokenBlockNumber: isHooDetected ? index + 1 : null
+            brokenBlockNumber: isHooDetected ? index + 1 : null,
           }
 
           setTimeout(() => {
@@ -316,7 +316,7 @@ export function useTowers() {
 
       return { updatedPowers: powers, blocksToDelete }
     },
-    [isHooDetected]
+    [isHooDetected],
   )
 
   /**
@@ -337,7 +337,7 @@ export function useTowers() {
     col: number,
     dx: number,
     dy: number,
-    blocksToDelete: BlockPosition[]
+    blocksToDelete: BlockPosition[],
   ): void => {
     const match: BlockPosition[] = []
     let r: number = row
@@ -542,7 +542,7 @@ export function useTowers() {
           break
       }
     },
-    [dispatchBoardState, targetPlayer]
+    [dispatchBoardState, targetPlayer],
   )
 
   /**
@@ -569,7 +569,7 @@ export function useTowers() {
           console.error(`Unknown special diamond type: ${powerBlock.specialDiamondType}`)
       }
     },
-    [dispatchBoardState, targetPlayer]
+    [dispatchBoardState, targetPlayer],
   )
 
   /**
@@ -616,7 +616,7 @@ export function useTowers() {
       dispatchBoardState({
         type: "commit",
         newBoard: [...getEmptyBoard(BOARD_ROWS - newBoard.length), ...newBoard],
-        newPiece: droppingPiece
+        newPiece: droppingPiece,
       })
 
       setIsCommitting(false)
@@ -669,7 +669,7 @@ export function useTowers() {
     dispatchBoardState({
       type: "commit",
       newBoard: [...getEmptyBoard(BOARD_ROWS - newBoard.length), ...newBoard],
-      newPiece: nextPiece
+      newPiece: nextPiece,
     })
 
     setIsCommitting(false)
@@ -870,7 +870,7 @@ export function useTowers() {
     isGameOver,
     score,
     nextPieces,
-    powerBar
+    powerBar,
   }
 }
 

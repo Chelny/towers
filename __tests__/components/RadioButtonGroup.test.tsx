@@ -8,7 +8,7 @@ describe("RadioButtonGroup Component", () => {
       <RadioButtonGroup id="test-group" label="Select an option">
         <RadioButtonGroup.Option id="option1" label="Option 1" value="1" />
         <RadioButtonGroup.Option id="option2" label="Option 2" value="2" />
-      </RadioButtonGroup>
+      </RadioButtonGroup>,
     )
 
     expect(screen.getByLabelText("Option 1")).toBeInTheDocument()
@@ -20,7 +20,7 @@ describe("RadioButtonGroup Component", () => {
       <RadioButtonGroup id="test-group" label="Select an option">
         <RadioButtonGroup.Option id="option1" label="Option 1" value="1" />
         <RadioButtonGroup.Option id="option2" label="Option 2" value="2" />
-      </RadioButtonGroup>
+      </RadioButtonGroup>,
     )
 
     const radio1: HTMLInputElement = screen.getByLabelText("Option 1")
@@ -42,7 +42,7 @@ describe("RadioButtonGroup Component", () => {
       <RadioButtonGroup id="test-group" label="Select an option" onChange={handleChange}>
         <RadioButtonGroup.Option id="option1" label="Option 1" value="1" />
         <RadioButtonGroup.Option id="option2" label="Option 2" value="2" />
-      </RadioButtonGroup>
+      </RadioButtonGroup>,
     )
 
     fireEvent.click(screen.getByLabelText("Option 1"))

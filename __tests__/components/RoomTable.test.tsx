@@ -5,7 +5,7 @@ import {
   mockSocketRoom1Table1Id,
   mockSocketState,
   mockStoreReducers,
-  mockTowersTableState11Info
+  mockTowersTableState11Info,
 } from "@/__mocks__/data/socketState"
 import { mockAuthenticatedSession } from "@/__mocks__/data/users"
 import RoomTable from "@/components/game/RoomTable"
@@ -19,7 +19,7 @@ const { useRouter, mockRouterPush } = vi.hoisted(() => {
 
   return {
     useRouter: () => ({ push: mockRouterPush }),
-    mockRouterPush
+    mockRouterPush,
   }
 })
 
@@ -28,17 +28,17 @@ vi.mock("next/navigation", async () => {
 
   return {
     ...actual,
-    useRouter
+    useRouter,
   }
 })
 
 vi.mock("@/hooks/useSessionData", () => ({
-  useSessionData: vi.fn()
+  useSessionData: vi.fn(),
 }))
 
 vi.mock("@/lib/hooks", () => ({
   useAppDispatch: vi.fn(),
-  useAppSelector: vi.fn()
+  useAppSelector: vi.fn(),
 }))
 
 vi.mock("@/redux/features/socket-slice")
@@ -54,7 +54,7 @@ describe("RoomTable Component", () => {
     vi.mocked(useAppSelector).mockImplementation((selectorFn: (state: RootState) => unknown) => {
       const mockState = {
         ...mockStoreReducers,
-        socket: mockSocketState
+        socket: mockSocketState,
       }
 
       return selectorFn(mockState)
@@ -79,7 +79,7 @@ describe("RoomTable Component", () => {
 
     await waitFor(() => {
       expect(mockRouterPush).toHaveBeenCalledWith(
-        `${ROUTE_TOWERS.PATH}?room=${mockTowersTableState11Info?.roomId}&table=${mockTowersTableState11Info?.id}`
+        `${ROUTE_TOWERS.PATH}?room=${mockTowersTableState11Info?.roomId}&table=${mockTowersTableState11Info?.id}`,
       )
     })
   })

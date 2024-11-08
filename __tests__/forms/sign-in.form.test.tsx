@@ -1,27 +1,35 @@
-import { useFormState, useFormStatus } from "react-dom"
+import { useActionState } from "react"
 import { useRouter } from "next/navigation"
 import { fireEvent, render, screen } from "@testing-library/react"
 import { SignInForm } from "@/app/(auth)/sign-in/sign-in.form"
 import { ROUTE_FORGOT_PASSWORD, ROUTE_SIGN_IN_WITH_MAGIC_LINK, ROUTE_SIGN_UP } from "@/constants/routes"
 import { mockRouter } from "@/vitest.setup"
 
+vi.mock("react", async (importActual) => {
+  const actual = await importActual<typeof import("react")>()
+
+  return {
+    ...actual,
+    useActionState: vi.fn(),
+  }
+})
+
 vi.mock("next/navigation")
 
-vi.mock("react-dom", () => ({
-  useFormState: vi.fn(),
-  useFormStatus: vi.fn()
-}))
+vi.mock("resend", () => {
+  return {
+    Resend: vi.fn().mockImplementation(() => {
+      return {
+        sendEmail: vi.fn().mockResolvedValue({ success: true }),
+      }
+    }),
+  }
+})
 
 describe("Sign In Form", () => {
   beforeEach(() => {
     vi.mocked(useRouter).mockReturnValue(mockRouter)
-    vi.mocked(useFormState).mockReturnValue([{ success: false, message: "", error: {} }, vi.fn(), false])
-    vi.mocked(useFormStatus).mockReturnValue({
-      pending: false,
-      data: null,
-      method: null,
-      action: null
-    })
+    vi.mocked(useActionState).mockReturnValue([{ success: false, message: "", error: {} }, vi.fn(), false])
   })
 
   afterEach(() => {
@@ -64,10 +72,10 @@ describe("Sign In Form", () => {
   })
 
   it("should show error messages when submitting an empty form", () => {
-    vi.mocked(useFormState).mockReturnValue([
+    vi.mocked(useActionState).mockReturnValue([
       { success: false, message: "The email or the password is invalid." },
       vi.fn(),
-      false
+      false,
     ])
 
     render(<SignInForm />)
@@ -76,10 +84,10 @@ describe("Sign In Form", () => {
   })
 
   it("should show an error for invalid email or password format", () => {
-    vi.mocked(useFormState).mockReturnValue([
+    vi.mocked(useActionState).mockReturnValue([
       { success: false, message: "The email or the password is invalid." },
       vi.fn(),
-      false
+      false,
     ])
 
     render(<SignInForm />)
@@ -88,12 +96,7 @@ describe("Sign In Form", () => {
   })
 
   it("should disable the submit and social buttons when the form is submitting", () => {
-    vi.mocked(useFormStatus).mockReturnValue({
-      pending: true,
-      data: new FormData(),
-      method: "POST",
-      action: "/api/sign-in"
-    })
+    vi.mocked(useActionState).mockReturnValue([{ success: false, message: "" }, vi.fn(), true])
 
     render(<SignInForm />)
 

@@ -2,7 +2,7 @@ import { TowersRoomChatMessage } from "@prisma/client"
 import { mockRoom1 } from "@/__mocks__/data/rooms"
 import {
   mockRoom1Table1TowersUserProfile1,
-  mockRoom1Table1TowersUserProfile2
+  mockRoom1Table1TowersUserProfile2,
 } from "@/__mocks__/data/towersUserProfiles"
 
 export const mockRoom1TowersRoomChatMessage1: TowersRoomChatMessage = {
@@ -11,7 +11,7 @@ export const mockRoom1TowersRoomChatMessage1: TowersRoomChatMessage = {
   userProfileId: mockRoom1Table1TowersUserProfile1.id,
   message: "Hey!",
   createdAt: new Date(),
-  updatedAt: new Date()
+  updatedAt: new Date(),
 }
 
 export const mockRoom1TowersRoomChatMessage2: TowersRoomChatMessage = {
@@ -20,5 +20,5 @@ export const mockRoom1TowersRoomChatMessage2: TowersRoomChatMessage = {
   userProfileId: mockRoom1Table1TowersUserProfile2.id,
   message: "Wazzup?",
   createdAt: new Date(),
-  updatedAt: new Date()
+  updatedAt: new Date(),
 }

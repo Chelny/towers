@@ -8,8 +8,8 @@ export const signUpSchema = Type.Object({
   username: Type.RegExp(USERNAME_PATTERN),
   password: Type.RegExp(PASSWORD_PATTERN),
   confirmPassword: Type.RegExp(PASSWORD_PATTERN),
-  termsAndConditions: Type.Const(true)
+  termsAndConditions: Type.Const(true),
 })
 
-export type SignUpFormData = SchemaFormData<typeof signUpSchema>
-export type SignUpFormErrorMessages = SchemaFormErrorMessages<keyof SignUpFormData>
+export type SignUpPayload = FormPayload<typeof signUpSchema>
+export type SignUpFormValidationErrors = FormValidationErrors<keyof SignUpPayload>

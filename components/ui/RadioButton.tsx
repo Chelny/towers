@@ -22,7 +22,7 @@ export default function RadioButton({
   checked = false,
   disabled = false,
   dataTestId = undefined,
-  onChange
+  onChange,
 }: RadioButtonProps): ReactNode {
   const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
     onChange?.(event)
@@ -36,7 +36,7 @@ export default function RadioButton({
           id={id}
           className={clsx(
             "peer appearance-none col-start-1 row-start-1 shrink-0 w-5 h-5 border-2 border-t-gray-600 border-e-gray-400 border-b-gray-400 border-s-gray-600 rounded-full bg-white",
-            "disabled:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            "disabled:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed",
           )}
           name={name}
           value={value}
@@ -52,7 +52,7 @@ export default function RadioButton({
           className={clsx(
             "col-start-1 row-start-1 w-2 h-2 rounded-full pointer-events-none",
             "peer-checked:bg-gray-600",
-            "peer-checked:peer-disabled:bg-gray-200 peer-checked:peer-disabled:cursor-not-allowed"
+            "peer-checked:peer-disabled:bg-gray-200 peer-checked:peer-disabled:cursor-not-allowed",
           )}
         />
       </div>

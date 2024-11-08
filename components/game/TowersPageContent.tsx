@@ -14,16 +14,18 @@ type TowersPageContentProps = {
 }
 
 export default function TowersPageContent({ roomId, tableId }: TowersPageContentProps): ReactNode {
-  const { status, update } = useSessionData()
+  const { data: session, status, update } = useSessionData()
   const isConnected: boolean = useAppSelector((state: RootState) => state.socket.isConnected)
   const dispatch: AppDispatch = useAppDispatch()
 
-  // Polling the session every 1 hour
+  /**
+   * Polling the session every 1 hour
+   */
   useEffect(() => {
     const handleOnline = (): void => {
       console.info("You are online.")
-      update()
       connectToSocket()
+      update()
     }
 
     const handleOffline = (): void => {
@@ -31,11 +33,14 @@ export default function TowersPageContent({ roomId, tableId }: TowersPageContent
       dispatch(destroySocket())
     }
 
+    // TIP: You can also use `navigator.onLine` and some extra event handlers
+    // to check if the user is online and only update the session if they are.
+    // https://developer.mozilla.org/en-US/docs/Web/API/Navigator/onLine
     const interval: NodeJS.Timeout = setInterval(
       () => {
         if (navigator.onLine) update()
       },
-      1000 * 60 * 60
+      1000 * 60 * 60,
     )
 
     window.addEventListener("online", handleOnline)
@@ -72,7 +77,7 @@ export default function TowersPageContent({ roomId, tableId }: TowersPageContent
 
   const connectToSocket = (): void => {
     if (status === "authenticated" && !isConnected) {
-      dispatch(initSocket())
+      dispatch(initSocket({ session }))
     }
   }
 

@@ -1,8 +1,8 @@
 import { Type } from "@sinclair/typebox"
 
 export const confirmEmailChangeSchema = Type.Object({
-  token: Type.String({ minLength: 1 })
+  token: Type.String({ minLength: 1 }),
 })
 
-export type ConfirmEmailChangeFormData = SchemaFormData<typeof confirmEmailChangeSchema>
-export type ConfirmEmailChangeFormErrorMessages = SchemaFormErrorMessages<keyof ConfirmEmailChangeFormData>
+export type ConfirmEmailChangePayload = FormPayload<typeof confirmEmailChangeSchema>
+export type ConfirmEmailChangeFormValidationErrors = FormValidationErrors<keyof ConfirmEmailChangePayload>

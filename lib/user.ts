@@ -7,6 +7,6 @@ import prisma from "@/lib/prisma"
 export const updateLastActiveAt = async (userId: string): Promise<void> => {
   await prisma.user.update({
     where: { id: userId, isOnline: true },
-    data: { lastActiveAt: new Date() }
+    data: { lastActiveAt: new Date() },
   })
 }

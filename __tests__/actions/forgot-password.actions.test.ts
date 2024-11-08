@@ -1,77 +1,74 @@
 import { Mock } from "vitest"
 import { forgotPassword } from "@/app/(auth)/forgot-password/forgot-password.actions"
-import { POST } from "@/app/api/forgot-password/route"
+import { ForgotPasswordErrorMessages } from "@/app/(auth)/forgot-password/forgot-password.schema"
 import { mockFormInitialState } from "@/vitest.setup"
 
-vi.mock("@/app/api/forgot-password/route", () => ({
-  POST: vi.fn()
-}))
-
 describe("Forgot Password Actions", () => {
+  let mockFetch: Mock
+
+  beforeEach(() => {
+    mockFetch = vi.fn()
+    global.fetch = mockFetch
+  })
+
   afterEach(() => {
     vi.restoreAllMocks()
   })
 
   it("should return errors if required fields are empty", async () => {
-    const formData = new FormData()
+    const formData: FormData = new FormData()
     formData.append("email", "")
 
-    const response = {
-      success: false,
-      error: {
-        email: "The email is required."
-      }
+    const error: ForgotPasswordErrorMessages = {
+      email: "The email is required.",
     }
 
-    ;(POST as Mock).mockResolvedValueOnce({
-      json: async () => response
+    const result: ApiResponse = await forgotPassword(mockFormInitialState, formData)
+
+    expect(mockFetch).not.toHaveBeenCalled()
+    expect(result).toEqual({
+      success: false,
+      error,
     })
-
-    const result = await forgotPassword(mockFormInitialState, formData)
-
-    expect(POST).not.toHaveBeenCalled()
-    expect(result).toEqual(response)
   })
 
   it("should return errors if required fields are invalid", async () => {
-    const formData = new FormData()
+    const formData: FormData = new FormData()
     formData.append("email", "@example.com")
 
-    const response = {
-      success: false,
-      error: {
-        email: "The email is required."
-      }
+    const error: ForgotPasswordErrorMessages = {
+      email: "The email is required.",
     }
 
-    ;(POST as Mock).mockResolvedValueOnce({
-      json: async () => response
+    const result: ApiResponse = await forgotPassword(mockFormInitialState, formData)
+
+    expect(mockFetch).not.toHaveBeenCalled()
+    expect(result).toEqual({
+      success: false,
+      error,
     })
-
-    const result = await forgotPassword(mockFormInitialState, formData)
-
-    expect(POST).not.toHaveBeenCalled()
-    expect(result).toEqual(response)
   })
 
   it("should call POST and return success if the payload is valid", async () => {
-    const formData = new FormData()
+    const formData: FormData = new FormData()
     formData.append("email", "john.doe@example.com")
 
-    const response = {
+    const mockResponse = {
       success: true,
-      message: "A reset password link has been sent in your inbox!"
+      message: "A reset password link has been sent in your inbox!",
     }
 
-    ;(POST as Mock).mockResolvedValueOnce({
-      json: async () => response
+    mockFetch.mockResolvedValueOnce({ json: async () => mockResponse })
+
+    const result: ApiResponse = await forgotPassword(mockFormInitialState, formData)
+
+    expect(mockFetch).toHaveBeenCalledWith(`${process.env.BASE_URL}/api/forgot-password`, {
+      method: "POST",
+      body: JSON.stringify({
+        email: "john.doe@example.com",
+      }),
     })
 
-    const result = await forgotPassword(mockFormInitialState, formData)
-
-    expect(POST).toHaveBeenCalledWith({
-      email: "john.doe@example.com"
-    })
-    expect(result).toEqual(response)
+    expect(result).toEqual(mockResponse)
   })
 })

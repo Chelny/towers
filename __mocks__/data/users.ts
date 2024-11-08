@@ -18,19 +18,19 @@ export const mockUser1: User = {
   bannedAt: null,
   deletionScheduledAt: null,
   createdAt: new Date(),
-  updatedAt: new Date()
+  updatedAt: new Date(),
 }
 
 export const mockLoadingSession: TSessionContextValue = {
   data: null,
   status: "loading",
-  update: vi.fn()
+  update: vi.fn(),
 }
 
 export const mockUnauthenticatedSession: TSessionContextValue = {
   data: null,
   status: "unauthenticated",
-  update: vi.fn()
+  update: vi.fn(),
 }
 
 export const mockAuthenticatedSession: TSessionContextValue = {
@@ -39,14 +39,14 @@ export const mockAuthenticatedSession: TSessionContextValue = {
       id: mockUser1.id,
       name: mockUser1.name,
       username: mockUser1.username!,
-      image: mockUser1.image
+      image: mockUser1.image,
     },
     account: null,
     isNewUser: false,
-    expires: "2024-01-01T00:00:00Z"
+    expires: "2024-01-01T00:00:00Z",
   },
   status: "authenticated",
-  update: vi.fn()
+  update: vi.fn(),
 }
 
 export const mockUser2: User = {
@@ -66,7 +66,7 @@ export const mockUser2: User = {
   bannedAt: null,
   deletionScheduledAt: null,
   createdAt: new Date(),
-  updatedAt: new Date()
+  updatedAt: new Date(),
 }
 
 export const mockUser3: User = {
@@ -86,7 +86,7 @@ export const mockUser3: User = {
   bannedAt: null,
   deletionScheduledAt: null,
   createdAt: new Date(),
-  updatedAt: new Date()
+  updatedAt: new Date(),
 }
 
 export const mockUser4: User = {
@@ -106,7 +106,7 @@ export const mockUser4: User = {
   bannedAt: null,
   deletionScheduledAt: null,
   createdAt: new Date(),
-  updatedAt: new Date()
+  updatedAt: new Date(),
 }
 
 export const mockUser5: User = {
@@ -126,5 +126,5 @@ export const mockUser5: User = {
   bannedAt: null,
   deletionScheduledAt: null,
   createdAt: new Date(),
-  updatedAt: new Date()
+  updatedAt: new Date(),
 }

@@ -8,8 +8,8 @@ export const getVerificationTokenByIdentifierToken = async (token: string): Prom
     where: {
       identifier_token: {
         identifier,
-        token
-      }
-    }
+        token,
+      },
+    },
   })
 }

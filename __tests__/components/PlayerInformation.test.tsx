@@ -7,7 +7,7 @@ import PlayerInformation from "@/components/game/PlayerInformation"
 import { useSessionData } from "@/hooks/useSessionData"
 
 vi.mock("@/hooks/useSessionData", () => ({
-  useSessionData: vi.fn()
+  useSessionData: vi.fn(),
 }))
 
 describe("PlayerInformation Component", () => {

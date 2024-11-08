@@ -1,57 +1,54 @@
 import { NextURL } from "next/dist/server/web/next-url"
-import { NextResponse, userAgent } from "next/server"
-import axios, { AxiosResponse } from "axios"
-import { auth } from "@/auth"
+import { NextResponse } from "next/server"
+import { NextAuthRequest } from "next-auth"
+import { auth as middleware } from "@/auth"
 import {
   API_AUTH_PREFIX,
   PROTECTED_ROUTES,
   PUBLIC_ROUTES,
+  ROUTE_GAMES,
   ROUTE_RESET_PASSWORD,
   ROUTE_SIGN_IN,
-  ROUTE_TOWERS
 } from "@/constants/routes"
 
 const validateToken = async (token: string): Promise<boolean> => {
-  const response: AxiosResponse<ApiResponse> = await axios.get(
-    `${process.env.BASE_URL}/api/reset-password?token=${token}`
-  )
-  return response.data.success
+  const response: Response = await fetch(`/api/reset-password?token=${token}`)
+
+  if (!response.ok) {
+    return false
+  }
+
+  const result = await response.json()
+  return result.success
 }
 
-export default auth(async (request): Promise<NextResponse> => {
+export default middleware(async (request: NextAuthRequest) => {
   // Content Security Policy (CSP)
   const nonce: string = Buffer.from(crypto.randomUUID()).toString("base64")
   const cspHeader: string = `
-    default-src 'self';
-    script-src 'self' 'nonce-${nonce}' 'strict-dynamic';
-    style-src 'self' 'nonce-${nonce}';
-    img-src 'self' blob: data:;
-    font-src 'self';
-    object-src 'none';
-    base-uri 'self';
-    form-action 'self';
-    frame-ancestors 'none';
+    default-src "self";
+    script-src "self" "nonce-${nonce}" "strict-dynamic";
+    style-src "self" "nonce-${nonce}";
+    img-src "self" blob: data:;
+    font-src "self";
+    object-src "none";
+    base-uri "self";
+    form-action "self";
+    frame-ancestors "none";
     upgrade-insecure-requests;
   `
 
   const requestHeaders: Headers = new Headers(request.headers)
-  requestHeaders.set("x-nonce", nonce)
+  requestHeaders.set("X-Nonce", nonce)
   requestHeaders.set("Content-Security-Policy", cspHeader.replace(/\s{2,}/g, " ").trim())
 
   const response: NextResponse = NextResponse.next({
     request: {
-      headers: requestHeaders
-    }
+      headers: requestHeaders,
+    },
   })
 
-  // User agent
-  const ipAddress: string = request.headers.get("x-forwarded-for") || request.ip || "[unknown]"
-  const { ua } = userAgent(request)
-
-  response.cookies.set("user-ip", ipAddress, { httpOnly: true })
-  response.cookies.set("user-agent", ua, { httpOnly: true })
-
-  // Allow next-auth paths
+  // Allow Auth.js paths
   if (request.nextUrl.pathname.startsWith(API_AUTH_PREFIX)) {
     return response
   }
@@ -74,7 +71,7 @@ export default auth(async (request): Promise<NextResponse> => {
 
   if (request.auth) {
     if (PUBLIC_ROUTES.includes(request.nextUrl.pathname)) {
-      const newUrl: URL = new URL(ROUTE_TOWERS.PATH, request.nextUrl.origin)
+      const newUrl: URL = new URL(ROUTE_GAMES.PATH, request.nextUrl.origin)
       return NextResponse.redirect(newUrl)
     }
   } else {
@@ -94,14 +91,14 @@ export const config = {
      * - api (API routes)
      * - _next/static (static files)
      * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
+     * - favicon.ico, sitemap.xml, robots.txt (metadata files)
      */
     {
-      source: "/((?!api|_next/static|_next/image|favicon.ico).*)",
+      source: "/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)",
       missing: [
         { type: "header", key: "next-router-prefetch" },
-        { type: "header", key: "purpose", value: "prefetch" }
-      ]
-    }
-  ]
+        { type: "header", key: "purpose", value: "prefetch" },
+      ],
+    },
+  ],
 }

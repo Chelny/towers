@@ -12,7 +12,7 @@ describe("Modal Component", () => {
     render(
       <Modal title="Test Modal" isOpen={true}>
         <p>Modal content</p>
-      </Modal>
+      </Modal>,
     )
 
     expect(screen.getByText("Test Modal")).toBeInTheDocument()
@@ -23,7 +23,7 @@ describe("Modal Component", () => {
     render(
       <Modal title="Test Modal" isOpen={false}>
         <p>Modal content</p>
-      </Modal>
+      </Modal>,
     )
 
     const modal: HTMLElement | null = screen.queryByText("Test Modal")
@@ -34,7 +34,7 @@ describe("Modal Component", () => {
     render(
       <Modal title="Test Modal" isOpen={true}>
         <p>Modal content</p>
-      </Modal>
+      </Modal>,
     )
 
     const modal: HTMLElement | null = screen.getByText("Test Modal")
@@ -47,7 +47,7 @@ describe("Modal Component", () => {
     render(
       <Modal title="Test Modal" isOpen={true} onCancel={handleCancel}>
         <p>Modal content</p>
-      </Modal>
+      </Modal>,
     )
 
     const closeButton: HTMLButtonElement = screen.getByText("Cancel")
@@ -62,7 +62,7 @@ describe("Modal Component", () => {
     render(
       <Modal title="Test Modal" isOpen={true} onConfirm={handleConfirm}>
         <p>Modal content</p>
-      </Modal>
+      </Modal>,
     )
 
     const confirmButton: HTMLButtonElement = screen.getByText("Confirm")
@@ -75,7 +75,7 @@ describe("Modal Component", () => {
     render(
       <Modal title="Test Modal" isOpen={true} cancelText="Dismiss" confirmText="Proceed" onConfirm={vi.fn()}>
         <p>Modal content</p>
-      </Modal>
+      </Modal>,
     )
 
     expect(screen.getByText("Dismiss")).toBeInTheDocument()
@@ -88,7 +88,7 @@ describe("Modal Component", () => {
     render(
       <Modal title="Test Modal" isOpen={true} onCancel={handleCancel} onConfirm={handleCancel}>
         <p>Modal content</p>
-      </Modal>
+      </Modal>,
     )
 
     const confirmButton: HTMLButtonElement = screen.getByText("Confirm")
@@ -103,7 +103,7 @@ describe("Modal Component", () => {
     render(
       <Modal title="Test Modal" isOpen={true} onCancel={handleCancel}>
         <p>Modal content</p>
-      </Modal>
+      </Modal>,
     )
 
     const closeButton: HTMLButtonElement = screen.getByText("Cancel")
@@ -118,7 +118,7 @@ describe("Modal Component", () => {
     render(
       <Modal title="Test Modal" isOpen={true} dataTestId="test-modal" onCancel={handleCancel}>
         <p>Modal content</p>
-      </Modal>
+      </Modal>,
     )
 
     const dialog: HTMLDialogElement = screen.getByTestId("test-modal")

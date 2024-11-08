@@ -6,7 +6,7 @@ export const mockRoom1: TowersRoom = {
   difficulty: RoomLevel.SOCIAL,
   full: false,
   createdAt: new Date(),
-  updatedAt: new Date()
+  updatedAt: new Date(),
 }
 
 export const mockRoom2: TowersRoom = {
@@ -15,7 +15,7 @@ export const mockRoom2: TowersRoom = {
   difficulty: RoomLevel.BEGINNER,
   full: true,
   createdAt: new Date(),
-  updatedAt: new Date()
+  updatedAt: new Date(),
 }
 
 export const mockRoom3: TowersRoom = {
@@ -24,5 +24,5 @@ export const mockRoom3: TowersRoom = {
   difficulty: RoomLevel.ADVANCED,
   full: false,
   createdAt: new Date(),
-  updatedAt: new Date()
+  updatedAt: new Date(),
 }

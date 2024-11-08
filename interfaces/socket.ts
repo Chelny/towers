@@ -3,7 +3,7 @@ import {
   ITowersRoomChatMessage,
   ITowersTable,
   ITowersTableChatMessage,
-  ITowersUserRoomTable
+  ITowersUserRoomTable,
 } from "@prisma/client"
 
 export interface SocketState {

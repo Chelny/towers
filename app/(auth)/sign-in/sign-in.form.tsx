@@ -1,16 +1,15 @@
 "use client"
 
-import { FormEvent, ReactNode } from "react"
-import { useFormState, useFormStatus } from "react-dom"
+import { ReactNode, useActionState } from "react"
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime"
 import { useRouter } from "next/navigation"
 import { signIn as authSignInWithProvider } from "next-auth/react"
 import { FaGithub } from "react-icons/fa6"
-import { GoPasskeyFill } from "react-icons/go"
+// import { GoPasskeyFill } from "react-icons/go"
 import { IoLogoGoogle } from "react-icons/io"
 import { PiMagicWandFill } from "react-icons/pi"
 import { signIn } from "@/app/(auth)/sign-in/sign-in.actions"
-import { SignInFormErrorMessages } from "@/app/(auth)/sign-in/sign-in.schema"
+import { SignInFormValidationErrors } from "@/app/(auth)/sign-in/sign-in.schema"
 import AlertMessage from "@/components/ui/AlertMessage"
 import Anchor from "@/components/ui/Anchor"
 import Button from "@/components/ui/Button"
@@ -19,27 +18,20 @@ import {
   ROUTE_FORGOT_PASSWORD,
   ROUTE_SIGN_IN_WITH_MAGIC_LINK,
   ROUTE_SIGN_UP,
-  SIGN_IN_REDIRECT
+  SIGN_IN_REDIRECT,
 } from "@/constants/routes"
 import { useSessionData } from "@/hooks/useSessionData"
 
 const initialState = {
   success: false,
   message: "",
-  error: {} as SignInFormErrorMessages
+  error: {} as SignInFormValidationErrors,
 }
 
 export function SignInForm(): ReactNode {
   const router: AppRouterInstance = useRouter()
   const { status } = useSessionData()
-  const { pending } = useFormStatus()
-  const [state, formAction] = useFormState<ApiResponse, FormData>(signIn, initialState)
-
-  const handleSignIn = (event: FormEvent<HTMLFormElement>): void => {
-    event.preventDefault()
-    const formData: FormData = new FormData(event.currentTarget)
-    formAction(formData)
-  }
+  const [state, formAction, isPending] = useActionState<ApiResponse, FormData>(signIn, initialState)
 
   const handleSignInWithMagicLink = (): void => {
     router.push(ROUTE_SIGN_IN_WITH_MAGIC_LINK.PATH)
@@ -47,12 +39,12 @@ export function SignInForm(): ReactNode {
 
   const handleSignInWithProvider = (provider: "google" | "github"): void => {
     authSignInWithProvider(provider, {
-      callbackUrl: SIGN_IN_REDIRECT
+      callbackUrl: SIGN_IN_REDIRECT,
     })
   }
 
   return (
-    <form className="w-full" noValidate onSubmit={handleSignIn}>
+    <form className="w-full" action={formAction} noValidate>
       {!state.success && state.message && <AlertMessage type="error">{state.message}</AlertMessage>}
       <Input id="email" label="Email" autoComplete="email" required dataTestId="sign-in-email-input" />
       <Input
@@ -66,7 +58,7 @@ export function SignInForm(): ReactNode {
       <div className="flex justify-end mb-4">
         <Anchor href={ROUTE_FORGOT_PASSWORD.PATH}>Forgot Password?</Anchor>
       </div>
-      <Button type="submit" className="w-full" disabled={pending} dataTestId="sign-in-submit-button">
+      <Button type="submit" className="w-full" disabled={isPending} dataTestId="sign-in-submit-button">
         Sign In
       </Button>
       <div className="my-4 text-center">
@@ -80,7 +72,7 @@ export function SignInForm(): ReactNode {
       <div className="space-y-4">
         <Button
           className="flex justify-center items-center w-full gap-x-2"
-          disabled={pending}
+          disabled={isPending}
           dataTestId="sign-in-magic-link-button"
           onClick={handleSignInWithMagicLink}
         >
@@ -91,7 +83,7 @@ export function SignInForm(): ReactNode {
         {/* {status === "authenticated" ? (
           <Button
             className="flex justify-center items-center w-full gap-x-2"
-            disabled={pending}
+            disabled={isPending}
             dataTestId="sign-up-passkey-button"
             onClick={() => authSignInWithProvider("passkey", { action: "register" })}
           >
@@ -101,7 +93,7 @@ export function SignInForm(): ReactNode {
         ) : status === "unauthenticated" ? (
           <Button
             className="flex justify-center items-center w-full gap-x-2"
-            disabled={pending}
+            disabled={isPending}
             dataTestId="sign-in-passkey-button"
             onClick={() => authSignInWithProvider("passkey")}
           >
@@ -112,7 +104,7 @@ export function SignInForm(): ReactNode {
         <Button
           type="button"
           className="flex justify-center items-center w-full gap-x-2"
-          disabled={pending}
+          disabled={isPending}
           dataTestId="sign-in-github-button"
           onClick={() => handleSignInWithProvider("github")}
         >
@@ -122,7 +114,7 @@ export function SignInForm(): ReactNode {
         <Button
           type="button"
           className="flex justify-center items-center w-full gap-x-2"
-          disabled={pending}
+          disabled={isPending}
           dataTestId="sign-in-google-button"
           onClick={() => handleSignInWithProvider("google")}
         >

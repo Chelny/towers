@@ -7,14 +7,14 @@ import {
   isPowerBarBlock,
   isPowerPieceBlock,
   isSpecialDiamond,
-  isTowersBlock
+  isTowersBlock,
 } from "@/utils/block-guards-utils"
 
 const defaultTowersBlockProps = {
   powerType: null,
   powerLevel: null,
   isToBeRemoved: false,
-  brokenBlockNumber: null
+  brokenBlockNumber: null,
 }
 
 describe("isTowersBlock Utility", () => {
@@ -25,7 +25,7 @@ describe("isTowersBlock Utility", () => {
       { ...defaultTowersBlockProps, letter: "W" },
       { ...defaultTowersBlockProps, letter: "E" },
       { ...defaultTowersBlockProps, letter: "R" },
-      { ...defaultTowersBlockProps, letter: "S" }
+      { ...defaultTowersBlockProps, letter: "S" },
     ]
 
     blocks.forEach((block: Block) => {
@@ -52,7 +52,7 @@ describe("isMedusaBlock Utility", () => {
     const blocks: Block[] = [
       { ...defaultTowersBlockProps, letter: "T" },
       { letter: "MI" },
-      { letter: "SD", specialDiamondType: "speed drop" }
+      { letter: "SD", specialDiamondType: "speed drop" },
     ]
 
     blocks.forEach((block: Block) => {
@@ -71,7 +71,7 @@ describe("isMidasBlock Utility", () => {
     const blocks: Block[] = [
       { ...defaultTowersBlockProps, letter: "T" },
       { letter: "ME" },
-      { letter: "SD", specialDiamondType: "speed drop" }
+      { letter: "SD", specialDiamondType: "speed drop" },
     ]
 
     blocks.forEach((block: Block) => {
@@ -125,7 +125,7 @@ describe("isPowerPieceBlock Utility", () => {
   it("should return false for non-power piece block", () => {
     const blocks: Block[] = [
       { ...defaultTowersBlockProps, letter: "T" },
-      { letter: "SD", specialDiamondType: "speed drop" }
+      { letter: "SD", specialDiamondType: "speed drop" },
     ]
 
     blocks.forEach((block: Block) => {
@@ -138,7 +138,7 @@ describe("isPowerBarBlock Utility", () => {
   it("should return true for power bar block with non-null powerType", () => {
     const blocks: Block[] = [
       { ...defaultTowersBlockProps, letter: "T", powerType: "attack" },
-      { letter: "SD", specialDiamondType: "speed drop" }
+      { letter: "SD", specialDiamondType: "speed drop" },
     ]
 
     blocks.forEach((block: Block) => {
@@ -166,7 +166,7 @@ describe("isEmptyCell Utility", () => {
       { ...defaultTowersBlockProps, letter: "T" },
       { letter: "ME" },
       { letter: "MI" },
-      { letter: "SD", specialDiamondType: "speed drop" }
+      { letter: "SD", specialDiamondType: "speed drop" },
     ]
 
     blocks.forEach((block: Block) => {

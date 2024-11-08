@@ -8,7 +8,7 @@ describe("Select Component", () => {
       <Select id="test-select" label="Choose option" placeholder="Select an option">
         <Select.Option value="1">Option 1</Select.Option>
         <Select.Option value="2">Option 2</Select.Option>
-      </Select>
+      </Select>,
     )
 
     expect(screen.getByText("Select an option")).toBeInTheDocument()
@@ -19,7 +19,7 @@ describe("Select Component", () => {
       <Select id="test-select" label="Choose option">
         <Select.Option value="1">Option 1</Select.Option>
         <Select.Option value="2">Option 2</Select.Option>
-      </Select>
+      </Select>,
     )
 
     fireEvent.click(screen.getByRole("combobox"))
@@ -33,7 +33,7 @@ describe("Select Component", () => {
       <Select id="test-select" label="Choose option" onChange={handleChange}>
         <Select.Option value="1">Option 1</Select.Option>
         <Select.Option value="2">Option 2</Select.Option>
-      </Select>
+      </Select>,
     )
 
     fireEvent.click(screen.getByRole("combobox"))
@@ -48,7 +48,7 @@ describe("Select Component", () => {
       <Select id="test-select" label="Choose option">
         <Select.Option value="1">Option 1</Select.Option>
         <Select.Option value="2">Option 2</Select.Option>
-      </Select>
+      </Select>,
     )
 
     fireEvent.click(screen.getByRole("combobox"))

@@ -23,7 +23,7 @@ export default function GridCell(props: GridCellProps): ReactNode {
         !props.isOpponentBoard && props.block.isToBeRemoved && !props.block.brokenBlockNumber && styles.BlockBreak,
         props.block.isToBeRemoved &&
           props.block.brokenBlockNumber &&
-          styles[`BlockExplode-${props.block.brokenBlockNumber}`]
+          styles[`BlockExplode-${props.block.brokenBlockNumber}`],
       )}
       role="gridcell"
     >

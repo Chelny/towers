@@ -3,7 +3,7 @@ import { Metadata } from "next"
 import { ROUTE_GAMES } from "@/constants/routes"
 
 export const metadata: Metadata = {
-  title: ROUTE_GAMES.TITLE
+  title: ROUTE_GAMES.TITLE,
 }
 
 export default function Games(): ReactNode {

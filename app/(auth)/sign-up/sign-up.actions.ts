@@ -1,23 +1,21 @@
 "use server"
 
-import { NextResponse } from "next/server"
 import { Value, ValueError } from "@sinclair/typebox/value"
-import { SignUpFormData, SignUpFormErrorMessages, signUpSchema } from "@/app/(auth)/sign-up/sign-up.schema"
-import { POST } from "@/app/api/sign-up/route"
+import { SignUpFormValidationErrors, SignUpPayload, signUpSchema } from "@/app/(auth)/sign-up/sign-up.schema"
 
 export async function signUp(prevState: ApiResponse, formData: FormData): Promise<ApiResponse> {
-  const rawFormData: SignUpFormData = {
+  const payload: SignUpPayload = {
     name: formData.get("name") as string,
     birthdate: formData.get("birthdate") as string,
     email: formData.get("email") as string,
     username: formData.get("username") as string,
     password: formData.get("password") as string,
     confirmPassword: formData.get("confirmPassword") as string,
-    termsAndConditions: formData.get("termsAndConditions") === "on"
+    termsAndConditions: formData.get("termsAndConditions") === "on",
   }
 
-  const errors: ValueError[] = Array.from(Value.Errors(signUpSchema, rawFormData))
-  const errorMessages: SignUpFormErrorMessages = {}
+  const errors: ValueError[] = Array.from(Value.Errors(signUpSchema, payload))
+  const errorMessages: SignUpFormValidationErrors = {}
 
   for (const error of errors) {
     switch (error.path.replace("/", "")) {
@@ -25,7 +23,7 @@ export async function signUp(prevState: ApiResponse, formData: FormData): Promis
         errorMessages.name = "The name is invalid."
         break
       case "birthdate":
-        if (rawFormData.birthdate) {
+        if (payload.birthdate) {
           errorMessages.birthdate = "The birthdate is invalid."
         }
         break
@@ -50,18 +48,21 @@ export async function signUp(prevState: ApiResponse, formData: FormData): Promis
     }
   }
 
-  if (rawFormData.password !== rawFormData.confirmPassword) {
+  if (payload.password !== payload.confirmPassword) {
     errorMessages.confirmPassword = "The password and password confirmation do not match."
   }
 
   if (Object.keys(errorMessages).length === 0) {
-    const response: NextResponse = await POST(rawFormData)
-    const data = await response.json()
-    return data
+    const response: Response = await fetch(`${process.env.BASE_URL}/api/sign-up`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    })
+
+    return await response.json()
   }
 
   return {
     success: false,
-    error: errorMessages
+    error: errorMessages,
   }
 }

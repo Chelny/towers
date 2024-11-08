@@ -20,11 +20,11 @@ export default function RoomTable({ roomId, tableId }: RoomTableProps): ReactNod
   const isRoomTablesLoading: boolean = useAppSelector((state: RootState) => selectIsRoomTablesLoading(state, roomId))
   const tableInfo: ITowersTable | null = useAppSelector((state: RootState) => selectTableInfo(state, roomId, tableId))
   const tableUsers: ITowersUserRoomTable[] = useAppSelector((state: RootState) =>
-    selectTableUsers(state, roomId, tableId)
+    selectTableUsers(state, roomId, tableId),
   )
   const seatMapping: number[][] = [
     [1, 3, 5, 7],
-    [2, 4, 6, 8]
+    [2, 4, 6, 8],
   ]
 
   const handleJoinTable = (): void => {
@@ -53,7 +53,7 @@ export default function RoomTable({ roomId, tableId }: RoomTableProps): ReactNod
                 <div key={rowIndex} className="flex flex-row gap-1">
                   {row.map((seatNumber: number, colIndex: number) => {
                     const userRoomTable: ITowersUserRoomTable | undefined = tableUsers?.find(
-                      (userRoomTable: ITowersUserRoomTable) => userRoomTable.seatNumber === seatNumber
+                      (userRoomTable: ITowersUserRoomTable) => userRoomTable.seatNumber === seatNumber,
                     )
                     return userRoomTable?.userProfile?.user ? (
                       <div

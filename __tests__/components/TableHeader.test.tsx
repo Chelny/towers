@@ -8,8 +8,8 @@ describe("TableHeader Component", () => {
 
     expect(
       screen.getByText(
-        `Table: ${mockTowersTableState11Info?.tableNumber} - Host: ${mockTowersTableState11Info?.host?.user?.username}`
-      )
+        `Table: ${mockTowersTableState11Info?.tableNumber} - Host: ${mockTowersTableState11Info?.host?.user?.username}`,
+      ),
     ).toBeInTheDocument()
     expect(screen.getByText(mockTowersRoomState1Info?.name!)).toBeInTheDocument()
   })

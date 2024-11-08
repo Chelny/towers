@@ -1,5 +1,5 @@
 import { act } from "react"
-import { renderHook } from "@testing-library/react-hooks"
+import { renderHook } from "@testing-library/react"
 import { BOARD_ROWS, HIDDEN_ROWS_COUNT, PIECE_LENGTH, PIECE_STARTING_COL, PIECE_STARTING_ROW } from "@/constants/game"
 import {
   boardReducer,
@@ -8,7 +8,7 @@ import {
   getEmptyBoard,
   getRandomPiece,
   hasCollisions,
-  useTowersBoard
+  useTowersBoard,
 } from "@/hooks/useTowersBoard"
 import { Board, BoardState, Piece } from "@/interfaces/game"
 
@@ -21,12 +21,12 @@ describe("useTowersBoard Hook", () => {
       droppingPiece: [
         { letter: "T", powerType: null, powerLevel: null, isToBeRemoved: false, brokenBlockNumber: null },
         { letter: "T", powerType: null, powerLevel: null, isToBeRemoved: false, brokenBlockNumber: null },
-        { letter: "T", powerType: null, powerLevel: null, isToBeRemoved: false, brokenBlockNumber: null }
+        { letter: "T", powerType: null, powerLevel: null, isToBeRemoved: false, brokenBlockNumber: null },
       ],
       droppingRow: PIECE_STARTING_ROW,
       droppingColumn: PIECE_STARTING_COL,
       powerBar: [],
-      usedPowerBlock: null
+      usedPowerBlock: null,
     })
   })
 
@@ -81,7 +81,7 @@ describe("useTowersBoard Hook", () => {
       droppingRow: PIECE_STARTING_ROW,
       droppingColumn: PIECE_STARTING_COL,
       powerBar: [],
-      usedPowerBlock: null
+      usedPowerBlock: null,
     }
 
     const newBoard: Board = getEmptyBoard()
@@ -90,7 +90,7 @@ describe("useTowersBoard Hook", () => {
     const newState: BoardState = boardReducer(initialState, {
       type: "commit",
       newBoard,
-      newPiece
+      newPiece,
     })
 
     expect(newState.board).toEqual([...getEmptyBoard(BOARD_ROWS - newBoard.length), ...newBoard])

@@ -1,26 +1,34 @@
-import { useFormState, useFormStatus } from "react-dom"
+import { useActionState } from "react"
 import { useRouter } from "next/navigation"
 import { render, screen } from "@testing-library/react"
 import { CancelAccountForm } from "@/app/(protected)/account/cancel/cancel.form"
 import { mockRouter } from "@/vitest.setup"
 
+vi.mock("react", async (importActual) => {
+  const actual = await importActual<typeof import("react")>()
+
+  return {
+    ...actual,
+    useActionState: vi.fn(),
+  }
+})
+
 vi.mock("next/navigation")
 
-vi.mock("react-dom", () => ({
-  useFormState: vi.fn(),
-  useFormStatus: vi.fn()
-}))
+vi.mock("resend", () => {
+  return {
+    Resend: vi.fn().mockImplementation(() => {
+      return {
+        sendEmail: vi.fn().mockResolvedValue({ success: true }),
+      }
+    }),
+  }
+})
 
 describe("Cancel Account Form", () => {
   beforeEach(() => {
     vi.mocked(useRouter).mockReturnValue(mockRouter)
-    vi.mocked(useFormState).mockReturnValue([{ success: false, message: "", error: {} }, vi.fn(), false])
-    vi.mocked(useFormStatus).mockReturnValue({
-      pending: false,
-      data: null,
-      method: null,
-      action: null
-    })
+    vi.mocked(useActionState).mockReturnValue([{ success: false, message: "", error: {} }, vi.fn(), false])
   })
 
   afterEach(() => {
@@ -41,15 +49,15 @@ describe("Cancel Account Form", () => {
   })
 
   it("should show error messages when submitting an empty form", () => {
-    vi.mocked(useFormState).mockReturnValue([
+    vi.mocked(useActionState).mockReturnValue([
       {
         success: false,
         error: {
-          email: "The email is invalid"
-        }
+          email: "The email is invalid",
+        },
       },
       vi.fn(),
-      false
+      false,
     ])
 
     render(<CancelAccountForm />)
@@ -58,12 +66,7 @@ describe("Cancel Account Form", () => {
   })
 
   it("should disable the submit button when the form is submitting", () => {
-    vi.mocked(useFormStatus).mockReturnValue({
-      pending: true,
-      data: new FormData(),
-      method: "DELETE",
-      action: "/api/account"
-    })
+    vi.mocked(useActionState).mockReturnValue([{ success: false, message: "" }, vi.fn(), true])
 
     render(<CancelAccountForm />)
 
@@ -71,14 +74,14 @@ describe("Cancel Account Form", () => {
   })
 
   it("should display a success message on form submission success", () => {
-    vi.mocked(useFormState).mockReturnValue([
+    vi.mocked(useActionState).mockReturnValue([
       {
         success: true,
         message:
-          "Your account deletion request has been accepted. Your account will be permanently deleted after 30 days."
+          "Your account deletion request has been accepted. Your account will be permanently deleted after 30 days.",
       },
       vi.fn(),
-      false
+      false,
     ])
 
     render(<CancelAccountForm />)

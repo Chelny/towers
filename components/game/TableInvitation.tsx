@@ -22,7 +22,7 @@ export default function TableInvitation({
   isOpen,
   data,
   onAcceptInvitation,
-  onCancel
+  onCancel,
 }: TableInvitationProps): ReactNode {
   const [reason, setReason] = useState<string>("")
   const [declineAll, setDeclineAll] = useState<boolean>(false)

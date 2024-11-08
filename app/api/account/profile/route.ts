@@ -1,33 +1,33 @@
 import { revalidatePath } from "next/cache"
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { User, UserStatus, VerificationToken } from "@prisma/client"
 import { Session } from "next-auth"
-import { ProfileFormData } from "@/app/(protected)/account/profile/profile.schema"
+import { ProfilePayload } from "@/app/(protected)/account/profile/profile.schema"
 import { auth } from "@/auth"
 import { ROUTE_PROFILE } from "@/constants/routes"
 import { getUserById, getUserByUsername } from "@/data/user"
+import { getPrismaError, unauthorized } from "@/lib/api"
 import { sendEmailChangeEmail } from "@/lib/email"
 import prisma from "@/lib/prisma"
 import { generateEmailChangeVerificationToken } from "@/lib/token"
-import { getPrismaError, unauthorized } from "@/utils/api"
 
 export async function GET(): Promise<NextResponse> {
+  const session: Session | null = await auth()
+
+  if (!session) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Please sign in to access your account.",
+      },
+      { status: 401 },
+    )
+  }
+
   try {
-    const session: Session | null = await auth()
-
-    if (!session) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Please sign in to access your account."
-        },
-        { status: 401 }
-      )
-    }
-
     const user: Partial<User> | null = await prisma.user.findUnique({
       where: {
-        id: session.user.id
+        id: session.user.id,
       },
       select: {
         name: true,
@@ -39,49 +39,54 @@ export async function GET(): Promise<NextResponse> {
         status: true,
         accounts: {
           select: {
-            provider: true
-          }
-        }
-      }
+            provider: true,
+          },
+        },
+      },
+      cacheStrategy: {
+        ttl: 600,
+        swr: 1800,
+      },
     })
 
     if (!user) {
       return NextResponse.json(
         {
           success: false,
-          message: "We couldn’t find an account with that information. Please check your details and try again."
+          message: "We couldn’t find an account with that information. Please check your details and try again.",
         },
-        { status: 404 }
+        { status: 404 },
       )
     }
 
     return NextResponse.json(
       {
         success: true,
-        data: user
+        data: user,
       },
-      { status: 200 }
+      { status: 200 },
     )
   } catch (error) {
     return getPrismaError(error)
   }
 }
 
-export async function PATCH(body: ProfileFormData): Promise<NextResponse> {
+export async function PATCH(request: NextRequest): Promise<NextResponse> {
+  const body: ProfilePayload = await request.json()
+
+  const session: Session | null = await auth()
+  if (!session) return unauthorized()
+
   try {
-    const session: Session | null = await auth()
-
-    if (!session) return unauthorized()
-
     const user: User | null = await getUserById(session.user.id)
 
     if (!user) {
       return NextResponse.json(
         {
           success: false,
-          message: "We couldn’t find an account with that information. Please check your details and try again."
+          message: "We couldn’t find an account with that information. Please check your details and try again.",
         },
-        { status: 404 }
+        { status: 404 },
       )
     }
 
@@ -91,9 +96,9 @@ export async function PATCH(body: ProfileFormData): Promise<NextResponse> {
       return NextResponse.json(
         {
           success: false,
-          message: "That username is already in use. Please choose a different one."
+          message: "That username is already in use. Please choose a different one.",
         },
-        { status: 409 }
+        { status: 409 },
       )
     }
 
@@ -101,7 +106,7 @@ export async function PATCH(body: ProfileFormData): Promise<NextResponse> {
       name: body.name,
       birthdate: body.birthdate ? new Date(body.birthdate) : undefined,
       username: body.username,
-      image: body.image
+      image: body.image,
     }
 
     let successMessage: string = "Your profile has been updated!"
@@ -118,7 +123,7 @@ export async function PATCH(body: ProfileFormData): Promise<NextResponse> {
           userData = {
             ...userData,
             pendingEmail: body.email,
-            status: UserStatus.PENDING_EMAIL_VERIFICATION
+            status: UserStatus.PENDING_EMAIL_VERIFICATION,
           }
 
           successMessage +=
@@ -127,20 +132,21 @@ export async function PATCH(body: ProfileFormData): Promise<NextResponse> {
       }
     }
 
+    // @ts-ignore
     const updatedUser: User = await prisma.user.update({
       where: {
-        id: session.user.id
+        id: session.user.id,
       },
-      data: userData
+      data: userData,
     })
 
     if (!updatedUser) {
       return NextResponse.json(
         {
           success: false,
-          message: "An error occurred. Please try again later."
+          message: "An error occurred. Please try again later.",
         },
-        { status: 500 }
+        { status: 500 },
       )
     }
 
@@ -157,10 +163,10 @@ export async function PATCH(body: ProfileFormData): Promise<NextResponse> {
           pendingEmail: updatedUser.pendingEmail,
           username: updatedUser.username,
           image: updatedUser.image,
-          status: updatedUser.status
-        }
+          status: updatedUser.status,
+        },
       },
-      { status: 200 }
+      { status: 200 },
     )
   } catch (error) {
     return getPrismaError(error)

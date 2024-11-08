@@ -3,7 +3,7 @@ import { ReactNode } from "react"
 export default function RoomTable(): ReactNode {
   const seatMapping: number[][] = [
     [1, 3, 5, 7],
-    [2, 4, 6, 8]
+    [2, 4, 6, 8],
   ]
 
   return (

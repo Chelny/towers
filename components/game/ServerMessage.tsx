@@ -19,7 +19,7 @@ export default function ServerMessage({ roomId, tableId }: ServerMessageProps): 
       return state.socket.errorMessage
     } else {
       if (roomId && tableId) {
-        return state.socket.towers[roomId].tables[tableId]?.errorMessage
+        return state.socket.towers[roomId]?.tables?.[tableId]?.errorMessage
       }
 
       return state.socket.towers[roomId]?.errorMessage

@@ -3,13 +3,13 @@ import {
   ITowersRoomChatMessage,
   ITowersTable,
   ITowersTableChatMessage,
-  ITowersUserRoomTable
+  ITowersUserRoomTable,
 } from "@prisma/client"
 import { mockRoom1, mockRoom2, mockRoom3 } from "@/__mocks__/data/rooms"
 import { mockRoom1Table1, mockRoom1Table2, mockRoom1Table3 } from "@/__mocks__/data/tables"
 import {
   mockRoom1TowersRoomChatMessage1,
-  mockRoom1TowersRoomChatMessage2
+  mockRoom1TowersRoomChatMessage2,
 } from "@/__mocks__/data/towersRoomChatMessages"
 import {
   mockRoom1Table1TowersChatMessage1,
@@ -20,21 +20,21 @@ import {
   mockRoom1Table1TowersChatMessage6,
   mockRoom1Table1TowersChatMessage7,
   mockRoom1Table1TowersChatMessage8,
-  mockRoom1Table1TowersChatMessage9
+  mockRoom1Table1TowersChatMessage9,
 } from "@/__mocks__/data/towersTableChatMessages"
 import {
   mockRoom1Table1TowersUserProfile1,
   mockRoom1Table1TowersUserProfile2,
   mockRoom1Table1TowersUserProfile3,
   mockRoom1Table1TowersUserProfile4,
-  mockRoom1Table1TowersUserProfile5
+  mockRoom1Table1TowersUserProfile5,
 } from "@/__mocks__/data/towersUserProfiles"
 import {
   mockRoom1Table1TowersUserRoomTable1,
   mockRoom1Table1TowersUserRoomTable2,
   mockRoom1Table1TowersUserRoomTable3,
   mockRoom1Table1TowersUserRoomTable4,
-  mockRoom1Table1TowersUserRoomTable5
+  mockRoom1Table1TowersUserRoomTable5,
 } from "@/__mocks__/data/towersUserRoomTables"
 import { mockUser1, mockUser2, mockUser3, mockUser4, mockUser5 } from "@/__mocks__/data/users"
 import { SocketState } from "@/interfaces/socket"
@@ -51,16 +51,16 @@ const mockRoom1Chat: ITowersRoomChatMessage[] = [
     ...mockRoom1TowersRoomChatMessage1,
     userProfile: {
       ...mockRoom1Table1TowersUserProfile1,
-      user: mockUser1
-    }
+      user: mockUser1,
+    },
   },
   {
     ...mockRoom1TowersRoomChatMessage2,
     userProfile: {
       ...mockRoom1Table1TowersUserProfile2,
-      user: mockUser2
-    }
-  }
+      user: mockUser2,
+    },
+  },
 ]
 
 const mockRoom1Users: ITowersUserRoomTable[] = [
@@ -68,42 +68,42 @@ const mockRoom1Users: ITowersUserRoomTable[] = [
     ...mockRoom1Table1TowersUserRoomTable1,
     userProfile: {
       ...mockRoom1Table1TowersUserProfile1,
-      user: mockUser1
+      user: mockUser1,
     },
-    table: mockRoom1Table1
+    table: mockRoom1Table1,
   },
   {
     ...mockRoom1Table1TowersUserRoomTable2,
     userProfile: {
       ...mockRoom1Table1TowersUserProfile2,
-      user: mockUser2
+      user: mockUser2,
     },
-    table: mockRoom1Table1
+    table: mockRoom1Table1,
   },
   {
     ...mockRoom1Table1TowersUserRoomTable3,
     userProfile: {
       ...mockRoom1Table1TowersUserProfile3,
-      user: mockUser3
+      user: mockUser3,
     },
-    table: mockRoom1Table1
+    table: mockRoom1Table1,
   },
   {
     ...mockRoom1Table1TowersUserRoomTable4,
     userProfile: {
       ...mockRoom1Table1TowersUserProfile4,
-      user: mockUser4
+      user: mockUser4,
     },
-    table: mockRoom1Table2
+    table: mockRoom1Table2,
   },
   {
     ...mockRoom1Table1TowersUserRoomTable5,
     userProfile: {
       ...mockRoom1Table1TowersUserProfile5,
-      user: mockUser5
+      user: mockUser5,
     },
-    table: mockRoom1Table3
-  }
+    table: mockRoom1Table3,
+  },
 ]
 
 /**
@@ -114,8 +114,8 @@ const mockRoom1Table1Info: ITowersTable = {
   ...mockRoom1Table1,
   host: {
     ...mockRoom1Table1TowersUserProfile1,
-    user: mockUser1
-  }
+    user: mockUser1,
+  },
 }
 
 const mockRoom1Table1Chat: ITowersTableChatMessage[] = [
@@ -123,65 +123,65 @@ const mockRoom1Table1Chat: ITowersTableChatMessage[] = [
     ...mockRoom1Table1TowersChatMessage1,
     userProfile: {
       ...mockRoom1Table1TowersUserProfile1,
-      user: mockUser1
-    }
+      user: mockUser1,
+    },
   },
   {
     ...mockRoom1Table1TowersChatMessage2,
     userProfile: {
       ...mockRoom1Table1TowersUserProfile2,
-      user: mockUser2
-    }
+      user: mockUser2,
+    },
   },
   {
     ...mockRoom1Table1TowersChatMessage3,
     userProfile: {
-      ...mockRoom1Table1TowersUserProfile1,
-      user: mockUser1
-    }
+      ...mockRoom1Table1TowersUserProfile2,
+      user: mockUser1,
+    },
   },
   {
     ...mockRoom1Table1TowersChatMessage4,
     userProfile: {
       ...mockRoom1Table1TowersUserProfile2,
-      user: mockUser2
-    }
+      user: mockUser2,
+    },
   },
   {
     ...mockRoom1Table1TowersChatMessage5,
     userProfile: {
       ...mockRoom1Table1TowersUserProfile1,
-      user: mockUser1
-    }
+      user: mockUser1,
+    },
   },
   {
     ...mockRoom1Table1TowersChatMessage6,
     userProfile: {
       ...mockRoom1Table1TowersUserProfile1,
-      user: mockUser1
-    }
+      user: mockUser1,
+    },
   },
   {
     ...mockRoom1Table1TowersChatMessage7,
     userProfile: {
       ...mockRoom1Table1TowersUserProfile1,
-      user: mockUser1
-    }
+      user: mockUser1,
+    },
   },
   {
     ...mockRoom1Table1TowersChatMessage8,
     userProfile: {
       ...mockRoom1Table1TowersUserProfile1,
-      user: mockUser1
-    }
+      user: mockUser1,
+    },
   },
   {
     ...mockRoom1Table1TowersChatMessage9,
     userProfile: {
       ...mockRoom1Table1TowersUserProfile1,
-      user: mockUser1
-    }
-  }
+      user: mockUser1,
+    },
+  },
 ]
 
 const mockRoom1Table1Users: ITowersUserRoomTable[] = [
@@ -189,26 +189,26 @@ const mockRoom1Table1Users: ITowersUserRoomTable[] = [
     ...mockRoom1Table1TowersUserRoomTable1,
     userProfile: {
       ...mockRoom1Table1TowersUserProfile1,
-      user: mockUser1
+      user: mockUser1,
     },
-    table: mockRoom1Table1
+    table: mockRoom1Table1,
   },
   {
     ...mockRoom1Table1TowersUserRoomTable2,
     userProfile: {
       ...mockRoom1Table1TowersUserProfile2,
-      user: mockUser2
+      user: mockUser2,
     },
-    table: mockRoom1Table1
+    table: mockRoom1Table1,
   },
   {
     ...mockRoom1Table1TowersUserRoomTable3,
     userProfile: {
       ...mockRoom1Table1TowersUserProfile3,
-      user: mockUser3
+      user: mockUser3,
     },
-    table: mockRoom1Table1
-  }
+    table: mockRoom1Table1,
+  },
 ]
 
 /**
@@ -219,7 +219,7 @@ export const mockSocketInitialState: SocketState = {
   isConnected: false,
   isLoading: false,
   towers: {},
-  errorMessage: null
+  errorMessage: null,
 }
 
 export const mockSocketRoom1Id: string = mockRoom1.id
@@ -251,16 +251,16 @@ export const mockSocketState: SocketState = {
           isChatLoading: false,
           users: mockRoom1Table1Users,
           isUsersLoading: false,
-          errorMessage: null
-        }
+          errorMessage: null,
+        },
         // [mockSocketRoom1Table2Id]: {},
         // [mockSocketRoom1Table3Id]: {},
       },
       isTablesLoading: false,
-      errorMessage: null
-    }
+      errorMessage: null,
+    },
   },
-  errorMessage: null
+  errorMessage: null,
 }
 
 export const mockTowers = mockSocketState.towers
@@ -286,5 +286,5 @@ export const mockTowersTableState11Users =
 
 export const mockStoreReducers = {
   socket: mockSocketInitialState,
-  sidebar: {} as SidebarState
+  sidebar: {} as SidebarState,
 }

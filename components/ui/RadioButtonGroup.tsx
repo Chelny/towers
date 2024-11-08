@@ -29,7 +29,7 @@ export default function RadioButtonGroup({
   dataTestId = undefined,
   description = "",
   errorMessage = "",
-  onChange
+  onChange,
 }: RadioButtonGroupProps): ReactNode {
   const [selectedValue, setSelectedValue] = useState<string>(defaultValue)
   const options = React.Children.toArray(children) as ReactElement<RadioButtonOptionProps>[]

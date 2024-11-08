@@ -5,7 +5,7 @@ const defaultTowersBlockProps = {
   powerType: null,
   powerLevel: null,
   isToBeRemoved: false,
-  brokenBlockNumber: null
+  brokenBlockNumber: null,
 }
 
 describe("getClassNameForBlock Utility", () => {
@@ -16,7 +16,7 @@ describe("getClassNameForBlock Utility", () => {
       { ...defaultTowersBlockProps, letter: "W" },
       { ...defaultTowersBlockProps, letter: "E" },
       { ...defaultTowersBlockProps, letter: "R" },
-      { ...defaultTowersBlockProps, letter: "S" }
+      { ...defaultTowersBlockProps, letter: "S" },
     ]
     const expectedClasses: string[] = ["BlockT", "BlockO", "BlockW", "BlockE", "BlockR", "BlockS"]
 
@@ -49,7 +49,7 @@ describe("getClassNameForBlockPowerType Utility", () => {
       ...defaultTowersBlockProps,
       letter: "T",
       powerType: "attack",
-      powerLevel: "minor"
+      powerLevel: "minor",
     }
 
     expect(getClassNameForBlockPowerType(attackBlock)).toBe("AttackBlock")
@@ -60,7 +60,7 @@ describe("getClassNameForBlockPowerType Utility", () => {
       ...defaultTowersBlockProps,
       letter: "T",
       powerType: "defense",
-      powerLevel: "minor"
+      powerLevel: "minor",
     }
 
     expect(getClassNameForBlockPowerType(defenseBlock)).toBe("DefenseBlock")
@@ -69,7 +69,7 @@ describe("getClassNameForBlockPowerType Utility", () => {
   it("should return an empty string for unknown power types", () => {
     const unknownPowerTypeBlock: TowersBlock = {
       ...defaultTowersBlockProps,
-      letter: "T"
+      letter: "T",
     }
 
     expect(getClassNameForBlockPowerType(unknownPowerTypeBlock)).toBe("")

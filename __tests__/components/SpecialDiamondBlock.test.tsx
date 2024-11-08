@@ -8,7 +8,7 @@ describe("SpecialDiamondBlock Component", () => {
     const mockSpecialDiamond: SpecialDiamond = {
       ...mockDefaultTowersBlockProps,
       letter: "SD",
-      specialDiamondType: "speed drop"
+      specialDiamondType: "speed drop",
     }
 
     render(<SpecialDiamondBlock block={mockSpecialDiamond} />)
@@ -21,7 +21,7 @@ describe("SpecialDiamondBlock Component", () => {
     const mockSpecialDiamond: SpecialDiamond = {
       ...mockDefaultTowersBlockProps,
       letter: "SD",
-      specialDiamondType: "remove powers"
+      specialDiamondType: "remove powers",
     }
 
     render(<SpecialDiamondBlock block={mockSpecialDiamond} />)
@@ -34,7 +34,7 @@ describe("SpecialDiamondBlock Component", () => {
     const mockSpecialDiamond: SpecialDiamond = {
       ...mockDefaultTowersBlockProps,
       letter: "SD",
-      specialDiamondType: "remove stones"
+      specialDiamondType: "remove stones",
     }
 
     render(<SpecialDiamondBlock block={mockSpecialDiamond} />)

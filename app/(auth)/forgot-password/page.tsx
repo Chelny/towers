@@ -4,7 +4,7 @@ import { ForgotPasswordForm } from "@/app/(auth)/forgot-password/forgot-password
 import { ROUTE_FORGOT_PASSWORD } from "@/constants/routes"
 
 export const metadata: Metadata = {
-  title: ROUTE_FORGOT_PASSWORD.TITLE
+  title: ROUTE_FORGOT_PASSWORD.TITLE,
 }
 
 export default function ForgotPasswordPage(): ReactNode {

@@ -7,7 +7,7 @@ import {
   PowerBarBlock,
   PowerPieceBlock,
   SpecialDiamond,
-  TowersBlock
+  TowersBlock,
 } from "@/interfaces/game"
 
 export const isTowersBlock = (block: Block): block is TowersBlock => {

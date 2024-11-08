@@ -1,6 +1,6 @@
 "use client"
 
-import { ReactNode } from "react"
+import { ReactNode, Suspense } from "react"
 import { ReadonlyURLSearchParams, useSearchParams } from "next/navigation"
 import GoToHomepageLink from "@/components/GoToHomepageLink"
 
@@ -28,11 +28,20 @@ const errorMap: Record<string, ReactNode> = {
       <br />
       Unique error code: <code className="rounded-sm p-1">Verification</code>
     </p>
-  )
+  ),
 }
 
 export default function AuthErrorPage(): ReactNode {
+  return (
+    <Suspense>
+      <ErrorMessage />
+    </Suspense>
+  )
+}
+
+function ErrorMessage(): ReactNode {
   const searchParams: ReadonlyURLSearchParams = useSearchParams()
+
   const error: string = searchParams.get("error") as string
 
   return (

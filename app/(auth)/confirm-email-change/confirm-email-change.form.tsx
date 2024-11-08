@@ -1,13 +1,12 @@
 "use client"
 
-import { FormEvent, ReactNode, RefObject, useCallback, useEffect, useRef } from "react"
-import { useFormState } from "react-dom"
+import { ReactNode, RefObject, useActionState, useCallback, useEffect, useRef } from "react"
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime"
 import { ReadonlyURLSearchParams, useSearchParams } from "next/navigation"
 import { useRouter } from "next/navigation"
 import { CgSpinner } from "react-icons/cg"
 import { confirmEmailChange } from "@/app/(auth)/confirm-email-change/confirm-email-change.actions"
-import { ConfirmEmailChangeFormErrorMessages } from "@/app/(auth)/confirm-email-change/confirm-email-change.schema"
+import { ConfirmEmailChangeFormValidationErrors } from "@/app/(auth)/confirm-email-change/confirm-email-change.schema"
 import AlertMessage from "@/components/ui/AlertMessage"
 import Button from "@/components/ui/Button"
 import { ROUTE_PROFILE } from "@/constants/routes"
@@ -15,15 +14,15 @@ import { ROUTE_PROFILE } from "@/constants/routes"
 const initialState = {
   success: false,
   message: "",
-  error: {} as ConfirmEmailChangeFormErrorMessages
+  error: {} as ConfirmEmailChangeFormValidationErrors,
 }
 
 export function ConfirmEmailChangeForm(): ReactNode {
   const router: AppRouterInstance = useRouter()
   const searchParams: ReadonlyURLSearchParams = useSearchParams()
   const token: string | null = searchParams.get("token")
-  const formRef: RefObject<HTMLFormElement> = useRef<HTMLFormElement>(null)
-  const [state, formAction] = useFormState<ApiResponse, FormData>(confirmEmailChange, initialState)
+  const formRef: RefObject<HTMLFormElement | null> = useRef<HTMLFormElement | null>(null)
+  const [state, formAction, isPending] = useActionState<ApiResponse, FormData>(confirmEmailChange, initialState)
 
   const handleSubmit = useCallback(() => {
     if (state?.success) return
@@ -38,15 +37,9 @@ export function ConfirmEmailChangeForm(): ReactNode {
     router.push(ROUTE_PROFILE.PATH)
   }
 
-  const handleConfirmEmailChange = (event: FormEvent<HTMLFormElement>): void => {
-    event.preventDefault()
-    const formData: FormData = new FormData(event.currentTarget)
-    formAction(formData)
-  }
-
   return (
-    <form ref={formRef} className="w-full" noValidate onSubmit={handleConfirmEmailChange}>
-      {state.message ? (
+    <form ref={formRef} className="w-full" action={formAction} noValidate>
+      {!isPending && state.message ? (
         <>
           <AlertMessage type={state.success ? "success" : "error"}>{state.message}</AlertMessage>
           {state.success && (

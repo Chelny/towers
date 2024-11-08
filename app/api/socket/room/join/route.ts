@@ -2,28 +2,28 @@ import { NextRequest, NextResponse } from "next/server"
 import { TowersUserProfile, TowersUserRoomTable } from "@prisma/client"
 import { Session } from "next-auth"
 import { auth } from "@/auth"
+import { getPrismaError, unauthorized } from "@/lib/api"
 import prisma from "@/lib/prisma"
 import { updateLastActiveAt } from "@/lib/user"
-import { getPrismaError } from "@/utils/api"
 
 export async function PATCH(request: NextRequest): Promise<NextResponse> {
+  const { roomId, tableId } = await request.json()
+
+  const session: Session | null = await auth()
+  if (!session) return unauthorized()
+
   try {
-    const session: Session | null = await auth()
-    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-
-    const { roomId, tableId } = await request.json()
-
     let towersUserProfile: TowersUserProfile | null = await prisma.towersUserProfile.findUnique({
       where: {
-        userId: session.user.id
-      }
+        userId: session.user.id,
+      },
     })
 
     if (!towersUserProfile) {
       towersUserProfile = await prisma.towersUserProfile.create({
         data: {
-          userId: session.user.id
-        }
+          userId: session.user.id,
+        },
       })
     }
 
@@ -35,8 +35,8 @@ export async function PATCH(request: NextRequest): Promise<NextResponse> {
         where: {
           userProfileId: towersUserProfile.id,
           roomId,
-          tableId: null
-        }
+          tableId: null,
+        },
       })
 
       if (inRoomNotInTable) {
@@ -47,11 +47,11 @@ export async function PATCH(request: NextRequest): Promise<NextResponse> {
           include: {
             userProfile: {
               include: {
-                user: true
-              }
+                user: true,
+              },
             },
-            table: true
-          }
+            table: true,
+          },
         })
       } else {
         // User is in the given room and in the given table
@@ -59,8 +59,8 @@ export async function PATCH(request: NextRequest): Promise<NextResponse> {
           where: {
             userProfileId: towersUserProfile.id,
             roomId,
-            tableId
-          }
+            tableId,
+          },
         })
 
         if (!inRoomAndInTable) {
@@ -68,19 +68,19 @@ export async function PATCH(request: NextRequest): Promise<NextResponse> {
           towersUserRoomTable = await prisma.towersUserRoomTable.create({
             data: {
               userProfile: {
-                connect: { id: towersUserProfile.id }
+                connect: { id: towersUserProfile.id },
               },
               roomId,
-              tableId
+              tableId,
             },
             include: {
               userProfile: {
                 include: {
-                  user: true
-                }
+                  user: true,
+                },
               },
-              table: true
-            }
+              table: true,
+            },
           })
         }
       }
@@ -90,8 +90,8 @@ export async function PATCH(request: NextRequest): Promise<NextResponse> {
         where: {
           userProfileId: towersUserProfile.id,
           roomId,
-          tableId: tableId ?? null
-        }
+          tableId: tableId ?? null,
+        },
       })
 
       if (joinedRoom) {
@@ -99,32 +99,32 @@ export async function PATCH(request: NextRequest): Promise<NextResponse> {
           where: { id: joinedRoom.id },
           data: {
             roomId,
-            tableId: tableId ?? null
+            tableId: tableId ?? null,
           },
           include: {
             userProfile: {
               include: {
-                user: true
-              }
+                user: true,
+              },
             },
-            table: true
-          }
+            table: true,
+          },
         })
       } else {
         towersUserRoomTable = await prisma.towersUserRoomTable.create({
           data: {
             userProfileId: towersUserProfile.id,
             roomId,
-            tableId: tableId ?? null
+            tableId: tableId ?? null,
           },
           include: {
             userProfile: {
               include: {
-                user: true
-              }
+                user: true,
+              },
             },
-            table: true
-          }
+            table: true,
+          },
         })
       }
     }
@@ -134,9 +134,9 @@ export async function PATCH(request: NextRequest): Promise<NextResponse> {
     return NextResponse.json(
       {
         success: true,
-        data: towersUserRoomTable
+        data: towersUserRoomTable,
       },
-      { status: 200 }
+      { status: 200 },
     )
   } catch (error) {
     return getPrismaError(error)

@@ -7,9 +7,9 @@ export const makeStore = () => {
   return configureStore({
     reducer: {
       socket: socketReducer,
-      sidebar: sidebarReducer
+      sidebar: sidebarReducer,
     },
-    middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(socketMiddleware)
+    middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(socketMiddleware),
   })
 }
 

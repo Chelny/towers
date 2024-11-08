@@ -1,9 +1,8 @@
 import { ITowersTable, ITowersTableChatMessage, ITowersUserRoomTable } from "@prisma/client"
 import { createAsyncThunk } from "@reduxjs/toolkit"
-import axios, { AxiosResponse, CancelTokenSource } from "axios"
 import { Session } from "next-auth"
 import { fetchRoomUsers } from "@/redux/thunks/room-thunks"
-import { getAxiosError } from "@/utils/api"
+import { isAbortError } from "@/utils/http-utils"
 
 export interface SocketTableThunkProps {
   roomId: string
@@ -20,43 +19,60 @@ export const joinTable = createAsyncThunk<SocketTableThunkResponse, SocketTableT
   "socket/joinTable",
   async ({ roomId, tableId }: SocketTableThunkProps, { signal, rejectWithValue }) => {
     try {
-      const source: CancelTokenSource = axios.CancelToken.source()
-
-      signal.addEventListener("abort", () => {
-        source.cancel()
+      const response: Response = await fetch(`${process.env.BASE_URL}/api/socket/room/join`, {
+        method: "PATCH",
+        body: JSON.stringify({ roomId, tableId }),
+        signal,
       })
 
-      const response = await axios.patch("/api/socket/room/join", { roomId, tableId })
+      if (!response.ok) {
+        const errorData: ApiResponse = await response.json()
+        throw new Error(errorData?.message || "Failed to join table")
+      }
 
-      return { roomId, tableId, towersUserRoomTable: response.data.data }
+      const result: ApiResponse<ITowersUserRoomTable> = await response.json()
+      return { roomId, tableId, towersUserRoomTable: result.data }
     } catch (error) {
-      getAxiosError(error)
+      if (isAbortError(error)) {
+        console.log("Join table request was cancelled")
+      } else {
+        console.error(error)
+      }
+
       return rejectWithValue("Failed to join table")
     }
-  }
+  },
 )
 
 export const leaveTable = createAsyncThunk<SocketTableThunkResponse, SocketTableThunkProps, { rejectValue: string }>(
   "socket/leaveTable",
   async ({ roomId, tableId }: SocketTableThunkProps, { signal, dispatch, rejectWithValue }) => {
     try {
-      const source: CancelTokenSource = axios.CancelToken.source()
-
-      signal.addEventListener("abort", () => {
-        source.cancel()
+      const response: Response = await fetch(`${process.env.BASE_URL}/api/socket/room/leave`, {
+        method: "PATCH",
+        body: JSON.stringify({ roomId, tableId }),
+        signal,
       })
 
-      await axios.patch("/api/socket/room/leave", { roomId, tableId })
+      if (!response.ok) {
+        const errorData: ApiResponse = await response.json()
+        throw new Error(errorData?.message || "Failed to leave table")
+      }
 
       dispatch(fetchRoomUsers({ roomId }))
       dispatch(fetchTableUsers({ roomId, tableId }))
 
       return { roomId, tableId }
     } catch (error) {
-      getAxiosError(error)
+      if (isAbortError(error)) {
+        console.log("Leave table request was cancelled")
+      } else {
+        console.error(error)
+      }
+
       return rejectWithValue("Failed to leave table")
     }
-  }
+  },
 )
 
 export const fetchTableInfo = createAsyncThunk<
@@ -67,18 +83,25 @@ export const fetchTableInfo = createAsyncThunk<
   const errorMessage: string = "Failed to fetch table info"
 
   try {
-    const response: AxiosResponse<ApiResponse<ITowersTable>> = await axios.get(`/api/tables/${tableId}`, { signal })
+    const response: Response = await fetch(`/api/tables/${tableId}`, { signal })
 
-    if (!response.data.data) {
+    if (!response.ok) {
+      const errorData: ApiResponse = await response.json()
+      throw new Error(errorData?.message)
+    }
+
+    const result: ApiResponse<ITowersTable> = await response.json()
+
+    if (!result.data) {
       return rejectWithValue(errorMessage)
     }
 
-    return response.data.data
+    return result.data
   } catch (error) {
-    if (axios.isCancel(error)) {
+    if (isAbortError(error)) {
       console.log("Fetch table info request was cancelled")
     } else {
-      getAxiosError(error)
+      console.error(error)
     }
 
     return rejectWithValue(errorMessage)
@@ -93,21 +116,25 @@ export const fetchTableChat = createAsyncThunk<
   const errorMessage: string = "Failed to fetch table chat"
 
   try {
-    const response: AxiosResponse<ApiResponse<ITowersTableChatMessage[]>> = await axios.get(
-      `/api/tables/${tableId}/chat?userId=${session?.user.id}`,
-      { signal }
-    )
+    const response: Response = await fetch(`/api/tables/${tableId}/chat?userId=${session?.user.id}`, { signal })
 
-    if (!response.data.data) {
+    if (!response.ok) {
+      const errorData: ApiResponse = await response.json()
+      throw new Error(errorData?.message)
+    }
+
+    const result: ApiResponse<ITowersTableChatMessage[]> = await response.json()
+
+    if (!result.data) {
       return rejectWithValue(errorMessage)
     }
 
-    return response.data.data
+    return result.data
   } catch (error) {
-    if (axios.isCancel(error)) {
+    if (isAbortError(error)) {
       console.log("Fetch table chat request was cancelled")
     } else {
-      getAxiosError(error)
+      console.error(error)
     }
 
     return rejectWithValue(errorMessage)
@@ -122,21 +149,25 @@ export const fetchTableUsers = createAsyncThunk<
   const errorMessage: string = "Failed to fetch table users"
 
   try {
-    const response: AxiosResponse<ApiResponse<ITowersUserRoomTable[]>> = await axios.get(
-      `/api/tables/${tableId}/users`,
-      { signal }
-    )
+    const response: Response = await fetch(`/api/tables/${tableId}/users`, { signal })
 
-    if (!response.data.data) {
+    if (!response.ok) {
+      const errorData: ApiResponse = await response.json()
+      throw new Error(errorData?.message)
+    }
+
+    const result: ApiResponse<ITowersUserRoomTable[]> = await response.json()
+
+    if (!result.data) {
       return rejectWithValue(errorMessage)
     }
 
-    return response.data.data
+    return result.data
   } catch (error) {
-    if (axios.isCancel(error)) {
+    if (isAbortError(error)) {
       console.log("Fetch table users request was cancelled")
     } else {
-      getAxiosError(error)
+      console.error(error)
     }
 
     return rejectWithValue(errorMessage)

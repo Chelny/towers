@@ -28,7 +28,7 @@ import {
   updateTable,
   updateTableInRoom,
   updateUsers,
-  updateUsersInRoom
+  updateUsersInRoom,
 } from "@/redux/features/socket-slice"
 
 export enum SocketEvent {
@@ -40,6 +40,7 @@ export enum SocketEvent {
   ReconnectAttempt = "reconnect_attempt",
   ReconnectError = "reconnect_error",
   ReconnectFailed = "reconnect_failed",
+  Ping = "ping",
   Error = "error",
 
   // Custom Listeners
@@ -54,7 +55,7 @@ export enum SocketEvent {
   TableReceiveChatMessage = "[table] receive new chat message",
   TableUserJoined = "[table] user joined",
   TableUserLeft = "[table] user left",
-  UserSignOutSuccess = "[user] sign out success",
+  SocketDisconnectSuccess = "[socket] disconnect success",
   ServerError = "[server] error",
 
   // Emitters
@@ -69,16 +70,17 @@ export enum SocketEvent {
   TableDelete = "[table] delete",
   TableSendMessage = "[table] send message",
   TableSendAutomatedMessage = "[table] send automated message",
-  UserSignOut = "[user] sign out",
+  SocketReconnect = "[socket] reconnect",
+  SocketDisconnect = "[socket] disconnect",
 }
 
 const socketMiddleware: Middleware = (store: MiddlewareAPI) => {
-  let socket: SocketInterface
+  let socket: SocketInterface | null = null
 
   return (next) => async (action: unknown) => {
     if (initSocket.match(action)) {
       if (!socket && typeof window !== "undefined") {
-        socket = await SocketFactory.create()
+        socket = await SocketFactory.create(action.payload.session)
 
         // **************************************************
         // * Socket IO Events
@@ -86,7 +88,7 @@ const socketMiddleware: Middleware = (store: MiddlewareAPI) => {
 
         socket.socket.on(SocketEvent.Connect, (): void => {
           store.dispatch(connectionEstablished())
-          console.info(`User connected with socket ID: ${socket.socket.id}.`)
+          console.info(`User connected with socket ID: ${socket?.socket.id}.`)
         })
 
         socket.socket.on(SocketEvent.ConnectError, (error: Error): void => {
@@ -96,7 +98,7 @@ const socketMiddleware: Middleware = (store: MiddlewareAPI) => {
 
         socket.socket.on(SocketEvent.Disconnect, (reason: string): void => {
           store.dispatch(connectionLost(reason))
-          console.info(`Socket disconnected due to ${reason}.`)
+          console.info(`Disconnected due to ${reason}.`)
         })
 
         socket.socket.on(SocketEvent.Reconnect, (attempt: number): void => {
@@ -105,11 +107,11 @@ const socketMiddleware: Middleware = (store: MiddlewareAPI) => {
         })
 
         socket.socket.on(SocketEvent.ReconnectAttempt, (attempt: number): void => {
-          console.info(`Attempting to reconnect to the socket... Attempt number: ${attempt}`)
+          console.info(`Attempting to reconnect to the socket... Attempt number: ${attempt}.`)
         })
 
         socket.socket.on(SocketEvent.ReconnectError, (error: Error): void => {
-          console.error(`Reconnection error: ${error.message}`)
+          console.error(`Reconnection error: ${error.message}.`)
           store.dispatch(connectionLost(error.message))
         })
 
@@ -118,11 +120,15 @@ const socketMiddleware: Middleware = (store: MiddlewareAPI) => {
           store.dispatch(connectionLost("Reconnection failed."))
         })
 
+        socket.socket.on(SocketEvent.Ping, (): void => {
+          console.info("Ping event received.")
+        })
+
         socket.socket.on(SocketEvent.Error, (error: Error): void => {
           console.error(`Socket error: ${error.message}.`)
         })
 
-        socket.socket.on(SocketEvent.UserSignOutSuccess, (): void => {
+        socket.socket.on(SocketEvent.SocketDisconnectSuccess, (): void => {
           SocketFactory.destroy()
         })
 
@@ -195,7 +201,7 @@ const socketMiddleware: Middleware = (store: MiddlewareAPI) => {
               ?.slice()
               .sort(
                 (a: ITowersUserRoomTable, b: ITowersUserRoomTable) =>
-                  new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+                  new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
               )?.[0]
 
             if (table.users?.length > 0) {
@@ -204,8 +210,8 @@ const socketMiddleware: Middleware = (store: MiddlewareAPI) => {
                   roomId,
                   tableId,
                   message: `${user.username} left the table.`,
-                  type: TableChatMessageType.USER_ACTION
-                })
+                  type: TableChatMessageType.USER_ACTION,
+                }),
               )
 
               if (table.info && nextTableHost && table.info?.host?.userId === user.id) {
@@ -215,10 +221,10 @@ const socketMiddleware: Middleware = (store: MiddlewareAPI) => {
                     tableId,
                     info: {
                       ...table.info,
-                      host: nextTableHost?.userProfile
+                      host: nextTableHost?.userProfile,
                     },
-                    users: table.users
-                  })
+                    users: table.users,
+                  }),
                 )
 
                 store.dispatch(
@@ -228,8 +234,8 @@ const socketMiddleware: Middleware = (store: MiddlewareAPI) => {
                     message:
                       "You are the host of the table. This gives you the power to invite to [or boot people from] your table. You may also limit other player’s access to your table by selecting its \"Table Type\".",
                     type: TableChatMessageType.TABLE_HOST,
-                    privateToUserId: user.id
-                  })
+                    privateToUserId: user.id,
+                  }),
                 )
               }
             }
@@ -244,7 +250,7 @@ const socketMiddleware: Middleware = (store: MiddlewareAPI) => {
       // **************************************************
 
       if (destroySocket.match(action)) {
-        socket.socket.emit(SocketEvent.UserSignOut)
+        socket.socket.emit(SocketEvent.SocketDisconnect)
       }
 
       // **************************************************

@@ -23,7 +23,7 @@ export default function Sidebar(): ReactNode {
   const [isLinkTextVisible, setIsLinkTextVisible] = useState<boolean>(false)
   const { data: session, status } = useSessionData()
   const dispatch = useDispatch()
-  const gameAccordionLinks = useAppSelector((state: RootState) => state.sidebar.gameLinks)
+  const gameAccordionLinks: AccordionLink[] = useAppSelector((state: RootState) => state.sidebar.gameLinks)
 
   useEffect(() => {
     if (isExpanded) {
@@ -58,7 +58,7 @@ export default function Sidebar(): ReactNode {
     <aside
       className={clsx(
         "flex-shrink-0 flex flex-col gap-4 min-w-24 h-full px-2 py-4 border-e border-e-gray-300 shadow-lg bg-gray-800 text-white/90 transition transition-[width] duration-500 ease-in-out",
-        isExpanded ? "w-72 items-start" : "w-24 items-center"
+        isExpanded ? "w-72 items-start" : "w-24 items-center",
       )}
     >
       {/* User image and collapse icon */}

@@ -2,68 +2,75 @@ import { NextRequest, NextResponse } from "next/server"
 import { TowersTable } from "@prisma/client"
 import { Session } from "next-auth"
 import { auth } from "@/auth"
+import { getPrismaError, missingTableIdResponse, unauthorized } from "@/lib/api"
 import prisma from "@/lib/prisma"
-import { badRequestMissingTableId, getPrismaError, unauthorized } from "@/utils/api"
 
-export async function GET(request: NextRequest, context: { params: { tableId: string } }): Promise<NextResponse> {
+type Params = Promise<{ tableId: string }>
+
+export async function GET(request: NextRequest, segmentData: { params: Params }): Promise<NextResponse> {
+  const { tableId } = await segmentData.params
+  if (!tableId) return missingTableIdResponse()
+
   try {
-    const { tableId } = context.params
-
-    if (!tableId) return badRequestMissingTableId()
-
     const table: TowersTable | null = await prisma.towersTable.findUnique({
       where: {
-        id: tableId
+        id: tableId,
       },
       include: {
         host: {
           include: {
-            user: true
-          }
+            user: true,
+          },
         },
         userRoomTables: {
           include: {
             userProfile: {
               include: {
-                user: true
-              }
-            }
-          }
-        }
-      }
+                user: true,
+              },
+            },
+          },
+        },
+      },
+      cacheStrategy: {
+        ttl: 30,
+        swr: 60,
+      },
     })
 
     return NextResponse.json(
       {
         success: true,
-        data: table
+        data: table,
       },
-      { status: 200 }
+      { status: 200 },
     )
   } catch (error) {
     return getPrismaError(error)
   }
 }
 
-export async function PATCH(request: NextRequest, context: { params: { tableId: string } }): Promise<NextResponse> {
+export async function PATCH(request: NextRequest, segmentData: { params: Params }): Promise<NextResponse> {
+  const { tableType, rated } = await request.json()
+
+  const { tableId } = await segmentData.params
+  if (!tableId) return missingTableIdResponse()
+
+  const session: Session | null = await auth()
+  if (!session) return unauthorized()
+
   try {
-    const session: Session | null = await auth()
-
-    if (!session) return unauthorized()
-
-    const { tableType, rated } = await request.json()
-
     const table: TowersTable = await prisma.towersTable.update({
-      where: { id: context.params.tableId },
-      data: { tableType, rated }
+      where: { id: tableId },
+      data: { tableType, rated },
     })
 
     return NextResponse.json(
       {
         success: true,
-        data: table
+        data: table,
       },
-      { status: 200 }
+      { status: 200 },
     )
   } catch (error) {
     return getPrismaError(error)

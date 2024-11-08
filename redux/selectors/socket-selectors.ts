@@ -22,7 +22,7 @@ export const selectIsRoomChatLoading = createSelector([selectRoomById], (room: T
 export const selectRoomUsers = createSelector([selectRoomById], (room: TowersRoomState) => room?.users || [])
 export const selectIsRoomUsersLoading = createSelector(
   [selectRoomById],
-  (room: TowersRoomState) => room?.isUsersLoading
+  (room: TowersRoomState) => room?.isUsersLoading,
 )
 
 export const selectRoomTables = createSelector([selectRoomById], (room: TowersRoomState) => {
@@ -30,7 +30,7 @@ export const selectRoomTables = createSelector([selectRoomById], (room: TowersRo
 })
 export const selectIsRoomTablesLoading = createSelector(
   [selectRoomById],
-  (room: TowersRoomState) => room?.isTablesLoading
+  (room: TowersRoomState) => room?.isTablesLoading,
 )
 
 // **************************************************
@@ -46,32 +46,32 @@ export const selectTableIsJoined = createSelector([selectTableById], (table: Tow
 export const selectTableInfo = createSelector([selectTableById], (table: TowersTableState) => table?.info || null)
 export const selectIsTableInfoLoading = createSelector(
   [selectTableById],
-  (table: TowersTableState) => table?.isInfoLoading
+  (table: TowersTableState) => table?.isInfoLoading,
 )
 
 export const selectTableChat = createSelector([selectTableById], (table: TowersTableState) => table?.chat || [])
 export const selectIsTableChatLoading = createSelector(
   [selectTableById],
-  (table: TowersTableState) => table?.isChatLoading
+  (table: TowersTableState) => table?.isChatLoading,
 )
 
 export const selectTableUsers = createSelector([selectTableById], (table: TowersTableState) => table?.users || [])
 export const selectIsTableUsersLoading = createSelector(
   [selectTableById],
-  (table: TowersTableState) => table?.isUsersLoading
+  (table: TowersTableState) => table?.isUsersLoading,
 )
 export const selectRoomUsersInvite = createSelector(
   [selectRoomById, (state: RootState, roomId: string, tableId: string) => tableId],
   (room: TowersRoomState, tableId: string) =>
-    room?.users?.filter((towersUserRoomTable: ITowersUserRoomTable) => towersUserRoomTable.tableId !== tableId)
+    room?.users?.filter((towersUserRoomTable: ITowersUserRoomTable) => towersUserRoomTable.tableId !== tableId),
 )
 export const selectTableUsersBoot = createSelector(
   [
     selectTableById,
-    (state: RootState, roomId: string, tableId: string, session: Session | null) => session?.user.id ?? null
+    (state: RootState, roomId: string, tableId: string, session: Session | null) => session?.user.id ?? null,
   ],
   (table: TowersTableState, sessionUserId: string | null) =>
     table?.users?.filter(
-      (towersUserRoomTable: ITowersUserRoomTable) => towersUserRoomTable.userProfile?.userId !== sessionUserId
-    )
+      (towersUserRoomTable: ITowersUserRoomTable) => towersUserRoomTable.userProfile?.userId !== sessionUserId,
+    ),
 )

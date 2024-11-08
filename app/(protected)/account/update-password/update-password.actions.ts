@@ -1,23 +1,24 @@
 "use server"
 
-import { NextResponse } from "next/server"
+import { RequestCookie } from "next/dist/compiled/@edge-runtime/cookies"
+import { ReadonlyRequestCookies } from "next/dist/server/web/spec-extension/adapters/request-cookies"
+import { cookies } from "next/headers"
 import { Value, ValueError } from "@sinclair/typebox/value"
 import {
   passwordSchema,
-  UpdatePasswordFormData,
-  UpdatePasswordFormErrorMessages
+  UpdatePasswordFormValidationErrors,
+  UpdatePasswordPayload,
 } from "@/app/(protected)/account/update-password/update-password.schema"
-import { PATCH } from "@/app/api/account/password/route"
 
 export async function password(prevState: ApiResponse, formData: FormData): Promise<ApiResponse> {
-  const rawFormData: UpdatePasswordFormData = {
+  const payload: UpdatePasswordPayload = {
     currentPassword: formData.get("currentPassword") as string,
     newPassword: formData.get("newPassword") as string,
-    confirmNewPassword: formData.get("confirmNewPassword") as string
+    confirmNewPassword: formData.get("confirmNewPassword") as string,
   }
 
-  const errors: ValueError[] = Array.from(Value.Errors(passwordSchema, rawFormData))
-  const errorMessages: UpdatePasswordFormErrorMessages = {}
+  const errors: ValueError[] = Array.from(Value.Errors(passwordSchema, payload))
+  const errorMessages: UpdatePasswordFormValidationErrors = {}
 
   for (const error of errors) {
     switch (error.path.replace("/", "")) {
@@ -36,18 +37,27 @@ export async function password(prevState: ApiResponse, formData: FormData): Prom
     }
   }
 
-  if (rawFormData.newPassword !== rawFormData.confirmNewPassword) {
+  if (payload.newPassword !== payload.confirmNewPassword) {
     errorMessages.confirmNewPassword = "The new password and new password confirmation do not match."
   }
 
   if (Object.keys(errorMessages).length === 0) {
-    const response: NextResponse = await PATCH(rawFormData)
-    const data = await response.json()
-    return data
+    const cookieStore: ReadonlyRequestCookies = await cookies()
+    const authToken: RequestCookie | undefined = cookieStore.get("authjs.session-token")
+    const headerCookie: string = authToken ? `${authToken.name}=${authToken.value}` : ""
+    const response: Response = await fetch(`${process.env.BASE_URL}/api/account/password`, {
+      method: "PATCH",
+      headers: {
+        Cookie: headerCookie,
+      },
+      body: JSON.stringify(payload),
+    })
+
+    return await response.json()
   }
 
   return {
     success: false,
-    error: errorMessages
+    error: errorMessages,
   }
 }

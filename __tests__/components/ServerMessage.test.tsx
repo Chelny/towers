@@ -8,11 +8,11 @@ import { useAppSelector } from "@/lib/hooks"
 import { RootState } from "@/redux/store"
 
 vi.mock("@/hooks/useSessionData", () => ({
-  useSessionData: vi.fn()
+  useSessionData: vi.fn(),
 }))
 
 vi.mock("@/lib/hooks", () => ({
-  useAppSelector: vi.fn()
+  useAppSelector: vi.fn(),
 }))
 
 describe("ServerMessage Component", () => {
@@ -37,7 +37,7 @@ describe("ServerMessage Component", () => {
     vi.mocked(useAppSelector).mockImplementation((selectorFn: (state: RootState) => unknown) => {
       const mockState = {
         ...mockStoreReducers,
-        socket: mockSocketState
+        socket: mockSocketState,
       }
 
       return selectorFn(mockState)
@@ -62,7 +62,7 @@ describe("ServerMessage Component", () => {
     })
 
     expect(
-      screen.getByText(`Connected to the game as ${mockAuthenticatedSession.data?.user.username}`)
+      screen.getByText(`Connected to the game as ${mockAuthenticatedSession.data?.user.username}`),
     ).toBeInTheDocument()
   })
 
@@ -91,8 +91,8 @@ describe("ServerMessage Component", () => {
         ...mockStoreReducers,
         socket: {
           ...mockSocketState,
-          errorMessage
-        }
+          errorMessage,
+        },
       }
 
       return selectorFn(mockState)

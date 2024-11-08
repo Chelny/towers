@@ -1,9 +1,8 @@
 import { TableType, TowersTable } from "@prisma/client"
 import { configureStore } from "@reduxjs/toolkit"
 import { fireEvent, render, screen, waitFor } from "@testing-library/react"
-import axios, { AxiosStatic } from "axios"
 import { Provider } from "react-redux"
-import { Mock, Mocked } from "vitest"
+import { Mock } from "vitest"
 import { mockRoom1 } from "@/__mocks__/data/rooms"
 import { mockSocketInitialState, mockSocketRoom1Id } from "@/__mocks__/data/socketState"
 import { mockRoom1Table1TowersUserProfile1 } from "@/__mocks__/data/towersUserProfiles"
@@ -11,20 +10,20 @@ import CreateTable from "@/components/game/CreateTable"
 import { SocketState } from "@/interfaces/socket"
 import socketReducer from "@/redux/features/socket-slice"
 
-vi.mock("axios")
+vi.stubGlobal("fetch", vi.fn())
 
 const initialState: SocketState = {
   ...mockSocketInitialState,
-  isConnected: true
+  isConnected: true,
 }
 
 const store = configureStore({
   reducer: {
-    socket: socketReducer
+    socket: socketReducer,
   },
   preloadedState: {
-    socket: initialState
-  }
+    socket: initialState,
+  },
 })
 
 describe("CreateTable Component", () => {
@@ -46,7 +45,7 @@ describe("CreateTable Component", () => {
           onSubmitSuccess={handleSubmitSuccess}
           onCancel={handleCancel}
         />
-      </Provider>
+      </Provider>,
     )
 
     expect(screen.getByText("Create Table")).toBeInTheDocument()
@@ -66,14 +65,14 @@ describe("CreateTable Component", () => {
           onSubmitSuccess={handleSubmitSuccess}
           onCancel={handleCancel}
         />
-      </Provider>
+      </Provider>,
     )
 
     fireEvent.click(screen.getByRole("combobox", { hidden: true }))
     fireEvent.click(
       screen.getByText((_: string, element: Element | null) => {
         return element?.textContent === "Private"
-      })
+      }),
     )
 
     expect(screen.getByDisplayValue(TableType.PRIVATE)).toBeInTheDocument()
@@ -82,7 +81,7 @@ describe("CreateTable Component", () => {
   it("should call onSubmitSuccess when the Create button is clicked", async () => {
     const handleSubmitSuccess: Mock = vi.fn()
     const handleCancel: Mock = vi.fn()
-    const mockAxios: Mocked<AxiosStatic> = axios as Mocked<typeof axios>
+
     const mockTable: TowersTable = {
       id: "99567d42-01cd-4a08-aa1d-95e7734a400a",
       roomId: mockRoom1.id,
@@ -91,10 +90,15 @@ describe("CreateTable Component", () => {
       tableType: TableType.PROTECTED,
       rated: true,
       createdAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
     }
 
-    mockAxios.post.mockResolvedValue({ status: 201, data: { data: mockTable } })
+    const mockResponse: Response = new Response(JSON.stringify({ data: mockTable }), {
+      status: 201,
+      headers: { "Content-Type": "application/json" },
+    })
+
+    vi.mocked(fetch).mockResolvedValueOnce(mockResponse)
 
     render(
       <Provider store={store}>
@@ -104,7 +108,7 @@ describe("CreateTable Component", () => {
           onSubmitSuccess={handleSubmitSuccess}
           onCancel={handleCancel}
         />
-      </Provider>
+      </Provider>,
     )
 
     fireEvent.click(screen.getByLabelText(/Table Type/i))
@@ -112,7 +116,13 @@ describe("CreateTable Component", () => {
     fireEvent.click(screen.getByLabelText(/Rated Game/i))
     fireEvent.click(screen.getByText("Create"))
 
-    await waitFor(() => expect(handleSubmitSuccess).toHaveBeenCalledWith(mockTable))
+    await waitFor(() => {
+      expect(handleSubmitSuccess).toHaveBeenCalledWith({
+        ...mockTable,
+        createdAt: mockTable.createdAt.toISOString(),
+        updatedAt: mockTable.updatedAt.toISOString(),
+      })
+    })
   })
 
   it("should call onCancel when cancel button is clicked", () => {
@@ -127,7 +137,7 @@ describe("CreateTable Component", () => {
           onSubmitSuccess={handleSubmitSuccess}
           onCancel={handleCancel}
         />
-      </Provider>
+      </Provider>,
     )
 
     fireEvent.click(screen.getByText("Cancel"))

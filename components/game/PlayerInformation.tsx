@@ -18,7 +18,7 @@ export default function PlayerInformation({
   isOpen,
   player,
   isRatingsVisible = false,
-  onCancel
+  onCancel,
 }: PlayerInformationProps): ReactNode {
   const { data: session } = useSessionData()
   const [isCurrentUser, setIsCurrentUser] = useState<boolean>(false)

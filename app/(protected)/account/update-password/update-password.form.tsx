@@ -1,9 +1,8 @@
 "use client"
 
-import { ClipboardEvent, FormEvent, ReactNode, useEffect, useRef } from "react"
-import { useFormState, useFormStatus } from "react-dom"
+import { ClipboardEvent, ReactNode, useActionState, useEffect, useRef } from "react"
 import { password } from "@/app/(protected)/account/update-password/update-password.actions"
-import { UpdatePasswordFormErrorMessages } from "@/app/(protected)/account/update-password/update-password.schema"
+import { UpdatePasswordFormValidationErrors } from "@/app/(protected)/account/update-password/update-password.schema"
 import AlertMessage from "@/components/ui/AlertMessage"
 import Button from "@/components/ui/Button"
 import Input from "@/components/ui/Input"
@@ -11,12 +10,11 @@ import Input from "@/components/ui/Input"
 const initialState = {
   success: false,
   message: "",
-  error: {} as UpdatePasswordFormErrorMessages
+  error: {} as UpdatePasswordFormValidationErrors,
 }
 
 export function UpdatePasswordForm(): ReactNode {
-  const { pending } = useFormStatus()
-  const [state, formAction] = useFormState<ApiResponse, FormData>(password, initialState)
+  const [state, formAction, isPending] = useActionState<ApiResponse, FormData>(password, initialState)
   const currentPasswordRef = useRef<HTMLInputElement>(null)
   const newPasswordRef = useRef<HTMLInputElement>(null)
   const confirmNewPasswordRef = useRef<HTMLInputElement>(null)
@@ -37,14 +35,8 @@ export function UpdatePasswordForm(): ReactNode {
     }
   }, [state])
 
-  const handleUpdatePassword = (event: FormEvent<HTMLFormElement>): void => {
-    event.preventDefault()
-    const formData: FormData = new FormData(event.currentTarget)
-    formAction(formData)
-  }
-
   return (
-    <form className="w-full" noValidate onSubmit={handleUpdatePassword}>
+    <form className="w-full" action={formAction} noValidate>
       {state?.message && <AlertMessage type={state.success ? "success" : "error"}>{state.message}</AlertMessage>}
       <>
         <Input
@@ -80,7 +72,7 @@ export function UpdatePasswordForm(): ReactNode {
           errorMessage={state?.error?.confirmNewPassword}
         />
       </>
-      <Button type="submit" className="w-full" disabled={pending} dataTestId="update-password-submit-button">
+      <Button type="submit" className="w-full" disabled={isPending} dataTestId="update-password-submit-button">
         Update Password
       </Button>
     </form>

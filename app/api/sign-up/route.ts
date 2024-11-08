@@ -1,14 +1,16 @@
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { User, VerificationToken } from "@prisma/client"
-import { hash } from "bcryptjs"
-import { SignUpFormData } from "@/app/(auth)/sign-up/sign-up.schema"
+import { hashSync } from "bcrypt-edge"
+import { SignUpPayload } from "@/app/(auth)/sign-up/sign-up.schema"
 import { getUserByEmail } from "@/data/user"
+import { getPrismaError } from "@/lib/api"
 import { sendVerificationEmail } from "@/lib/email"
 import prisma from "@/lib/prisma"
 import { generateEmailVerificationToken } from "@/lib/token"
-import { getPrismaError } from "@/utils/api"
 
-export async function POST(body: SignUpFormData): Promise<NextResponse> {
+export async function POST(request: NextRequest): Promise<NextResponse> {
+  const body: SignUpPayload = await request.json()
+
   try {
     const user: User | null = await getUserByEmail(body.email)
 
@@ -16,41 +18,42 @@ export async function POST(body: SignUpFormData): Promise<NextResponse> {
       return NextResponse.json(
         {
           success: false,
-          message: "An account with this email already exists. Please use a different email to create a new account."
+          message: "An account with this email already exists. Please use a different email to create a new account.",
         },
-        { status: 409 }
+        { status: 409 },
       )
     }
 
-    const hashedPassword: string = body.password && (await hash(body.password, 12))
+    const hashedPassword: string = body.password && hashSync(body.password, 12)
 
     if (!hashedPassword) {
       return NextResponse.json(
         {
           success: false,
-          message: "An error occurred. Please try again later."
+          message: "An error occurred. Please try again later.",
         },
-        { status: 500 }
+        { status: 500 },
       )
     }
 
+    // @ts-ignore
     const newUser: User = await prisma.user.create({
       data: {
         name: body.name,
         birthdate: body.birthdate ? new Date(body.birthdate) : undefined,
         email: body.email,
         username: body.username,
-        password: hashedPassword
-      }
+        password: hashedPassword,
+      },
     })
 
     if (!newUser) {
       return NextResponse.json(
         {
           success: false,
-          message: "An error occurred. Please try again later."
+          message: "An error occurred. Please try again later.",
         },
-        { status: 500 }
+        { status: 500 },
       )
     }
 
@@ -63,9 +66,9 @@ export async function POST(body: SignUpFormData): Promise<NextResponse> {
     return NextResponse.json(
       {
         success: true,
-        message: `A confirmation email has been sent to ${body.email}. If you don’t see it in your inbox, please check your spam or junk folder.`
+        message: `A confirmation email has been sent to ${body.email}. If you don’t see it in your inbox, please check your spam or junk folder.`,
       },
-      { status: 201 }
+      { status: 201 },
     )
   } catch (error) {
     return getPrismaError(error)

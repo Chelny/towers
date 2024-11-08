@@ -8,7 +8,7 @@ export const mockRoom1Table1: TowersTable = {
   tableType: TableType.PUBLIC,
   rated: true,
   createdAt: new Date(),
-  updatedAt: new Date()
+  updatedAt: new Date(),
 }
 
 export const mockRoom1Table2: TowersTable = {
@@ -19,7 +19,7 @@ export const mockRoom1Table2: TowersTable = {
   tableType: TableType.PROTECTED,
   rated: false,
   createdAt: new Date(),
-  updatedAt: new Date()
+  updatedAt: new Date(),
 }
 
 export const mockRoom1Table3: TowersTable = {
@@ -30,5 +30,5 @@ export const mockRoom1Table3: TowersTable = {
   tableType: TableType.PRIVATE,
   rated: true,
   createdAt: new Date(),
-  updatedAt: new Date()
+  updatedAt: new Date(),
 }

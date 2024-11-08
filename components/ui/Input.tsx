@@ -37,9 +37,9 @@ export default forwardRef<HTMLInputElement, InputProps>(function Input(
     description = "",
     errorMessage = "",
     onInput,
-    onPaste
+    onPaste,
   }: InputProps,
-  ref: ForwardedRef<HTMLInputElement>
+  ref: ForwardedRef<HTMLInputElement>,
 ): ReactNode {
   const [value, setValue] = useState<string | null | undefined>(defaultValue)
 
@@ -66,7 +66,7 @@ export default forwardRef<HTMLInputElement, InputProps>(function Input(
           "overflow-hidden w-full p-1 border-2 border-t-gray-600 border-e-gray-400 border-b-gray-400 border-s-gray-600 rounded-sm bg-white text-black line-clamp-1",
           "read-only:bg-gray-200",
           "disabled:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed",
-          className
+          className,
         )}
         placeholder={placeholder}
         autoComplete={autoComplete}

@@ -30,7 +30,7 @@ export const useSessionData = (): TSessionContextValue => {
     status: "unauthenticated",
     async update(): Promise<Session | null | undefined> {
       return undefined
-    }
+    },
   }
 
   if (!sessionContent && process.env.NODE_ENV !== "production") {

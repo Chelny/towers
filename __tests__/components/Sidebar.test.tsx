@@ -1,3 +1,4 @@
+import { ImgHTMLAttributes } from "react"
 import { fireEvent, render, screen } from "@testing-library/react"
 import { signOut } from "next-auth/react"
 import { useDispatch } from "react-redux"
@@ -6,24 +7,34 @@ import { mockAuthenticatedSession } from "@/__mocks__/data/users"
 import Sidebar from "@/components/Sidebar"
 import { useSessionData } from "@/hooks/useSessionData"
 
+vi.mock("next/image", () => ({
+  __esModule: true,
+  default: (props: ImgHTMLAttributes<HTMLImageElement>) => {
+    // @ts-ignore
+    const { priority, crossOrigin, ...restProps } = props
+    // eslint-disable-next-line @next/next/no-img-element
+    return <img {...restProps} crossOrigin={crossOrigin} role="img" alt={restProps.alt} />
+  },
+}))
+
 vi.mock("next-auth/react", () => ({
-  signOut: vi.fn()
+  signOut: vi.fn(),
 }))
 
 vi.mock("react-redux", () => ({
-  useDispatch: vi.fn()
+  useDispatch: vi.fn(),
 }))
 
 vi.mock("@/hooks/useSessionData", () => ({
-  useSessionData: vi.fn()
+  useSessionData: vi.fn(),
 }))
 
 vi.mock("@/lib/email", () => ({
-  sendEmail: vi.fn().mockResolvedValue({ success: true })
+  sendEmail: vi.fn().mockResolvedValue({ success: true }),
 }))
 
 vi.mock("@/lib/hooks", () => ({
-  useAppSelector: vi.fn()
+  useAppSelector: vi.fn(),
 }))
 
 describe("Sidebar Component", () => {

@@ -23,7 +23,7 @@ export default function SmallScreenWarning(): ReactNode {
       <div
         className={clsx(
           "small-screen-warning",
-          "fixed inset-0 z-50 flex flex-col justify-center items-center gap-2 p-4 bg-white text-center"
+          "fixed inset-0 z-50 flex flex-col justify-center items-center gap-2 p-4 bg-white text-center",
         )}
       >
         <h2 className="text-2xl font-bold mb-2">Screen Too Small</h2>
@@ -34,7 +34,7 @@ export default function SmallScreenWarning(): ReactNode {
         </p>
         {session && (
           <Button className="mt-2" type="button" onClick={handleSignOut}>
-            <span>Sign out</span>
+            Sign out
           </Button>
         )}
       </div>

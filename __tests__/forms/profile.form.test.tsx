@@ -1,5 +1,5 @@
-import { useFormState, useFormStatus } from "react-dom"
-import { Account, User } from "@prisma/client"
+import { useActionState } from "react"
+import { Account, IUserProfile, User } from "@prisma/client"
 import { render, screen } from "@testing-library/react"
 import { Mock } from "vitest"
 import { mockUnauthenticatedSession, mockUser1 } from "@/__mocks__/data/users"
@@ -11,7 +11,16 @@ const { useRouter, mockRouterPush } = vi.hoisted(() => {
 
   return {
     useRouter: () => ({ push: mockRouterPush }),
-    mockRouterPush
+    mockRouterPush,
+  }
+})
+
+vi.mock("react", async (importActual) => {
+  const actual = await importActual<typeof import("react")>()
+
+  return {
+    ...actual,
+    useActionState: vi.fn(),
   }
 })
 
@@ -20,48 +29,35 @@ vi.mock("next/navigation", async () => {
 
   return {
     ...actual,
-    useRouter
+    useRouter,
   }
 })
 
-vi.mock("react-dom", () => ({
-  useFormState: vi.fn(),
-  useFormStatus: vi.fn()
-}))
-
 vi.mock("@/hooks/useSessionData", () => ({
-  useSessionData: vi.fn()
+  useSessionData: vi.fn(),
 }))
 
 vi.mock("@/app/(protected)/account/profile/profile.actions", () => ({
-  profile: vi.fn()
+  profile: vi.fn(),
 }))
 
 describe("Sign Up Form", () => {
   const user: User & { accounts: Account[] } = {
     ...mockUser1,
-    accounts: []
+    accounts: [],
   }
 
-  const userWithLinkedAccounts = {
+  const userWithLinkedAccounts: IUserProfile = {
     ...user,
     accounts: [
       {
-        provider: "google"
-      }
-    ]
+        provider: "google",
+      } as Account,
+    ],
   }
 
   beforeEach(() => {
-    vi.mocked(useFormState).mockReturnValue([{ success: false, message: "", error: {} }, vi.fn(), false])
-
-    vi.mocked(useFormStatus).mockReturnValue({
-      pending: false,
-      data: null,
-      method: null,
-      action: null
-    })
-
+    vi.mocked(useActionState).mockReturnValue([{ success: false, message: "", error: {} }, vi.fn(), false])
     vi.mocked(useSessionData).mockReturnValue(mockUnauthenticatedSession)
   })
 
@@ -95,17 +91,17 @@ describe("Sign Up Form", () => {
   })
 
   it("should show error messages when submitting an empty form", () => {
-    vi.mocked(useFormState).mockReturnValue([
+    vi.mocked(useActionState).mockReturnValue([
       {
         success: false,
         error: {
           name: "The name is invalid.",
           email: "The email is invalid.",
-          username: "The username is invalid."
-        }
+          username: "The username is invalid.",
+        },
       },
       vi.fn(),
-      false
+      false,
     ])
 
     render(<ProfileForm user={user} />)
@@ -116,15 +112,15 @@ describe("Sign Up Form", () => {
   })
 
   it("should show an error if the birthdate is invalid", () => {
-    vi.mocked(useFormState).mockReturnValue([
+    vi.mocked(useActionState).mockReturnValue([
       {
         success: false,
         error: {
-          birthdate: "The birthdate is invalid."
-        }
+          birthdate: "The birthdate is invalid.",
+        },
       },
       vi.fn(),
-      false
+      false,
     ])
 
     render(<ProfileForm user={user} />)
@@ -133,12 +129,7 @@ describe("Sign Up Form", () => {
   })
 
   it("should disable the submit button when the form is submitting", () => {
-    vi.mocked(useFormStatus).mockReturnValue({
-      pending: true,
-      data: new FormData(),
-      method: "PATCH",
-      action: "/api/account/profile"
-    })
+    vi.mocked(useActionState).mockReturnValue([{ success: false, message: "" }, vi.fn(), true])
 
     render(<ProfileForm user={user} />)
 
@@ -148,7 +139,7 @@ describe("Sign Up Form", () => {
   it("should display a success message on form submission success", () => {
     const { update } = useSessionData()
 
-    vi.mocked(useFormState).mockReturnValue([
+    vi.mocked(useActionState).mockReturnValue([
       {
         success: true,
         message: "Your profile has been updated!",
@@ -156,11 +147,11 @@ describe("Sign Up Form", () => {
           ...user,
           name: "Jane Doe",
           email: "jane.doe@example.com",
-          username: "jane.doe"
-        }
+          username: "jane.doe",
+        },
       },
       vi.fn(),
-      false
+      false,
     ])
 
     render(<ProfileForm user={user} />)
@@ -170,7 +161,7 @@ describe("Sign Up Form", () => {
       name: "Jane Doe",
       email: "jane.doe@example.com",
       username: "jane.doe",
-      image: "https://example.com/avatar.jpg"
+      image: "https://example.com/avatar.jpg",
     })
   })
 })

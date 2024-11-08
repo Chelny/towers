@@ -2,9 +2,7 @@
 
 import React, { Context, createContext, type PropsWithChildren, ReactNode, useEffect, useMemo, useState } from "react"
 import { usePathname } from "next/navigation"
-import axios, { AxiosRequestConfig, AxiosResponse } from "axios"
 import { getCsrfToken } from "next-auth/react"
-import { getAxiosError } from "@/utils/api"
 import type { Session } from "next-auth"
 
 type TSessionProviderProps = PropsWithChildren<{
@@ -35,17 +33,12 @@ export const SessionDataProvider = ({ session: initialSession = null, children }
   useEffect(() => {
     const fetchSession = async (): Promise<void> => {
       if (!initialSession) {
-        try {
-          // Retrive data from session callback
-          const response: AxiosResponse = await axios.get("/api/auth/session")
-          const fetchedSession: Session | null = response.data
+        // Retrieving data from session callback
+        const fetchedSessionResponse: Response = await fetch("api/auth/session")
+        const fetchedSession: Session | null = await fetchedSessionResponse.json()
 
-          setSession(fetchedSession)
-        } catch (error) {
-          getAxiosError(error)
-        } finally {
-          setLoading(false)
-        }
+        setSession(fetchedSession)
+        setLoading(false)
       }
     }
 
@@ -56,42 +49,36 @@ export const SessionDataProvider = ({ session: initialSession = null, children }
     () => ({
       data: session,
       status: loading ? "loading" : session ? "authenticated" : "unauthenticated",
-      async update(data?: TUpdateSessionData) {
+      async update(data?: TUpdateSessionData): Promise<Session | null | undefined> {
         if (loading || !session) return
 
         setLoading(true)
 
-        const fetchOptions: AxiosRequestConfig = {
+        const fetchOptions: RequestInit = {
           headers: {
-            "Content-Type": "application/json"
-          }
+            "Content-Type": "application/json",
+          },
         }
 
         if (data) {
           fetchOptions.method = "POST"
           // That is possible to replace getCsrfToken with a fetch to /api/auth/csrf
-          fetchOptions.data = { csrfToken: await getCsrfToken(), data }
+          fetchOptions.body = JSON.stringify({ csrfToken: await getCsrfToken(), data })
         }
 
-        try {
-          const fetchedSessionResponse = await axios("/api/auth/session", fetchOptions)
-          let fetchedSession: Session | null = null
+        const fetchedSessionResponse: Response = await fetch("/api/auth/session", fetchOptions)
+        let fetchedSession: Session | null = null
 
-          if (fetchedSessionResponse.status === 200) {
-            fetchedSession = fetchedSessionResponse.data
-            setSession(fetchedSession)
-            setLoading(false)
-          }
-
-          return fetchedSession
-        } catch (error) {
-          getAxiosError(error)
-        } finally {
+        if (fetchedSessionResponse.ok) {
+          fetchedSession = await fetchedSessionResponse.json()
+          setSession(fetchedSession)
           setLoading(false)
         }
-      }
+
+        return fetchedSession
+      },
     }),
-    [loading, session]
+    [loading, session],
   )
 
   return <SessionContext.Provider value={sessionData}>{children}</SessionContext.Provider>

@@ -9,16 +9,16 @@ import socketReducer from "@/redux/features/socket-slice"
 
 const initialState: SocketState = {
   ...mockSocketInitialState,
-  isConnected: true
+  isConnected: true,
 }
 
 const store = configureStore({
   reducer: {
-    socket: socketReducer
+    socket: socketReducer,
   },
   preloadedState: {
-    socket: initialState
-  }
+    socket: initialState,
+  },
 })
 
 describe("RoomHeader Component", () => {
@@ -26,7 +26,7 @@ describe("RoomHeader Component", () => {
     render(
       <Provider store={store}>
         <RoomHeader room={mockTowersRoomState1Info} />
-      </Provider>
+      </Provider>,
     )
 
     expect(screen.getByText(mockRoom1.name)).toBeInTheDocument()

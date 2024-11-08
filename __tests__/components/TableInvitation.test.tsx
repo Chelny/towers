@@ -5,7 +5,7 @@ import TableInvitation from "@/components/game/TableInvitation"
 describe("TableInvitation Component", () => {
   const mockTableInvitationData = {
     user: { username: "jane.doe" },
-    table: { tableNumber: 5, rated: true }
+    table: { tableNumber: 5, rated: true },
   }
 
   beforeAll(() => {
@@ -23,7 +23,7 @@ describe("TableInvitation Component", () => {
         data={mockTableInvitationData}
         onAcceptInvitation={mockHandleAcceptInvitation}
         onCancel={mockHandleCancel}
-      />
+      />,
     )
 
     expect(screen.getByText("jane.doe (2552) invited you to table #5.")).toBeInTheDocument()
@@ -40,7 +40,7 @@ describe("TableInvitation Component", () => {
         data={mockTableInvitationData}
         onAcceptInvitation={mockHandleAcceptInvitation}
         onCancel={mockHandleCancel}
-      />
+      />,
     )
 
     fireEvent.click(screen.getByText("Accept"))
@@ -58,7 +58,7 @@ describe("TableInvitation Component", () => {
         data={mockTableInvitationData}
         onAcceptInvitation={mockHandleAcceptInvitation}
         onCancel={mockHandleCancel}
-      />
+      />,
     )
 
     fireEvent.click(screen.getByText("Decline"))

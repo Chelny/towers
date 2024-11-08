@@ -6,7 +6,7 @@ import {
   PIECE_LENGTH,
   PIECE_STARTING_COL,
   PIECE_STARTING_ROW,
-  POWER_BAR_LENGTH
+  POWER_BAR_LENGTH,
 } from "@/constants/game"
 import {
   Block,
@@ -25,7 +25,7 @@ import {
   PowerLevel,
   Powers,
   TowersBlock,
-  TowersLetter
+  TowersLetter,
 } from "@/interfaces/game"
 import { isEmptyCell, isMedusaBlock, isSpecialDiamond, isTowersBlock } from "@/utils/block-guards-utils"
 import { areAdjacentBlocksSame, getNumBlocksToRearrange, isSettingUpThreeInRow } from "@/utils/board-utils"
@@ -44,20 +44,20 @@ export function useTowersBoard(): [BoardState, Dispatch<BoardAction>] {
       droppingPiece: [
         { letter: "T", powerType: null, powerLevel: null, isToBeRemoved: false, brokenBlockNumber: null },
         { letter: "T", powerType: null, powerLevel: null, isToBeRemoved: false, brokenBlockNumber: null },
-        { letter: "T", powerType: null, powerLevel: null, isToBeRemoved: false, brokenBlockNumber: null }
+        { letter: "T", powerType: null, powerLevel: null, isToBeRemoved: false, brokenBlockNumber: null },
       ],
       droppingRow: PIECE_STARTING_ROW,
       droppingColumn: PIECE_STARTING_COL,
       powerBar: [],
-      usedPowerBlock: null
+      usedPowerBlock: null,
     },
     (emptyState: BoardState) => {
       const state: BoardState = {
         ...emptyState,
-        board: getEmptyBoard()
+        board: getEmptyBoard(),
       }
       return state
-    }
+    },
   )
 
   return [boardState, dispatchBoardState]
@@ -111,7 +111,7 @@ function generateBlock(powers?: Powers): TowersBlock {
       powerType: power.powerType,
       powerLevel: power.powerLevel,
       isToBeRemoved: false,
-      brokenBlockNumber: null
+      brokenBlockNumber: null,
     }
   }
 
@@ -248,7 +248,7 @@ export function boardReducer(state: BoardState, action: BoardAction): BoardState
         droppingRow: PIECE_STARTING_ROW,
         droppingColumn: PIECE_STARTING_COL,
         powerBar: [],
-        usedPowerBlock: null
+        usedPowerBlock: null,
       }
     case "drop":
       newState.droppingRow++
@@ -270,7 +270,7 @@ export function boardReducer(state: BoardState, action: BoardAction): BoardState
         board: [...getEmptyBoard(BOARD_ROWS - action.newBoard!.length), ...action.newBoard!],
         droppingPiece: action.newPiece!,
         droppingRow: PIECE_STARTING_ROW,
-        droppingColumn: PIECE_STARTING_COL
+        droppingColumn: PIECE_STARTING_COL,
       }
     case "addToPowerBar":
       const updatedPowerBar: PowerBarBlock[] = [...newState.powerBar, action.newAddedPowerBlock!]
@@ -528,7 +528,7 @@ function dropStones(newState: BoardState, powerLevel: PowerLevel): BoardState {
 function defuse(newState: BoardState, powerLevel: PowerLevel): BoardState {
   const totalPurplePowers: number = newState.board.reduce(
     (count: number, row: BoardRow) => count + row.filter((block: BoardBlock) => block.letter === "E").length,
-    0
+    0,
   )
 
   // Determine the number of purple powers to defuse based on the power level
@@ -677,7 +677,7 @@ function colorPlague(newState: BoardState): BoardState {
           return createEmptyCell() // Replace the color block with an empty cell
         }
         return block
-      })
+      }),
     )
   }
 
@@ -717,13 +717,13 @@ function specialSpeedDrop(newState: BoardState): BoardState {
  */
 function specialRemovePowers(newState: BoardState): BoardState {
   const updatedBoard: BoardRow[] = newState.board.map((row: BoardRow) =>
-    row.map((block: BoardBlock) => (isTowersBlock(block) ? createPieceBlock(block.letter) : block))
+    row.map((block: BoardBlock) => (isTowersBlock(block) ? createPieceBlock(block.letter) : block)),
   )
 
   return {
     ...newState,
     board: updatedBoard,
-    powerBar: []
+    powerBar: [],
   }
 }
 
@@ -735,7 +735,7 @@ function specialRemovePowers(newState: BoardState): BoardState {
  */
 function specialRemoveStones(newState: BoardState): BoardState {
   const updatedBoard: BoardRow[] = newState.board.map((row: BoardRow) =>
-    row.map((block: BoardBlock) => (isMedusaBlock(block) ? createEmptyCell() : block))
+    row.map((block: BoardBlock) => (isMedusaBlock(block) ? createEmptyCell() : block)),
   )
 
   // Shift down remaining blocks
@@ -754,6 +754,6 @@ function specialRemoveStones(newState: BoardState): BoardState {
 
   return {
     ...newState,
-    board: updatedBoard
+    board: updatedBoard,
   }
 }

@@ -4,7 +4,7 @@ export const mockDefaultTowersBlockProps = {
   powerType: null,
   powerLevel: null,
   isToBeRemoved: false,
-  brokenBlockNumber: null
+  brokenBlockNumber: null,
 }
 
 export const mockBlockT: BoardBlock = { ...mockDefaultTowersBlockProps, letter: "T" }

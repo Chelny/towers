@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/react"
 import Breadcrumb from "@/components/ui/Breadcrumb"
 
 vi.mock("next/navigation", () => ({
-  usePathname: vi.fn()
+  usePathname: vi.fn(),
 }))
 
 describe("Breadcrumb Component", () => {

@@ -1,53 +1,55 @@
 import { NextRequest, NextResponse } from "next/server"
 import { PasswordResetToken, User } from "@prisma/client"
-import { hash } from "bcryptjs"
-import { ResetPasswordFormData } from "@/app/(auth)/reset-password/reset-password.schema"
+import { hashSync } from "bcrypt-edge"
+import { ResetPasswordPayload } from "@/app/(auth)/reset-password/reset-password.schema"
 import { getPasswordResetTokenByToken } from "@/data/password-reset-token"
 import { getUserByEmail } from "@/data/user"
+import { getPrismaError } from "@/lib/api"
 import prisma from "@/lib/prisma"
-import { getPrismaError } from "@/utils/api"
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
+  const searchParams: URLSearchParams = request.nextUrl.searchParams
+  const token: string | null = searchParams.get("token")
+
+  if (!token) {
+    return NextResponse.json(
+      {
+        success: false,
+        error: "The token is invalid.",
+      },
+      { status: 401 },
+    )
+  }
+
   try {
-    const searchParams: URLSearchParams = request.nextUrl.searchParams
-    const token: string | null = searchParams.get("token")
-
-    if (!token) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "The token is invalid."
-        },
-        { status: 401 }
-      )
-    }
-
     const passwordResetToken: PasswordResetToken | null = await prisma.passwordResetToken.findUnique({
-      where: { token }
+      where: { token },
     })
 
     if (!passwordResetToken || new Date() > passwordResetToken.expires) {
       return NextResponse.json(
         {
           success: false,
-          error: "The token is invalid."
+          error: "The token is invalid.",
         },
-        { status: 401 }
+        { status: 401 },
       )
     }
 
     return NextResponse.json(
       {
-        success: true
+        success: true,
       },
-      { status: 200 }
+      { status: 200 },
     )
   } catch (error) {
     return getPrismaError(error)
   }
 }
 
-export async function PATCH(body: ResetPasswordFormData): Promise<NextResponse> {
+export async function PATCH(request: NextRequest): Promise<NextResponse> {
+  const body: ResetPasswordPayload = await request.json()
+
   try {
     // Check token validity
     const existingToken = await getPasswordResetTokenByToken(body.token)
@@ -56,9 +58,9 @@ export async function PATCH(body: ResetPasswordFormData): Promise<NextResponse> 
       return NextResponse.json(
         {
           success: false,
-          message: "The token is missing or invalid."
+          message: "The token is missing or invalid.",
         },
-        { status: 404 }
+        { status: 404 },
       )
     }
 
@@ -69,9 +71,9 @@ export async function PATCH(body: ResetPasswordFormData): Promise<NextResponse> 
       return NextResponse.json(
         {
           success: false,
-          message: "The token is expired."
+          message: "The token is expired.",
         },
-        { status: 403 }
+        { status: 403 },
       )
     }
 
@@ -82,18 +84,18 @@ export async function PATCH(body: ResetPasswordFormData): Promise<NextResponse> 
       return NextResponse.json(
         {
           success: false,
-          message: "We couldn’t find an account with that email. Please check the email address and try again."
+          message: "We couldn’t find an account with that email. Please check the email address and try again.",
         },
-        { status: 404 }
+        { status: 404 },
       )
     }
 
     if (body.password) {
-      const hashedPassword = await hash(body.password, 12)
+      const hashedPassword = hashSync(body.password, 12)
 
       await prisma.user.update({
         where: { id: existingUser.id },
-        data: { password: hashedPassword }
+        data: { password: hashedPassword },
       })
     }
 
@@ -102,9 +104,9 @@ export async function PATCH(body: ResetPasswordFormData): Promise<NextResponse> 
     return NextResponse.json(
       {
         success: true,
-        message: "The password has been reset!"
+        message: "The password has been reset!",
       },
-      { status: 200 }
+      { status: 200 },
     )
   } catch (error) {
     return getPrismaError(error)

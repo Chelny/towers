@@ -7,7 +7,7 @@ describe("NextPiece Component", () => {
   const mockNextPiece: Piece = [
     { ...mockDefaultTowersBlockProps, letter: "T", powerType: "defense" },
     { ...mockDefaultTowersBlockProps, letter: "O", powerType: null },
-    { ...mockDefaultTowersBlockProps, letter: "W", powerType: "attack" }
+    { ...mockDefaultTowersBlockProps, letter: "W", powerType: "attack" },
   ]
 
   it("should render all blocks in the next piece", () => {

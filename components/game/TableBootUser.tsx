@@ -38,5 +38,5 @@ export default function TableBootUser({ isOpen, users, isRatingsVisible, onCance
 }
 
 const PlayersList = dynamic(() => import("@/components/game/PlayersList"), {
-  loading: () => <PlayersListSkeleton />
+  loading: () => <PlayersListSkeleton />,
 })

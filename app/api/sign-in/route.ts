@@ -1,18 +1,20 @@
-import { NextResponse } from "next/server"
-import { TowersUserProfile, User, UserStatus } from "@prisma/client"
-import { compare } from "bcryptjs"
-import { SignInFormData } from "@/app/(auth)/sign-in/sign-in.schema"
+import { NextRequest, NextResponse } from "next/server"
+import { User, UserStatus } from "@prisma/client"
+import { compareSync } from "bcrypt-edge"
+import { SignInPayload } from "@/app/(auth)/sign-in/sign-in.schema"
 import { getUserByEmail } from "@/data/user"
+import { getPrismaError } from "@/lib/api"
 import prisma from "@/lib/prisma"
-import { getPrismaError } from "@/utils/api"
 
-export async function POST(body: SignInFormData): Promise<NextResponse> {
+export async function POST(request: NextRequest): Promise<NextResponse> {
+  const body: SignInPayload = await request.json()
+
   try {
     const user: User | null = await getUserByEmail(body.email)
     if (!user) throw new Error("The email or the password is invalid.")
 
     if (body.password && user.password) {
-      const isPasswordsMatch: boolean = await compare(body.password, user.password)
+      const isPasswordsMatch: boolean = compareSync(body.password, user.password)
       if (!isPasswordsMatch) throw new Error("The email or the password is invalid.")
     }
 
@@ -21,7 +23,7 @@ export async function POST(body: SignInFormData): Promise<NextResponse> {
       case UserStatus.PENDING_EMAIL_VERIFICATION:
         if (!user.emailVerified) {
           throw new Error(
-            "Your email verification is pending. Please check your inbox and verify your email to activate your account."
+            "Your email verification is pending. Please check your inbox and verify your email to activate your account.",
           )
         }
         break
@@ -30,12 +32,12 @@ export async function POST(body: SignInFormData): Promise<NextResponse> {
       case UserStatus.PENDING_DELETION:
         await prisma.user.update({
           where: {
-            id: user.id
+            id: user.id,
           },
           data: {
             status: UserStatus.ACTIVE,
-            deletionScheduledAt: null
-          }
+            deletionScheduledAt: null,
+          },
         })
         break
       default:
@@ -46,16 +48,14 @@ export async function POST(body: SignInFormData): Promise<NextResponse> {
       {
         success: true,
         data: {
-          user: {
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            username: user.username,
-            image: user.image
-          }
-        }
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          username: user.username,
+          image: user.image,
+        },
       },
-      { status: 200 }
+      { status: 200 },
     )
   } catch (error) {
     return getPrismaError(error)

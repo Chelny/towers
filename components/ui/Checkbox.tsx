@@ -24,7 +24,7 @@ export default function Checkbox({
   disabled = false,
   dataTestId = undefined,
   errorMessage = "",
-  onChange
+  onChange,
 }: CheckboxProps): ReactNode {
   const [checked, setChecked] = useState<boolean>(defaultChecked)
 
@@ -45,7 +45,7 @@ export default function Checkbox({
           id={id}
           className={clsx(
             "peer shrink-0 appearance-none w-5 h-5 border-2 border-t-gray-600 border-e-gray-400 border-b-gray-400 border-s-gray-600 rounded-sm mt-1 bg-white cursor-pointer",
-            "disabled:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            "disabled:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed",
           )}
           name={id}
           checked={checked}
@@ -63,7 +63,7 @@ export default function Checkbox({
           htmlFor={id}
           className={clsx(
             "mt-1",
-            "peer-enabled:cursor-pointer peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"
+            "peer-enabled:cursor-pointer peer-disabled:opacity-50 peer-disabled:cursor-not-allowed",
           )}
         >
           {label}

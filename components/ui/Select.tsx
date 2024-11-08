@@ -1,6 +1,15 @@
 "use client"
 
-import React, { KeyboardEvent, PropsWithChildren, ReactElement, ReactNode, useEffect, useRef, useState } from "react"
+import React, {
+  KeyboardEvent,
+  PropsWithChildren,
+  ReactElement,
+  ReactNode,
+  RefObject,
+  useEffect,
+  useRef,
+  useState,
+} from "react"
 import clsx from "clsx/lite"
 import { PiCaretDownDuotone, PiCaretDownFill } from "react-icons/pi"
 
@@ -30,11 +39,11 @@ export default function Select({
   dataTestId = undefined,
   description = "",
   errorMessage = "",
-  onChange
+  onChange,
 }: SelectProps): ReactNode {
   const [selectedValue, setSelectedValue] = useState<string>(defaultValue)
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false)
-  const dropdownRef = useRef<HTMLDivElement | null>(null)
+  const dropdownRef: RefObject<HTMLDivElement | null> = useRef<HTMLDivElement | null>(null)
   const options = React.Children.toArray(children) as ReactElement<SelectOptionProps>[]
 
   useEffect(() => {
@@ -88,7 +97,7 @@ export default function Select({
         className={clsx(
           "flex justify-between items-center w-full h-8 px-1 py-4 overflow-hidden border-2 border-t-gray-200 border-e-gray-400 border-b-gray-400 border-s-gray-200 rounded-sm ring-1 ring-black bg-gray-300 text-black line-clamp-1",
           disabled && "bg-gray-200 opacity-50 cursor-not-allowed",
-          className
+          className,
         )}
         role="combobox"
         tabIndex={0}
@@ -131,7 +140,7 @@ export default function Select({
               className={clsx(
                 "block w-full px-2 py-2 text-left cursor-pointer",
                 "hover:bg-gray-200",
-                option.props.value === selectedValue && "bg-blue-100"
+                option.props.value === selectedValue && "bg-blue-100",
               )}
               role="option"
               tabIndex={0}

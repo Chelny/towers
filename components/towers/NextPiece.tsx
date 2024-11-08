@@ -20,7 +20,7 @@ export default function NextPiece(props: NextPieceProps): ReactNode {
           className={clsx(
             "w-grid-cell h-grid-cell box-border text-center",
             styles[getClassNameForBlock(block)],
-            styles[getClassNameForBlockPowerType(block)]
+            styles[getClassNameForBlockPowerType(block)],
           )}
         >
           {isTowersBlock(block) && block.powerType === "defense" ? (

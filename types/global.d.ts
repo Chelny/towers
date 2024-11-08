@@ -1,17 +1,17 @@
-import { TSchema, Static } from "@sinclair/typebox"
+import { Static, TSchema } from "@sinclair/typebox"
 
 declare global {
-  type SchemaFormData<T extends TSchema> = Static<T>
+  type FormPayload<T extends TSchema> = Static<T>
 
-  type SchemaFormErrorMessages<T extends string> = {
+  type FormValidationErrors<T extends string> = {
     [K in T]?: string
   }
 
-  type ApiResponse<T = undefined> = {
+  type ApiResponse<T = unknown> = {
     success: boolean
     message?: string
     data?: T
-    error?: string | SchemaFormErrorMessages
+    error?: string | FormValidationErrors
   }
 
   type Debounce = (this: any, ...args: any[]) => void

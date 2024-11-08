@@ -1,6 +1,6 @@
 "use client"
 
-import { KeyboardEvent, memo, MouseEvent, ReactNode, useCallback, useEffect, useRef, useState } from "react"
+import { KeyboardEvent, memo, MouseEvent, ReactNode, RefObject, useCallback, useEffect, useRef, useState } from "react"
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime"
 import dynamic from "next/dynamic"
 import { useRouter } from "next/navigation"
@@ -10,7 +10,7 @@ import {
   ITowersTable,
   ITowersTableWithRelations,
   ITowersUserRoomTable,
-  RoomLevel
+  RoomLevel,
 } from "@prisma/client"
 import CreateTable from "@/components/game/CreateTable"
 import ServerMessage from "@/components/game/ServerMessage"
@@ -26,7 +26,7 @@ import {
   RATING_GOLD,
   RATING_MASTER,
   RATING_PLATINUM,
-  RATING_SILVER
+  RATING_SILVER,
 } from "@/constants/game"
 import { ROUTE_TOWERS } from "@/constants/routes"
 import { useSessionData } from "@/hooks/useSessionData"
@@ -41,7 +41,7 @@ import {
   selectRoomInfo,
   selectRoomIsJoined,
   selectRoomTables,
-  selectRoomUsers
+  selectRoomUsers,
 } from "@/redux/selectors/socket-selectors"
 import { AppDispatch, RootState } from "@/redux/store"
 import {
@@ -51,7 +51,7 @@ import {
   fetchRoomUsers,
   joinRoom,
   leaveRoom,
-  SocketRoomThunkResponse
+  SocketRoomThunkResponse,
 } from "@/redux/thunks/room-thunks"
 
 type RoomProps = {
@@ -74,8 +74,8 @@ export default memo(function Room({ roomId }: RoomProps): ReactNode {
   const roomUsers: ITowersUserRoomTable[] = useAppSelector((state: RootState) => selectRoomUsers(state, roomId))
   const tables: TowersTableState[] = useAppSelector((state: RootState) => selectRoomTables(state, roomId))
   const dispatch: AppDispatch = useAppDispatch()
-  const messageInputRef = useRef<HTMLInputElement>(null)
-  const chatEndRef = useRef<HTMLDivElement>(null)
+  const messageInputRef: RefObject<HTMLInputElement | null> = useRef<HTMLInputElement | null>(null)
+  const chatEndRef: RefObject<HTMLDivElement | null> = useRef<HTMLDivElement | null>(null)
   const [isCreateTableModalOpen, setIsCreateTableModalOpen] = useState<boolean>(false)
   const [invitationModals, setInvitationModals] = useState<{ id: string; data: TableInvitationData }[]>([])
 
@@ -97,7 +97,7 @@ export default memo(function Room({ roomId }: RoomProps): ReactNode {
           })
       }
     },
-    [isJoinedRoom]
+    [isJoinedRoom],
   )
 
   useEffect(() => {
@@ -118,8 +118,8 @@ export default memo(function Room({ roomId }: RoomProps): ReactNode {
       dispatch(
         addLink({
           href: `${ROUTE_TOWERS.PATH}?room=${roomId}`,
-          label: roomInfo.name
-        })
+          label: roomInfo.name,
+        }),
       )
     }
   }, [roomInfo])
@@ -135,7 +135,7 @@ export default memo(function Room({ roomId }: RoomProps): ReactNode {
 
   const handleCloseInvitationModal = (id: string): void => {
     setInvitationModals((prev: { id: string; data: TableInvitationData }[]) =>
-      prev.filter((modal: { id: string; data: TableInvitationData }) => modal.id !== id)
+      prev.filter((modal: { id: string; data: TableInvitationData }) => modal.id !== id),
     )
   }
 
@@ -172,12 +172,12 @@ export default memo(function Room({ roomId }: RoomProps): ReactNode {
       ?.filter((table: TowersTableState) =>
         table.users?.some(
           (userRoomTable: ITowersUserRoomTable) =>
-            userRoomTable.userProfile?.userId === session?.user.id && userRoomTable.roomId === roomId
-        )
+            userRoomTable.userProfile?.userId === session?.user.id && userRoomTable.roomId === roomId,
+        ),
       )
       .map((table: TowersTableState) => ({
         id: (table.info as ITowersTable).id,
-        isLastUser: table.users.length === 1
+        isLastUser: table.users.length === 1,
       }))
 
     dispatch(leaveRoom({ roomId }))
@@ -271,7 +271,7 @@ export default memo(function Room({ roomId }: RoomProps): ReactNode {
               <div className="flex-1 flex flex-col overflow-y-auto">
                 {tables?.map(
                   (table: TowersTableState) =>
-                    table?.info?.id && <RoomTable key={table?.info?.id} roomId={roomId} tableId={table?.info?.id} />
+                    table?.info?.id && <RoomTable key={table?.info?.id} roomId={roomId} tableId={table?.info?.id} />,
                 )}
               </div>
             </div>
@@ -332,17 +332,17 @@ export default memo(function Room({ roomId }: RoomProps): ReactNode {
 }, areEqual)
 
 const RoomHeader = dynamic(() => import("@/components/game/RoomHeader"), {
-  loading: () => <RoomHeaderSkeleton />
+  loading: () => <RoomHeaderSkeleton />,
 })
 
 const RoomTable = dynamic(() => import("@/components/game/RoomTable"), {
-  loading: () => <RoomTableSkeleton />
+  loading: () => <RoomTableSkeleton />,
 })
 
 const Chat = dynamic(() => import("@/components/game/Chat"), {
-  loading: () => <ChatSkeleton />
+  loading: () => <ChatSkeleton />,
 })
 
 const PlayersList = dynamic(() => import("@/components/game/PlayersList"), {
-  loading: () => <PlayersListSkeleton full />
+  loading: () => <PlayersListSkeleton full />,
 })

@@ -11,7 +11,7 @@ describe("Anchor Component", () => {
     render(
       <Anchor href={href} className={className}>
         {childrenText}
-      </Anchor>
+      </Anchor>,
     )
 
     const linkElement: HTMLAnchorElement | null = screen.getByText(childrenText).closest("a")

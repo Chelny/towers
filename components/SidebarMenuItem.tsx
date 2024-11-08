@@ -29,7 +29,7 @@ export default function SidebarMenuItem({
   href = undefined,
   accordionLinks = [],
   disabled = false,
-  onClick
+  onClick,
 }: SidebarMenuItemProps): ReactNode {
   const pathname: string = usePathname()
   const [isAccordionOpen, setAccordionOpen] = useState<boolean>(false)
@@ -52,7 +52,7 @@ export default function SidebarMenuItem({
       className={clsx(
         "py-1 rounded-md overflow-hidden",
         isExpanded ? "w-full" : "w-auto",
-        href && isExpanded && pathname === href ? "bg-slate-700" : "text-white/70"
+        href && isExpanded && pathname === href ? "bg-slate-700" : "text-white/70",
       )}
     >
       {/* Single menu item */}
@@ -62,7 +62,7 @@ export default function SidebarMenuItem({
           className={clsx(
             "flex items-center gap-4 w-full p-2",
             "disabled:opacity-50 disabled:cursor-not-allowed",
-            href && pathname === href && "font-semibold"
+            href && pathname === href && "font-semibold",
           )}
           aria-label={ariaLabel}
         >
@@ -71,7 +71,7 @@ export default function SidebarMenuItem({
               "p-2 border-2 rounded-md",
               href && pathname === href
                 ? "border-slate-300/50 bg-slate-400/50 text-white/90"
-                : "border-slate-600 bg-slate-700 text-white/70"
+                : "border-slate-600 bg-slate-700 text-white/70",
             )}
           >
             <Icon className="w-5 h-5" aria-hidden="true" />
@@ -80,7 +80,7 @@ export default function SidebarMenuItem({
             className={clsx(
               "transition-opacity duration-300",
               isExpanded ? "block" : "hidden",
-              isLinkTextVisible ? "opacity-100" : "opacity-0"
+              isLinkTextVisible ? "opacity-100" : "opacity-0",
             )}
           >
             {children}
@@ -92,7 +92,7 @@ export default function SidebarMenuItem({
           className={clsx(
             "flex items-center gap-4 w-full p-2 rounded-md",
             "disabled:opacity-50 disabled:cursor-not-allowed",
-            isExpanded && accordionLinks.some((link: AccordionLink) => pathname?.includes(link.href)) && "bg-slate-600"
+            isExpanded && accordionLinks.some((link: AccordionLink) => pathname?.includes(link.href)) && "bg-slate-600",
           )}
           disabled={disabled}
           aria-label={ariaLabel}
@@ -103,7 +103,7 @@ export default function SidebarMenuItem({
               "relative p-2 border-2 rounded-md",
               accordionLinks.some((link: AccordionLink) => pathname?.includes(link.href))
                 ? "border-slate-300/50 bg-slate-400/50 text-white/90"
-                : "border-slate-600 bg-slate-700 text-white/70"
+                : "border-slate-600 bg-slate-700 text-white/70",
             )}
           >
             <Icon className="w-5 h-5" aria-hidden="true" />
@@ -112,7 +112,7 @@ export default function SidebarMenuItem({
               <span
                 className={clsx(
                   "absolute left-1/2 top-[100%] w-[2px] bg-white/15 transform -translate-x-1/2 transition-all duration-300",
-                  isAccordionOpen ? "h-screen" : "h-0"
+                  isAccordionOpen ? "h-screen" : "h-0",
                 )}
               />
             )}
@@ -121,7 +121,7 @@ export default function SidebarMenuItem({
             className={clsx(
               "flex justify-between items-center w-full transition-opacity duration-300",
               isExpanded ? "block" : "hidden",
-              isLinkTextVisible ? "opacity-100" : "opacity-0"
+              isLinkTextVisible ? "opacity-100" : "opacity-0",
             )}
           >
             {accordionLinks.length > 0 ? (
@@ -141,7 +141,7 @@ export default function SidebarMenuItem({
         <div
           className={clsx(
             "pl-12 space-y-2 overflow-hidden transition-all duration-200",
-            isAccordionOpen ? "max-h-screen mt-2" : "max-h-0"
+            isAccordionOpen ? "max-h-screen mt-2" : "max-h-0",
           )}
         >
           {accordionLinks.map((link: AccordionLink) => (
@@ -150,7 +150,7 @@ export default function SidebarMenuItem({
               href={link.href}
               className={clsx(
                 "flex items-center gap-4 w-full p-2 rounded-md ms-2",
-                pathname?.includes(link.href) && "text-white/90 font-semibold"
+                pathname?.includes(link.href) && "text-white/90 font-semibold",
               )}
               aria-label={ariaLabel}
             >

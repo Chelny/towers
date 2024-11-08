@@ -1,26 +1,31 @@
 import { NextRequest, NextResponse } from "next/server"
 import { TowersRoom } from "@prisma/client"
+import { getPrismaError, missingRoomIdResponse } from "@/lib/api"
 import prisma from "@/lib/prisma"
-import { badRequestMissingRoomId, getPrismaError } from "@/utils/api"
 
-export async function GET(request: NextRequest, context: { params: { roomId: string } }): Promise<NextResponse> {
+type Params = Promise<{ roomId: string }>
+
+export async function GET(request: NextRequest, segmentData: { params: Params }): Promise<NextResponse> {
+  const { roomId } = await segmentData.params
+  if (!roomId) return missingRoomIdResponse()
+
   try {
-    const { roomId } = context.params
-
-    if (!roomId) return badRequestMissingRoomId()
-
     const room: TowersRoom | null = await prisma.towersRoom.findUnique({
       where: {
-        id: roomId
-      }
+        id: roomId,
+      },
+      cacheStrategy: {
+        ttl: 600,
+        swr: 900,
+      },
     })
 
     return NextResponse.json(
       {
         success: true,
-        data: room
+        data: room,
       },
-      { status: 200 }
+      { status: 200 },
     )
   } catch (error) {
     return getPrismaError(error)

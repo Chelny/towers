@@ -1,13 +1,12 @@
 "use client"
 
-import { ClipboardEvent, FormEvent, ReactNode, useEffect, useState } from "react"
-import { useFormState, useFormStatus } from "react-dom"
+import { ClipboardEvent, ReactNode, useActionState, useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Account, User, UserStatus } from "@prisma/client"
 import axios from "axios"
 import { IoWarning } from "react-icons/io5"
 import { profile } from "@/app/(protected)/account/profile/profile.actions"
-import { ProfileFormErrorMessages } from "@/app/(protected)/account/profile/profile.schema"
+import { ProfileFormValidationErrors } from "@/app/(protected)/account/profile/profile.schema"
 import AlertMessage from "@/components/ui/AlertMessage"
 import Button from "@/components/ui/Button"
 import Calendar from "@/components/ui/Calendar"
@@ -23,13 +22,12 @@ type ProfileProps = {
 const initialState = {
   success: false,
   message: "",
-  error: {} as ProfileFormErrorMessages
+  error: {} as ProfileFormValidationErrors,
 }
 
 export function ProfileForm({ user, isNewUser }: ProfileProps): ReactNode {
   const router = useRouter()
-  const { pending } = useFormStatus()
-  const [state, formAction] = useFormState<ApiResponse<User>, FormData>(profile, initialState)
+  const [state, formAction, isPending] = useActionState<ApiResponse<User>, FormData>(profile, initialState)
   const { update } = useSessionData()
   const [isNewUserSuccess, setIsNewUserSuccess] = useState<boolean>(false)
 
@@ -40,7 +38,7 @@ export function ProfileForm({ user, isNewUser }: ProfileProps): ReactNode {
           name: state?.data?.name,
           email: state?.data?.email,
           username: state?.data?.username,
-          image: state?.data?.image
+          image: state?.data?.image,
         })
       }
 
@@ -53,18 +51,12 @@ export function ProfileForm({ user, isNewUser }: ProfileProps): ReactNode {
     }
   }, [state])
 
-  const handleUpdateProfile = (event: FormEvent<HTMLFormElement>): void => {
-    event.preventDefault()
-    const formData: FormData = new FormData(event.currentTarget)
-    formAction(formData)
-  }
-
   const handleResendVerification = async (): Promise<void> => {
     await axios.post("/api/send-email-verification", { user })
   }
 
   return (
-    <form className="w-full" noValidate onSubmit={handleUpdateProfile}>
+    <form className="w-full" action={formAction} noValidate>
       {state?.message && (
         <AlertMessage type={state.success ? "success" : "error"}>
           {state.message}
@@ -139,7 +131,7 @@ export function ProfileForm({ user, isNewUser }: ProfileProps): ReactNode {
         description="Username must be between 5 and 16 characters long and can contain digits, periods, and underscores."
         errorMessage={state?.error?.username}
       />
-      <Button type="submit" className="w-full" disabled={pending} dataTestId="profile-submit-button">
+      <Button type="submit" className="w-full" disabled={isPending} dataTestId="profile-submit-button">
         {isNewUser ? "Complete Registration" : "Update Profile"}
       </Button>
     </form>

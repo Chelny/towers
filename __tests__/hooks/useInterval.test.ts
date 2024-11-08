@@ -1,5 +1,5 @@
 import { act } from "react"
-import { renderHook } from "@testing-library/react-hooks"
+import { renderHook } from "@testing-library/react"
 import { useInterval } from "@/hooks/useInterval"
 
 describe("useInterval Hook", () => {
@@ -42,7 +42,7 @@ describe("useInterval Hook", () => {
   it("should update the callback without resetting the interval", () => {
     const callback1 = vi.fn()
     const { rerender } = renderHook(({ callback, delay }) => useInterval(callback, delay), {
-      initialProps: { callback: callback1, delay: 1000 }
+      initialProps: { callback: callback1, delay: 1000 },
     })
 
     act(() => {

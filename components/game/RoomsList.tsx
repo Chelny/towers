@@ -27,12 +27,12 @@ export default function RoomsList({ rooms }: RoomsListProps): ReactNode {
 
   return (
     <ul className="grid grid-cols-[repeat(auto-fill,_minmax(14rem,_1fr))] gap-8">
-      {rooms.map((room: ITowersRoomWithUsersCount) => (
+      {rooms?.map((room: ITowersRoomWithUsersCount) => (
         <li
           key={room.id}
           className={clsx(
             "flex flex-col gap-2 p-4 border border-gray-300 rounded bg-white",
-            room.full && "has-[button:disabled]:opacity-50 has-[button:disabled]:cursor-not-allowed"
+            room.full && "has-[button:disabled]:opacity-50 has-[button:disabled]:cursor-not-allowed",
           )}
         >
           <div className="font-medium">{room.name}</div>

@@ -16,7 +16,7 @@ export default function GridRow(props: GridRowProps): ReactNode {
       className={clsx(
         "grid",
         props.rowIndex < HIDDEN_ROWS_COUNT && "hidden",
-        props.isOpponentBoard ? "grid-cols-grid-row-opponent" : "grid-cols-grid-row"
+        props.isOpponentBoard ? "grid-cols-grid-row-opponent" : "grid-cols-grid-row",
       )}
       role="row"
     >

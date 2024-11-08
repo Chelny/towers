@@ -1,29 +1,30 @@
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { Account, User, UserStatus } from "@prisma/client"
 import { Session } from "next-auth"
-import { CancelAccountFormData } from "@/app/(protected)/account/cancel/cancel.schema"
+import { CancelAccountPayload } from "@/app/(protected)/account/cancel/cancel.schema"
 import { auth } from "@/auth"
 import { getAccountsByUserId } from "@/data/account"
 import { getUserById } from "@/data/user"
+import { getPrismaError, unauthorized } from "@/lib/api"
 import { sendAccountDeletionEmail } from "@/lib/email"
 import prisma from "@/lib/prisma"
-import { getPrismaError, unauthorized } from "@/utils/api"
 
-export async function DELETE(body: CancelAccountFormData): Promise<NextResponse> {
+export async function DELETE(request: NextRequest): Promise<NextResponse> {
+  const body: CancelAccountPayload = await request.json()
+
+  const session: Session | null = await auth()
+  if (!session) return unauthorized()
+
   try {
-    const session: Session | null = await auth()
-
-    if (!session) return unauthorized()
-
     const user: User | null = await getUserById(session.user.id)
 
     if (!user) {
       return NextResponse.json(
         {
           success: false,
-          message: "We couldn’t find an account with that information. Please check your details and try again."
+          message: "We couldn’t find an account with that information. Please check your details and try again.",
         },
-        { status: 404 }
+        { status: 404 },
       )
     }
 
@@ -31,9 +32,9 @@ export async function DELETE(body: CancelAccountFormData): Promise<NextResponse>
       return NextResponse.json(
         {
           success: false,
-          message: "The email provided does not match our records. Please try again."
+          message: "The email provided does not match our records. Please try again.",
         },
-        { status: 400 }
+        { status: 400 },
       )
     }
 
@@ -56,19 +57,19 @@ export async function DELETE(body: CancelAccountFormData): Promise<NextResponse>
 
     const updatedUser: Pick<User, "name" | "email" | "deletionScheduledAt"> = await prisma.user.update({
       where: {
-        id: session.user.id
+        id: session.user.id,
       },
       data: {
         isOnline: false,
         lastActiveAt: new Date(),
         status: UserStatus.PENDING_DELETION,
-        deletionScheduledAt: deletionDate
+        deletionScheduledAt: deletionDate,
       },
       select: {
         name: true,
         email: true,
-        deletionScheduledAt: true
-      }
+        deletionScheduledAt: true,
+      },
     })
 
     await sendAccountDeletionEmail(updatedUser)
@@ -76,9 +77,9 @@ export async function DELETE(body: CancelAccountFormData): Promise<NextResponse>
     return NextResponse.json(
       {
         success: true,
-        message: successMessage
+        message: successMessage,
       },
-      { status: 202 }
+      { status: 202 },
     )
   } catch (error) {
     return getPrismaError(error)

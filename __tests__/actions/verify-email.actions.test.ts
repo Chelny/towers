@@ -1,54 +1,58 @@
 import { Mock } from "vitest"
 import { verifyEmail } from "@/app/(auth)/verify-email/verify-email.actions"
-import { PATCH } from "@/app/api/verify-email/route"
+import { VerifyEmailFormValidationErrors } from "@/app/(auth)/verify-email/verify-email.schema"
 import { mockFormInitialState } from "@/vitest.setup"
 
-vi.mock("@/app/api/verify-email/route", () => ({
-  PATCH: vi.fn()
-}))
-
 describe("Verify Email Actions", () => {
+  let mockFetch: Mock
+
+  beforeEach(() => {
+    mockFetch = vi.fn()
+    global.fetch = mockFetch
+  })
+
   afterEach(() => {
     vi.restoreAllMocks()
   })
 
   it("should return errors if payload is incomplete", async () => {
-    const formData = new FormData()
+    const formData: FormData = new FormData()
     formData.append("token", "")
 
-    const response = {
-      success: false,
-      message: "The verification link is invalid.",
-      error: {
-        token: "The token is missing or invalid."
-      }
+    const error: VerifyEmailFormValidationErrors = {
+      token: "The token is missing or invalid.",
     }
 
-    ;(PATCH as Mock).mockResolvedValueOnce({
-      json: async () => response
+    const result: ApiResponse = await verifyEmail(mockFormInitialState, formData)
+
+    expect(mockFetch).not.toHaveBeenCalled()
+    expect(result).toEqual({
+      success: false,
+      message: "The verification link is invalid.",
+      error,
     })
-
-    const result = await verifyEmail(mockFormInitialState, formData)
-
-    expect(PATCH).not.toHaveBeenCalled()
-    expect(result).toEqual(response)
   })
 
   it("should call PATCH and return success when payload is valid", async () => {
-    const formData = new FormData()
+    const formData: FormData = new FormData()
     formData.append("token", "YjY1ZWYwYzEtYWU2My00YWIwLTljZmQtMzcxYjdiY2UwODRifGNoZWxueTFAZXhhbXBsZS5kZXY=")
 
-    const response = { success: true, message: "The email has been verified!" }
+    const mockResponse = {
+      success: true,
+      message: "The email has been verified!",
+    }
 
-    ;(PATCH as Mock).mockResolvedValueOnce({
-      json: async () => response
+    mockFetch.mockResolvedValueOnce({ json: async () => mockResponse })
+
+    const result: ApiResponse = await verifyEmail(mockFormInitialState, formData)
+
+    expect(mockFetch).toHaveBeenCalledWith(`${process.env.BASE_URL}/api/verify-email`, {
+      method: "PATCH",
+      body: JSON.stringify({
+        token: "YjY1ZWYwYzEtYWU2My00YWIwLTljZmQtMzcxYjdiY2UwODRifGNoZWxueTFAZXhhbXBsZS5kZXY=",
+      }),
     })
 
-    const result = await verifyEmail(mockFormInitialState, formData)
-
-    expect(PATCH).toHaveBeenCalledWith({
-      token: "YjY1ZWYwYzEtYWU2My00YWIwLTljZmQtMzcxYjdiY2UwODRifGNoZWxueTFAZXhhbXBsZS5kZXY="
-    })
-    expect(result).toEqual(response)
+    expect(result).toEqual(mockResponse)
   })
 })

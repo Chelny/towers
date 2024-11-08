@@ -6,7 +6,7 @@ import {
   mockBlockR,
   mockBlockS,
   mockBlockT,
-  mockBlockW
+  mockBlockW,
 } from "@/__mocks__/data/board"
 import { Board, BoardBlock } from "@/interfaces/game"
 import { areAdjacentBlocksSame, getNumBlocksToRearrange, isSettingUpThreeInRow } from "@/utils/board-utils"
@@ -27,7 +27,7 @@ describe("areAdjacentBlocksSame Utility", () => {
     [mockBlockR, mockBlockO, mockBlockMedusa, mockBlockW, mockBlockT, mockBlockO], // Row 11
     [mockBlockO, mockBlockR, mockBlockS, mockBlockMedusa, mockBlockW, mockBlockT], // Row 12
     [mockBlockW, mockBlockO, mockBlockR, mockBlockS, mockBlockR, mockBlockT], // Row 13
-    [mockBlockT, mockBlockW, mockBlockT, mockBlockE, mockBlockT, mockBlockMedusa] // Row 14
+    [mockBlockT, mockBlockW, mockBlockT, mockBlockE, mockBlockT, mockBlockMedusa], // Row 14
   ]
 
   it("should return true if swapping creates horizontally adjacent blocks with the same letter", () => {
@@ -59,7 +59,7 @@ describe("isSettingUpThreeInRow Utility", () => {
     [mockBlockR, mockBlockO, mockBlockMedusa, mockBlockW, mockBlockT, mockBlockO], // Row 11
     [mockBlockR, mockBlockR, mockBlockS, mockBlockMedusa, mockBlockW, mockBlockT], // Row 12
     [mockBlockW, mockBlockR, mockBlockR, mockBlockS, mockBlockR, mockBlockT], // Row 13
-    [mockBlockT, mockBlockW, mockBlockT, mockBlockE, mockBlockT, mockBlockMedusa] // Row 14
+    [mockBlockT, mockBlockW, mockBlockT, mockBlockE, mockBlockT, mockBlockMedusa], // Row 14
   ]
 
   it("should return true if swapping sets up three blocks in a row horizontally", () => {
@@ -91,7 +91,7 @@ describe("getNumBlocksToRearrange Utility", () => {
     [mockBlockR, mockBlockO, mockBlockMedusa, mockBlockW, mockBlockT, mockBlockO], // Row 11
     [mockBlockO, mockBlockR, mockBlockS, mockBlockE, mockBlockW, mockBlockT], // Row 12
     [mockBlockW, mockBlockO, mockBlockR, mockBlockS, mockBlockR, mockBlockT], // Row 13
-    [mockBlockT, mockBlockW, mockBlockT, mockBlockE, mockBlockT, mockBlockMedusa] // Row 14
+    [mockBlockT, mockBlockW, mockBlockT, mockBlockE, mockBlockT, mockBlockMedusa], // Row 14
   ]
   const mockBlockECount: number = mockBoard
     .flat()

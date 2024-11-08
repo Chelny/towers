@@ -11,7 +11,7 @@ import {
   RATING_DIAMOND,
   RATING_GOLD,
   RATING_MASTER,
-  RATING_PLATINUM
+  RATING_PLATINUM,
 } from "@/constants/game"
 import { useSessionData } from "@/hooks/useSessionData"
 
@@ -26,7 +26,7 @@ export default function PlayersList({
   users,
   full = false,
   isRatingsVisible = false,
-  onSelectedPlayer
+  onSelectedPlayer,
 }: PlayersListProps): ReactNode {
   const { data: session } = useSessionData()
   const [sortKey, setSortKey] = useState<"name" | "rating" | "table">("name")
@@ -132,7 +132,7 @@ export default function PlayersList({
                 "flex divide-gray-200",
                 full ? "divide-x-2 select-none" : "divide-x",
                 selectedPlayerId === player.id ? "bg-blue-100" : "bg-white",
-                player.userProfile?.userId === session?.user.id && "text-blue-700"
+                player.userProfile?.userId === session?.user.id && "text-blue-700",
               )}
               role="button"
               tabIndex={0}
@@ -156,7 +156,7 @@ export default function PlayersList({
                           player.userProfile?.rating < RATING_PLATINUM &&
                           "bg-cyan-600",
                         player.userProfile?.rating < RATING_GOLD && "bg-green-600",
-                        player.userProfile?.gamesCompleted < PROVISIONAL_MAX_COMPLETED_GAMES && "!bg-gray-400"
+                        player.userProfile?.gamesCompleted < PROVISIONAL_MAX_COMPLETED_GAMES && "!bg-gray-400",
                       )}
                     />
                   )}

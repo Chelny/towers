@@ -1,12 +1,12 @@
 "use client"
 
-import React, { ReactNode, useEffect, useRef, useState } from "react"
+import React, { ReactNode, RefObject, useEffect, useRef, useState } from "react"
 import clsx from "clsx/lite"
 import {
   PiCaretDoubleLeftDuotone,
   PiCaretDoubleRightDuotone,
   PiCaretLeftDuotone,
-  PiCaretRightDuotone
+  PiCaretRightDuotone,
 } from "react-icons/pi"
 import Button from "@/components/ui/Button"
 
@@ -37,17 +37,17 @@ export default function Calendar({
   dataTestId = undefined,
   description = "",
   errorMessage = "",
-  onChange
+  onChange,
 }: CalendarProps): ReactNode {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(defaultValue ? new Date(defaultValue) : undefined)
   const [browsingDate, setBrowsingDate] = useState<Date>(
-    maxDate ? new Date(Math.min(maxDate.getTime(), new Date().getTime())) : new Date()
+    maxDate ? new Date(Math.min(maxDate.getTime(), new Date().getTime())) : new Date(),
   )
   const [daysInMonth, setDaysInMonth] = useState<number[]>([])
   const [isCalendarVisible, setCalendarVisible] = useState<boolean>(false)
   const [view, setView] = useState<"month" | "year">("month")
   const [currentDecade, setCurrentDecade] = useState<number>(Math.floor(browsingDate.getUTCFullYear() / 10) * 10)
-  const calendarRef = useRef<HTMLDivElement>(null)
+  const calendarRef: RefObject<HTMLDivElement | null> = useRef<HTMLDivElement | null>(null)
   const monthNames: string[] = [
     "January",
     "February",
@@ -60,7 +60,7 @@ export default function Calendar({
     "September",
     "October",
     "November",
-    "December"
+    "December",
   ]
   const daysOfWeek: string[] = ["S", "M", "T", "W", "T", "F", "S"]
 
@@ -116,8 +116,8 @@ export default function Calendar({
       browsingDate.getUTCMonth(),
       Math.min(
         selectedDate ? selectedDate.getUTCDate() : new Date().getUTCDate(),
-        new Date(newYear, browsingDate.getUTCMonth() + 1, 0).getUTCDate()
-      )
+        new Date(newYear, browsingDate.getUTCMonth() + 1, 0).getUTCDate(),
+      ),
     )
 
     setBrowsingDate(newBrowsingDate)
@@ -180,7 +180,7 @@ export default function Calendar({
                       !disabled && day !== null && !isDisabledDay && "cursor-pointer hover:bg-gray-200",
                       day === null && "opacity-50 cursor-default",
                       isSelectedDay && "bg-blue-100",
-                      isDisabledDay && "opacity-50 cursor-not-allowed"
+                      isDisabledDay && "opacity-50 cursor-not-allowed",
                     )}
                     disabled={isDisabledDay}
                     role="gridcell"
@@ -238,7 +238,7 @@ export default function Calendar({
                 >
                   {year}
                 </button>
-              )
+              ),
           )}
         </div>
       </div>
@@ -273,7 +273,7 @@ export default function Calendar({
               year: "numeric",
               month: "long",
               day: "numeric",
-              timeZone: "UTC"
+              timeZone: "UTC",
             })
           : placeholder}
       </Button>

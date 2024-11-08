@@ -17,7 +17,7 @@ export default function TableInviteUser({
   isOpen,
   users,
   isRatingsVisible,
-  onCancel
+  onCancel,
 }: TableInviteUserProps): ReactNode {
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null)
 
@@ -43,5 +43,5 @@ export default function TableInviteUser({
 }
 
 const PlayersList = dynamic(() => import("@/components/game/PlayersList"), {
-  loading: () => <PlayersListSkeleton full />
+  loading: () => <PlayersListSkeleton full />,
 })

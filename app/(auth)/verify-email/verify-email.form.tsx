@@ -1,13 +1,12 @@
 "use client"
 
-import { FormEvent, ReactNode, RefObject, useCallback, useEffect, useRef } from "react"
-import { useFormState } from "react-dom"
+import { ReactNode, RefObject, useActionState, useCallback, useEffect, useRef } from "react"
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime"
 import { ReadonlyURLSearchParams, useSearchParams } from "next/navigation"
 import { useRouter } from "next/navigation"
 import { CgSpinner } from "react-icons/cg"
 import { verifyEmail } from "@/app/(auth)/verify-email/verify-email.actions"
-import { VerifyEmailFormErrorMessages } from "@/app/(auth)/verify-email/verify-email.schema"
+import { VerifyEmailFormValidationErrors } from "@/app/(auth)/verify-email/verify-email.schema"
 import AlertMessage from "@/components/ui/AlertMessage"
 import Button from "@/components/ui/Button"
 import { ROUTE_SIGN_IN } from "@/constants/routes"
@@ -15,15 +14,15 @@ import { ROUTE_SIGN_IN } from "@/constants/routes"
 const initialState = {
   success: false,
   message: "",
-  error: {} as VerifyEmailFormErrorMessages
+  error: {} as VerifyEmailFormValidationErrors,
 }
 
 export function VerifyEmailForm(): ReactNode {
   const router: AppRouterInstance = useRouter()
   const searchParams: ReadonlyURLSearchParams = useSearchParams()
   const token: string | null = searchParams.get("token")
-  const formRef: RefObject<HTMLFormElement> = useRef<HTMLFormElement>(null)
-  const [state, formAction] = useFormState<ApiResponse, FormData>(verifyEmail, initialState)
+  const formRef: RefObject<HTMLFormElement | null> = useRef<HTMLFormElement | null>(null)
+  const [state, formAction] = useActionState<ApiResponse, FormData>(verifyEmail, initialState)
 
   const handleSubmit = useCallback(() => {
     if (state?.success) return
@@ -38,14 +37,8 @@ export function VerifyEmailForm(): ReactNode {
     router.push(ROUTE_SIGN_IN.PATH)
   }
 
-  const handleVerifyEmail = (event: FormEvent<HTMLFormElement>): void => {
-    event.preventDefault()
-    const formData: FormData = new FormData(event.currentTarget)
-    formAction(formData)
-  }
-
   return (
-    <form ref={formRef} className="w-full" noValidate onSubmit={handleVerifyEmail}>
+    <form ref={formRef} className="w-full" action={formAction} noValidate>
       {state.message ? (
         <>
           <AlertMessage type={state.success ? "success" : "error"}>{state.message}</AlertMessage>

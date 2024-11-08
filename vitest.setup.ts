@@ -6,11 +6,11 @@ export const mockRouter = {
   refresh: vi.fn(),
   push: vi.fn(),
   replace: vi.fn(),
-  prefetch: vi.fn()
+  prefetch: vi.fn(),
 }
 
 export const mockFormInitialState = {
   success: false,
   message: "",
-  error: {}
+  error: {},
 }

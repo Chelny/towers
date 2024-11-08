@@ -4,7 +4,7 @@ import { SessionContext } from "@/context/session-context"
 import { useSessionData } from "@/hooks/useSessionData"
 
 vi.mock("@/hooks/useSessionData", () => ({
-  useSessionData: vi.fn()
+  useSessionData: vi.fn(),
 }))
 
 describe("useSessionData Hook", () => {
@@ -18,7 +18,7 @@ describe("useSessionData Hook", () => {
     const { result } = renderHook(() => useSessionData(), {
       wrapper: ({ children }) => (
         <SessionContext.Provider value={mockAuthenticatedSession}>{children}</SessionContext.Provider>
-      )
+      ),
     })
 
     expect(result.current).toEqual(mockAuthenticatedSession)
@@ -28,7 +28,7 @@ describe("useSessionData Hook", () => {
     const { result } = renderHook(() => useSessionData(), {
       wrapper: ({ children }) => (
         <SessionContext.Provider value={mockUnauthenticatedSession}>{children}</SessionContext.Provider>
-      )
+      ),
     })
 
     expect(result.current).toEqual(mockUnauthenticatedSession)
@@ -46,7 +46,7 @@ describe("useSessionData Hook", () => {
 
   it("should throw an error in non-production when SessionContext is null", () => {
     const error: Error = new Error(
-      "[auth-wrapper-error]: `useSessionData` must be wrapped in a <SessionDataProvider />"
+      "[auth-wrapper-error]: `useSessionData` must be wrapped in a <SessionDataProvider />",
     )
 
     vi.mocked(useSessionData).mockRejectedValueOnce(error)

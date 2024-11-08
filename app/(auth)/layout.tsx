@@ -15,7 +15,7 @@ export default function AuthLayout({ children }: AuthLayoutProps): ReactNode {
       <div
         className={clsx(
           "flex flex-col h-full p-4 pb-8 overflow-y-auto",
-          "md:flex-1 md:flex md:justify-center md:items-center md:pb-4"
+          "md:flex-1 md:flex md:justify-center md:items-center md:pb-4",
         )}
       >
         <div className={clsx("sm:w-96 sm:mx-auto", "md:w-full md:max-w-md")}>

@@ -7,10 +7,11 @@ import {
   memo,
   MouseEvent,
   ReactNode,
+  RefObject,
   useCallback,
   useEffect,
   useRef,
-  useState
+  useState,
 } from "react"
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime"
 import dynamic from "next/dynamic"
@@ -22,11 +23,10 @@ import {
   ITowersUserRoomTable,
   RoomLevel,
   TableChatMessageType,
-  TableType
+  TableType,
 } from "@prisma/client"
 import { Type } from "@sinclair/typebox"
 import { Value, ValueError } from "@sinclair/typebox/value"
-import axios, { AxiosResponse } from "axios"
 import clsx from "clsx/lite"
 import { v4 as uuidv4 } from "uuid"
 import ServerMessage from "@/components/game/ServerMessage"
@@ -52,7 +52,7 @@ import {
   sendTableChatMessage,
   tableErrorMessage,
   updateTable,
-  updateUsers
+  updateUsers,
 } from "@/redux/features/socket-slice"
 import {
   selectIsTableChatLoading,
@@ -63,7 +63,7 @@ import {
   selectTableInfo,
   selectTableIsJoined,
   selectTableUsers,
-  selectTableUsersBoot
+  selectTableUsersBoot,
 } from "@/redux/selectors/socket-selectors"
 import { AppDispatch, RootState } from "@/redux/store"
 import { fetchRoomUsers } from "@/redux/thunks/room-thunks"
@@ -73,9 +73,8 @@ import {
   fetchTableUsers,
   joinTable,
   leaveTable,
-  SocketTableThunkResponse
+  SocketTableThunkResponse,
 } from "@/redux/thunks/table-thunks"
-import { getAxiosError } from "@/utils/api"
 
 enum GameState {
   WAITING_FOR_PLAYERS = 0,
@@ -96,7 +95,7 @@ const INITIAL_SEATS_CSS = [
   { rowSpan: 5, seatNumbers: [1, 2], team: 1 },
   { rowSpan: 3, seatNumbers: [5, 6], team: 3 },
   { rowSpan: 3, seatNumbers: [3, 4], team: 2 },
-  { rowSpan: 3, seatNumbers: [7, 8], team: 4 }
+  { rowSpan: 3, seatNumbers: [7, 8], team: 4 },
 ]
 
 type TableProps = {
@@ -119,17 +118,17 @@ export default memo(function Table({ roomId, tableId }: TableProps): ReactNode {
   const chat: ITowersTableChatMessage[] = useAppSelector((state: RootState) => selectTableChat(state, roomId, tableId))
   const isChatLoading: boolean = useAppSelector((state: RootState) => selectIsTableChatLoading(state, roomId, tableId))
   const tableUsers: ITowersUserRoomTable[] = useAppSelector((state: RootState) =>
-    selectTableUsers(state, roomId, tableId)
+    selectTableUsers(state, roomId, tableId),
   )
   const roomUsersInvite: ITowersUserRoomTable[] = useAppSelector((state: RootState) =>
-    selectRoomUsersInvite(state, roomId, tableId)
+    selectRoomUsersInvite(state, roomId, tableId),
   )
   const tableUsersBoot: ITowersUserRoomTable[] = useAppSelector((state: RootState) =>
-    selectTableUsersBoot(state, roomId, tableId, session)
+    selectTableUsersBoot(state, roomId, tableId, session),
   )
   const dispatch: AppDispatch = useAppDispatch()
-  const messageInputRef = useRef<HTMLInputElement>(null)
-  const chatEndRef = useRef<HTMLDivElement>(null)
+  const messageInputRef: RefObject<HTMLInputElement | null> = useRef<HTMLInputElement | null>(null)
+  const chatEndRef: RefObject<HTMLDivElement | null> = useRef<HTMLDivElement | null>(null)
   const [tableType, setTableType] = useState<string>(TableType.PUBLIC)
   const [isRated, setIsRated] = useState<boolean>(true)
   const [isInviteUserModalOpen, setIsInviteUserModalOpen] = useState<boolean>(false)
@@ -138,8 +137,8 @@ export default memo(function Table({ roomId, tableId }: TableProps): ReactNode {
   const [seatedSeats, setSeatedSeats] = useState<Set<number>>(new Set())
   const [isGameState, setGameState] = useState<GameState>(GameState.WAITING_FOR_PLAYERS)
   const [seatUnavailable, setSeatUnavailable] = useState<boolean>(false)
-  const [errorMessages, setErrorMessages] = useState<ChangeTableOptionsFormErrorMessages>({})
-  const formRef = useRef<HTMLFormElement>(null)
+  const [errorMessages, setErrorMessages] = useState<ChangeTableOptionsFormValidationErrors>({})
+  const formRef: RefObject<HTMLFormElement | null> = useRef<HTMLFormElement | null>(null)
 
   const initializeTable = useCallback(
     (signal: AbortSignal): void => {
@@ -167,14 +166,14 @@ export default memo(function Table({ roomId, tableId }: TableProps): ReactNode {
                   roomId,
                   tableId,
                   message: `${session?.user.username} joined the table.`,
-                  type: TableChatMessageType.USER_ACTION
-                })
+                  type: TableChatMessageType.USER_ACTION,
+                }),
               )
             }
           })
       }
     },
-    [isJoinedTable]
+    [isJoinedTable],
   )
 
   useEffect(() => {
@@ -203,13 +202,13 @@ export default memo(function Table({ roomId, tableId }: TableProps): ReactNode {
         addLinks([
           {
             href: `${ROUTE_TOWERS.PATH}?room=${roomId}`,
-            label: roomInfo.name
+            label: roomInfo.name,
           },
           {
             href: `${ROUTE_TOWERS.PATH}?room=${roomId}&table=${tableId}`,
-            label: `${roomInfo.name} - Table ${tableInfo.tableNumber}`
-          }
-        ])
+            label: `${roomInfo.name} - Table ${tableInfo.tableNumber}`,
+          },
+        ]),
       )
     }
   }, [roomInfo, tableInfo])
@@ -245,8 +244,8 @@ export default memo(function Table({ roomId, tableId }: TableProps): ReactNode {
           tableId,
           message,
           type: TableChatMessageType.TABLE_TYPE,
-          privateToUserId: session?.user.id
-        })
+          privateToUserId: session?.user.id,
+        }),
       )
     }
   }
@@ -264,24 +263,24 @@ export default memo(function Table({ roomId, tableId }: TableProps): ReactNode {
 
     const formElement: EventTarget & HTMLFormElement = event.currentTarget
     const formData: FormData = new FormData(formElement)
-    const rawFormData: ChangeTableOptionsFormData = {
+    const payload: ChangeTableOptionsPayload = {
       tableType: formData.get("tableType") as TableType,
-      rated: formData.get("rated") === "on"
+      rated: formData.get("rated") === "on",
     }
-    const errors: ValueError[] = Array.from(Value.Errors(changeTableOptionsSchema, rawFormData))
+    const errors: ValueError[] = Array.from(Value.Errors(changeTableOptionsSchema, payload))
 
     for (const error of errors) {
       switch (error.path.replace("/", "")) {
         case "tableType":
-          setErrorMessages((prev: ChangeTableOptionsFormErrorMessages) => ({
+          setErrorMessages((prev: ChangeTableOptionsFormValidationErrors) => ({
             ...prev,
-            tableType: "You must select a table type."
+            tableType: "You must select a table type.",
           }))
           break
         case "rated":
-          setErrorMessages((prev: ChangeTableOptionsFormErrorMessages) => ({
+          setErrorMessages((prev: ChangeTableOptionsFormValidationErrors) => ({
             ...prev,
-            rated: "You must rate this game."
+            rated: "You must rate this game.",
           }))
           break
         default:
@@ -291,23 +290,26 @@ export default memo(function Table({ roomId, tableId }: TableProps): ReactNode {
     }
 
     if (Object.keys(errorMessages).length === 0) {
-      await handleChangeTableOptions(rawFormData)
+      await handleChangeTableOptions(payload)
     }
   }
 
-  const handleChangeTableOptions = async (body: ChangeTableOptionsFormData): Promise<void> => {
+  const handleChangeTableOptions = async (body: ChangeTableOptionsPayload): Promise<void> => {
     try {
-      const response: AxiosResponse = await axios.patch(`/api/tables/${tableId}`, body)
+      const response: Response = await fetch(`/api/tables/${tableId}`, {
+        method: "PATCH",
+        body: JSON.stringify(body),
+      })
 
-      dispatch(
-        updateTable({
-          roomId,
-          tableId,
-          info: response.data.data
-        })
-      )
+      if (!response.ok) {
+        const errorData: ApiResponse = await response.json()
+        throw new Error(errorData?.message)
+      }
+
+      const result = await response.json()
+      dispatch(updateTable({ roomId, tableId, info: result.data }))
     } catch (error) {
-      dispatch(tableErrorMessage({ roomId, tableId, message: getAxiosError(error).message }))
+      dispatch(tableErrorMessage({ roomId, tableId, message: error as string }))
     }
   }
 
@@ -333,7 +335,7 @@ export default memo(function Table({ roomId, tableId }: TableProps): ReactNode {
       if (!seat || seat === 1 || seat === 2) return prevSeatsCss
 
       const clickedTeamGroup: SeatsCss | undefined = prevSeatsCss.find((group: SeatsCss) =>
-        group.seatNumbers.includes(seat)
+        group.seatNumbers.includes(seat),
       )
       if (!clickedTeamGroup) return prevSeatsCss
 
@@ -358,7 +360,7 @@ export default memo(function Table({ roomId, tableId }: TableProps): ReactNode {
 
       return prevSeatsCss.map((group: SeatsCss) => ({
         ...group,
-        seatNumbers: group.seatNumbers.map((seat: number) => newSeatsMapping[seat] || seat)
+        seatNumbers: group.seatNumbers.map((seat: number) => newSeatsMapping[seat] || seat),
       }))
     })
   }
@@ -549,7 +551,7 @@ export default memo(function Table({ roomId, tableId }: TableProps): ReactNode {
                     key={index}
                     className={clsx(
                       `row-span-${group.rowSpan}`,
-                      index === 0 ? "flex flex-row justify-center items-center" : ""
+                      index === 0 ? "flex flex-row justify-center items-center" : "",
                     )}
                   >
                     <div className={index === 0 ? "contents" : "flex flex-row justify-center items-center"}>
@@ -620,7 +622,7 @@ export default memo(function Table({ roomId, tableId }: TableProps): ReactNode {
                   onKeyDown={handleSendMessage}
                 />
                 <div className="overflow-y-auto p-1">
-                  <Chat messages={chat} isTableChat />
+                  <Chat messages={chat} userId={session?.user.id} />
                   <div ref={chatEndRef} />
                 </div>
               </div>
@@ -651,25 +653,25 @@ export default memo(function Table({ roomId, tableId }: TableProps): ReactNode {
 }, areEqual)
 
 const TableHeader = dynamic(() => import("@/components/game/TableHeader"), {
-  loading: () => <TableHeaderSkeleton />
+  loading: () => <TableHeaderSkeleton />,
 })
 
 const Chat = dynamic(() => import("@/components/game/Chat"), {
-  loading: () => <ChatSkeleton />
+  loading: () => <ChatSkeleton />,
 })
 
 const PlayersList = dynamic(() => import("@/components/game/PlayersList"), {
-  loading: () => <PlayersListSkeleton />
+  loading: () => <PlayersListSkeleton />,
 })
 
-export const changeTableOptionsSchema = Type.Object({
+const changeTableOptionsSchema = Type.Object({
   tableType: Type.Union([
     Type.Literal(TableType.PUBLIC),
     Type.Literal(TableType.PROTECTED),
-    Type.Literal(TableType.PRIVATE)
+    Type.Literal(TableType.PRIVATE),
   ]),
-  rated: Type.Boolean()
+  rated: Type.Boolean(),
 })
 
-export type ChangeTableOptionsFormData = SchemaFormData<typeof changeTableOptionsSchema>
-export type ChangeTableOptionsFormErrorMessages = SchemaFormErrorMessages<keyof ChangeTableOptionsFormData>
+type ChangeTableOptionsPayload = FormPayload<typeof changeTableOptionsSchema>
+type ChangeTableOptionsFormValidationErrors = FormValidationErrors<keyof ChangeTableOptionsPayload>

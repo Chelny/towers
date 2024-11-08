@@ -3,20 +3,20 @@
 import { Value, ValueError } from "@sinclair/typebox/value"
 import { AuthError } from "next-auth"
 import {
-  SignInWithMagicLinkFormData,
-  SignInWithMagicLinkFormErrorMessages,
-  signInWithMagicLinkSchema
+  SignInWithMagicLinkFormValidationErrors,
+  SignInWithMagicLinkPayload,
+  signInWithMagicLinkSchema,
 } from "@/app/(auth)/sign-in-with-magic-link/sign-in-with-magic-link.schema"
 import { signIn as authSignInWithMagicLink } from "@/auth"
 import { SIGN_IN_REDIRECT } from "@/constants/routes"
 
 export async function signInWithMagicLink(prevState: ApiResponse, formData: FormData): Promise<ApiResponse> {
-  const rawFormData: SignInWithMagicLinkFormData = {
-    email: formData.get("email") as string
+  const payload: SignInWithMagicLinkPayload = {
+    email: formData.get("email") as string,
   }
 
-  const errors: ValueError[] = Array.from(Value.Errors(signInWithMagicLinkSchema, rawFormData))
-  const errorMessages: SignInWithMagicLinkFormErrorMessages = {}
+  const errors: ValueError[] = Array.from(Value.Errors(signInWithMagicLinkSchema, payload))
+  const errorMessages: SignInWithMagicLinkFormValidationErrors = {}
 
   for (const error of errors) {
     switch (error.path.replace("/", "")) {
@@ -32,13 +32,13 @@ export async function signInWithMagicLink(prevState: ApiResponse, formData: Form
   if (Object.keys(errorMessages).length === 0) {
     try {
       await authSignInWithMagicLink("resend", {
-        ...rawFormData,
-        redirectTo: SIGN_IN_REDIRECT
+        ...payload,
+        redirectTo: SIGN_IN_REDIRECT,
       })
 
       return {
         success: true,
-        message: "You’re successfully signed in. Welcome back!"
+        message: "You’re successfully signed in. Welcome back!",
       }
     } catch (error) {
       if (error instanceof AuthError) {
@@ -46,7 +46,7 @@ export async function signInWithMagicLink(prevState: ApiResponse, formData: Form
           default:
             return {
               success: false,
-              message: error.cause?.err?.message
+              message: error.cause?.err?.message,
             }
         }
       }
@@ -57,6 +57,6 @@ export async function signInWithMagicLink(prevState: ApiResponse, formData: Form
 
   return {
     success: false,
-    error: errorMessages
+    error: errorMessages,
   }
 }

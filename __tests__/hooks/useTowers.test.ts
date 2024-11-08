@@ -1,5 +1,5 @@
 import { act } from "react"
-import { renderHook } from "@testing-library/react-hooks"
+import { renderHook } from "@testing-library/react"
 import { NUM_NEXT_PIECES } from "@/constants/game"
 import { useTowers } from "@/hooks/useTowers"
 import { getRandomPiece } from "@/hooks/useTowersBoard"
@@ -13,8 +13,8 @@ vi.mock("@/hooks/useTowersBoard", async () => {
     getRandomPiece: vi.fn(() => [
       { letter: "T", powerType: null, powerLevel: null, isToBeRemoved: false, brokenBlockNumber: null },
       { letter: "T", powerType: null, powerLevel: null, isToBeRemoved: false, brokenBlockNumber: null },
-      { letter: "T", powerType: null, powerLevel: null, isToBeRemoved: false, brokenBlockNumber: null }
-    ])
+      { letter: "T", powerType: null, powerLevel: null, isToBeRemoved: false, brokenBlockNumber: null },
+    ]),
   }
 })
 
@@ -36,7 +36,7 @@ describe("useTowers Hook", () => {
     const mockPiece: Piece = [
       { letter: "T", powerType: null, powerLevel: null, isToBeRemoved: false, brokenBlockNumber: null },
       { letter: "T", powerType: null, powerLevel: null, isToBeRemoved: false, brokenBlockNumber: null },
-      { letter: "T", powerType: null, powerLevel: null, isToBeRemoved: false, brokenBlockNumber: null }
+      { letter: "T", powerType: null, powerLevel: null, isToBeRemoved: false, brokenBlockNumber: null },
     ]
 
     vi.mocked(getRandomPiece).mockReturnValue(mockPiece)
@@ -65,7 +65,7 @@ describe("useTowers Hook", () => {
     const mockPiece: Piece = [
       { letter: "T", powerType: null, powerLevel: null, isToBeRemoved: false, brokenBlockNumber: null },
       { letter: "T", powerType: null, powerLevel: null, isToBeRemoved: false, brokenBlockNumber: null },
-      { letter: "T", powerType: null, powerLevel: null, isToBeRemoved: false, brokenBlockNumber: null }
+      { letter: "T", powerType: null, powerLevel: null, isToBeRemoved: false, brokenBlockNumber: null },
     ]
 
     vi.mocked(getRandomPiece).mockReturnValue(mockPiece)
@@ -99,7 +99,7 @@ describe("useTowers Hook", () => {
             return { ...cell, isToBeRemoved: true }
           }
           return cell
-        })
+        }),
       )
 
       // Simulate score update
@@ -110,7 +110,7 @@ describe("useTowers Hook", () => {
 
       // Remove blocks marked for deletion
       result.current.board = result.current.board.map((row: BoardRow) =>
-        row.map((cell: BoardBlock) => (cell.isToBeRemoved ? { ...cell, letter: " " } : cell))
+        row.map((cell: BoardBlock) => (cell.isToBeRemoved ? { ...cell, letter: " " } : cell)),
       )
     })
 

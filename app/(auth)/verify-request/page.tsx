@@ -4,7 +4,7 @@ import GoToHomepageLink from "@/components/GoToHomepageLink"
 import { ROUTE_VERIFY_REQUEST } from "@/constants/routes"
 
 export const metadata: Metadata = {
-  title: ROUTE_VERIFY_REQUEST.TITLE
+  title: ROUTE_VERIFY_REQUEST.TITLE,
 }
 
 export default function VerifyRequestPage(): ReactNode {

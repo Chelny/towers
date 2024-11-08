@@ -7,7 +7,7 @@ import {
   mockBlockR,
   mockBlockS,
   mockBlockT,
-  mockBlockW
+  mockBlockW,
 } from "@/__mocks__/data/board"
 import Grid from "@/components/towers/Grid"
 import { BOARD_COLS, BOARD_ROWS } from "@/constants/game"
@@ -29,7 +29,7 @@ describe("Grid Component", () => {
     [mockBlockR, mockBlockO, mockBlockMedusa, mockBlockW, mockBlockT, mockBlockO], // Row 11
     [mockBlockO, mockBlockR, mockBlockS, mockBlockMedusa, mockBlockW, mockBlockT], // Row 12
     [mockBlockW, mockBlockO, mockBlockR, mockBlockS, mockBlockR, mockBlockT], // Row 13
-    [mockBlockT, mockBlockW, mockBlockT, mockBlockE, mockBlockT, mockBlockMedusa] // Row 14
+    [mockBlockT, mockBlockW, mockBlockT, mockBlockE, mockBlockT, mockBlockMedusa], // Row 14
   ]
 
   it("should render a grid with correct number of rows and cells", () => {

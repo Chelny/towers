@@ -10,7 +10,7 @@ export interface SidebarState {
 }
 
 const initialState: SidebarState = {
-  gameLinks: []
+  gameLinks: [],
 }
 
 const sidebarSlice = createSlice({
@@ -32,8 +32,8 @@ const sidebarSlice = createSlice({
     },
     resetLinks: (state: SidebarState): void => {
       state.gameLinks = []
-    }
-  }
+    },
+  },
 })
 
 export const { addLink, addLinks, removeLink, resetLinks } = sidebarSlice.actions

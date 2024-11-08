@@ -4,7 +4,7 @@ import { SignInWithMagicLinkForm } from "@/app/(auth)/sign-in-with-magic-link/si
 import { ROUTE_SIGN_IN_WITH_MAGIC_LINK } from "@/constants/routes"
 
 export const metadata: Metadata = {
-  title: ROUTE_SIGN_IN_WITH_MAGIC_LINK.TITLE
+  title: ROUTE_SIGN_IN_WITH_MAGIC_LINK.TITLE,
 }
 
 export default function SignInWithMagicLinkPage(): ReactNode {

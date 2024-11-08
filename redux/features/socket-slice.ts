@@ -4,9 +4,10 @@ import {
   ITowersTableChatMessage,
   ITowersTableWithRelations,
   ITowersUserRoomTable,
-  TableChatMessageType
+  TableChatMessageType,
 } from "@prisma/client"
 import { ActionReducerMapBuilder, createSlice, PayloadAction } from "@reduxjs/toolkit"
+import { Session } from "next-auth"
 import { SocketState } from "@/interfaces/socket"
 import { socketExtraReducers } from "@/redux/features/socket-extra-reducers"
 
@@ -14,7 +15,7 @@ const initialState: SocketState = {
   isConnected: false,
   isLoading: false,
   towers: {},
-  errorMessage: null
+  errorMessage: null,
 }
 
 const socketSlice = createSlice({
@@ -25,13 +26,14 @@ const socketSlice = createSlice({
     // * Socket IO Actions
     // **************************************************
 
-    initSocket: (state: SocketState): void => {
+    initSocket: (state: SocketState, action: PayloadAction<{ session: Session | null }>): void => {
       state.isConnected = false
       state.isLoading = true
       state.errorMessage = null
     },
     destroySocket: (state: SocketState): void => {
       state.isConnected = false
+      state.isLoading = false
       state.errorMessage = null
     },
     connectionEstablished: (state: SocketState): void => {
@@ -39,7 +41,7 @@ const socketSlice = createSlice({
       state.isLoading = false
       state.errorMessage = null
     },
-    connectionLost: (state: SocketState, action: PayloadAction<string | null>): void => {
+    connectionLost: (state: SocketState, action: PayloadAction<string>): void => {
       state.isConnected = false
       state.isLoading = false
       state.errorMessage = action.payload
@@ -60,17 +62,17 @@ const socketSlice = createSlice({
 
     joinRoomSocketRoom: (
       state: SocketState,
-      action: PayloadAction<{ roomId: string; towersUserRoomTable: ITowersUserRoomTable }>
+      action: PayloadAction<{ roomId: string; towersUserRoomTable: ITowersUserRoomTable }>,
     ): void => {},
     leaveRoomSocketRoom: (
       state: SocketState,
-      action: PayloadAction<{ roomId: string; tablesToQuit: { id: string; isLastUser: boolean }[] }>
+      action: PayloadAction<{ roomId: string; tablesToQuit: { id: string; isLastUser: boolean }[] }>,
     ): void => {},
 
     sendRoomChatMessage: (state: SocketState, action: PayloadAction<{ roomId: string; message: string }>): void => {},
     addMessageToRoomChat: (
       state: SocketState,
-      action: PayloadAction<{ roomId: string; message: ITowersRoomChatMessage }>
+      action: PayloadAction<{ roomId: string; message: ITowersRoomChatMessage }>,
     ): void => {
       const { roomId, message } = action.payload
 
@@ -81,13 +83,13 @@ const socketSlice = createSlice({
 
     addUserToRoom: (
       state: SocketState,
-      action: PayloadAction<{ roomId: string; towersUserRoomTable: ITowersUserRoomTable }>
+      action: PayloadAction<{ roomId: string; towersUserRoomTable: ITowersUserRoomTable }>,
     ): void => {
       const { roomId, towersUserRoomTable } = action.payload
 
       if (state.towers[roomId]?.users) {
         const roomUserIndex: number = state.towers[roomId].users.findIndex(
-          (user: ITowersUserRoomTable) => user.userProfileId === towersUserRoomTable.userProfileId
+          (user: ITowersUserRoomTable) => user.userProfileId === towersUserRoomTable.userProfileId,
         )
 
         if (roomUserIndex !== -1) {
@@ -99,11 +101,11 @@ const socketSlice = createSlice({
     },
     updateUsers: (
       state: SocketState,
-      action: PayloadAction<{ roomId: string; users: ITowersUserRoomTable[] }>
+      action: PayloadAction<{ roomId: string; users: ITowersUserRoomTable[] }>,
     ): void => {},
     updateUsersInRoom: (
       state: SocketState,
-      action: PayloadAction<{ roomId: string; users: ITowersUserRoomTable[] }>
+      action: PayloadAction<{ roomId: string; users: ITowersUserRoomTable[] }>,
     ): void => {
       const { roomId, users } = action.payload
 
@@ -111,11 +113,11 @@ const socketSlice = createSlice({
         state.towers[roomId].users = [...(state.towers[roomId].users ?? []), ...(users ?? [])]
           .sort(
             (a: ITowersUserRoomTable, b: ITowersUserRoomTable) =>
-              new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+              new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
           )
           .filter(
             (user: ITowersUserRoomTable, index: number, users: ITowersUserRoomTable[]) =>
-              index === users.findIndex((u: ITowersUserRoomTable) => u?.userProfileId === user?.userProfileId)
+              index === users.findIndex((u: ITowersUserRoomTable) => u?.userProfileId === user?.userProfileId),
           )
       }
     },
@@ -124,7 +126,7 @@ const socketSlice = createSlice({
 
       if (state.towers[roomId]?.users) {
         state.towers[roomId].users = state.towers[roomId].users.filter(
-          (towersUserRoomTable: ITowersUserRoomTable) => towersUserRoomTable.userProfile?.userId !== userId
+          (towersUserRoomTable: ITowersUserRoomTable) => towersUserRoomTable.userProfile?.userId !== userId,
         )
       }
     },
@@ -140,17 +142,17 @@ const socketSlice = createSlice({
 
     joinTableSocketRoom: (
       state: SocketState,
-      action: PayloadAction<{ roomId: string; tableId: string; towersUserRoomTable: ITowersUserRoomTable }>
+      action: PayloadAction<{ roomId: string; tableId: string; towersUserRoomTable: ITowersUserRoomTable }>,
     ): void => {},
     leaveTableSocketRoom: (state: SocketState, action: PayloadAction<{ roomId: string; tableId: string }>): void => {},
 
     addTable: (
       state: SocketState,
-      action: PayloadAction<{ roomId: string; info: ITowersTableWithRelations }>
+      action: PayloadAction<{ roomId: string; info: ITowersTableWithRelations }>,
     ): void => {},
     addTableToRoom: (
       state: SocketState,
-      action: PayloadAction<{ roomId: string; info: ITowersTableWithRelations }>
+      action: PayloadAction<{ roomId: string; info: ITowersTableWithRelations }>,
     ): void => {
       const { roomId, info } = action.payload
 
@@ -159,18 +161,18 @@ const socketSlice = createSlice({
           ...state.towers[roomId].tables,
           [info.id]: {
             ...state.towers[roomId].tables[info.id],
-            info
-          }
+            info,
+          },
         }
       }
     },
     updateTable: (
       state: SocketState,
-      action: PayloadAction<{ roomId: string; tableId: string; info?: ITowersTable; users?: ITowersUserRoomTable[] }>
+      action: PayloadAction<{ roomId: string; tableId: string; info?: ITowersTable; users?: ITowersUserRoomTable[] }>,
     ): void => {},
     updateTableInRoom: (
       state: SocketState,
-      action: PayloadAction<{ roomId: string; tableId: string; info?: ITowersTable; users?: ITowersUserRoomTable[] }>
+      action: PayloadAction<{ roomId: string; tableId: string; info?: ITowersTable; users?: ITowersUserRoomTable[] }>,
     ): void => {
       const { roomId, tableId, info, users } = action.payload
 
@@ -178,31 +180,31 @@ const socketSlice = createSlice({
         state.towers[roomId].users = [...(state.towers[roomId].users ?? []), ...(users ?? [])]
           .sort(
             (a: ITowersUserRoomTable, b: ITowersUserRoomTable) =>
-              new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+              new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
           )
           .filter(
             (user: ITowersUserRoomTable, index: number, users: ITowersUserRoomTable[]) =>
-              index === users.findIndex((u: ITowersUserRoomTable) => u?.userProfileId === user?.userProfileId)
+              index === users.findIndex((u: ITowersUserRoomTable) => u?.userProfileId === user?.userProfileId),
           )
       }
 
       if (state.towers[roomId].tables[tableId]) {
         state.towers[roomId].tables[tableId].info = {
           ...((state.towers[roomId].tables[tableId].info ?? {}) as ITowersTable),
-          ...(info ?? {})
+          ...(info ?? {}),
         }
 
         state.towers[roomId].tables[tableId].users = [
           ...(state.towers[roomId].tables[tableId].users ?? []),
-          ...(users ?? [])
+          ...(users ?? []),
         ]
           .sort(
             (a: ITowersUserRoomTable, b: ITowersUserRoomTable) =>
-              new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+              new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
           )
           .filter(
             (user: ITowersUserRoomTable, index: number, users: ITowersUserRoomTable[]) =>
-              index === users.findIndex((u: ITowersUserRoomTable) => u?.userProfileId === user?.userProfileId)
+              index === users.findIndex((u: ITowersUserRoomTable) => u?.userProfileId === user?.userProfileId),
           )
       }
     },
@@ -217,11 +219,11 @@ const socketSlice = createSlice({
 
     sendTableChatMessage: (
       state: SocketState,
-      action: PayloadAction<{ roomId: string; tableId: string; message: string }>
+      action: PayloadAction<{ roomId: string; tableId: string; message: string }>,
     ): void => {},
     addMessageToTableChat: (
       state: SocketState,
-      action: PayloadAction<{ roomId: string; tableId: string; message: ITowersTableChatMessage }>
+      action: PayloadAction<{ roomId: string; tableId: string; message: ITowersTableChatMessage }>,
     ): void => {
       const { roomId, tableId, message } = action.payload
 
@@ -237,18 +239,18 @@ const socketSlice = createSlice({
         message: string
         type: TableChatMessageType
         privateToUserId?: string
-      }>
+      }>,
     ): void => {},
 
     addUserToTable: (
       state: SocketState,
-      action: PayloadAction<{ roomId: string; tableId: string; towersUserRoomTable: ITowersUserRoomTable }>
+      action: PayloadAction<{ roomId: string; tableId: string; towersUserRoomTable: ITowersUserRoomTable }>,
     ): void => {
       const { roomId, tableId, towersUserRoomTable } = action.payload
 
       if (state.towers[roomId].tables[tableId]?.users) {
         const tableUserIndex: number = state.towers[roomId].tables[tableId].users.findIndex(
-          (user: ITowersUserRoomTable) => user.userProfileId === towersUserRoomTable.userProfileId
+          (user: ITowersUserRoomTable) => user.userProfileId === towersUserRoomTable.userProfileId,
         )
 
         if (tableUserIndex !== -1) {
@@ -260,28 +262,28 @@ const socketSlice = createSlice({
     },
     removeUserFromTable: (
       state: SocketState,
-      action: PayloadAction<{ roomId: string; tableId: string; userId: string }>
+      action: PayloadAction<{ roomId: string; tableId: string; userId: string }>,
     ): void => {
       const { roomId, tableId, userId } = action.payload
 
       if (state.towers[roomId].tables[tableId]?.users) {
         state.towers[roomId].tables[tableId].users = state.towers[roomId].tables[tableId].users.filter(
-          (towersUserRoomTable: ITowersUserRoomTable) => towersUserRoomTable.userProfile?.userId !== userId
+          (towersUserRoomTable: ITowersUserRoomTable) => towersUserRoomTable.userProfile?.userId !== userId,
         )
       }
     },
 
     tableErrorMessage: (
       state: SocketState,
-      action: PayloadAction<{ roomId: string; tableId: string; message: string }>
+      action: PayloadAction<{ roomId: string; tableId: string; message: string }>,
     ): void => {
       const { roomId, tableId, message } = action.payload
       state.towers[roomId].tables[tableId].errorMessage = message
-    }
+    },
   },
   extraReducers: (builder: ActionReducerMapBuilder<SocketState>): void => {
     socketExtraReducers(builder)
-  }
+  },
 })
 
 export const {
@@ -312,7 +314,7 @@ export const {
   sendTableAutomatedChatMessage,
   addUserToTable,
   removeUserFromTable,
-  tableErrorMessage
+  tableErrorMessage,
 } = socketSlice.actions
 
 export default socketSlice.reducer

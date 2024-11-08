@@ -2,7 +2,7 @@ import { TableChatMessageType, TowersTableChatMessage } from "@prisma/client"
 import { mockRoom1Table1 } from "@/__mocks__/data/tables"
 import {
   mockRoom1Table1TowersUserProfile1,
-  mockRoom1Table1TowersUserProfile2
+  mockRoom1Table1TowersUserProfile2,
 } from "@/__mocks__/data/towersUserProfiles"
 import { mockUser1, mockUser2 } from "@/__mocks__/data/users"
 
@@ -12,20 +12,20 @@ export const mockRoom1Table1TowersChatMessage1: TowersTableChatMessage = {
   userProfileId: mockRoom1Table1TowersUserProfile1.id,
   message: `*** ${mockUser1.username} joined the table.`,
   type: TableChatMessageType.USER_ACTION,
-  privateToUserId: mockRoom1Table1TowersUserProfile1.id,
+  privateToUserId: mockUser1.id,
   createdAt: new Date(),
-  updatedAt: new Date()
+  updatedAt: new Date(),
 }
 
 export const mockRoom1Table1TowersChatMessage2: TowersTableChatMessage = {
   id: "1f014cfd-015c-4a60-803a-53344532abf9",
   tableId: mockRoom1Table1.id,
   userProfileId: mockRoom1Table1TowersUserProfile2.id,
-  message: `*** ${mockUser2.username}’s old rating: 1100; new rating: 1110`,
-  type: TableChatMessageType.CHAT,
-  privateToUserId: mockRoom1Table1TowersUserProfile2.id,
+  message: "*** T ==> 9",
+  type: TableChatMessageType.CIPHER_KEY,
+  privateToUserId: mockUser2.id,
   createdAt: new Date(),
-  updatedAt: new Date()
+  updatedAt: new Date(),
 }
 
 export const mockRoom1Table1TowersChatMessage3: TowersTableChatMessage = {
@@ -36,7 +36,7 @@ export const mockRoom1Table1TowersChatMessage3: TowersTableChatMessage = {
   type: TableChatMessageType.CHAT,
   privateToUserId: null,
   createdAt: new Date(),
-  updatedAt: new Date()
+  updatedAt: new Date(),
 }
 
 export const mockRoom1Table1TowersChatMessage4: TowersTableChatMessage = {
@@ -47,7 +47,7 @@ export const mockRoom1Table1TowersChatMessage4: TowersTableChatMessage = {
   type: TableChatMessageType.CHAT,
   privateToUserId: null,
   createdAt: new Date(),
-  updatedAt: new Date()
+  updatedAt: new Date(),
 }
 
 export const mockRoom1Table1TowersChatMessage5: TowersTableChatMessage = {
@@ -56,9 +56,9 @@ export const mockRoom1Table1TowersChatMessage5: TowersTableChatMessage = {
   userProfileId: mockRoom1Table1TowersUserProfile1.id,
   message: `*** ${mockUser1.username}’s old rating: 2050; new rating: 2040`,
   type: TableChatMessageType.GAME_RATING,
-  privateToUserId: mockRoom1Table1TowersUserProfile1.id,
+  privateToUserId: null,
   createdAt: new Date(),
-  updatedAt: new Date()
+  updatedAt: new Date(),
 }
 
 export const mockRoom1Table1TowersChatMessage6: TowersTableChatMessage = {
@@ -68,9 +68,9 @@ export const mockRoom1Table1TowersChatMessage6: TowersTableChatMessage = {
   message:
     "*** You are the host of the table. This gives you the power to invite to [or boot people from] your table. You may also limit other player’s access to your table by selecting its \"Table Type\".",
   type: TableChatMessageType.TABLE_HOST,
-  privateToUserId: mockRoom1Table1TowersUserProfile1.id,
+  privateToUserId: mockUser1.id,
   createdAt: new Date(),
-  updatedAt: new Date()
+  updatedAt: new Date(),
 }
 
 export const mockRoom1Table1TowersChatMessage7: TowersTableChatMessage = {
@@ -79,9 +79,9 @@ export const mockRoom1Table1TowersChatMessage7: TowersTableChatMessage = {
   userProfileId: mockRoom1Table1TowersUserProfile1.id,
   message: "*** Only people you have invited may play now.",
   type: TableChatMessageType.TABLE_TYPE,
-  privateToUserId: mockRoom1Table1TowersUserProfile1.id,
+  privateToUserId: mockUser1.id,
   createdAt: new Date(),
-  updatedAt: new Date()
+  updatedAt: new Date(),
 }
 
 export const mockRoom1Table1TowersChatMessage8: TowersTableChatMessage = {
@@ -90,9 +90,9 @@ export const mockRoom1Table1TowersChatMessage8: TowersTableChatMessage = {
   userProfileId: mockRoom1Table1TowersUserProfile1.id,
   message: "*** V ==> M",
   type: TableChatMessageType.CIPHER_KEY,
-  privateToUserId: mockRoom1Table1TowersUserProfile1.id,
+  privateToUserId: mockUser1.id,
   createdAt: new Date(),
-  updatedAt: new Date()
+  updatedAt: new Date(),
 }
 
 export const mockRoom1Table1TowersChatMessage9: TowersTableChatMessage = {
@@ -101,7 +101,7 @@ export const mockRoom1Table1TowersChatMessage9: TowersTableChatMessage = {
   userProfileId: mockRoom1Table1TowersUserProfile1.id,
   message: "2FKK 2OF W1VAM2FO 91MO 8EWOF2 NF9 7HW3FE",
   type: TableChatMessageType.HERO_MESSAGE,
-  privateToUserId: mockRoom1Table1TowersUserProfile1.id,
+  privateToUserId: mockUser1.id,
   createdAt: new Date(),
-  updatedAt: new Date()
+  updatedAt: new Date(),
 }

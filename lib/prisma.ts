@@ -1,28 +1,24 @@
-import { PrismaClient } from "@prisma/client"
+import { PrismaClient } from "@prisma/client/edge"
+import { withAccelerate } from "@prisma/extension-accelerate"
 
-// PrismaClient is attached to the `global` object in development to prevent
-// exhausting your database connection limit.
-//
-// Learn more:
-// https://pris.ly/d/help/next-js-best-practices
+// Learn more about instantiating PrismaClient in Next.js here: https://www.prisma.io/docs/data-platform/accelerate/getting-started
 
-const globalForPrisma = global as unknown as { prisma: PrismaClient }
-
-const prisma =
-  globalForPrisma.prisma ||
-  new PrismaClient({
+const prismaClientSingleton = () => {
+  return new PrismaClient({
     omit: {
       user: {
-        password: true
+        password: true,
       },
-      account: {
-        refresh_token: true,
-        access_token: true,
-        id_token: true
-      }
-    }
-  })
+    },
+  }).$extends(withAccelerate())
+}
 
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma
+declare const globalThis: {
+  prismaGlobal: ReturnType<typeof prismaClientSingleton>
+} & typeof global
+
+const prisma = globalThis.prismaGlobal ?? prismaClientSingleton()
 
 export default prisma
+
+if (process.env.NODE_ENV !== "production") globalThis.prismaGlobal = prisma

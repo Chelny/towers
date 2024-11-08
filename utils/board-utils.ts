@@ -18,7 +18,7 @@ export const areAdjacentBlocksSame = (
   row1: number,
   col1: number,
   row2: number,
-  col2: number
+  col2: number,
 ): boolean => {
   // Temporarily swap the blocks
   const temp: Block = board[row1][col1]
@@ -92,7 +92,7 @@ export const isSettingUpThreeInRow = (
   row1: number,
   col1: number,
   row2: number,
-  col2: number
+  col2: number,
 ): boolean => {
   const checkHorizontal = (row: number, col: number): boolean => {
     const block: Block = board[row][col]
@@ -194,7 +194,7 @@ export const getNumBlocksToRearrange = (board: Board, powerLevel: PowerLevel, to
     totalBlocks = board.reduce(
       (count: number, row: BoardRow) =>
         count + row.filter((cell: BoardBlock) => !isEmptyCell(cell) && !isMedusaBlock(cell)).length,
-      0
+      0,
     )
   }
 

@@ -4,7 +4,7 @@ import { CancelAccountForm } from "@/app/(protected)/account/cancel/cancel.form"
 import { ROUTE_CANCEL_ACCOUNT } from "@/constants/routes"
 
 export const metadata: Metadata = {
-  title: ROUTE_CANCEL_ACCOUNT.TITLE
+  title: ROUTE_CANCEL_ACCOUNT.TITLE,
 }
 
 export default async function CancelAccount(): Promise<ReactNode> {

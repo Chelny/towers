@@ -8,30 +8,33 @@ import TowersPageContent from "@/components/game/TowersPageContent"
 import { ROUTE_TOWERS } from "@/constants/routes"
 import prisma from "@/lib/prisma"
 
-type PageProps = {
-  params: { id: string }
-  searchParams: { [key: string]: string | string[] | undefined }
+type SearchParams = { [key: string]: string | string[] | undefined }
+
+type TowersPageProps = {
+  params: Promise<{ id: string }>
+  searchParams: Promise<SearchParams>
 }
 
-export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
+export async function generateMetadata(towersPageProps: TowersPageProps): Promise<Metadata> {
+  const searchParams: SearchParams = await towersPageProps.searchParams
   let title: string = ROUTE_TOWERS.TITLE
 
   if (searchParams.room) {
     const room: TowersRoom | null = await prisma.towersRoom.findUnique({
-      where: { id: searchParams.room as string }
+      where: { id: searchParams.room as string },
     })
 
     title = `Room: ${room?.name}`
 
     if (searchParams.table) {
       const table: TowersTable | null = await prisma.towersTable.findUnique({
-        where: { id: searchParams.table as string }
+        where: { id: searchParams.table as string },
       })
 
       if (table) {
         const tableHost: ITowersUserProfile | null = await prisma.towersUserProfile.findUnique({
           where: { userId: table?.hostId },
-          include: { user: true }
+          include: { user: true },
         })
 
         if (tableHost) {
@@ -42,18 +45,22 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
   }
 
   return {
-    title
+    title,
+    alternates: {
+      canonical: `${process.env.NEXT_PUBLIC_BASE_URL}${ROUTE_TOWERS.PATH}`,
+    },
   }
 }
 
-export default async function Towers({ searchParams }: PageProps): Promise<ReactNode> {
+export default async function Towers(towersPageProps: TowersPageProps): Promise<ReactNode> {
+  const searchParams: SearchParams = await towersPageProps.searchParams
   const roomId: string = searchParams.room as string
   const tableId: string = searchParams.table as string
 
   if (!roomId) {
     const response: NextResponse = await GET()
-    const data = await response.json()
-    const rooms: ITowersRoomWithUsersCount[] = data.data
+    const result = await response.json()
+    const rooms: ITowersRoomWithUsersCount[] = result.data
 
     return (
       <>

@@ -7,7 +7,7 @@ import {
   fetchRoomTables,
   fetchRoomUsers,
   joinRoom,
-  leaveRoom
+  leaveRoom,
 } from "@/redux/thunks/room-thunks"
 import { fetchTableChat, fetchTableInfo, fetchTableUsers, joinTable, leaveTable } from "@/redux/thunks/table-thunks"
 
@@ -36,7 +36,7 @@ export const socketExtraReducers = (builder: ActionReducerMapBuilder<SocketState
         isUsersLoading: false,
         tables: {},
         isTablesLoading: false,
-        errorMessage: null
+        errorMessage: null,
       }
     })
     .addCase(joinRoom.rejected, (state: SocketState, action): void => {
@@ -73,7 +73,7 @@ export const socketExtraReducers = (builder: ActionReducerMapBuilder<SocketState
       state.towers[roomId] = {
         ...state.towers[roomId],
         isInfoLoading: true,
-        errorMessage: null
+        errorMessage: null,
       }
     })
     .addCase(fetchRoomInfo.fulfilled, (state: SocketState, action): void => {
@@ -82,7 +82,7 @@ export const socketExtraReducers = (builder: ActionReducerMapBuilder<SocketState
       state.towers[roomId] = {
         ...state.towers[roomId],
         info: action.payload,
-        isInfoLoading: false
+        isInfoLoading: false,
       }
     })
     .addCase(fetchRoomInfo.rejected, (state: SocketState, action): void => {
@@ -91,7 +91,7 @@ export const socketExtraReducers = (builder: ActionReducerMapBuilder<SocketState
       state.towers[roomId] = {
         ...state.towers[roomId],
         isInfoLoading: false,
-        errorMessage: action.payload || null
+        errorMessage: action.payload || null,
       }
     })
 
@@ -105,7 +105,7 @@ export const socketExtraReducers = (builder: ActionReducerMapBuilder<SocketState
       state.towers[roomId] = {
         ...state.towers[roomId],
         isChatLoading: true,
-        errorMessage: null
+        errorMessage: null,
       }
     })
     .addCase(fetchRoomChat.fulfilled, (state: SocketState, action): void => {
@@ -114,7 +114,7 @@ export const socketExtraReducers = (builder: ActionReducerMapBuilder<SocketState
       state.towers[roomId] = {
         ...state.towers[roomId],
         chat: action.payload,
-        isChatLoading: false
+        isChatLoading: false,
       }
     })
     .addCase(fetchRoomChat.rejected, (state: SocketState, action): void => {
@@ -123,7 +123,7 @@ export const socketExtraReducers = (builder: ActionReducerMapBuilder<SocketState
       state.towers[roomId] = {
         ...state.towers[roomId],
         isChatLoading: false,
-        errorMessage: action.payload || null
+        errorMessage: action.payload || null,
       }
     })
 
@@ -137,7 +137,7 @@ export const socketExtraReducers = (builder: ActionReducerMapBuilder<SocketState
       state.towers[roomId] = {
         ...state.towers[roomId],
         isUsersLoading: true,
-        errorMessage: null
+        errorMessage: null,
       }
     })
     .addCase(fetchRoomUsers.fulfilled, (state: SocketState, action): void => {
@@ -146,7 +146,7 @@ export const socketExtraReducers = (builder: ActionReducerMapBuilder<SocketState
       state.towers[roomId] = {
         ...state.towers[roomId],
         users: action.payload,
-        isUsersLoading: false
+        isUsersLoading: false,
       }
     })
     .addCase(fetchRoomUsers.rejected, (state: SocketState, action): void => {
@@ -155,7 +155,7 @@ export const socketExtraReducers = (builder: ActionReducerMapBuilder<SocketState
       state.towers[roomId] = {
         ...state.towers[roomId],
         isUsersLoading: false,
-        errorMessage: action.payload || null
+        errorMessage: action.payload || null,
       }
     })
 
@@ -169,7 +169,7 @@ export const socketExtraReducers = (builder: ActionReducerMapBuilder<SocketState
       state.towers[roomId] = {
         ...state.towers[roomId],
         isTablesLoading: true,
-        errorMessage: null
+        errorMessage: null,
       }
     })
     .addCase(fetchRoomTables.fulfilled, (state: SocketState, action): void => {
@@ -182,18 +182,18 @@ export const socketExtraReducers = (builder: ActionReducerMapBuilder<SocketState
           acc[table.id] = { info: tableInfo, users: userRoomTables }
           return acc
         },
-        {}
+        {},
       )
 
       state.towers[roomId].tables = Object.keys(tablesMap).reduce(
         (updatedTables: Record<string, TowersTableState>, tableId: string) => {
           updatedTables[tableId] = {
             ...state.towers[roomId].tables[tableId],
-            ...tablesMap[tableId]
+            ...tablesMap[tableId],
           }
           return updatedTables
         },
-        {}
+        {},
       )
 
       state.towers[roomId].isTablesLoading = false
@@ -204,7 +204,7 @@ export const socketExtraReducers = (builder: ActionReducerMapBuilder<SocketState
       state.towers[roomId] = {
         ...state.towers[roomId],
         isTablesLoading: false,
-        errorMessage: action.payload || null
+        errorMessage: action.payload || null,
       }
     })
 
@@ -230,7 +230,7 @@ export const socketExtraReducers = (builder: ActionReducerMapBuilder<SocketState
           isChatLoading: false,
           users: [],
           isUsersLoading: false,
-          errorMessage: null
+          errorMessage: null,
         }
       }
     })
@@ -255,7 +255,7 @@ export const socketExtraReducers = (builder: ActionReducerMapBuilder<SocketState
       if (state.towers[roomId]?.tables?.[tableId]) {
         state.towers[roomId].tables[tableId] = {
           ...state.towers[roomId].tables[tableId],
-          isJoined: false
+          isJoined: false,
         }
       }
     })
@@ -275,7 +275,7 @@ export const socketExtraReducers = (builder: ActionReducerMapBuilder<SocketState
         state.towers[roomId].tables[tableId] = {
           ...state.towers[roomId].tables[tableId],
           isInfoLoading: true,
-          errorMessage: null
+          errorMessage: null,
         }
       }
     })
@@ -286,7 +286,7 @@ export const socketExtraReducers = (builder: ActionReducerMapBuilder<SocketState
         state.towers[roomId].tables[tableId] = {
           ...state.towers[roomId].tables[tableId],
           info: action.payload,
-          isInfoLoading: false
+          isInfoLoading: false,
         }
       }
     })
@@ -297,7 +297,7 @@ export const socketExtraReducers = (builder: ActionReducerMapBuilder<SocketState
         state.towers[roomId].tables[tableId] = {
           ...state.towers[roomId].tables[tableId],
           isInfoLoading: false,
-          errorMessage: action.payload || null
+          errorMessage: action.payload || null,
         }
       }
     })
@@ -313,7 +313,7 @@ export const socketExtraReducers = (builder: ActionReducerMapBuilder<SocketState
         state.towers[roomId].tables[tableId] = {
           ...state.towers[roomId].tables[tableId],
           isChatLoading: true,
-          errorMessage: null
+          errorMessage: null,
         }
       }
     })
@@ -324,7 +324,7 @@ export const socketExtraReducers = (builder: ActionReducerMapBuilder<SocketState
         state.towers[roomId].tables[tableId] = {
           ...state.towers[roomId].tables[tableId],
           chat: action.payload,
-          isChatLoading: false
+          isChatLoading: false,
         }
       }
     })
@@ -335,7 +335,7 @@ export const socketExtraReducers = (builder: ActionReducerMapBuilder<SocketState
         state.towers[roomId].tables[tableId] = {
           ...state.towers[roomId].tables[tableId],
           isChatLoading: false,
-          errorMessage: action.payload || null
+          errorMessage: action.payload || null,
         }
       }
     })
@@ -351,7 +351,7 @@ export const socketExtraReducers = (builder: ActionReducerMapBuilder<SocketState
         state.towers[roomId].tables[tableId] = {
           ...state.towers[roomId].tables[tableId],
           isUsersLoading: true,
-          errorMessage: null
+          errorMessage: null,
         }
       }
     })
@@ -362,7 +362,7 @@ export const socketExtraReducers = (builder: ActionReducerMapBuilder<SocketState
         state.towers[roomId].tables[tableId] = {
           ...state.towers[roomId].tables[tableId],
           users: action.payload,
-          isUsersLoading: false
+          isUsersLoading: false,
         }
       }
     })
@@ -373,7 +373,7 @@ export const socketExtraReducers = (builder: ActionReducerMapBuilder<SocketState
         state.towers[roomId].tables[tableId] = {
           ...state.towers[roomId].tables[tableId],
           isUsersLoading: false,
-          errorMessage: action.payload || null
+          errorMessage: action.payload || null,
         }
       }
     })

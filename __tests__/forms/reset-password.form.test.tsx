@@ -1,4 +1,4 @@
-import { useFormState, useFormStatus } from "react-dom"
+import { useActionState } from "react"
 import { render, screen } from "@testing-library/react"
 import { ResetPasswordForm } from "@/app/(auth)/reset-password/reset-password.form"
 
@@ -16,12 +16,21 @@ const { useSearchParams, mockSearchParams } = vi.hoisted(() => {
     delete: vi.fn(),
     set: vi.fn(),
     sort: vi.fn(),
-    [Symbol.iterator]: vi.fn()
+    [Symbol.iterator]: vi.fn(),
   }
 
   return {
     useSearchParams: () => mockSearchParams,
-    mockSearchParams
+    mockSearchParams,
+  }
+})
+
+vi.mock("react", async (importActual) => {
+  const actual = await importActual<typeof import("react")>()
+
+  return {
+    ...actual,
+    useActionState: vi.fn(),
   }
 })
 
@@ -30,33 +39,21 @@ vi.mock("next/navigation", async () => {
 
   return {
     ...actual,
-    useSearchParams
+    useSearchParams,
   }
 })
-
-vi.mock("react-dom", () => ({
-  useFormState: vi.fn(),
-  useFormStatus: vi.fn()
-}))
 
 vi.mock("resend", () => {
   return {
     Resend: vi.fn().mockImplementation(() => ({
-      send: vi.fn().mockResolvedValue({})
-    }))
+      send: vi.fn().mockResolvedValue({}),
+    })),
   }
 })
 
 describe("Reset Password Form", () => {
   beforeEach(() => {
-    vi.mocked(useFormState).mockReturnValue([{ success: false, message: "", error: {} }, vi.fn(), false])
-
-    vi.mocked(useFormStatus).mockReturnValue({
-      pending: false,
-      data: null,
-      method: null,
-      action: null
-    })
+    vi.mocked(useActionState).mockReturnValue([{ success: false, message: "", error: {} }, vi.fn(), false])
   })
 
   afterEach(() => {
@@ -85,10 +82,10 @@ describe("Reset Password Form", () => {
   })
 
   it("should show an error for invalid password format", () => {
-    vi.mocked(useFormState).mockReturnValue([
+    vi.mocked(useActionState).mockReturnValue([
       { success: false, error: { password: "The password is invalid." } },
       vi.fn(),
-      false
+      false,
     ])
 
     render(<ResetPasswordForm />)
@@ -97,12 +94,7 @@ describe("Reset Password Form", () => {
   })
 
   it("should disable the submit button when the form is submitting", () => {
-    vi.mocked(useFormStatus).mockReturnValue({
-      pending: true,
-      data: new FormData(),
-      method: "PATCH",
-      action: "/api/reset-password"
-    })
+    vi.mocked(useActionState).mockReturnValue([{ success: false, message: "" }, vi.fn(), true])
 
     render(<ResetPasswordForm />)
 
@@ -110,10 +102,10 @@ describe("Reset Password Form", () => {
   })
 
   it("should display a success message on form submission success", () => {
-    vi.mocked(useFormState).mockReturnValue([
+    vi.mocked(useActionState).mockReturnValue([
       { success: true, message: "The password has been updated!" },
       vi.fn(),
-      false
+      false,
     ])
 
     render(<ResetPasswordForm />)

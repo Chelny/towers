@@ -1,39 +1,39 @@
 import { NextRequest, NextResponse } from "next/server"
 import { TowersTable, TowersUserProfile } from "@prisma/client"
+import { getPrismaError } from "@/lib/api"
 import prisma from "@/lib/prisma"
-import { getPrismaError } from "@/utils/api"
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
-  try {
-    const { roomId, userId, tableType, rated } = await request.json()
+  const { roomId, userId, tableType, rated } = await request.json()
 
+  try {
     let towersUserProfile: TowersUserProfile | null = await prisma.towersUserProfile.findUnique({
       where: {
-        userId
-      }
+        userId,
+      },
     })
 
     if (!towersUserProfile) {
       return NextResponse.json(
         {
-          success: true,
-          message: "The user profile was not found"
+          success: false,
+          message: "The user profile was not found",
         },
-        { status: 404 }
+        { status: 404 },
       )
     }
 
     // Retrieve all table numbers in the room
     const roomTables: { tableNumber: number }[] = await prisma.towersTable.findMany({
       where: {
-        roomId
+        roomId,
       },
       select: {
-        tableNumber: true
+        tableNumber: true,
       },
       orderBy: {
-        tableNumber: "asc"
-      }
+        tableNumber: "asc",
+      },
     })
 
     // Find the lowest available table number
@@ -53,23 +53,23 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         tableNumber: availableTableNumber,
         hostId: towersUserProfile.id,
         tableType,
-        rated
+        rated,
       },
       include: {
         host: {
           include: {
-            user: true
-          }
-        }
-      }
+            user: true,
+          },
+        },
+      },
     })
 
     return NextResponse.json(
       {
         success: true,
-        data: table
+        data: table,
       },
-      { status: 201 }
+      { status: 201 },
     )
   } catch (error) {
     return getPrismaError(error)

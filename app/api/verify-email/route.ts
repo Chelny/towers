@@ -1,12 +1,14 @@
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { User, UserStatus, VerificationToken } from "@prisma/client"
-import { VerifyEmailFormData } from "@/app/(auth)/verify-email/verify-email.schema"
+import { VerifyEmailPayload } from "@/app/(auth)/verify-email/verify-email.schema"
 import { getUserById } from "@/data/user"
 import { getVerificationTokenByIdentifierToken } from "@/data/verification-token"
+import { getPrismaError } from "@/lib/api"
 import prisma from "@/lib/prisma"
-import { getPrismaError } from "@/utils/api"
 
-export async function PATCH(body: VerifyEmailFormData): Promise<NextResponse> {
+export async function PATCH(request: NextRequest): Promise<NextResponse> {
+  const body: VerifyEmailPayload = await request.json()
+
   try {
     // Check token validity
     const token: VerificationToken | null = await getVerificationTokenByIdentifierToken(body.token)
@@ -15,9 +17,9 @@ export async function PATCH(body: VerifyEmailFormData): Promise<NextResponse> {
       return NextResponse.json(
         {
           success: false,
-          message: "The token is missing or invalid."
+          message: "The token is missing or invalid.",
         },
-        { status: 404 }
+        { status: 404 },
       )
     }
 
@@ -28,9 +30,9 @@ export async function PATCH(body: VerifyEmailFormData): Promise<NextResponse> {
       return NextResponse.json(
         {
           success: false,
-          message: "The token is expired."
+          message: "The token is expired.",
         },
-        { status: 403 }
+        { status: 403 },
       )
     }
 
@@ -41,9 +43,9 @@ export async function PATCH(body: VerifyEmailFormData): Promise<NextResponse> {
       return NextResponse.json(
         {
           success: false,
-          message: "We couldn’t find an account with that email. Please check the email address and try again."
+          message: "We couldn’t find an account with that email. Please check the email address and try again.",
         },
-        { status: 404 }
+        { status: 404 },
       )
     }
 
@@ -51,25 +53,25 @@ export async function PATCH(body: VerifyEmailFormData): Promise<NextResponse> {
       where: { id: user.id },
       data: {
         emailVerified: new Date(),
-        status: UserStatus.ACTIVE
-      }
+        status: UserStatus.ACTIVE,
+      },
     })
 
     await prisma.verificationToken.delete({
       where: {
         identifier_token: {
           identifier: token.identifier,
-          token: token.token
-        }
-      }
+          token: token.token,
+        },
+      },
     })
 
     return NextResponse.json(
       {
         success: true,
-        message: "The email has been verified!"
+        message: "The email has been verified!",
       },
-      { status: 200 }
+      { status: 200 },
     )
   } catch (error) {
     return getPrismaError(error)

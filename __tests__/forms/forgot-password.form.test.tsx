@@ -1,22 +1,29 @@
-import { useFormState, useFormStatus } from "react-dom"
+import { useActionState } from "react"
 import { render, screen } from "@testing-library/react"
 import { ForgotPasswordForm } from "@/app/(auth)/forgot-password/forgot-password.form"
 
-vi.mock("react-dom", () => ({
-  useFormState: vi.fn(),
-  useFormStatus: vi.fn()
-}))
+vi.mock("react", async (importActual) => {
+  const actual = await importActual<typeof import("react")>()
+
+  return {
+    ...actual,
+    useActionState: vi.fn(),
+  }
+})
+
+vi.mock("resend", () => {
+  return {
+    Resend: vi.fn().mockImplementation(() => {
+      return {
+        sendEmail: vi.fn().mockResolvedValue({ success: true }),
+      }
+    }),
+  }
+})
 
 describe("Forgot Password Form", () => {
   beforeEach(() => {
-    vi.mocked(useFormState).mockReturnValue([{ success: false, message: "", error: {} }, vi.fn(), false])
-
-    vi.mocked(useFormStatus).mockReturnValue({
-      pending: false,
-      data: null,
-      method: null,
-      action: null
-    })
+    vi.mocked(useActionState).mockReturnValue([{ success: false, message: "", error: {} }, vi.fn(), false])
   })
 
   afterEach(() => {
@@ -37,10 +44,10 @@ describe("Forgot Password Form", () => {
   })
 
   it("should show error messages when submitting an empty form", async () => {
-    vi.mocked(useFormState).mockReturnValue([
+    vi.mocked(useActionState).mockReturnValue([
       { success: false, error: { email: "The email is required." } },
       vi.fn(),
-      false
+      false,
     ])
 
     render(<ForgotPasswordForm />)
@@ -49,12 +56,7 @@ describe("Forgot Password Form", () => {
   })
 
   it("should disable the submit button when the form is submitting", () => {
-    vi.mocked(useFormStatus).mockReturnValue({
-      pending: true,
-      data: new FormData(),
-      method: "POST",
-      action: "/api/forgot-password"
-    })
+    vi.mocked(useActionState).mockReturnValue([{ success: false, message: "" }, vi.fn(), true])
 
     render(<ForgotPasswordForm />)
 
@@ -62,10 +64,10 @@ describe("Forgot Password Form", () => {
   })
 
   it("should display a success message on form submission success", () => {
-    vi.mocked(useFormState).mockReturnValue([
+    vi.mocked(useActionState).mockReturnValue([
       { success: true, message: "A reset password link has been sent in your inbox!" },
       vi.fn(),
-      false
+      false,
     ])
 
     render(<ForgotPasswordForm />)

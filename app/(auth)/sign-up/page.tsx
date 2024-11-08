@@ -5,7 +5,7 @@ import Anchor from "@/components/ui/Anchor"
 import { ROUTE_SIGN_IN, ROUTE_SIGN_UP } from "@/constants/routes"
 
 export const metadata: Metadata = {
-  title: ROUTE_SIGN_UP.TITLE
+  title: ROUTE_SIGN_UP.TITLE,
 }
 
 export default function SignUpPage(): ReactNode {

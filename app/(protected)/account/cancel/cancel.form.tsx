@@ -1,12 +1,11 @@
 "use client"
 
-import { ClipboardEvent, FormEvent, ReactNode, useEffect } from "react"
-import { useFormState, useFormStatus } from "react-dom"
+import { ClipboardEvent, ReactNode, useActionState, useEffect } from "react"
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime"
 import { useRouter } from "next/navigation"
 import { signOut } from "next-auth/react"
 import { cancelAccount } from "@/app/(protected)/account/cancel/cancel.actions"
-import { CancelAccountFormErrorMessages } from "@/app/(protected)/account/cancel/cancel.schema"
+import { CancelAccountFormValidationErrors } from "@/app/(protected)/account/cancel/cancel.schema"
 import AlertMessage from "@/components/ui/AlertMessage"
 import Button from "@/components/ui/Button"
 import Input from "@/components/ui/Input"
@@ -15,13 +14,12 @@ import { ROUTE_SIGN_IN } from "@/constants/routes"
 const initialState = {
   success: false,
   message: "",
-  error: {} as CancelAccountFormErrorMessages
+  error: {} as CancelAccountFormValidationErrors,
 }
 
 export function CancelAccountForm(): ReactNode {
   const router: AppRouterInstance = useRouter()
-  const { pending } = useFormStatus()
-  const [state, formAction] = useFormState<ApiResponse, FormData>(cancelAccount, initialState)
+  const [state, formAction, isPending] = useActionState<ApiResponse, FormData>(cancelAccount, initialState)
 
   useEffect(() => {
     if (state?.success) {
@@ -38,14 +36,8 @@ export function CancelAccountForm(): ReactNode {
     }
   }, [state, router])
 
-  const handleCancelAccountDeletion = (event: FormEvent<HTMLFormElement>): void => {
-    event.preventDefault()
-    const formData: FormData = new FormData(event.currentTarget)
-    formAction(formData)
-  }
-
   return (
-    <form className="w-full" noValidate onSubmit={handleCancelAccountDeletion}>
+    <form className="w-full" action={formAction} noValidate>
       {state?.message && <AlertMessage type={state.success ? "success" : "error"}>{state.message}</AlertMessage>}
       <p>
         Please note that canceling your account is a permanent action and cannot be undone. All your data, including
@@ -70,7 +62,7 @@ export function CancelAccountForm(): ReactNode {
       <Button
         type="submit"
         className="mt-4 bg-red-500 text-white"
-        disabled={pending}
+        disabled={isPending}
         dataTestId="cancel-account-submit-button"
       >
         Confirm Deletion

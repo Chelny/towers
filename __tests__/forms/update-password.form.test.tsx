@@ -1,22 +1,29 @@
-import { useFormState, useFormStatus } from "react-dom"
+import { useActionState } from "react"
 import { render, screen } from "@testing-library/react"
 import { UpdatePasswordForm } from "@/app/(protected)/account/update-password/update-password.form"
 
-vi.mock("react-dom", () => ({
-  useFormState: vi.fn(),
-  useFormStatus: vi.fn()
-}))
+vi.mock("react", async (importActual) => {
+  const actual = await importActual<typeof import("react")>()
+
+  return {
+    ...actual,
+    useActionState: vi.fn(),
+  }
+})
+
+vi.mock("resend", () => {
+  return {
+    Resend: vi.fn().mockImplementation(() => {
+      return {
+        sendEmail: vi.fn().mockResolvedValue({ success: true }),
+      }
+    }),
+  }
+})
 
 describe("Update Password Form", () => {
   beforeEach(() => {
-    vi.mocked(useFormState).mockReturnValue([{ success: false, message: "", error: {} }, vi.fn(), false])
-
-    vi.mocked(useFormStatus).mockReturnValue({
-      pending: false,
-      data: null,
-      method: null,
-      action: null
-    })
+    vi.mocked(useActionState).mockReturnValue([{ success: false, message: "", error: {} }, vi.fn(), false])
   })
 
   afterEach(() => {
@@ -41,17 +48,17 @@ describe("Update Password Form", () => {
   })
 
   it("should show error messages when submitting an empty form", () => {
-    vi.mocked(useFormState).mockReturnValue([
+    vi.mocked(useActionState).mockReturnValue([
       {
         success: false,
         error: {
           currentPassword: "The current password is invalid.",
           newPassword: "The new password is invalid.",
-          confirmNewPassword: "The new password confirmation is invalid."
-        }
+          confirmNewPassword: "The new password confirmation is invalid.",
+        },
       },
       vi.fn(),
-      false
+      false,
     ])
 
     render(<UpdatePasswordForm />)
@@ -62,15 +69,15 @@ describe("Update Password Form", () => {
   })
 
   it("should show an error if passwords do not match", () => {
-    vi.mocked(useFormState).mockReturnValue([
+    vi.mocked(useActionState).mockReturnValue([
       {
         success: false,
         error: {
-          confirmNewPassword: "The new password and new password confirmation do not match."
-        }
+          confirmNewPassword: "The new password and new password confirmation do not match.",
+        },
       },
       vi.fn(),
-      false
+      false,
     ])
 
     render(<UpdatePasswordForm />)
@@ -79,12 +86,7 @@ describe("Update Password Form", () => {
   })
 
   it("should disable the submit button when the form is submitting", () => {
-    vi.mocked(useFormStatus).mockReturnValue({
-      pending: true,
-      data: new FormData(),
-      method: "PATCH",
-      action: "/api/account/update-password"
-    })
+    vi.mocked(useActionState).mockReturnValue([{ success: false, message: "" }, vi.fn(), true])
 
     render(<UpdatePasswordForm />)
 
@@ -92,10 +94,10 @@ describe("Update Password Form", () => {
   })
 
   it("should display a success message on form submission success", () => {
-    vi.mocked(useFormState).mockReturnValue([
+    vi.mocked(useActionState).mockReturnValue([
       { success: true, message: "The password has been updated!" },
       vi.fn(),
-      false
+      false,
     ])
 
     render(<UpdatePasswordForm />)

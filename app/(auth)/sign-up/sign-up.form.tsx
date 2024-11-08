@@ -1,9 +1,8 @@
 "use client"
 
-import { ClipboardEvent, FormEvent, ReactNode } from "react"
-import { useFormState, useFormStatus } from "react-dom"
+import { ClipboardEvent, ReactNode, useActionState } from "react"
 import { signUp } from "@/app/(auth)/sign-up/sign-up.actions"
-import { SignUpFormErrorMessages } from "@/app/(auth)/sign-up/sign-up.schema"
+import { SignUpFormValidationErrors } from "@/app/(auth)/sign-up/sign-up.schema"
 import AlertMessage from "@/components/ui/AlertMessage"
 import Button from "@/components/ui/Button"
 import Calendar from "@/components/ui/Calendar"
@@ -13,21 +12,14 @@ import Input from "@/components/ui/Input"
 const initialState = {
   success: false,
   message: "",
-  error: {} as SignUpFormErrorMessages
+  error: {} as SignUpFormValidationErrors,
 }
 
 export function SignUpForm(): ReactNode {
-  const { pending } = useFormStatus()
-  const [state, formAction] = useFormState<ApiResponse, FormData>(signUp, initialState)
-
-  const handleSignUp = (event: FormEvent<HTMLFormElement>): void => {
-    event.preventDefault()
-    const formData: FormData = new FormData(event.currentTarget)
-    formAction(formData)
-  }
+  const [state, formAction, isPending] = useActionState<ApiResponse, FormData>(signUp, initialState)
 
   return (
-    <form className="w-full" noValidate onSubmit={handleSignUp}>
+    <form className="w-full" action={formAction} noValidate>
       {state?.message && <AlertMessage type={state.success ? "success" : "error"}>{state.message}</AlertMessage>}
       <Input
         id="name"
@@ -93,7 +85,7 @@ export function SignUpForm(): ReactNode {
         dataTestId="sign-up-terms-and-conditions-checkbox"
         errorMessage={state?.error?.termsAndConditions}
       />
-      <Button type="submit" className="w-full" disabled={pending || state.success} dataTestId="sign-up-submit-button">
+      <Button type="submit" className="w-full" disabled={isPending || state.success} dataTestId="sign-up-submit-button">
         Sign Up
       </Button>
     </form>

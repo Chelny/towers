@@ -1,3 +1,4 @@
+import { ImgHTMLAttributes } from "react"
 import { render, screen } from "@testing-library/react"
 import { Mock } from "vitest"
 import { mockSocketRoom1Id, mockSocketRoom1Table1Id } from "@/__mocks__/data/socketState"
@@ -12,21 +13,31 @@ const { useRouter } = vi.hoisted(() => {
 
   return {
     useRouter: () => ({ push: mockRouterPush }),
-    mockRouterPush
+    mockRouterPush,
   }
 })
+
+vi.mock("next/image", () => ({
+  __esModule: true,
+  default: (props: ImgHTMLAttributes<HTMLImageElement>) => {
+    // @ts-ignore
+    const { priority, crossOrigin, ...restProps } = props
+    // eslint-disable-next-line @next/next/no-img-element
+    return <img {...restProps} crossOrigin={crossOrigin} role="img" alt={restProps.alt} />
+  },
+}))
 
 vi.mock("next/navigation", async () => {
   const actual = await vi.importActual("next/navigation")
 
   return {
     ...actual,
-    useRouter
+    useRouter,
   }
 })
 
 vi.mock("@/hooks/useSessionData", () => ({
-  useSessionData: vi.fn()
+  useSessionData: vi.fn(),
 }))
 
 vi.mock("@/lib/hooks", async () => {
@@ -35,7 +46,7 @@ vi.mock("@/lib/hooks", async () => {
   return {
     ...actual,
     useAppDispatch: vi.fn(),
-    useAppSelector: vi.fn()
+    useAppSelector: vi.fn(),
   }
 })
 
@@ -72,7 +83,7 @@ describe("TowersPageContent Component", () => {
   it("should dispatch initSocket when not connected and session is authenticated", () => {
     render(<TowersPageContent roomId={mockSocketRoom1Id} tableId="" />)
 
-    expect(mockAppDispatch).toHaveBeenCalledWith(initSocket())
+    expect(mockAppDispatch).toHaveBeenCalledWith(initSocket({ session: mockAuthenticatedSession.data }))
   })
 
   it("should dispatche destroySocket when offline event is triggered", () => {

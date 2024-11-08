@@ -6,8 +6,8 @@ export const profileSchema = Type.Object({
   birthdate: Type.Optional(Type.RegExp(BIRTH_DATE_PATTERN)),
   email: Type.RegExp(EMAIL_PATTERN),
   username: Type.RegExp(USERNAME_PATTERN),
-  image: Type.Optional(Type.String())
+  image: Type.Optional(Type.String()),
 })
 
-export type ProfileFormData = SchemaFormData<typeof profileSchema>
-export type ProfileFormErrorMessages = SchemaFormErrorMessages<keyof ProfileFormData>
+export type ProfilePayload = FormPayload<typeof profileSchema>
+export type ProfileFormValidationErrors = FormValidationErrors<keyof ProfilePayload>

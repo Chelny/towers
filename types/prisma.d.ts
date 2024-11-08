@@ -1,4 +1,5 @@
 import {
+  Account,
   Prisma,
   TowersRoom,
   TowersRoomChatMessage,
@@ -10,8 +11,12 @@ import {
 } from "@prisma/client"
 
 declare module "@prisma/client" {
-  interface IUserWithRelations extends Omit<User, "password"> {
+  interface IUserWithRelations extends User {
     towersUserProfile?: TowersUserProfileWithRelations
+  }
+
+  interface IUserProfile extends User {
+    accounts: Account[]
   }
 
   interface ITowersTableWithRelations extends TowersTable {
@@ -20,7 +25,7 @@ declare module "@prisma/client" {
   }
 
   interface ITowersUserProfileWithRelations extends TowersUserProfile {
-    user: Omit<User, "password">
+    user: User
     userRoomTables?: ITowersUserRoomTableWithRelations[]
   }
 

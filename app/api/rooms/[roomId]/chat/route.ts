@@ -3,53 +3,54 @@ import { TowersRoomChatMessage, TowersUserProfile } from "@prisma/client"
 import DOMPurify from "isomorphic-dompurify"
 import { Session } from "next-auth"
 import { auth } from "@/auth"
+import { getPrismaError, missingRoomIdResponse, unauthorized } from "@/lib/api"
 import prisma from "@/lib/prisma"
 import { updateLastActiveAt } from "@/lib/user"
-import { badRequestMissingRoomId, getPrismaError, unauthorized } from "@/utils/api"
 
-export async function GET(request: NextRequest, context: { params: { roomId: string } }): Promise<NextResponse> {
+type Params = Promise<{ roomId: string }>
+
+export async function GET(request: NextRequest, segmentData: { params: Params }): Promise<NextResponse> {
+  const { roomId } = await segmentData.params
+  if (!roomId) return missingRoomIdResponse()
+
+  const session: Session | null = await auth()
+  if (!session) return unauthorized()
+
   try {
-    const { roomId } = context.params
-    const session: Session | null = await auth()
-
-    if (!roomId) return badRequestMissingRoomId()
-
-    if (!session) return unauthorized()
-
     const towersUserProfile: TowersUserProfile | null = await prisma.towersUserProfile.findUnique({
-      where: { userId: session.user.id }
+      where: { userId: session.user.id },
     })
 
     if (!towersUserProfile) {
       return NextResponse.json(
         {
           success: false,
-          message: "The user profile was not found"
+          message: "The user profile was not found",
         },
-        { status: 404 }
+        { status: 404 },
       )
     }
 
     const towersUserRoomTable: { updatedAt: Date } | null = await prisma.towersUserRoomTable.findFirst({
       where: {
         userProfileId: towersUserProfile.id,
-        roomId
+        roomId,
       },
       select: {
-        updatedAt: true
+        updatedAt: true,
       },
       orderBy: {
-        updatedAt: "asc"
-      }
+        updatedAt: "asc",
+      },
     })
 
     if (!towersUserRoomTable) {
       return NextResponse.json(
         {
           success: false,
-          message: "The user has not yet joined the room"
+          message: "The user has not yet joined the room",
         },
-        { status: 404 }
+        { status: 404 },
       )
     }
 
@@ -57,67 +58,71 @@ export async function GET(request: NextRequest, context: { params: { roomId: str
       where: {
         roomId,
         updatedAt: {
-          gt: towersUserProfile.updatedAt
-        }
+          gt: towersUserProfile.updatedAt,
+        },
       },
       include: {
         userProfile: {
           include: {
-            user: true
-          }
-        }
+            user: true,
+          },
+        },
       },
       orderBy: {
-        updatedAt: "asc"
+        updatedAt: "asc",
       },
-      take: 100
+      take: 50,
+      cacheStrategy: {
+        ttl: 5,
+        swr: 20,
+      },
     })
 
     return NextResponse.json(
       {
         success: true,
-        data: chatMessages
+        data: chatMessages,
       },
-      { status: 200 }
+      { status: 200 },
     )
   } catch (error) {
     return getPrismaError(error)
   }
 }
 
-export async function POST(request: NextRequest, context: { params: { roomId: string } }): Promise<NextResponse> {
+export async function POST(request: NextRequest, segmentData: { params: Params }): Promise<NextResponse> {
+  const body = await request.json()
+
+  const { roomId } = await segmentData.params
+  if (!roomId) return missingRoomIdResponse()
+
+  const session: Session | null = body.session
+  if (!session) return unauthorized()
+
   try {
-    const { roomId } = context.params
-    const data = await request.json()
-    const session: Session | null = data.session
-
-    if (!roomId) return badRequestMissingRoomId()
-
-    if (!session) return unauthorized()
-
     const towersUserProfile: TowersUserProfile | null = await prisma.towersUserProfile.findUnique({
-      where: { userId: session.user.id }
+      where: { userId: session.user.id },
     })
 
     if (!towersUserProfile) {
       return NextResponse.json(
         {
           success: false,
-          message: "Unable to find the requested user profile."
+          message: "Unable to find the requested user profile.",
         },
-        { status: 404 }
+        { status: 404 },
       )
     }
 
-    let message: string = DOMPurify.sanitize(data.message)
+    let message: string = DOMPurify.sanitize(body.message)
 
     if (message.trim().length === 0) {
       return NextResponse.json(
         {
           success: false,
-          message: "Invalid input. XSS attack detected."
+          message: "Invalid input. XSS attack detected.",
         },
-        { status: 400 }
+        { status: 400 },
       )
     }
 
@@ -125,15 +130,15 @@ export async function POST(request: NextRequest, context: { params: { roomId: st
       data: {
         roomId,
         userProfileId: towersUserProfile.id,
-        message
+        message,
       },
       include: {
         userProfile: {
           include: {
-            user: true
-          }
-        }
-      }
+            user: true,
+          },
+        },
+      },
     })
 
     await updateLastActiveAt(session.user.id)
@@ -141,9 +146,9 @@ export async function POST(request: NextRequest, context: { params: { roomId: st
     return NextResponse.json(
       {
         success: true,
-        data: chatMessage
+        data: chatMessage,
       },
-      { status: 201 }
+      { status: 201 },
     )
   } catch (error) {
     return getPrismaError(error)

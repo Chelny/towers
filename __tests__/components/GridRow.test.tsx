@@ -7,7 +7,7 @@ describe("GridRow Component", () => {
   const mockRow: BoardRow = [
     { ...mockDefaultTowersBlockProps, letter: "T", powerType: "defense" },
     { ...mockDefaultTowersBlockProps, letter: "O", powerType: null },
-    { ...mockDefaultTowersBlockProps, letter: "W", powerType: "attack" }
+    { ...mockDefaultTowersBlockProps, letter: "W", powerType: "attack" },
   ]
 
   it("should render a row with the correct number of cells", () => {
@@ -23,7 +23,7 @@ describe("GridRow Component", () => {
         <GridRow rowIndex={0} row={mockRow} />
         <GridRow rowIndex={1} row={mockRow} />
         <GridRow rowIndex={2} row={mockRow} />
-      </>
+      </>,
     )
 
     const rows: HTMLDivElement[] = screen.getAllByRole("row")

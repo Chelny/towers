@@ -6,18 +6,18 @@ import {
   TowersTableChatMessage,
   TowersUserProfile,
   User,
-  UserStatus
+  UserStatus,
 } from "@prisma/client"
 import { parseArgs } from "node:util"
 import prisma from "@/lib/prisma"
 
 const options = {
-  environment: { type: "string" }
+  environment: { type: "string" },
 }
 
 async function main(): Promise<void> {
   const {
-    values: { environment }
+    values: { environment },
     // @ts-ignore
   } = parseArgs({ options })
 
@@ -27,15 +27,22 @@ async function main(): Promise<void> {
 
   await prisma.towersRoom.createMany({
     data: [
+      { name: "Leaning Tower of Pisa", difficulty: RoomLevel.SOCIAL },
+      { name: "Tower of Babble", difficulty: RoomLevel.SOCIAL },
       { name: "Eiffel Tower", difficulty: RoomLevel.SOCIAL },
+      { name: "Sunshine 60 Tower", difficulty: RoomLevel.SOCIAL },
+      { name: "Two Union Square", difficulty: RoomLevel.SOCIAL },
       { name: "Empire State Building", difficulty: RoomLevel.BEGINNER },
-      { name: "CN Tower", difficulty: RoomLevel.ADVANCED }
-    ]
+      { name: "Sears Tower", difficulty: RoomLevel.BEGINNER },
+      { name: "Chang Tower", difficulty: RoomLevel.BEGINNER },
+      { name: "One Astor Place", difficulty: RoomLevel.BEGINNER },
+      { name: "Olympia Centre", difficulty: RoomLevel.BEGINNER },
+      { name: "World Trade Center", difficulty: RoomLevel.INTERMEDIATE },
+      { name: "CN Tower", difficulty: RoomLevel.ADVANCED },
+    ],
   })
 
-  if (environment === "production") {
-  } else if (environment === "staging") {
-  } else {
+  if (environment === "development") {
     // **************************************************
     // * Users
     // **************************************************
@@ -49,30 +56,30 @@ async function main(): Promise<void> {
         name: "John Doe",
         email: "john.doe@example.com",
         username: "john.doe",
-        birthdate: new Date("1990-01-01")
+        birthdate: new Date("1990-01-01"),
       },
       {
         name: "Jane Smith",
         email: "marryj@example.com",
-        username: "jane_smith"
+        username: "jane_smith",
       },
       {
         name: "Sam Lee",
         email: "slee1951@example.com",
         username: "samlee5141234567",
-        birthdate: new Date("1951-07-21")
+        birthdate: new Date("1951-07-21"),
       },
       {
         name: "Chris Green",
         email: "itschris85@example.co.jp",
         username: "itschris85",
-        birthdate: new Date("1985-05-15")
+        birthdate: new Date("1985-05-15"),
       },
       {
         name: "Patricia White",
         email: "patricia_j_white@example.com",
-        username: "triciaj"
-      }
+        username: "triciaj",
+      },
     ]
 
     await prisma.user.createMany({
@@ -82,8 +89,8 @@ async function main(): Promise<void> {
         emailVerified: new Date(),
         isOnline: true,
         lastActiveAt: new Date(),
-        status: UserStatus.ACTIVE
-      }))
+        status: UserStatus.ACTIVE,
+      })),
     })
 
     const users: User[] = await prisma.user.findMany()
@@ -94,8 +101,8 @@ async function main(): Promise<void> {
 
     const towersRoom1 = await prisma.towersRoom.findUnique({
       where: {
-        name: "Eiffel Tower"
-      }
+        name: "Eiffel Tower",
+      },
     })
 
     if (towersRoom1) {
@@ -109,7 +116,7 @@ async function main(): Promise<void> {
         gamesCompleted: Math.floor(Math.random() * 100),
         wins: Math.floor(Math.random() * 50),
         loses: Math.floor(Math.random() * 50),
-        streak: Math.floor(Math.random() * 5)
+        streak: Math.floor(Math.random() * 5),
       }))
 
       await prisma.towersUserProfile.createMany({ data: towersUserProfileData as TowersUserProfile[] })
@@ -127,27 +134,27 @@ async function main(): Promise<void> {
           tableNumber: 1,
           hostId: towersUserProfiles[0].id,
           tableType: TableType.PUBLIC,
-          rated: true
+          rated: true,
         },
         {
           tableNumber: 2,
           hostId: towersUserProfiles[3].id,
           tableType: TableType.PROTECTED,
-          rated: false
+          rated: false,
         },
         {
           tableNumber: 3,
           hostId: towersUserProfiles[4].id,
           tableType: TableType.PRIVATE,
-          rated: true
-        }
+          rated: true,
+        },
       ]
 
       await prisma.towersTable.createMany({
         data: tablesData.map((table: TTable) => ({
           ...table,
-          roomId: towersRoom1.id
-        }))
+          roomId: towersRoom1.id,
+        })),
       })
 
       const tables: TowersTable[] = await prisma.towersTable.findMany()
@@ -163,24 +170,24 @@ async function main(): Promise<void> {
               userProfileId: towersUserProfiles[i].id,
               roomId: tables[0].roomId,
               tableId: tables[0].id,
-              seatNumber: i + 1
-            }
+              seatNumber: i + 1,
+            },
           })
         } else if (i === 3) {
           await prisma.towersUserRoomTable.create({
             data: {
               userProfileId: towersUserProfiles[i].id,
               roomId: tables[1].roomId,
-              tableId: tables[1].id
-            }
+              tableId: tables[1].id,
+            },
           })
         } else if (i === 4) {
           await prisma.towersUserRoomTable.create({
             data: {
               userProfileId: towersUserProfiles[i].id,
               roomId: tables[2].roomId,
-              tableId: tables[2].id
-            }
+              tableId: tables[2].id,
+            },
           })
         }
       }
@@ -194,23 +201,23 @@ async function main(): Promise<void> {
       const roomChatMessages: TRoomChatMessage[] = [
         {
           userProfileId: towersUserProfiles[0].id,
-          message: "Hello from Room 1!"
+          message: "Hello from Room 1!",
         },
         {
           userProfileId: towersUserProfiles[1].id,
-          message: "Hey everyone!"
+          message: "Hey everyone!",
         },
         {
           userProfileId: towersUserProfiles[2].id,
-          message: "Let’s play!"
-        }
+          message: "Let’s play!",
+        },
       ]
 
       await prisma.towersRoomChatMessage.createMany({
         data: roomChatMessages.map((message: TRoomChatMessage) => ({
           ...message,
-          roomId: towersRoom1.id
-        }))
+          roomId: towersRoom1.id,
+        })),
       })
 
       // **************************************************
@@ -222,32 +229,32 @@ async function main(): Promise<void> {
       const tableChatMessages: TTableChatMessage[] = [
         {
           userProfileId: towersUserProfiles[0].id,
-          message: "Hello from Room 1!"
+          message: "Hello from Room 1!",
         },
         {
           userProfileId: towersUserProfiles[1].id,
-          message: "Hey everyone!"
+          message: "Hey everyone!",
         },
         {
           userProfileId: towersUserProfiles[2].id,
-          message: "Let’s play!"
+          message: "Let’s play!",
         },
         {
           userProfileId: towersUserProfiles[0].id,
-          message: "Hi!! Let the game begin!"
+          message: "Hi!! Let the game begin!",
         },
         {
           userProfileId: towersUserProfiles[1].id,
-          message: "Let’s GOOOOO!"
-        }
+          message: "Let’s GOOOOO!",
+        },
       ]
 
       // Create chat messages for table 1 in room 1
       await prisma.towersTableChatMessage.createMany({
         data: tableChatMessages.map((message: TTableChatMessage) => ({
           ...message,
-          tableId: tables[0].id
-        }))
+          tableId: tables[0].id,
+        })),
       })
     }
   }
