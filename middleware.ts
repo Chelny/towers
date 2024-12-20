@@ -1,28 +1,9 @@
-import { NextURL } from "next/dist/server/web/next-url"
-import { NextResponse } from "next/server"
-import { NextAuthRequest } from "next-auth"
-import { auth as middleware } from "@/auth"
-import {
-  API_AUTH_PREFIX,
-  PROTECTED_ROUTES,
-  PUBLIC_ROUTES,
-  ROUTE_GAMES,
-  ROUTE_RESET_PASSWORD,
-  ROUTE_SIGN_IN,
-} from "@/constants/routes"
+import { NextRequest, NextResponse } from "next/server"
+import { betterFetch } from "@better-fetch/fetch"
+import { PROTECTED_ROUTES, PUBLIC_ROUTES, ROUTE_GAMES, ROUTE_SIGN_IN } from "@/constants/routes"
+import type { Session } from "better-auth/types"
 
-const validateToken = async (token: string): Promise<boolean> => {
-  const response: Response = await fetch(`/api/reset-password?token=${token}`)
-
-  if (!response.ok) {
-    return false
-  }
-
-  const result = await response.json()
-  return result.success
-}
-
-export default middleware(async (request: NextAuthRequest) => {
+export default async function middleware(request: NextRequest) {
   // Content Security Policy (CSP)
   const nonce: string = Buffer.from(crypto.randomUUID()).toString("base64")
   const cspHeader: string = `
@@ -48,41 +29,34 @@ export default middleware(async (request: NextAuthRequest) => {
     },
   })
 
-  // Allow Auth.js paths
-  if (request.nextUrl.pathname.startsWith(API_AUTH_PREFIX)) {
-    return response
-  }
+  // Allow access to reset password page only if there is a token parameter
+  // if ([ROUTE_RESET_PASSWORD.PATH].includes(request.nextUrl.pathname)) {
+  //   const url: NextURL = request.nextUrl.clone()
+  //   const token: string | null = url.searchParams.get("token")
+  //   const newUrl: URL = new URL(ROUTE_SIGN_IN.PATH, request.nextUrl.origin)
+  //   if (!token) return NextResponse.redirect(newUrl)
+  // }
 
-  // Allow access to reset password page only if token is valid
-  const url: NextURL = request.nextUrl.clone()
-  const token: string | null = url.searchParams.get("token")
+  const { data: session } = await betterFetch<Session>("/api/auth/get-session", {
+    baseURL: request.nextUrl.origin,
+    headers: {
+      // Get the cookie from the request
+      cookie: request.headers.get("cookie") || "",
+    },
+  })
 
-  if ([ROUTE_RESET_PASSWORD.PATH].includes(request.nextUrl.pathname)) {
-    const newUrl: URL = new URL(ROUTE_SIGN_IN.PATH, request.nextUrl.origin)
-
-    if (!token) return NextResponse.redirect(newUrl)
-
-    const isTokenValid: boolean = await validateToken(token)
-
-    if (!isTokenValid) {
-      return NextResponse.redirect(newUrl)
-    }
-  }
-
-  if (request.auth) {
+  if (session) {
     if (PUBLIC_ROUTES.includes(request.nextUrl.pathname)) {
-      const newUrl: URL = new URL(ROUTE_GAMES.PATH, request.nextUrl.origin)
-      return NextResponse.redirect(newUrl)
+      return NextResponse.redirect(new URL(ROUTE_GAMES.PATH, request.nextUrl.origin))
     }
   } else {
     if (PROTECTED_ROUTES.includes(request.nextUrl.pathname)) {
-      const newUrl: URL = new URL(ROUTE_SIGN_IN.PATH, request.nextUrl.origin)
-      return NextResponse.redirect(newUrl)
+      return NextResponse.redirect(new URL(ROUTE_SIGN_IN.PATH, request.nextUrl.origin))
     }
   }
 
   return response
-})
+}
 
 export const config = {
   matcher: [
@@ -91,14 +65,8 @@ export const config = {
      * - api (API routes)
      * - _next/static (static files)
      * - _next/image (image optimization files)
-     * - favicon.ico, sitemap.xml, robots.txt (metadata files)
+     * - favicon.ico, sitemap.xml, robots.txt, manifest.webmanifest (metadata files)
      */
-    {
-      source: "/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)",
-      missing: [
-        { type: "header", key: "next-router-prefetch" },
-        { type: "header", key: "purpose", value: "prefetch" },
-      ],
-    },
+    "/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|manifest.webmanifest).*)",
   ],
 }

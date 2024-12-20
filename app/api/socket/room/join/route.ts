@@ -1,15 +1,16 @@
+import { headers } from "next/headers"
 import { NextRequest, NextResponse } from "next/server"
 import { TowersUserProfile, TowersUserRoomTable } from "@prisma/client"
-import { Session } from "next-auth"
-import { auth } from "@/auth"
+import { updateUserLastActiveAt } from "@/data/user"
 import { getPrismaError, unauthorized } from "@/lib/api"
+import { auth } from "@/lib/auth"
+import { Session } from "@/lib/auth-client"
 import prisma from "@/lib/prisma"
-import { updateLastActiveAt } from "@/lib/user"
 
 export async function PATCH(request: NextRequest): Promise<NextResponse> {
   const { roomId, tableId } = await request.json()
 
-  const session: Session | null = await auth()
+  const session: Session | null = await auth.api.getSession({ headers: await headers() })
   if (!session) return unauthorized()
 
   try {
@@ -129,7 +130,7 @@ export async function PATCH(request: NextRequest): Promise<NextResponse> {
       }
     }
 
-    await updateLastActiveAt(session.user.id)
+    await updateUserLastActiveAt(session.user.id)
 
     return NextResponse.json(
       {

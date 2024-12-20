@@ -47,7 +47,7 @@ export async function generateMetadata(towersPageProps: TowersPageProps): Promis
   return {
     title,
     alternates: {
-      canonical: `${process.env.NEXT_PUBLIC_BASE_URL}${ROUTE_TOWERS.PATH}`,
+      canonical: `${process.env.BASE_URL}${ROUTE_TOWERS.PATH}`,
     },
   }
 }

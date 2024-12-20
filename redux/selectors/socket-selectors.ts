@@ -1,7 +1,7 @@
 import { ITowersUserRoomTable } from "@prisma/client"
 import { createSelector } from "@reduxjs/toolkit"
-import { Session } from "next-auth"
 import { TowersRoomState, TowersTableState } from "@/interfaces/socket"
+import { Session } from "@/lib/auth-client"
 import { RootState } from "@/redux/store"
 
 // **************************************************

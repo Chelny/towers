@@ -13,20 +13,16 @@ export async function POST(): Promise<NextResponse> {
       console.log("######################################")
       console.log("")
 
-      await prisma.user.deleteMany({
-        where: { deletionScheduledAt: { lte: new Date() } },
-      })
+      // await prisma.user.deleteMany({
+      //   where: { deletionScheduledAt: { lt: new Date() } },
+      // })
 
-      await prisma.verificationToken.deleteMany({
-        where: { expires: { lte: new Date() } },
-      })
-
-      await prisma.passwordResetToken.deleteMany({
-        where: { expires: { lte: new Date() } },
-      })
+      // await prisma.verification.deleteMany({
+      //   where: { expiresAt: { lt: new Date() } },
+      // })
     })
 
-    return NextResponse.json({ success: true }, { status: 201 })
+    return NextResponse.json({ success: true }, { status: 200 })
   } catch (error) {
     const errorMessage: string = error instanceof Error ? error.message : "Unknown error occurred"
     return NextResponse.json({ success: false, message: errorMessage }, { status: 500 })

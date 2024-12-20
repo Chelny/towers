@@ -1,4 +1,4 @@
-import { User, UserStatus } from "@prisma/client"
+import { User } from "@prisma/client"
 import prisma from "@/lib/prisma"
 
 export const getUserById = async (id: string | undefined): Promise<User | null> => {
@@ -13,6 +13,13 @@ export const getUserByUsername = async (username: string): Promise<User | null> 
   return await prisma.user.findUnique({ where: { username } })
 }
 
-export const getActiveUserByEmail = async (email: string): Promise<User | null> => {
-  return await prisma.user.findUnique({ where: { email, status: UserStatus.ACTIVE } })
+/**
+ * Update isOnline and lastActiveAt on POST, PUT, PATCH, DELETE requests
+ * @param id
+ */
+export const updateUserLastActiveAt = async (id: string): Promise<void> => {
+  await prisma.user.update({
+    where: { id },
+    data: { isOnline: true, lastActiveAt: new Date() },
+  })
 }

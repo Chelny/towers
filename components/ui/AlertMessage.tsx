@@ -15,6 +15,8 @@ export default function AlertMessage({ children, type = "info" }: AlertMessagePr
         type === "success" && "border-emerald-200 bg-emerald-100 text-emerald-600",
         type === "error" && "border-red-200 bg-red-100 text-red-600",
       )}
+      role="alert"
+      aria-live="assertive"
     >
       {children}
     </div>

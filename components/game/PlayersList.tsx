@@ -1,10 +1,10 @@
 "use client"
 
 import { ReactNode, useMemo, useState } from "react"
+import { createId } from "@paralleldrive/cuid2"
 import { ITowersUserRoomTable } from "@prisma/client"
 import clsx from "clsx/lite"
 import { BsSortAlphaDown, BsSortAlphaDownAlt, BsSortNumericDown, BsSortNumericDownAlt } from "react-icons/bs"
-import { v4 as uuidv4 } from "uuid"
 import PlayerInformation from "@/components/game/PlayerInformation"
 import {
   PROVISIONAL_MAX_COMPLETED_GAMES,
@@ -13,7 +13,7 @@ import {
   RATING_MASTER,
   RATING_PLATINUM,
 } from "@/constants/game"
-import { useSessionData } from "@/hooks/useSessionData"
+import { authClient } from "@/lib/auth-client"
 
 type PlayersListProps = {
   users: ITowersUserRoomTable[]
@@ -28,7 +28,7 @@ export default function PlayersList({
   isRatingsVisible = false,
   onSelectedPlayer,
 }: PlayersListProps): ReactNode {
-  const { data: session } = useSessionData()
+  const { data: session, isPending, error } = authClient.useSession()
   const [sortKey, setSortKey] = useState<"name" | "rating" | "table">("name")
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null)
@@ -181,7 +181,7 @@ export default function PlayersList({
       </div>
 
       <PlayerInformation
-        key={uuidv4()}
+        key={createId()}
         isOpen={isPlayerInfoModalOpen}
         player={sortedPlayersList?.find((player: ITowersUserRoomTable) => player.id === selectedPlayerId)}
         isRatingsVisible={isRatingsVisible}

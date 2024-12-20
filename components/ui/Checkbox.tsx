@@ -52,8 +52,6 @@ export default function Checkbox({
           required={required}
           disabled={disabled}
           aria-labelledby={`${id}Label`}
-          aria-checked={checked}
-          aria-disabled={disabled}
           data-testid={dataTestId}
           onChange={handleChange}
         />

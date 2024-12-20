@@ -36,7 +36,6 @@ export default function Button({
       )}
       disabled={disabled}
       tabIndex={tabIndex}
-      aria-disabled={disabled}
       data-testid={dataTestId}
       {...props}
       onClick={(event: MouseEvent<HTMLButtonElement>) => onClick?.(event)}

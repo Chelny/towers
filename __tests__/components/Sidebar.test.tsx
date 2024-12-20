@@ -1,11 +1,16 @@
 import { ImgHTMLAttributes } from "react"
 import { fireEvent, render, screen } from "@testing-library/react"
-import { signOut } from "next-auth/react"
 import { useDispatch } from "react-redux"
 import { Mock } from "vitest"
-import { mockAuthenticatedSession } from "@/__mocks__/data/users"
+import { mockSession } from "@/__mocks__/data/users"
 import Sidebar from "@/components/Sidebar"
-import { useSessionData } from "@/hooks/useSessionData"
+import { authClient } from "@/lib/auth-client"
+import { mockUseRouter } from "@/vitest.setup"
+
+vi.mock("next/navigation", () => ({
+  usePathname: vi.fn(),
+  useRouter: vi.fn(() => mockUseRouter),
+}))
 
 vi.mock("next/image", () => ({
   __esModule: true,
@@ -17,20 +22,15 @@ vi.mock("next/image", () => ({
   },
 }))
 
-vi.mock("next-auth/react", () => ({
-  signOut: vi.fn(),
-}))
-
 vi.mock("react-redux", () => ({
   useDispatch: vi.fn(),
 }))
 
-vi.mock("@/hooks/useSessionData", () => ({
-  useSessionData: vi.fn(),
-}))
-
-vi.mock("@/lib/email", () => ({
-  sendEmail: vi.fn().mockResolvedValue({ success: true }),
+vi.mock("@/lib/auth-client", () => ({
+  authClient: {
+    signOut: vi.fn(),
+    useSession: vi.fn(),
+  },
 }))
 
 vi.mock("@/lib/hooks", () => ({
@@ -42,7 +42,7 @@ describe("Sidebar Component", () => {
 
   beforeEach(() => {
     vi.mocked(useDispatch).mockReturnValue(mockDispatch)
-    vi.mocked(useSessionData).mockReturnValue(mockAuthenticatedSession)
+    vi.mocked(authClient.useSession).mockReturnValue(mockSession)
   })
 
   afterEach(() => {
@@ -51,6 +51,7 @@ describe("Sidebar Component", () => {
 
   it("should render the sidebar in collapsed state initially", () => {
     render(<Sidebar />)
+
     expect(screen.getByLabelText("Expand sidebar")).toBeInTheDocument()
     expect(screen.queryByText("John Doe")).not.toBeInTheDocument()
   })
@@ -74,6 +75,6 @@ describe("Sidebar Component", () => {
     fireEvent.click(signOutButton)
 
     expect(mockDispatch).toHaveBeenCalled()
-    expect(signOut).toHaveBeenCalled()
+    expect(authClient.signOut).toHaveBeenCalled()
   })
 })

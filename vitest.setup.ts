@@ -1,6 +1,6 @@
 import "@testing-library/jest-dom"
 
-export const mockRouter = {
+export const mockUseRouter = {
   back: vi.fn(),
   forward: vi.fn(),
   refresh: vi.fn(),
@@ -9,8 +9,18 @@ export const mockRouter = {
   prefetch: vi.fn(),
 }
 
-export const mockFormInitialState = {
-  success: false,
-  message: "",
-  error: {},
+export const mockUseSearchParams = {
+  get: vi.fn(),
+  getAll: vi.fn(),
+  has: vi.fn(),
+  toString: vi.fn(),
+  keys: vi.fn(),
+  values: vi.fn(),
+  entries: vi.fn(),
+  forEach: vi.fn(),
+  append: vi.fn(),
+  delete: vi.fn(),
+  set: vi.fn(),
+  sort: vi.fn(),
+  [Symbol.iterator]: vi.fn(),
 }

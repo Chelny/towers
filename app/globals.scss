@@ -13,61 +13,64 @@
   --border-radius: 0.25rem;
 }
 
+@layer base {
+  html {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+  }
+
+  // a,
+  .towers-link {
+    @apply text-blue-600 underline hover:text-blue-800 visited:text-purple-600;
+  }
+}
+
 *,
 *::before,
 *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+  @apply p-0 m-0 box-border;
 }
 
 html,
 body {
-  height: 100%;
+  @apply h-full;
 }
 
 body {
-  overflow-x: hidden;
-  background-color: #f0f0f0;
-  font-family: Verdana, Arial, Helvetica, sans-serif;
-  font-size: 16px;
-  font-variant: tabular-nums;
+  @apply overflow-x-hidden bg-gray-100 text-base tabular-nums;
 }
 
 ::-webkit-scrollbar {
-  width: 1rem;
+  @apply w-3;
 }
 
 ::-webkit-scrollbar-track {
-  background: url("/images/scrollbar-track.png") repeat;
   image-rendering: pixelated;
+
+  @apply bg-[url("/images/scrollbar-track.png")] bg-repeat;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #bbb;
+  @apply bg-zinc-300;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #aaa;
+  @apply bg-zinc-400;
+}
+
+::selection {
+  @apply bg-slate-400 text-white;
 }
 
 dialog::backdrop {
-  background: rgb(0 0 0 / 25%);
+  @apply bg-black opacity-25;
 }
 
 .small-screen-warning {
-  display: flex;
+  @apply flex;
 }
 
 @media (min-width: 1350px) and (min-height: 768px) {
   .small-screen-warning {
-    display: none;
-  }
-}
-
-@layer base {
-  // a,
-  .towers-link {
-    @apply text-blue-600 underline hover:text-blue-800 visited:text-purple-600;
+    @apply hidden;
   }
 }

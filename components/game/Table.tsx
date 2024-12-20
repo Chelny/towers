@@ -13,9 +13,9 @@ import {
   useRef,
   useState,
 } from "react"
-import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime"
 import dynamic from "next/dynamic"
 import { useRouter } from "next/navigation"
+import { createId } from "@paralleldrive/cuid2"
 import {
   ITowersRoom,
   ITowersTable,
@@ -28,7 +28,6 @@ import {
 import { Type } from "@sinclair/typebox"
 import { Value, ValueError } from "@sinclair/typebox/value"
 import clsx from "clsx/lite"
-import { v4 as uuidv4 } from "uuid"
 import ServerMessage from "@/components/game/ServerMessage"
 import TableBootUser from "@/components/game/TableBootUser"
 import TableInviteUser from "@/components/game/TableInviteUser"
@@ -41,7 +40,7 @@ import Checkbox from "@/components/ui/Checkbox"
 import Select from "@/components/ui/Select"
 import { CHAT_MESSSAGE_MAX_LENGTH } from "@/constants/game"
 import { ROUTE_TOWERS } from "@/constants/routes"
-import { useSessionData } from "@/hooks/useSessionData"
+import { authClient } from "@/lib/auth-client"
 import { useAppDispatch, useAppSelector } from "@/lib/hooks"
 import { addLinks, removeLink } from "@/redux/features/sidebar-slice"
 import {
@@ -108,8 +107,8 @@ const areEqual = (prevProps: TableProps, nextProps: TableProps): boolean => {
 }
 
 export default memo(function Table({ roomId, tableId }: TableProps): ReactNode {
-  const router: AppRouterInstance = useRouter()
-  const { data: session } = useSessionData()
+  const router = useRouter()
+  const { data: session, isPending, error } = authClient.useSession()
   const isConnected: boolean = useAppSelector((state: RootState) => state.socket.isConnected)
   const roomInfo: ITowersRoom | null = useAppSelector((state: RootState) => selectRoomInfo(state, roomId))
   const isJoinedTable: boolean = useAppSelector((state: RootState) => selectTableIsJoined(state, roomId, tableId))
@@ -634,7 +633,7 @@ export default memo(function Table({ roomId, tableId }: TableProps): ReactNode {
       </form>
 
       <TableInviteUser
-        key={uuidv4()}
+        key={createId()}
         isOpen={isInviteUserModalOpen}
         users={roomUsersInvite}
         isRatingsVisible={roomInfo && roomInfo?.difficulty !== RoomLevel.SOCIAL}
@@ -642,7 +641,7 @@ export default memo(function Table({ roomId, tableId }: TableProps): ReactNode {
       />
 
       <TableBootUser
-        key={uuidv4()}
+        key={createId()}
         isOpen={isBootUserModalOpen}
         users={tableUsersBoot}
         isRatingsVisible={roomInfo && roomInfo?.difficulty !== RoomLevel.SOCIAL}

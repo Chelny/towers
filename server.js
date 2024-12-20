@@ -9,23 +9,8 @@ const dev = process.env.NODE_ENV !== "production"
 const protocol = process.env.PROTOCOL
 const hostname = process.env.HOSTNAME
 const port = parseInt(process.env.PORT, 10)
-const app = next({ dev, hostname, port })
+const app = next({ dev, hostname, port, turbopack: true })
 const handler = app.getRequestHandler()
-
-const getLocalIpAddress = () => {
-  const interfaces = os.networkInterfaces()
-
-  for (const name of Object.keys(interfaces)) {
-    for (const iface of interfaces[name]) {
-      // Skip over internal (i.e. 127.0.0.1) and non-IPv4 addresses
-      if (iface.family === "IPv4" && !iface.internal) {
-        return iface.address
-      }
-    }
-  }
-
-  return "localhost"
-}
 
 app.prepare().then(async () => {
   const httpServer = createServer(handler)
@@ -34,11 +19,11 @@ app.prepare().then(async () => {
       // The backup duration of the sessions and the packets
       maxDisconnectionDuration: 2 * 60 * 1000, // 2 minutes
       // Whether to skip middlewares upon successful recovery
-      skipMiddlewares: true
-    }
+      skipMiddlewares: true,
+    },
   })
 
-  io.use((socket, next) => {
+  io.use(async (socket, next) => {
     const session = socket.handshake.auth.session
 
     if (session) {
@@ -237,7 +222,7 @@ app.prepare().then(async () => {
           session,
           message,
           type,
-          privateToUserId
+          privateToUserId,
         })
 
         io.to(tableId).emit("[table] receive new chat message", { roomId, tableId, message: chatResponse.data.data })
@@ -270,19 +255,34 @@ app.prepare().then(async () => {
   })
 
   // Scheduler
-  const runScheduler = async () => {
-    try {
-      await axios.post(
-        `${process.env.BASE_URL}/api/services/scheduler`,
-        {
-          headers: {
-            "Content-Type": "application/json"
-          }
+  // const runScheduler = async () => {
+  //   try {
+  //     await axios.post(
+  //       `${process.env.BASE_URL}/api/services/scheduler`,
+  //       {
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //       },
+  //     )
+  //   } catch (error) {
+  //     console.error(error)
+  //   }
+  // }
+
+  const getLocalIpAddress = () => {
+    const interfaces = os.networkInterfaces()
+
+    for (const name of Object.keys(interfaces)) {
+      for (const iface of interfaces[name]) {
+        // Skip over internal (i.e. 127.0.0.1) and non-IPv4 addresses
+        if (iface.family === "IPv4" && !iface.internal) {
+          return iface.address
         }
-      )
-    } catch (error) {
-      console.error(error)
+      }
     }
+
+    return "localhost"
   }
 
   httpServer
@@ -294,6 +294,6 @@ app.prepare().then(async () => {
       const localIp = getLocalIpAddress()
       console.info(`> Ready on \x1b[34m${protocol}://${hostname}:${port}\x1b[0m`)
       if (dev) console.info(`> Accessible locally at \x1b[34m${protocol}://${localIp}:${port}\x1b[0m`)
-      runScheduler()
+      // runScheduler()
     })
 })

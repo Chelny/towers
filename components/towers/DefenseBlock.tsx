@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react"
+import { ReactNode } from "react"
 import { TowersLetter } from "@/interfaces/game"
 import styles from "./Block.module.scss"
 

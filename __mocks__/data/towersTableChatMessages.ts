@@ -1,3 +1,4 @@
+import { createId } from "@paralleldrive/cuid2"
 import { TableChatMessageType, TowersTableChatMessage } from "@prisma/client"
 import { mockRoom1Table1 } from "@/__mocks__/data/tables"
 import {
@@ -7,7 +8,7 @@ import {
 import { mockUser1, mockUser2 } from "@/__mocks__/data/users"
 
 export const mockRoom1Table1TowersChatMessage1: TowersTableChatMessage = {
-  id: "1effe75e-e637-4110-b276-4bd9954128ee",
+  id: createId(),
   tableId: mockRoom1Table1.id,
   userProfileId: mockRoom1Table1TowersUserProfile1.id,
   message: `*** ${mockUser1.username} joined the table.`,
@@ -18,7 +19,7 @@ export const mockRoom1Table1TowersChatMessage1: TowersTableChatMessage = {
 }
 
 export const mockRoom1Table1TowersChatMessage2: TowersTableChatMessage = {
-  id: "1f014cfd-015c-4a60-803a-53344532abf9",
+  id: createId(),
   tableId: mockRoom1Table1.id,
   userProfileId: mockRoom1Table1TowersUserProfile2.id,
   message: "*** T ==> 9",
@@ -29,7 +30,7 @@ export const mockRoom1Table1TowersChatMessage2: TowersTableChatMessage = {
 }
 
 export const mockRoom1Table1TowersChatMessage3: TowersTableChatMessage = {
-  id: "36293139-3493-4db1-a393-4301789f3d89",
+  id: createId(),
   tableId: mockRoom1Table1.id,
   userProfileId: mockRoom1Table1TowersUserProfile2.id,
   message: "Hey!",
@@ -40,7 +41,7 @@ export const mockRoom1Table1TowersChatMessage3: TowersTableChatMessage = {
 }
 
 export const mockRoom1Table1TowersChatMessage4: TowersTableChatMessage = {
-  id: "418ec943-e620-4ff9-9d26-37ead4c5e9ae",
+  id: createId(),
   tableId: mockRoom1Table1.id,
   userProfileId: mockRoom1Table1TowersUserProfile2.id,
   message: "Wazzup?",
@@ -51,7 +52,7 @@ export const mockRoom1Table1TowersChatMessage4: TowersTableChatMessage = {
 }
 
 export const mockRoom1Table1TowersChatMessage5: TowersTableChatMessage = {
-  id: "e77ee20a-094c-42e3-b1ee-a167317778c5",
+  id: createId(),
   tableId: mockRoom1Table1.id,
   userProfileId: mockRoom1Table1TowersUserProfile1.id,
   message: `*** ${mockUser1.username}’s old rating: 2050; new rating: 2040`,
@@ -62,7 +63,7 @@ export const mockRoom1Table1TowersChatMessage5: TowersTableChatMessage = {
 }
 
 export const mockRoom1Table1TowersChatMessage6: TowersTableChatMessage = {
-  id: "2082a4d5-c281-44e8-b75b-38a2ca60591c",
+  id: createId(),
   tableId: mockRoom1Table1.id,
   userProfileId: mockRoom1Table1TowersUserProfile1.id,
   message:
@@ -74,7 +75,7 @@ export const mockRoom1Table1TowersChatMessage6: TowersTableChatMessage = {
 }
 
 export const mockRoom1Table1TowersChatMessage7: TowersTableChatMessage = {
-  id: "11160e3c-4e83-4917-b7c0-1097bcdc942c",
+  id: createId(),
   tableId: mockRoom1Table1.id,
   userProfileId: mockRoom1Table1TowersUserProfile1.id,
   message: "*** Only people you have invited may play now.",
@@ -85,7 +86,7 @@ export const mockRoom1Table1TowersChatMessage7: TowersTableChatMessage = {
 }
 
 export const mockRoom1Table1TowersChatMessage8: TowersTableChatMessage = {
-  id: "cdcba5b2-8d01-4166-ae48-ef4bd61c4366",
+  id: createId(),
   tableId: mockRoom1Table1.id,
   userProfileId: mockRoom1Table1TowersUserProfile1.id,
   message: "*** V ==> M",
@@ -96,7 +97,7 @@ export const mockRoom1Table1TowersChatMessage8: TowersTableChatMessage = {
 }
 
 export const mockRoom1Table1TowersChatMessage9: TowersTableChatMessage = {
-  id: "38b8c715-5310-493d-8b94-339bd163e653",
+  id: createId(),
   tableId: mockRoom1Table1.id,
   userProfileId: mockRoom1Table1TowersUserProfile1.id,
   message: "2FKK 2OF W1VAM2FO 91MO 8EWOF2 NF9 7HW3FE",

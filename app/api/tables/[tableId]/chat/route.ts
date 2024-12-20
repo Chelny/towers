@@ -1,11 +1,12 @@
+import { headers } from "next/headers"
 import { NextRequest, NextResponse } from "next/server"
 import { TowersTableChatMessage, TowersUserProfile } from "@prisma/client"
 import DOMPurify from "isomorphic-dompurify"
-import { Session } from "next-auth"
-import { auth } from "@/auth"
+import { updateUserLastActiveAt } from "@/data/user"
 import { getPrismaError, missingTableIdResponse, unauthorized } from "@/lib/api"
+import { auth } from "@/lib/auth"
+import { Session } from "@/lib/auth-client"
 import prisma from "@/lib/prisma"
-import { updateLastActiveAt } from "@/lib/user"
 
 type Params = Promise<{ tableId: string }>
 
@@ -16,7 +17,7 @@ export async function GET(request: NextRequest, segmentData: { params: Params })
   const searchParams: URLSearchParams = request.nextUrl.searchParams
   const userId: string | null = searchParams.get("userId")
 
-  const session: Session | null = await auth()
+  const session: Session | null = await auth.api.getSession({ headers: await headers() })
   if (!session) return unauthorized()
 
   try {
@@ -91,7 +92,7 @@ export async function POST(request: NextRequest, segmentData: { params: Params }
   const { tableId } = await segmentData.params
   if (!tableId) return missingTableIdResponse()
 
-  const session: Session | null = body.session
+  const session: Session | null = await auth.api.getSession({ headers: await headers() })
   if (!session) return unauthorized()
 
   try {
@@ -138,7 +139,7 @@ export async function POST(request: NextRequest, segmentData: { params: Params }
       },
     })
 
-    await updateLastActiveAt(session.user.id)
+    await updateUserLastActiveAt(session.user.id)
 
     return NextResponse.json(
       {

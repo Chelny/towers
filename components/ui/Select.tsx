@@ -1,6 +1,6 @@
 "use client"
 
-import React, {
+import {
   KeyboardEvent,
   PropsWithChildren,
   ReactElement,
@@ -10,6 +10,7 @@ import React, {
   useRef,
   useState,
 } from "react"
+import React from "react"
 import clsx from "clsx/lite"
 import { PiCaretDownDuotone, PiCaretDownFill } from "react-icons/pi"
 

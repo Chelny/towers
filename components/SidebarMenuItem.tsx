@@ -1,6 +1,6 @@
 "use client"
 
-import { PropsWithChildren, ReactNode, useState } from "react"
+import { PropsWithChildren, ReactNode, useEffect, useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import clsx from "clsx/lite"
@@ -32,6 +32,7 @@ export default function SidebarMenuItem({
   onClick,
 }: SidebarMenuItemProps): ReactNode {
   const pathname: string = usePathname()
+  const [hasMounted, setHasMounted] = useState<boolean>(false)
   const [isAccordionOpen, setAccordionOpen] = useState<boolean>(false)
 
   const handleClick = (): void => {
@@ -46,6 +47,10 @@ export default function SidebarMenuItem({
       onClick?.()
     }
   }
+
+  useEffect(() => {
+    setHasMounted(true)
+  }, [])
 
   return (
     <div
@@ -94,7 +99,7 @@ export default function SidebarMenuItem({
             "disabled:opacity-50 disabled:cursor-not-allowed",
             isExpanded && accordionLinks.some((link: AccordionLink) => pathname?.includes(link.href)) && "bg-slate-600",
           )}
-          disabled={disabled}
+          disabled={hasMounted ? disabled : false}
           aria-label={ariaLabel}
           onClick={handleClick}
         >

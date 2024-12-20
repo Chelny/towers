@@ -1,7 +1,7 @@
 "use client"
 
-import { Session } from "next-auth"
 import { io, Socket } from "socket.io-client"
+import { Session } from "@/lib/auth-client"
 
 export interface SocketInterface {
   socket: Socket
@@ -18,7 +18,7 @@ class SocketConnection implements SocketInterface {
     return this._socket
   }
 
-  public async initialize(session: Session | null): Promise<void> {
+  public async initialize(session: Session): Promise<void> {
     if (session) {
       this._socket = io({
         auth: { session },
@@ -41,7 +41,7 @@ class SocketConnection implements SocketInterface {
 let socketConnection: SocketConnection | null
 
 export class SocketFactory {
-  public static async create(session: Session | null): Promise<SocketConnection> {
+  public static async create(session: Session): Promise<SocketConnection> {
     if (!socketConnection) {
       socketConnection = new SocketConnection()
       await socketConnection.initialize(session)

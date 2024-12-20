@@ -2,12 +2,12 @@
 
 import { ReactNode } from "react"
 import Image from "next/image"
-import { useSessionData } from "@/hooks/useSessionData"
+import { authClient } from "@/lib/auth-client"
 
 export default function UserAvatar(): ReactNode {
-  const { data: session, status } = useSessionData()
+  const { data: session, isPending } = authClient.useSession()
 
-  if (!session || status === "loading") {
+  if (!session || isPending) {
     return (
       <div className="w-10 h-10 rounded-md bg-zinc-400">
         <Image

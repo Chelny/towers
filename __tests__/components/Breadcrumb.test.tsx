@@ -28,10 +28,10 @@ describe("Breadcrumb Component", () => {
   })
 
   it("should format breadcrumb links correctly with hyphenated names", () => {
-    vi.mocked(usePathname).mockReturnValue("/account/update-password")
+    vi.mocked(usePathname).mockReturnValue("/account/change-password")
 
     render(<Breadcrumb />)
 
-    expect(screen.getByText("Update Password")).toBeInTheDocument()
+    expect(screen.getByText("Change Password")).toBeInTheDocument()
   })
 })

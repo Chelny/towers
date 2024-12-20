@@ -1,7 +1,6 @@
 "use client"
 
 import { ReactNode } from "react"
-import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime"
 import { useRouter } from "next/navigation"
 import { ITowersTable, ITowersUserRoomTable, TableType } from "@prisma/client"
 import Button from "@/components/ui/Button"
@@ -16,7 +15,7 @@ type RoomTableProps = {
 }
 
 export default function RoomTable({ roomId, tableId }: RoomTableProps): ReactNode {
-  const router: AppRouterInstance = useRouter()
+  const router = useRouter()
   const isRoomTablesLoading: boolean = useAppSelector((state: RootState) => selectIsRoomTablesLoading(state, roomId))
   const tableInfo: ITowersTable | null = useAppSelector((state: RootState) => selectTableInfo(state, roomId, tableId))
   const tableUsers: ITowersUserRoomTable[] = useAppSelector((state: RootState) =>

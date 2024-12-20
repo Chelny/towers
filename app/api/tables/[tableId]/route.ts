@@ -1,8 +1,9 @@
+import { headers } from "next/headers"
 import { NextRequest, NextResponse } from "next/server"
 import { TowersTable } from "@prisma/client"
-import { Session } from "next-auth"
-import { auth } from "@/auth"
 import { getPrismaError, missingTableIdResponse, unauthorized } from "@/lib/api"
+import { auth } from "@/lib/auth"
+import { Session } from "@/lib/auth-client"
 import prisma from "@/lib/prisma"
 
 type Params = Promise<{ tableId: string }>
@@ -56,7 +57,7 @@ export async function PATCH(request: NextRequest, segmentData: { params: Params 
   const { tableId } = await segmentData.params
   if (!tableId) return missingTableIdResponse()
 
-  const session: Session | null = await auth()
+  const session: Session | null = await auth.api.getSession({ headers: await headers() })
   if (!session) return unauthorized()
 
   try {

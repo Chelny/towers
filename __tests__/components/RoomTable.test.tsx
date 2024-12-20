@@ -7,10 +7,10 @@ import {
   mockStoreReducers,
   mockTowersTableState11Info,
 } from "@/__mocks__/data/socketState"
-import { mockAuthenticatedSession } from "@/__mocks__/data/users"
+import { mockSession } from "@/__mocks__/data/users"
 import RoomTable from "@/components/game/RoomTable"
 import { ROUTE_TOWERS } from "@/constants/routes"
-import { useSessionData } from "@/hooks/useSessionData"
+import { authClient } from "@/lib/auth-client"
 import { useAppDispatch, useAppSelector } from "@/lib/hooks"
 import { RootState } from "@/redux/store"
 
@@ -32,8 +32,10 @@ vi.mock("next/navigation", async () => {
   }
 })
 
-vi.mock("@/hooks/useSessionData", () => ({
-  useSessionData: vi.fn(),
+vi.mock("@/lib/auth-client", () => ({
+  authClient: {
+    useSession: vi.fn(),
+  },
 }))
 
 vi.mock("@/lib/hooks", () => ({
@@ -50,7 +52,7 @@ describe("RoomTable Component", () => {
 
   beforeEach(() => {
     vi.mocked(useAppDispatch).mockReturnValue(mockAppDispatch)
-    vi.mocked(useSessionData).mockReturnValue(mockAuthenticatedSession)
+    vi.mocked(authClient.useSession).mockReturnValue(mockSession)
     vi.mocked(useAppSelector).mockImplementation((selectorFn: (state: RootState) => unknown) => {
       const mockState = {
         ...mockStoreReducers,

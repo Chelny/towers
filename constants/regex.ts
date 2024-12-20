@@ -27,10 +27,10 @@ export const USERNAME_PATTERN = /^(?=[a-zA-Z0-9._]{4,32}$)(?!.*[_.]{2})[^_.].*[^
 
 /**
  * Password Pattern
- * - Password must be at least 8 characters long
+ * - Password must be between 8 and 32 characters long
  * - Must contain at least one digit
  * - Must contain at least one uppercase letter
  * - Must contain at least one special character (excluding whitespace, tab, newline and carriage return)
  */
 export const PASSWORD_PATTERN =
-  /^(?=.*[0-9])(?=.*[!"#$%&'()*+,-./:;<=>?@[\\\]^_`{|}~])(?=.*[A-Z])[a-zA-Z0-9!"#$%&'()*+,-./:;<=>?@[\\\]^_`{|}~]{8,}$/
+  /^(?=.*[0-9])(?=.*[!"#$%&'()*+,-./:;<=>?@[\\\]^_`{|}~])(?=.*[A-Z])[a-zA-Z0-9!"#$%&'()*+,-./:;<=>?@[\\\]^_`{|}~]{8,32}$/

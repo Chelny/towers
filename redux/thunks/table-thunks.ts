@@ -1,6 +1,6 @@
 import { ITowersTable, ITowersTableChatMessage, ITowersUserRoomTable } from "@prisma/client"
 import { createAsyncThunk } from "@reduxjs/toolkit"
-import { Session } from "next-auth"
+import { Session } from "@/lib/auth-client"
 import { fetchRoomUsers } from "@/redux/thunks/room-thunks"
 import { isAbortError } from "@/utils/http-utils"
 

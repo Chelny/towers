@@ -3,11 +3,14 @@
 import { ReactNode } from "react"
 import { usePathname } from "next/navigation"
 import Anchor from "@/components/ui/Anchor"
-import { ROUTE_HOME } from "@/constants/routes"
+import { ROUTE_ERROR, ROUTE_HOME } from "@/constants/routes"
 
 export default function Breadcrumb(): ReactNode {
   const pathname: string = usePathname()
   const pathSegments: string[] = pathname.split("/").filter((path: string) => path)
+
+  // Do not show breadcrumb on error page
+  if (pathname === ROUTE_ERROR.PATH) return null
 
   return (
     <nav className="mb-6" aria-label="breadcrumb">

@@ -1,3 +1,4 @@
+import { createId } from "@paralleldrive/cuid2"
 import { TableType, TowersTable } from "@prisma/client"
 import { configureStore } from "@reduxjs/toolkit"
 import { fireEvent, render, screen, waitFor } from "@testing-library/react"
@@ -6,11 +7,19 @@ import { Mock } from "vitest"
 import { mockRoom1 } from "@/__mocks__/data/rooms"
 import { mockSocketInitialState, mockSocketRoom1Id } from "@/__mocks__/data/socketState"
 import { mockRoom1Table1TowersUserProfile1 } from "@/__mocks__/data/towersUserProfiles"
+import { mockSession } from "@/__mocks__/data/users"
 import CreateTable from "@/components/game/CreateTable"
 import { SocketState } from "@/interfaces/socket"
+import { authClient } from "@/lib/auth-client"
 import socketReducer from "@/redux/features/socket-slice"
 
 vi.stubGlobal("fetch", vi.fn())
+
+vi.mock("@/lib/auth-client", () => ({
+  authClient: {
+    useSession: vi.fn(),
+  },
+}))
 
 const initialState: SocketState = {
   ...mockSocketInitialState,
@@ -31,6 +40,7 @@ describe("CreateTable Component", () => {
     HTMLDialogElement.prototype.showModal = vi.fn()
     HTMLDialogElement.prototype.close = vi.fn()
     HTMLElement.prototype.scrollIntoView = vi.fn()
+    vi.mocked(authClient.useSession).mockReturnValue(mockSession)
   })
 
   it("should render the modal with correct default values when opened", () => {
@@ -83,7 +93,7 @@ describe("CreateTable Component", () => {
     const handleCancel: Mock = vi.fn()
 
     const mockTable: TowersTable = {
-      id: "99567d42-01cd-4a08-aa1d-95e7734a400a",
+      id: createId(),
       roomId: mockRoom1.id,
       tableNumber: 4,
       hostId: mockRoom1Table1TowersUserProfile1.id,

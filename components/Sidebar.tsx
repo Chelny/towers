@@ -1,8 +1,8 @@
 "use client"
 
 import { ReactNode, useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 import clsx from "clsx/lite"
-import { signOut } from "next-auth/react"
 import { IoLanguage } from "react-icons/io5"
 import { LuGamepad2 } from "react-icons/lu"
 import { PiSignOut } from "react-icons/pi"
@@ -12,16 +12,17 @@ import { TbTower } from "react-icons/tb"
 import { useDispatch } from "react-redux"
 import SidebarMenuItem, { AccordionLink } from "@/components/SidebarMenuItem"
 import UserAvatar from "@/components/UserAvatar"
-import { ROUTE_CANCEL_ACCOUNT, ROUTE_PROFILE, ROUTE_TOWERS, ROUTE_UPDATE_PASSWORD } from "@/constants/routes"
-import { useSessionData } from "@/hooks/useSessionData"
+import { ROUTE_DELETE_ACCOUNT, ROUTE_HOME, ROUTE_PROFILE, ROUTE_TOWERS } from "@/constants/routes"
+import { authClient } from "@/lib/auth-client"
 import { useAppSelector } from "@/lib/hooks"
 import { destroySocket } from "@/redux/features/socket-slice"
 import { RootState } from "@/redux/store"
 
 export default function Sidebar(): ReactNode {
+  const router = useRouter()
   const [isExpanded, setIsExpanded] = useState<boolean>(false)
   const [isLinkTextVisible, setIsLinkTextVisible] = useState<boolean>(false)
-  const { data: session, status } = useSessionData()
+  const { data: session, isPending } = authClient.useSession()
   const dispatch = useDispatch()
   const gameAccordionLinks: AccordionLink[] = useAppSelector((state: RootState) => state.sidebar.gameLinks)
 
@@ -40,18 +41,20 @@ export default function Sidebar(): ReactNode {
   const getAccountAccordionLinks = (): AccordionLink[] => {
     const links: AccordionLink[] = [{ href: ROUTE_PROFILE.PATH, label: ROUTE_PROFILE.TITLE }]
 
-    if (session?.account) {
-      links.push({ href: ROUTE_UPDATE_PASSWORD.PATH, label: ROUTE_UPDATE_PASSWORD.TITLE })
-    }
-
-    links.push({ href: ROUTE_CANCEL_ACCOUNT.PATH, label: ROUTE_CANCEL_ACCOUNT.TITLE })
+    links.push({ href: ROUTE_DELETE_ACCOUNT.PATH, label: ROUTE_DELETE_ACCOUNT.TITLE })
 
     return links
   }
 
-  const handleSignOut = (): void => {
+  const handleSignOut = async (): Promise<void> => {
     dispatch(destroySocket())
-    signOut()
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          router.push(ROUTE_HOME.PATH)
+        },
+      },
+    })
   }
 
   return (
@@ -100,7 +103,7 @@ export default function Sidebar(): ReactNode {
           isExpanded={isExpanded}
           isLinkTextVisible={isLinkTextVisible}
           accordionLinks={getAccountAccordionLinks()}
-          disabled={status === "loading"}
+          disabled={isPending}
           onClick={() => setIsExpanded(true)}
         >
           Account
@@ -118,7 +121,7 @@ export default function Sidebar(): ReactNode {
             isExpanded={isExpanded}
             isLinkTextVisible={isLinkTextVisible}
             accordionLinks={gameAccordionLinks}
-            disabled={status === "loading"}
+            disabled={isPending}
             onClick={() => setIsExpanded(true)}
           >
             Towers

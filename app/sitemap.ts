@@ -12,7 +12,7 @@ import {
 } from "@/constants/routes"
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl: string = process.env.NEXT_PUBLIC_BASE_URL!
+  const baseUrl: string = process.env.BASE_URL!
 
   return [
     // High-priority routes

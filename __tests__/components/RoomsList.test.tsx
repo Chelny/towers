@@ -3,33 +3,22 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { Mock } from "vitest"
 import { mockRoom1, mockRoom2, mockRoom3 } from "@/__mocks__/data/rooms"
 import { mockSocketRoom3Id, mockSocketState, mockStoreReducers } from "@/__mocks__/data/socketState"
-import { mockAuthenticatedSession } from "@/__mocks__/data/users"
+import { mockSession } from "@/__mocks__/data/users"
 import RoomsList from "@/components/game/RoomsList"
 import { ROUTE_TOWERS } from "@/constants/routes"
-import { useSessionData } from "@/hooks/useSessionData"
+import { authClient } from "@/lib/auth-client"
 import { useAppDispatch, useAppSelector } from "@/lib/hooks"
 import { RootState } from "@/redux/store"
+import { mockUseRouter } from "@/vitest.setup"
 
-const { useRouter, mockRouterPush } = vi.hoisted(() => {
-  const mockRouterPush: Mock = vi.fn()
+vi.mock("next/navigation", () => ({
+  useRouter: vi.fn(() => mockUseRouter),
+}))
 
-  return {
-    useRouter: () => ({ push: mockRouterPush }),
-    mockRouterPush,
-  }
-})
-
-vi.mock("next/navigation", async () => {
-  const actual = await vi.importActual("next/navigation")
-
-  return {
-    ...actual,
-    useRouter,
-  }
-})
-
-vi.mock("@/hooks/useSessionData", () => ({
-  useSessionData: vi.fn(),
+vi.mock("@/lib/auth-client", () => ({
+  authClient: {
+    useSession: vi.fn(),
+  },
 }))
 
 vi.mock("@/lib/hooks", () => ({
@@ -60,7 +49,7 @@ describe("RoomsList Component", () => {
 
   beforeEach(() => {
     vi.mocked(useAppDispatch).mockReturnValue(mockAppDispatch)
-    vi.mocked(useSessionData).mockReturnValue(mockAuthenticatedSession)
+    vi.mocked(authClient.useSession).mockReturnValue(mockSession)
     vi.mocked(useAppSelector).mockImplementation((selectorFn: (state: RootState) => unknown) => {
       const mockState = {
         ...mockStoreReducers,
@@ -100,25 +89,25 @@ describe("RoomsList Component", () => {
     expect(buttons[1]).toBeDisabled()
   })
 
-  it("should navigate to the correct room when join button is clicked", async () => {
+  it("should navigate to the correct room when join button is clicked", () => {
     render(<RoomsList rooms={mockRooms} />)
 
     const buttons: HTMLButtonElement[] = screen.getAllByRole("button", { name: /Join/i })
     fireEvent.click(buttons[2])
 
-    await waitFor(() => {
-      expect(mockRouterPush).toHaveBeenCalledWith(`${ROUTE_TOWERS.PATH}?room=${mockSocketRoom3Id}`)
+    waitFor(() => {
+      expect(mockUseRouter).toHaveBeenCalledWith(`${ROUTE_TOWERS.PATH}?room=${mockSocketRoom3Id}`)
     })
   })
 
-  it("should not trigger navigation when join button is disabled", async () => {
+  it("should not trigger navigation when join button is disabled", () => {
     render(<RoomsList rooms={mockRooms} />)
 
     const buttons: HTMLButtonElement[] = screen.getAllByRole("button", { name: /Joined/i })
     fireEvent.click(buttons[0])
 
-    await waitFor(() => {
-      expect(mockRouterPush).not.toHaveBeenCalled()
+    waitFor(() => {
+      expect(mockUseRouter).not.toHaveBeenCalled()
     })
   })
 })

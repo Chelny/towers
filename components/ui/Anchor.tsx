@@ -5,11 +5,12 @@ import clsx from "clsx/lite"
 type AnchorProps = PropsWithChildren<{
   href: string
   className?: string
+  dataTestId?: string
 }>
 
-export default function Anchor({ children, href, className = "" }: AnchorProps): ReactNode {
+export default function Anchor({ children, href, className = "", dataTestId = undefined }: AnchorProps): ReactNode {
   return (
-    <Link href={href} className={clsx("towers-link", className)}>
+    <Link className={clsx("towers-link", className)} href={href} data-testid={dataTestId}>
       {children}
     </Link>
   )

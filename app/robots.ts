@@ -5,10 +5,17 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: "*",
-        disallow: ["/api/", "/account", "/games"],
+        disallow: [
+          "/apple-touch-icon-120x120.png",
+          "/apple-touch-icon-precomposed.png",
+          "/apple-touch-icon-120x120-precomposed.png",
+          "/api/",
+          "/account",
+          "/games",
+        ],
         allow: "/",
       },
     ],
-    sitemap: `${process.env.NEXT_PUBLIC_BASE_URL}/sitemap.xml`,
+    sitemap: `${process.env.BASE_URL}/sitemap.xml`,
   }
 }

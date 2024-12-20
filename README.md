@@ -83,14 +83,10 @@ This project is inspired by Yahoo! Towers but is an independent work. It is not 
 
 ### Prerequisites
 
-This is an example of how to list things you need to use the software and how to install them.
-
 - npm
   ```sh
   npm install npm@latest -g
   ```
-- Postgres: https://www.postgresql.org/download/ or use command line (<a href="#start-postgres-server">see below</a> for macOS)
-- pgAdmin (optional): https://www.pgadmin.org/download/ or you can use <a href="#browse-the-data-with-prisma-studio">Prisma Studio</a> locally
 
 ### Installation
 
@@ -108,25 +104,15 @@ This is an example of how to list things you need to use the software and how to
 
 1. Fill the environment file
 
-   On the root directory of the project, create a new file named `.env` then copy and paste the content of `.env.local.example`.
+   On the root directory of the project, create a new file named `.env` then copy and paste the content of `.env.example`.
 
    Steps:
 
-   - Change the DATABASE_URL (or the DATABASE_URL and DIRECT_DATABASE_URL if using [Prisma Accelerate](https://www.prisma.io/accelerate)) placeholders to your database info
-   - Generate an Auth.js auth secret key (`npx auth secret`)
-   - Register a OAuth application on Github and Google to get the client ID and secret
-   - Create an account at [resend.com](https://resend.com/) to test email sending functionality and get the API key from there
-
-1. <span id="start-postgres-server">Start Postgres server</span>
-
-   macOS:
-
-   ```sh
-    brew install postgresql # Install PostgreSQL using Homebrew
-    brew services start postgresql # Start PostgreSQL as a background service
-    brew services restart postgresql # Restart PostgreSQL service
-    brew services stop postgresql # Stop PostgreSQL service
-   ```
+   - Change the `DATABASE_URL` (or the `DATABASE_URL` and `DIRECT_DATABASE_URL` if using [Prisma Accelerate](https://www.prisma.io/accelerate)) placeholders with your database info
+   - Generate a secret key for `BETTER_AUTH_SECRET` (command: `openssl rand -base64 32`)
+   - Register OAuth applications on providers websites to get the client ID and client secret
+   - Create an account at [resend.com](https://resend.com/) to test the email sending functionality and get the API key (`RESEND_API_KEY`) from there
+   - Get Google Analytics ID for `GOOGLE_ANALYTICS`
 
 1. Push Prisma schema to database
 
@@ -150,14 +136,6 @@ This is an example of how to list things you need to use the software and how to
 
    This command starts the development server, allowing you to access your application locally at http://localhost:3000.
 
-1. <span id="browse-the-data-with-prisma-studio">Browse the data</span>
-
-   ```sh
-   npm run prisma:studio
-   ```
-
-   This command opens Prisma Studio, a visual interface for exploring and managing your data. Use it to inspect the data in your database at http://localhost:5555.
-
 <p align="end">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- USAGE -->
@@ -173,17 +151,18 @@ _TODO_
 ## Roadmap
 
 - General
-  - [ ] Add Recaptcha
-  - [ ] Use database-based session
   - [ ] Add Terms and Conditions and Privacy Policy links in `/sign-in` page
   - [ ] Multi-language Support
     - [ ] French
-  - [ ] Implement rate limit (429 - Too Many Requests)
-  - [ ] Add analytics
+  - [ ] Redirect new user that signs up with OAuth to /new-user
+  - [ ] Fix delete user redirection from confirmation link
+  - [ ] Fix passkeys (sign-in and profile) - Known issue: Will be fixed in 1.1.x
+  - [ ] Add OTP (email and phone)
+  - [x] Add analytics
+  - [ ] Add tooltip
+  - [ ] Add toast
 - User
   - [ ] Add predefined avatars or allow users to upload their avatar
-  - [ ] Add sign-in with passkey (currently experimental)
-  - [ ] Double-check account deletion date (timezone) in email
   - [ ] Prevent user from accessing their account while in a game room (show prompt on click)
 - Room
   - [ ] Prevent users from accessing a room directly by its URL (e.g., full rooms)
@@ -224,8 +203,8 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 ## Contact
 
 [![Bluesky](https://img.shields.io/badge/Bluesky-1185FE?style=for-the-badge)](https://bsky.app/profile/chelny.bsky.social)
-[![Twitter](https://img.shields.io/badge/Twitter-1DA1F2?style=for-the-badge&logo=twitter&logoColor=white)](https://twitter.com/Chelny)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://linkedin.com/in/chelny)
+[![Twitter](https://img.shields.io/badge/Twitter-1DA1F2?style=for-the-badge&logo=twitter&logoColor=white)](https://twitter.com/Chelny)
 
 <p align="end">(<a href="#readme-top">back to top</a>)</p>
 

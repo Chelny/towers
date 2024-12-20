@@ -9,12 +9,10 @@ declare global {
 
   type ApiResponse<T = unknown> = {
     success: boolean
-    message?: string
+    message: string
     data?: T
     error?: string | FormValidationErrors
   }
-
-  type Debounce = (this: any, ...args: any[]) => void
 
   type NonNullableObject<T> = {
     [K in keyof T as T[K] extends null | undefined ? never : K]: T[K]

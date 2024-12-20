@@ -46,4 +46,21 @@ describe("Input Component", () => {
     const input: HTMLInputElement = screen.getByLabelText("Username")
     expect(input).toBeDisabled()
   })
+
+  it("should toggle password visibility when the eye icon is clicked", () => {
+    render(<Input type="password" id="test-password" label="Password" required />)
+
+    const input: HTMLInputElement = screen.getByLabelText("Password")
+    const toggleButton: HTMLButtonElement = screen.getByRole("button", { name: /show password/i })
+
+    expect(input).toHaveAttribute("type", "password")
+
+    fireEvent.click(toggleButton)
+
+    expect(input).toHaveAttribute("type", "text")
+
+    fireEvent.click(toggleButton)
+
+    expect(input).toHaveAttribute("type", "password")
+  })
 })

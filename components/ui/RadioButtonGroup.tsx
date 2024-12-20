@@ -48,7 +48,6 @@ export default function RadioButtonGroup({
       aria-describedby={description ? `${id}Description` : undefined}
       aria-required={required}
       aria-invalid={errorMessage ? "true" : "false"}
-      aria-disabled={disabled}
       aria-errormessage={errorMessage ? `${id}ErrorMessage` : undefined}
       data-testid={dataTestId}
     >

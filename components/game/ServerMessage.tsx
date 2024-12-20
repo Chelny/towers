@@ -2,7 +2,7 @@
 
 import { ReactNode, useEffect, useState } from "react"
 import AlertMessage from "@/components/ui/AlertMessage"
-import { useSessionData } from "@/hooks/useSessionData"
+import { authClient } from "@/lib/auth-client"
 import { useAppSelector } from "@/lib/hooks"
 import { RootState } from "@/redux/store"
 
@@ -12,7 +12,7 @@ type ServerMessageProps = {
 }
 
 export default function ServerMessage({ roomId, tableId }: ServerMessageProps): ReactNode {
-  const { data: session, status } = useSessionData()
+  const { data: session, isPending } = authClient.useSession()
   const isConnected: boolean = useAppSelector((state: RootState) => state.socket.isConnected)
   const errorMessage: string | null = useAppSelector((state: RootState) => {
     if (state.socket.errorMessage) {
@@ -28,14 +28,14 @@ export default function ServerMessage({ roomId, tableId }: ServerMessageProps): 
   const [isInitialized, setIsInitialized] = useState<boolean>(false)
 
   useEffect(() => {
-    if (status !== "loading") {
+    if (!isPending) {
       const timer: NodeJS.Timeout = setTimeout(() => {
         setIsInitialized(true)
       }, 1000)
 
       return () => clearTimeout(timer)
     }
-  }, [status])
+  }, [session])
 
   if (!isInitialized) {
     return null
@@ -46,11 +46,11 @@ export default function ServerMessage({ roomId, tableId }: ServerMessageProps): 
       return <AlertMessage type="error">{errorMessage}</AlertMessage>
     }
 
-    if (status === "unauthenticated") {
+    if (!isPending && !session) {
       return <AlertMessage type="error">You are not logged in</AlertMessage>
     }
 
-    if (status === "authenticated") {
+    if (!isPending && session) {
       return <AlertMessage type="info">Connected to the game as {session?.user.username}</AlertMessage>
     }
   } else {

@@ -1,8 +1,9 @@
+import { createId } from "@paralleldrive/cuid2"
 import { TowersUserProfile } from "@prisma/client"
 import { mockUser1, mockUser2, mockUser3, mockUser4, mockUser5 } from "@/__mocks__/data/users"
 
 export const mockRoom1Table1TowersUserProfile1: TowersUserProfile = {
-  id: "b96a633f-5945-44b2-8075-696a6d09fec2",
+  id: createId(),
   userId: mockUser1.id,
   rating: 4159,
   gamesCompleted: 81,
@@ -14,7 +15,7 @@ export const mockRoom1Table1TowersUserProfile1: TowersUserProfile = {
 }
 
 export const mockRoom1Table1TowersUserProfile2: TowersUserProfile = {
-  id: "d5850073-736a-4078-af51-73c40fa5eba2",
+  id: createId(),
   userId: mockUser2.id,
   rating: 1897,
   gamesCompleted: 97,
@@ -26,7 +27,7 @@ export const mockRoom1Table1TowersUserProfile2: TowersUserProfile = {
 }
 
 export const mockRoom1Table1TowersUserProfile3: TowersUserProfile = {
-  id: "3f813c7c-0599-4bee-a641-403a11b32ce8",
+  id: createId(),
   userId: mockUser3.id,
   rating: 3677,
   gamesCompleted: 96,
@@ -38,7 +39,7 @@ export const mockRoom1Table1TowersUserProfile3: TowersUserProfile = {
 }
 
 export const mockRoom1Table1TowersUserProfile4: TowersUserProfile = {
-  id: "fb12d58f-3123-4f28-bf50-5d34864fbc76",
+  id: createId(),
   userId: mockUser4.id,
   rating: 1785,
   gamesCompleted: 67,
@@ -50,7 +51,7 @@ export const mockRoom1Table1TowersUserProfile4: TowersUserProfile = {
 }
 
 export const mockRoom1Table1TowersUserProfile5: TowersUserProfile = {
-  id: "b797a2ee-c904-4f32-a8a8-69669fd428fd",
+  id: createId(),
   userId: mockUser5.id,
   rating: 2166,
   gamesCompleted: 38,

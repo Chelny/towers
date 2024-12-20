@@ -1,139 +1,173 @@
 "use client"
 
-import { ClipboardEvent, ReactNode, useActionState, useEffect, useState } from "react"
+import { FormEvent, ReactNode, useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { Account, User, UserStatus } from "@prisma/client"
-import axios from "axios"
-import { IoWarning } from "react-icons/io5"
-import { profile } from "@/app/(protected)/account/profile/profile.actions"
-import { ProfileFormValidationErrors } from "@/app/(protected)/account/profile/profile.schema"
+import { Value, ValueError } from "@sinclair/typebox/value"
+import {
+  ProfileFormValidationErrors,
+  ProfilePayload,
+  profileSchema,
+} from "@/app/(protected)/account/profile/profile.schema"
 import AlertMessage from "@/components/ui/AlertMessage"
 import Button from "@/components/ui/Button"
 import Calendar from "@/components/ui/Calendar"
 import Input from "@/components/ui/Input"
+import { INITIAL_FORM_STATE } from "@/constants/api"
 import { ROUTE_TOWERS } from "@/constants/routes"
-import { useSessionData } from "@/hooks/useSessionData"
+import { authClient } from "@/lib/auth-client"
+import { Session } from "@/lib/auth-client"
 
-type ProfileProps = {
-  user: (Partial<User> & { accounts: Partial<Account>[] }) | null
-  isNewUser?: boolean
+type ProfileFormProps = {
+  session: Session | null
 }
 
-const initialState = {
-  success: false,
-  message: "",
-  error: {} as ProfileFormValidationErrors,
-}
-
-export function ProfileForm({ user, isNewUser }: ProfileProps): ReactNode {
+export function ProfileForm({ session }: ProfileFormProps): ReactNode {
   const router = useRouter()
-  const [state, formAction, isPending] = useActionState<ApiResponse<User>, FormData>(profile, initialState)
-  const { update } = useSessionData()
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [formState, setFormState] = useState<ApiResponse>(INITIAL_FORM_STATE)
   const [isNewUserSuccess, setIsNewUserSuccess] = useState<boolean>(false)
+  const isNewUser: boolean = !session?.user.username
+
+  const handleUpdateUser = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
+    event.preventDefault()
+
+    const formData: FormData = new FormData(event.currentTarget)
+    const payload: ProfilePayload = {
+      name: formData.get("name") as string,
+      birthdate: formData.get("birthdate") as string,
+      username: formData.get("username") as string,
+      image: formData.get("image") as string,
+    }
+
+    const errors: ValueError[] = Array.from(Value.Errors(profileSchema, payload))
+    const errorMessages: ProfileFormValidationErrors = {}
+
+    for (const error of errors) {
+      switch (error.path.replace("/", "")) {
+        case "name":
+          errorMessages.name = "The name is invalid."
+          break
+        case "birthdate":
+          if (payload.birthdate) {
+            errorMessages.birthdate = "The birthdate is invalid."
+          }
+          break
+        case "username":
+          errorMessages.username = "The username is invalid."
+          break
+        case "image":
+          if (errorMessages.image) {
+            errorMessages.image = "The image is invalid."
+          }
+          break
+        default:
+          console.error(`Update Profile Action: Unknown error at ${error.path}`)
+          break
+      }
+    }
+
+    if (Object.keys(errorMessages).length > 0) {
+      setFormState({
+        success: false,
+        message: "Validation errors occurred.",
+        error: errorMessages,
+      })
+    } else {
+      await authClient.updateUser(
+        {
+          name: payload.name,
+          birthdate: payload.birthdate ? new Date(payload.birthdate) : undefined,
+          username: payload.username,
+          // image: payload.image ? convertImageToBase64(payload.image) : null,
+        },
+        {
+          onRequest: () => {
+            setIsLoading(true)
+            setFormState(INITIAL_FORM_STATE)
+          },
+          onSuccess: () => {
+            setIsLoading(false)
+            setFormState({
+              success: true,
+              message: "Your profile has been updated!",
+            })
+          },
+          onError: (ctx) => {
+            setIsLoading(false)
+            setFormState({
+              success: false,
+              message: ctx.error.message,
+            })
+          },
+        },
+      )
+    }
+  }
 
   useEffect(() => {
-    if (state?.success) {
-      if (state?.data) {
-        update({
-          name: state?.data?.name,
-          email: state?.data?.email,
-          username: state?.data?.username,
-          image: state?.data?.image,
-        })
-      }
-
+    if (formState?.success) {
       if (isNewUser) {
         setIsNewUserSuccess(true)
         setTimeout(() => {
           router.push(ROUTE_TOWERS.PATH)
-        }, 5000)
+        }, 3000)
       }
     }
-  }, [state])
-
-  const handleResendVerification = async (): Promise<void> => {
-    await axios.post("/api/send-email-verification", { user })
-  }
+  }, [formState])
 
   return (
-    <form className="w-full" action={formAction} noValidate>
-      {state?.message && (
-        <AlertMessage type={state.success ? "success" : "error"}>
-          {state.message}
-          {isNewUserSuccess && " You will be redirected in 5 seconds..."}
-        </AlertMessage>
-      )}
-      {/* <Input
-        type="file"
-        id="image"
-        label="Avatar"
-        defaultValue={undefined}
-        disabled
-        dataTestId="profile-image-input"
-        errorMessage={state?.error?.image}
-      />
-      <hr className="mt-6 mb-4" /> */}
-      <Input
-        id="name"
-        label="Name"
-        placeholder="Enter your name"
-        defaultValue={user?.name}
-        required
-        dataTestId="profile-name-input"
-        errorMessage={state?.error?.name}
-      />
-      <Calendar
-        id="birthdate"
-        label="Birthdate"
-        maxDate={new Date(new Date().getFullYear() - 13, new Date().getMonth(), new Date().getDate())}
-        defaultValue={user?.birthdate ? String(new Date(user?.birthdate)) : undefined}
-        dataTestId="profile-birthdate-calendar"
-        description="You must be at least 13 years old."
-        errorMessage={state?.error?.birthdate}
-      />
-      <Input
-        type="email"
-        id="email"
-        label="Email"
-        placeholder="Enter your email"
-        defaultValue={user?.pendingEmail || user?.email}
-        required
-        readOnly={typeof user?.accounts !== "undefined" && user?.accounts?.length > 0}
-        dataTestId="profile-email-input"
-        onPaste={(event: ClipboardEvent<HTMLInputElement>) => event.preventDefault()}
-        description={
-          typeof user?.accounts !== "undefined" && user?.accounts?.length > 0
-            ? `Email linked to your account can only be updated through ${user?.accounts[0]?.provider}.`
-            : ""
-        }
-        errorMessage={state?.error?.email}
-      />
-      {user?.status === UserStatus.PENDING_EMAIL_VERIFICATION && (
-        <div className="flex items-center gap-2 font-medium">
-          <IoWarning className="w-5 h-5 text-amber-500" />
-          <div>
-            Email not verified.{" "}
-            <button className="towers-link" onClick={handleResendVerification}>
-              Resend verification
-            </button>
-          </div>
-        </div>
-      )}
-      <hr className="mt-6 mb-4" />
-      <Input
-        id="username"
-        label="Username"
-        placeholder="Enter your username"
-        autoComplete="off"
-        defaultValue={user?.username}
-        required
-        dataTestId="profile-username-input"
-        description="Username must be between 5 and 16 characters long and can contain digits, periods, and underscores."
-        errorMessage={state?.error?.username}
-      />
-      <Button type="submit" className="w-full" disabled={isPending} dataTestId="profile-submit-button">
-        {isNewUser ? "Complete Registration" : "Update Profile"}
-      </Button>
-    </form>
+    <>
+      <h3 className="text-lg font-semibold mb-4">Profile Information</h3>
+      <form className="w-full" noValidate onSubmit={handleUpdateUser}>
+        {formState?.message && (
+          <AlertMessage type={formState.success ? "success" : "error"}>
+            {formState.message}
+            {isNewUserSuccess && " You will be redirected in 3 seconds..."}
+          </AlertMessage>
+        )}
+        {/* <Input
+          type="file"
+          id="image"
+          label="Avatar"
+          defaultValue={undefined}
+          disabled
+          dataTestId="profile-image-input"
+          errorMessage={formState?.error?.image}
+        />
+        <hr className="mt-6 mb-4" /> */}
+        <Input
+          id="name"
+          label="Name"
+          placeholder="Enter your name"
+          defaultValue={session?.user?.name}
+          required
+          dataTestId="profile-name-input"
+          errorMessage={formState?.error?.name}
+        />
+        <Calendar
+          id="birthdate"
+          label="Birthdate"
+          maxDate={new Date(new Date().getFullYear() - 13, new Date().getMonth(), new Date().getDate())}
+          defaultValue={session?.user?.birthdate ? String(new Date(session?.user?.birthdate)) : undefined}
+          dataTestId="profile-birthdate-calendar"
+          description="You must be at least 13 years old."
+          errorMessage={formState?.error?.birthdate}
+        />
+        <Input
+          id="username"
+          label="Username"
+          placeholder="Enter your username"
+          autoComplete="off"
+          defaultValue={session?.user?.username}
+          required
+          dataTestId="profile-username-input"
+          description="Username must be between 5 and 16 characters long and can contain digits, periods, and underscores."
+          errorMessage={formState?.error?.username}
+        />
+        <Button type="submit" className="w-full" disabled={isLoading}>
+          {isNewUser ? "Complete Registration" : "Update Profile"}
+        </Button>
+      </form>
+    </>
   )
 }

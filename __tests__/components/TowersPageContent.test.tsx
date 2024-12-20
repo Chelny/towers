@@ -2,9 +2,9 @@ import { ImgHTMLAttributes } from "react"
 import { render, screen } from "@testing-library/react"
 import { Mock } from "vitest"
 import { mockSocketRoom1Id, mockSocketRoom1Table1Id } from "@/__mocks__/data/socketState"
-import { mockAuthenticatedSession } from "@/__mocks__/data/users"
+import { mockSession } from "@/__mocks__/data/users"
 import TowersPageContent from "@/components/game/TowersPageContent"
-import { useSessionData } from "@/hooks/useSessionData"
+import { authClient } from "@/lib/auth-client"
 import { useAppDispatch } from "@/lib/hooks"
 import { destroySocket, initSocket } from "@/redux/features/socket-slice"
 
@@ -36,8 +36,10 @@ vi.mock("next/navigation", async () => {
   }
 })
 
-vi.mock("@/hooks/useSessionData", () => ({
-  useSessionData: vi.fn(),
+vi.mock("@/lib/auth-client", () => ({
+  authClient: {
+    useSession: vi.fn(),
+  },
 }))
 
 vi.mock("@/lib/hooks", async () => {
@@ -59,7 +61,7 @@ describe("TowersPageContent Component", () => {
 
   beforeEach(() => {
     vi.mocked(useAppDispatch).mockReturnValue(mockAppDispatch)
-    vi.mocked(useSessionData).mockReturnValue(mockAuthenticatedSession)
+    vi.mocked(authClient.useSession).mockReturnValue(mockSession)
   })
 
   afterEach(() => {
@@ -83,7 +85,7 @@ describe("TowersPageContent Component", () => {
   it("should dispatch initSocket when not connected and session is authenticated", () => {
     render(<TowersPageContent roomId={mockSocketRoom1Id} tableId="" />)
 
-    expect(mockAppDispatch).toHaveBeenCalledWith(initSocket({ session: mockAuthenticatedSession.data }))
+    expect(mockAppDispatch).toHaveBeenCalledWith(initSocket({ session: mockSession.data }))
   })
 
   it("should dispatche destroySocket when offline event is triggered", () => {
@@ -91,12 +93,5 @@ describe("TowersPageContent Component", () => {
 
     window.dispatchEvent(new Event("offline"))
     expect(mockAppDispatch).toHaveBeenCalledWith(destroySocket())
-  })
-
-  it("should update session on online event", () => {
-    render(<TowersPageContent roomId={mockSocketRoom1Id} tableId="" />)
-
-    window.dispatchEvent(new Event("online"))
-    expect(mockAuthenticatedSession.update).toHaveBeenCalled()
   })
 })

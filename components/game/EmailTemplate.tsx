@@ -1,6 +1,5 @@
 import { ReactNode } from "react"
-import Image from "next/image"
-import { APP_ADDRESS, APP_NAME } from "@/constants/app"
+import { APP_CONFIG } from "@/constants/app"
 
 const brandColor: string = "#115e59"
 export const emailColors: Record<string, string> = {
@@ -37,12 +36,14 @@ export default function EmailTemplate({ html }: EmailTemplateProps): ReactNode {
           borderRadius: "8px",
           margin: "32px auto 16px",
           backgroundColor: emailColors.mainBackground,
+          wordBreak: "break-word",
         }}
       >
         <thead>
           <tr>
             <th>
-              <Image src="/logo.png" alt={APP_NAME} title={APP_NAME} />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/logo.png" alt={APP_CONFIG.NAME_SHORT} title={APP_CONFIG.NAME_SHORT} />
             </th>
           </tr>
         </thead>
@@ -70,9 +71,9 @@ export default function EmailTemplate({ html }: EmailTemplateProps): ReactNode {
                 textAlign: "center",
               }}
             >
-              &copy; 2024 {APP_NAME}, All Rights Reserved
+              &copy; 2024 {APP_CONFIG.NAME}, All Rights Reserved
               <br />
-              {APP_ADDRESS}
+              {APP_CONFIG.ADDRESS}
             </td>
           </tr>
         </tbody>

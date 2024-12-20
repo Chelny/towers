@@ -1,8 +1,8 @@
 import { ImgHTMLAttributes } from "react"
 import { render, screen } from "@testing-library/react"
-import { mockAuthenticatedSession, mockLoadingSession, mockUnauthenticatedSession } from "@/__mocks__/data/users"
+import { mockErrorSession, mockPendingSession, mockSession } from "@/__mocks__/data/users"
 import UserAvatar from "@/components/UserAvatar"
-import { useSessionData } from "@/hooks/useSessionData"
+import { authClient } from "@/lib/auth-client"
 
 vi.mock("next/image", () => ({
   __esModule: true,
@@ -14,13 +14,15 @@ vi.mock("next/image", () => ({
   },
 }))
 
-vi.mock("@/hooks/useSessionData", () => ({
-  useSessionData: vi.fn(),
+vi.mock("@/lib/auth-client", () => ({
+  authClient: {
+    useSession: vi.fn(),
+  },
 }))
 
 describe("UserAvatar Component", () => {
   it("should render placeholder avatar when session data is not available", () => {
-    vi.mocked(useSessionData).mockReturnValue(mockLoadingSession)
+    vi.mocked(authClient.useSession).mockReturnValue(mockErrorSession)
 
     render(<UserAvatar />)
 
@@ -29,7 +31,7 @@ describe("UserAvatar Component", () => {
   })
 
   it("should handle missing session user correctly", () => {
-    vi.mocked(useSessionData).mockReturnValue(mockUnauthenticatedSession)
+    vi.mocked(authClient.useSession).mockReturnValue(mockPendingSession)
 
     render(<UserAvatar />)
 
@@ -38,7 +40,7 @@ describe("UserAvatar Component", () => {
   })
 
   it("should render user avatar when session data is available", () => {
-    vi.mocked(useSessionData).mockReturnValue(mockAuthenticatedSession)
+    vi.mocked(authClient.useSession).mockReturnValue(mockSession)
 
     render(<UserAvatar />)
 

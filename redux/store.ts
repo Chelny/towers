@@ -9,7 +9,7 @@ export const makeStore = () => {
       socket: socketReducer,
       sidebar: sidebarReducer,
     },
-    middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(socketMiddleware),
+    middleware: (getDefaultMiddleware) => getDefaultMiddleware({ serializableCheck: false }).concat(socketMiddleware),
   })
 }
 

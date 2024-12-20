@@ -1,65 +1,69 @@
-import { useActionState } from "react"
-import { render, screen } from "@testing-library/react"
+import { fireEvent, render, screen, waitFor } from "@testing-library/react"
+import { Mock } from "vitest"
 import { SignInWithMagicLinkForm } from "@/app/(auth)/sign-in-with-magic-link/sign-in-with-magic-link.form"
 
-vi.mock("react", () => ({
-  useActionState: vi.fn(),
+vi.mock("@/lib/auth-client", () => ({
+  authClient: {
+    signIn: {
+      magicLink: vi.fn(),
+    },
+  },
 }))
 
-vi.mock("react", async (importActual) => {
-  const actual = await importActual<typeof import("react")>()
-
-  return {
-    ...actual,
-    useActionState: vi.fn(),
-  }
-})
-
-vi.mock("resend", () => {
-  return {
-    Resend: vi.fn().mockImplementation(() => {
-      return {
-        sendEmail: vi.fn().mockResolvedValue({ success: true }),
-      }
-    }),
-  }
-})
-
 describe("Sign In with Magic Link Form", () => {
-  beforeEach(() => {
-    vi.mocked(useActionState).mockReturnValue([{ success: false, message: "", error: {} }, vi.fn(), false])
-  })
-
-  afterEach(() => {
-    vi.restoreAllMocks()
-  })
-
   it("should render the form with all elements", () => {
     render(<SignInWithMagicLinkForm />)
 
     expect(screen.getByTestId("sign-in-with-magic-link-email-input")).toBeInTheDocument()
-    expect(screen.getByTestId("sign-in-with-magic-link-submit-button")).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: /Email Me A Sign In Link/i })).toBeInTheDocument()
   })
 
-  it("should have correct required properties for form fields", () => {
+  it("should correctly mark form fields as required", () => {
     render(<SignInWithMagicLinkForm />)
 
     expect(screen.getByTestId("sign-in-with-magic-link-email-input")).toHaveAttribute("required")
   })
 
-  it("should show error messages when submitting an empty form", () => {
-    vi.mocked(useActionState).mockReturnValue([{ success: false, message: "The email is invalid." }, vi.fn(), false])
-
+  it("should display error messages when the form is submitted with empty fields", () => {
     render(<SignInWithMagicLinkForm />)
+
+    fireEvent.click(screen.getByRole("button", { name: /Email Me A Sign In Link/i }))
 
     expect(screen.getByText(/The email is invalid/i)).toBeInTheDocument()
   })
 
-  it("should disable the submit and social buttons when the form is submitting", () => {
-    vi.mocked(useActionState).mockReturnValue([{ success: false, message: "" }, vi.fn(), true])
+  it("should display error messages for invalid email format", () => {
+    render(<SignInWithMagicLinkForm />)
+
+    fireEvent.input(screen.getByTestId("sign-in-with-magic-link-email-input"), { target: { value: "john.doe" } })
+    fireEvent.click(screen.getByRole("button", { name: /Email Me A Sign In Link/i }))
+
+    expect(screen.getByText(/The email is invalid/i)).toBeInTheDocument()
+  })
+
+  it("should disable the submit button during form submission and show a success message on successful submission", async () => {
+    const { authClient } = await import("@/lib/auth-client")
+    const mockSignInMagicLink: Mock = authClient.signIn.magicLink as Mock
+
+    mockSignInMagicLink.mockImplementation(async (_, callbacks) => {
+      callbacks.onRequest()
+      await new Promise((resolve) => setTimeout(resolve, 100))
+      callbacks.onSuccess()
+    })
 
     render(<SignInWithMagicLinkForm />)
 
-    expect(screen.getByTestId("sign-in-with-magic-link-submit-button")).toBeDisabled()
+    fireEvent.input(screen.getByTestId("sign-in-with-magic-link-email-input"), {
+      target: { value: "john.doe@example.com" },
+    })
+
+    const submitButton: HTMLButtonElement = screen.getByRole("button", { name: /Email Me A Sign In Link/i })
+    fireEvent.click(submitButton)
+
+    expect(submitButton).toBeDisabled()
+
+    await waitFor(() => {
+      expect(screen.getByText(/We’ve sent a magic sign-in link to john\.doe@example\.com/i)).toBeInTheDocument()
+    })
   })
 })

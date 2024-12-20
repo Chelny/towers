@@ -1,7 +1,6 @@
 "use client"
 
 import { KeyboardEvent, memo, MouseEvent, ReactNode, RefObject, useCallback, useEffect, useRef, useState } from "react"
-import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime"
 import dynamic from "next/dynamic"
 import { useRouter } from "next/navigation"
 import {
@@ -29,8 +28,8 @@ import {
   RATING_SILVER,
 } from "@/constants/game"
 import { ROUTE_TOWERS } from "@/constants/routes"
-import { useSessionData } from "@/hooks/useSessionData"
 import { TowersTableState } from "@/interfaces/socket"
+import { authClient } from "@/lib/auth-client"
 import { useAppDispatch, useAppSelector } from "@/lib/hooks"
 import { addLink, removeLink } from "@/redux/features/sidebar-slice"
 import { addTable, joinRoomSocketRoom, leaveRoomSocketRoom, sendRoomChatMessage } from "@/redux/features/socket-slice"
@@ -63,8 +62,8 @@ const areEqual = (prevProps: RoomProps, nextProps: RoomProps): boolean => {
 }
 
 export default memo(function Room({ roomId }: RoomProps): ReactNode {
-  const router: AppRouterInstance = useRouter()
-  const { data: session } = useSessionData()
+  const router = useRouter()
+  const { data: session, isPending, error } = authClient.useSession()
   const isConnected: boolean = useAppSelector((state: RootState) => state.socket.isConnected)
   const isJoinedRoom: boolean = useAppSelector((state: RootState) => selectRoomIsJoined(state, roomId))
   const roomInfo: ITowersRoom | null = useAppSelector((state: RootState) => selectRoomInfo(state, roomId))
@@ -130,7 +129,7 @@ export default memo(function Room({ roomId }: RoomProps): ReactNode {
 
   const openInvitationModal = (id: string, data: TableInvitationData): void => {
     setInvitationModals((prev: { id: string; data: TableInvitationData }[]) => [...prev, { id, data }])
-    // openInvitationModal(uuidv4(), { user: { username: "the_player1" }, table: { tableId: 67 } })
+    // openInvitationModal(createId(), { user: { username: "the_player1" }, table: { tableId: 67 } })
   }
 
   const handleCloseInvitationModal = (id: string): void => {

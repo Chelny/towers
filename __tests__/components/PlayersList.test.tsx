@@ -2,7 +2,15 @@ import { ITowersUserRoomTable } from "@prisma/client"
 import { fireEvent, render, screen } from "@testing-library/react"
 import { Mock } from "vitest"
 import { mockTowersRoomState1Users } from "@/__mocks__/data/socketState"
+import { mockSession } from "@/__mocks__/data/users"
 import PlayersList from "@/components/game/PlayersList"
+import { authClient } from "@/lib/auth-client"
+
+vi.mock("@/lib/auth-client", () => ({
+  authClient: {
+    useSession: vi.fn(),
+  },
+}))
 
 describe("PlayersList Component", () => {
   const handleSelectedPlayer: Mock = vi.fn()
@@ -12,6 +20,7 @@ describe("PlayersList Component", () => {
   beforeAll(() => {
     HTMLDialogElement.prototype.showModal = vi.fn()
     HTMLDialogElement.prototype.close = vi.fn()
+    vi.mocked(authClient.useSession).mockReturnValue(mockSession)
   })
 
   it("should render the players list correctly", () => {

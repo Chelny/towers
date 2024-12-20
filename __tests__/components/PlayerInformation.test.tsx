@@ -2,12 +2,14 @@ import { ITowersUserRoomTable } from "@prisma/client"
 import { fireEvent, render, screen } from "@testing-library/react"
 import { Mock } from "vitest"
 import { mockTowersRoomState1Users } from "@/__mocks__/data/socketState"
-import { mockAuthenticatedSession } from "@/__mocks__/data/users"
+import { mockSession } from "@/__mocks__/data/users"
 import PlayerInformation from "@/components/game/PlayerInformation"
-import { useSessionData } from "@/hooks/useSessionData"
+import { authClient } from "@/lib/auth-client"
 
-vi.mock("@/hooks/useSessionData", () => ({
-  useSessionData: vi.fn(),
+vi.mock("@/lib/auth-client", () => ({
+  authClient: {
+    useSession: vi.fn(),
+  },
 }))
 
 describe("PlayerInformation Component", () => {
@@ -20,7 +22,7 @@ describe("PlayerInformation Component", () => {
   })
 
   beforeEach(() => {
-    vi.mocked(useSessionData).mockReturnValue(mockAuthenticatedSession)
+    vi.mocked(authClient.useSession).mockReturnValue(mockSession)
   })
 
   it("should hide message input and \"Send\" button when viewing current user's information", () => {

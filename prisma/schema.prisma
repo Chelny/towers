@@ -1,7 +1,6 @@
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["omitApi"]
-  engineType      = "library"
+  provider   = "prisma-client-js"
+  engineType = "library"
 }
 
 datasource db {
@@ -11,121 +10,104 @@ datasource db {
 }
 
 model User {
-  id                  String             @id @default(uuid())
+  id                  String             @id @default(cuid(2))
   name                String
   birthdate           DateTime?
   email               String             @unique
-  emailVerified       DateTime?
-  pendingEmail        String?
-  username            String?            @unique
-  password            String?
+  emailVerified       Boolean            @default(false)
+  username            String             @unique
   image               String?
-  language            String             @default("en")
-  isOnline            Boolean            @default(false)
-  lastActiveAt        DateTime           @default(now())
-  status              UserStatus         @default(PENDING_EMAIL_VERIFICATION)
-  bannedAt            DateTime?
-  deletionScheduledAt DateTime?
+  language            String?            @default("en")
+  role                String?
+  isOnline            Boolean?           @default(false)
+  lastActiveAt        DateTime?
+  banned              Boolean?
+  banReason           String?
+  banExpires          DateTime?
   createdAt           DateTime           @default(now())
   updatedAt           DateTime           @updatedAt
-  accounts            Account[]
-  authenticators      Authenticator[]
-  directMessageUser2  DirectMessage[]    @relation("DirectMessageReceiver")
-  directMessageUser1  DirectMessage[]    @relation("DirectMessageSender")
-  friendshipUser1     Friendship[]       @relation("FriendshipUser1")
-  friendshipUser2     Friendship[]       @relation("FriendshipUser2")
-  loginHistoryRecords LoginHistory[]
   sessions            Session[]
+  accounts            Account[]
+  passkeys            Passkey[]
+  directMessagesUser2 DirectMessage[]    @relation("DirectMessageReceiver")
+  directMessagesUser1 DirectMessage[]    @relation("DirectMessageSender")
+  friendshipsUser1    Friendship[]       @relation("FriendshipUser1")
+  friendshipsUser2    Friendship[]       @relation("FriendshipUser2")
   towersUserProfile   TowersUserProfile?
 }
 
-model Account {
-  id                String   @id @default(uuid())
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String?  @map("refreshToken")
-  access_token      String?  @map("accessToken")
-  expires_at        Int?     @map("expiresAt")
-  token_type        String?  @map("tokenType")
-  scope             String?
-  id_token          String?  @map("idToken")
-  session_state     String?  @map("sessionState")
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([provider, providerAccountId])
-}
-
 model Session {
-  id           String   @id @default(uuid())
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id             String   @id @default(cuid(2))
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token          String   @unique
+  expiresAt      DateTime
+  ipAddress      String?
+  userAgent      String?
+  impersonatedBy String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }
 
-model VerificationToken {
-  id         String   @id @default(uuid())
+model Account {
+  id                    String    @id @default(cuid(2))
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accountId             String
+  providerId            String
+  accessToken           String?
+  refreshToken          String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  idToken               String?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+}
+
+model Verification {
+  id         String   @id @default(cuid(2))
   identifier String
-  token      String
-  expires    DateTime
+  value      String
+  expiresAt  DateTime
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
-
-  @@unique([identifier, token])
 }
 
-model Authenticator {
-  credentialID         String   @id
-  userId               String
-  providerAccountId    String
-  credentialPublicKey  String
-  counter              Int
-  credentialDeviceType String
-  credentialBackedUp   Boolean
-  transports           String?
-  createdAt            DateTime @default(now())
-  updatedAt            DateTime @updatedAt
-  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, credentialID])
+model Passkey {
+  id             String   @id @default(cuid(2))
+  name           String?
+  publicKey      String
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  webauthnUserID String
+  counter        Int
+  deviceType     String
+  backedUp       Boolean
+  transports     String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }
 
-model PasswordResetToken {
-  id        String   @id @default(uuid())
-  email     String
-  token     String   @unique
-  expires   DateTime
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([email, token])
-}
-
-model LoginHistory {
-  id        String   @id @default(uuid())
-  userId    String
-  ipAddress String
-  userAgent String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+model RateLimit {
+  id          String   @id @default(cuid(2))
+  key         String?
+  count       Int?
+  lastRequest Int?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Friendship {
-  id        String           @id @default(uuid())
+  id        String           @id @default(cuid(2))
   userId1   String
+  user1     User             @relation("FriendshipUser1", fields: [userId1], references: [id], onDelete: Cascade)
   userId2   String
+  user2     User             @relation("FriendshipUser2", fields: [userId2], references: [id], onDelete: Cascade)
   status    FriendshipStatus
   createdAt DateTime         @default(now())
   updatedAt DateTime         @updatedAt
-  user1     User             @relation("FriendshipUser1", fields: [userId1], references: [id], onDelete: Cascade)
-  user2     User             @relation("FriendshipUser2", fields: [userId2], references: [id], onDelete: Cascade)
 
   @@unique([userId1, userId2])
   @@index([userId1])
@@ -133,20 +115,20 @@ model Friendship {
 }
 
 model DirectMessage {
-  id         String   @id @default(uuid())
+  id         String   @id @default(cuid(2))
   senderId   String
+  sender     User     @relation("DirectMessageSender", fields: [senderId], references: [id], onDelete: Cascade)
   receiverId String
+  receiver   User     @relation("DirectMessageReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
   message    String
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
-  receiver   User     @relation("DirectMessageReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
-  sender     User     @relation("DirectMessageSender", fields: [senderId], references: [id], onDelete: Cascade)
 
   @@index([senderId, receiverId])
 }
 
 model TowersRoom {
-  id             String                  @id @default(uuid())
+  id             String                  @id @default(cuid(2))
   name           String                  @unique
   difficulty     RoomLevel               @default(SOCIAL)
   full           Boolean                 @default(false)
@@ -158,27 +140,27 @@ model TowersRoom {
 }
 
 model TowersRoomChatMessage {
-  id            String            @id @default(uuid())
+  id            String            @id @default(cuid(2))
   roomId        String
+  room          TowersRoom        @relation(fields: [roomId], references: [id], onDelete: Cascade)
   userProfileId String
+  userProfile   TowersUserProfile @relation(fields: [userProfileId], references: [id], onDelete: Cascade)
   message       String
   createdAt     DateTime          @default(now())
   updatedAt     DateTime          @updatedAt
-  room          TowersRoom        @relation(fields: [roomId], references: [id], onDelete: Cascade)
-  userProfile   TowersUserProfile @relation(fields: [userProfileId], references: [id], onDelete: Cascade)
 }
 
 model TowersTable {
-  id             String                   @id @default(uuid())
+  id             String                   @id @default(cuid(2))
   roomId         String
+  room           TowersRoom               @relation(fields: [roomId], references: [id], onDelete: Cascade)
   tableNumber    Int
   hostId         String
+  host           TowersUserProfile        @relation("TableHost", fields: [hostId], references: [id])
   tableType      TableType                @default(PUBLIC)
   rated          Boolean                  @default(true)
   createdAt      DateTime                 @default(now())
   updatedAt      DateTime                 @updatedAt
-  host           TowersUserProfile        @relation("TableHost", fields: [hostId], references: [id])
-  room           TowersRoom               @relation(fields: [roomId], references: [id], onDelete: Cascade)
   bootedUsers    TowersTableBoot[]
   chatMessages   TowersTableChatMessage[]
   userRoomTables TowersUserRoomTable[]
@@ -187,8 +169,9 @@ model TowersTable {
 }
 
 model TowersTableSettings {
-  id            String            @id @default(uuid())
+  id            String            @id @default(cuid(2))
   userProfileId String
+  userProfile   TowersUserProfile @relation(fields: [userProfileId], references: [id], onDelete: Cascade)
   upKey         String            @default("ArrowUp")
   downKey       String            @default("ArrowDown")
   leftKey       String            @default("ArrowLeft")
@@ -196,37 +179,37 @@ model TowersTableSettings {
   spaceKey      String            @default("Space")
   createdAt     DateTime          @default(now())
   updatedAt     DateTime          @updatedAt
-  userProfile   TowersUserProfile @relation(fields: [userProfileId], references: [id], onDelete: Cascade)
 }
 
 model TowersTableChatMessage {
-  id              String               @id @default(uuid())
+  id              String               @id @default(cuid(2))
   tableId         String
+  table           TowersTable          @relation(fields: [tableId], references: [id], onDelete: Cascade)
   userProfileId   String
+  userProfile     TowersUserProfile    @relation(fields: [userProfileId], references: [id], onDelete: Cascade)
   message         String
   type            TableChatMessageType @default(CHAT)
   privateToUserId String?
   createdAt       DateTime             @default(now())
   updatedAt       DateTime             @updatedAt
-  table           TowersTable          @relation(fields: [tableId], references: [id], onDelete: Cascade)
-  userProfile     TowersUserProfile    @relation(fields: [userProfileId], references: [id], onDelete: Cascade)
 }
 
 model TowersTableBoot {
-  id                          String            @id @default(uuid())
+  id                          String            @id @default(cuid(2))
   tableId                     String
+  table                       TowersTable       @relation(fields: [tableId], references: [id], onDelete: Cascade)
   userProfileId               String
+  bootedUser                  TowersUserProfile @relation("TableBootedUser", fields: [userProfileId], references: [id], onDelete: Cascade)
   bootedByTowersUserProfileId String
+  bootedBy                    TowersUserProfile @relation("TableBootedBy", fields: [bootedByTowersUserProfileId], references: [id], onDelete: Cascade)
   createdAt                   DateTime          @default(now())
   updatedAt                   DateTime          @updatedAt
-  bootedBy                    TowersUserProfile @relation("TableBootedBy", fields: [bootedByTowersUserProfileId], references: [id], onDelete: Cascade)
-  table                       TowersTable       @relation(fields: [tableId], references: [id], onDelete: Cascade)
-  bootedUser                  TowersUserProfile @relation("TableBootedUser", fields: [userProfileId], references: [id], onDelete: Cascade)
 }
 
 model TowersUserProfile {
-  id                String                   @id @default(uuid())
+  id                String                   @id @default(cuid(2))
   userId            String                   @unique
+  user              User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
   rating            Int                      @default(0)
   gamesCompleted    Int                      @default(0)
   wins              Int                      @default(0)
@@ -240,13 +223,13 @@ model TowersUserProfile {
   bootedTables      TowersTableBoot[]        @relation("TableBootedUser")
   tableChatMessages TowersTableChatMessage[]
   tableSettings     TowersTableSettings[]
-  user              User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userRoomTables    TowersUserRoomTable[]
 }
 
 model TowersUserRoomTable {
-  id            String            @id @default(uuid())
+  id            String            @id @default(cuid(2))
   userProfileId String
+  userProfile   TowersUserProfile @relation(fields: [userProfileId], references: [id], onDelete: Cascade)
   roomId        String?
   tableId       String?
   seatNumber    Int?
@@ -254,17 +237,9 @@ model TowersUserRoomTable {
   updatedAt     DateTime          @updatedAt
   room          TowersRoom?       @relation(fields: [roomId], references: [id])
   table         TowersTable?      @relation(fields: [tableId], references: [id])
-  userProfile   TowersUserProfile @relation(fields: [userProfileId], references: [id], onDelete: Cascade)
 
   @@unique([userProfileId, roomId, tableId])
   @@unique([roomId, tableId, seatNumber])
-}
-
-enum UserStatus {
-  PENDING_EMAIL_VERIFICATION
-  ACTIVE
-  BANNED
-  PENDING_DELETION
 }
 
 enum FriendshipStatus {

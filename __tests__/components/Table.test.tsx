@@ -3,9 +3,9 @@ import { fireEvent, render, screen } from "@testing-library/react"
 import { Mock } from "vitest"
 import { mockRoom1 } from "@/__mocks__/data/rooms"
 import { mockRoom1Table1 } from "@/__mocks__/data/tables"
-import { mockAuthenticatedSession } from "@/__mocks__/data/users"
+import { mockSession } from "@/__mocks__/data/users"
 import Table from "@/components/game/Table"
-import { useSessionData } from "@/hooks/useSessionData"
+import { authClient } from "@/lib/auth-client"
 import { useAppDispatch } from "@/lib/hooks"
 
 const { useRouter } = vi.hoisted(() => {
@@ -36,8 +36,10 @@ vi.mock("next/navigation", async () => {
   }
 })
 
-vi.mock("@/hooks/useSessionData", () => ({
-  useSessionData: vi.fn(),
+vi.mock("@/lib/auth-client", () => ({
+  authClient: {
+    useSession: vi.fn(),
+  },
 }))
 
 vi.mock("@/lib/hooks", () => ({
@@ -54,7 +56,7 @@ describe("Table Component", () => {
 
   beforeEach(() => {
     vi.mocked(useAppDispatch).mockReturnValue(mockAppDispatch)
-    vi.mocked(useSessionData).mockReturnValue(mockAuthenticatedSession)
+    vi.mocked(authClient.useSession).mockReturnValue(mockSession)
   })
 
   afterEach(() => {

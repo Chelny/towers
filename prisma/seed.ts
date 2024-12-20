@@ -6,9 +6,9 @@ import {
   TowersTableChatMessage,
   TowersUserProfile,
   User,
-  UserStatus,
 } from "@prisma/client"
 import { parseArgs } from "node:util"
+import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 
 const options = {
@@ -85,15 +85,33 @@ async function main(): Promise<void> {
     await prisma.user.createMany({
       data: userData.map((user: TUser) => ({
         ...user,
-        password: "$2a$12$.a4AhkJrYEAefd2Ok3S4YOKNPiYMO44GCthg.DwwPgY4eqmoPjqWC",
-        emailVerified: new Date(),
+        emailVerified: true,
         isOnline: true,
         lastActiveAt: new Date(),
-        status: UserStatus.ACTIVE,
       })),
     })
 
     const users: User[] = await prisma.user.findMany()
+
+    // **************************************************
+    // * Account
+    // **************************************************
+
+    const ctx = await auth.$context
+    const password: string = await ctx.password.hash("Test1234!")
+
+    for (let index = 0; index < users.length; index++) {
+      const user: User = users[index]
+
+      await prisma.account.create({
+        data: {
+          userId: user.id,
+          accountId: user.id,
+          providerId: "credential",
+          password,
+        },
+      })
+    }
 
     // **************************************************
     // * TowersRoom

@@ -15,7 +15,7 @@ export default function ProtectedLayout({ children }: ProtectedLayoutProps): Rea
   return (
     <div className="flex h-dvh">
       <Sidebar />
-      <div className="relative flex-1 p-4 overflow-x-hidden overflow-y-auto">{children}</div>
+      <div className="relative flex-1 p-4 pb-8 overflow-x-hidden overflow-y-auto">{children}</div>
     </div>
   )
 }

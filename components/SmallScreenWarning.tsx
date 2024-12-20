@@ -1,21 +1,29 @@
 "use client"
 
 import { ReactNode } from "react"
+import { useRouter } from "next/navigation"
 import clsx from "clsx/lite"
-import { signOut } from "next-auth/react"
 import Button from "@/components/ui/Button"
-import { useSessionData } from "@/hooks/useSessionData"
+import { ROUTE_HOME } from "@/constants/routes"
+import { authClient } from "@/lib/auth-client"
 import { useAppDispatch } from "@/lib/hooks"
 import { destroySocket } from "@/redux/features/socket-slice"
 import { AppDispatch } from "@/redux/store"
 
 export default function SmallScreenWarning(): ReactNode {
-  const { data: session } = useSessionData()
+  const router = useRouter()
+  const { data: session } = authClient.useSession()
   const dispatch: AppDispatch = useAppDispatch()
 
-  const handleSignOut = (): void => {
+  const handleSignOut = async (): Promise<void> => {
     dispatch(destroySocket())
-    signOut()
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          router.push(ROUTE_HOME.PATH)
+        },
+      },
+    })
   }
 
   return (
@@ -32,11 +40,9 @@ export default function SmallScreenWarning(): ReactNode {
           <br />
           or use a computer for a better experience.
         </p>
-        {session && (
-          <Button className="mt-2" type="button" onClick={handleSignOut}>
-            Sign out
-          </Button>
-        )}
+        <Button className="mt-2" type="button" disabled={!session} onClick={handleSignOut}>
+          Sign out
+        </Button>
       </div>
     </div>
   )

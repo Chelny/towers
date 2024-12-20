@@ -1,130 +1,150 @@
-import { User, UserStatus } from "@prisma/client"
-import { TSessionContextValue } from "@/context/session-context"
+import { createId } from "@paralleldrive/cuid2"
+import { Session } from "@/lib/auth-client"
 
-export const mockUser1: User = {
-  id: "112dc46f-54cb-43f9-81fa-21080a4fb990",
+export const mockUser1: Session["user"] = {
+  id: createId(),
   name: "John Doe",
   birthdate: new Date("2000-01-01"),
   email: "john.doe@example.com",
-  emailVerified: new Date("2024-09-01"),
-  pendingEmail: null,
+  emailVerified: true,
   username: "john.doe",
-  password: "Password123!",
   image: "https://example.com/avatar.jpg",
   language: "en",
   isOnline: true,
   lastActiveAt: new Date(),
-  status: UserStatus.ACTIVE,
-  bannedAt: null,
-  deletionScheduledAt: null,
+  banned: false,
   createdAt: new Date(),
   updatedAt: new Date(),
 }
 
-export const mockLoadingSession: TSessionContextValue = {
-  data: null,
-  status: "loading",
-  update: vi.fn(),
-}
-
-export const mockUnauthenticatedSession: TSessionContextValue = {
-  data: null,
-  status: "unauthenticated",
-  update: vi.fn(),
-}
-
-export const mockAuthenticatedSession: TSessionContextValue = {
-  data: {
-    user: {
-      id: mockUser1.id,
-      name: mockUser1.name,
-      username: mockUser1.username!,
-      image: mockUser1.image,
-    },
-    account: null,
-    isNewUser: false,
-    expires: "2024-01-01T00:00:00Z",
-  },
-  status: "authenticated",
-  update: vi.fn(),
-}
-
-export const mockUser2: User = {
-  id: "6db799ae-bb22-4257-aed2-58788d3eb6fb",
+export const mockUser2: Session["user"] = {
+  id: createId(),
   name: "Jane Smith",
   birthdate: new Date("1985-05-15"),
   email: "test_jane@example.dev",
-  emailVerified: new Date(),
-  pendingEmail: null,
+  emailVerified: true,
   username: "janesmith",
-  password: "Password123!",
   image: null,
   language: "en",
   isOnline: true,
   lastActiveAt: new Date(),
-  status: UserStatus.ACTIVE,
-  bannedAt: null,
-  deletionScheduledAt: null,
+  banned: false,
   createdAt: new Date(),
   updatedAt: new Date(),
 }
 
-export const mockUser3: User = {
-  id: "a20ec552-68a5-4734-9530-e16a5074150d",
+export const mockUser3: Session["user"] = {
+  id: createId(),
   name: "Sam Lee",
   birthdate: new Date("2000-07-21"),
   email: "test_sam@example.dev",
-  emailVerified: new Date(),
-  pendingEmail: null,
+  emailVerified: true,
   username: "samlee",
-  password: "Password123!",
   image: null,
   language: "en",
   isOnline: true,
   lastActiveAt: new Date(),
-  status: UserStatus.ACTIVE,
-  bannedAt: null,
-  deletionScheduledAt: null,
+  banned: false,
   createdAt: new Date(),
   updatedAt: new Date(),
 }
 
-export const mockUser4: User = {
-  id: "5d6c6316-8edb-4556-90e0-65fe61dd6d5c",
+export const mockUser4: Session["user"] = {
+  id: createId(),
   name: "Chris Green",
   birthdate: null,
   email: "test_chris@example.dev",
-  emailVerified: new Date(),
-  pendingEmail: null,
+  emailVerified: true,
   username: "chrisgreen",
-  password: "Password123!",
   image: null,
   language: "en",
   isOnline: true,
   lastActiveAt: new Date(),
-  status: UserStatus.ACTIVE,
-  bannedAt: null,
-  deletionScheduledAt: null,
+  banned: false,
   createdAt: new Date(),
   updatedAt: new Date(),
 }
 
-export const mockUser5: User = {
-  id: "cd6b72cb-ab7b-4405-b43d-126b620d4e0e",
+export const mockUser5: Session["user"] = {
+  id: createId(),
   name: "Patricia White",
   birthdate: new Date("1992-02-28"),
   email: "test_patricia@example.dev",
-  emailVerified: new Date(),
-  pendingEmail: null,
+  emailVerified: true,
   username: "patwhite",
-  password: "Password123!",
   image: null,
   language: "en",
   isOnline: true,
   lastActiveAt: new Date(),
-  status: UserStatus.ACTIVE,
-  bannedAt: null,
-  deletionScheduledAt: null,
+  banned: false,
   createdAt: new Date(),
   updatedAt: new Date(),
+}
+
+export const mockSession = {
+  data: {
+    user: mockUser1,
+    session: {
+      id: createId(),
+      userId: mockUser1.id,
+      token: "mockToken",
+      expiresAt: new Date(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    accounts: [],
+  },
+  isPending: false,
+  error: null,
+}
+
+export const mockSessionCredentialAccount = {
+  id: createId(),
+  userId: mockUser1.id,
+  accountId: mockUser1.id,
+  providerId: "credential",
+  accessToken: null,
+  refreshToken: null,
+  accessTokenExpiresAt: null,
+  refreshTokenExpiresAt: null,
+  idToken: null,
+  scope: null,
+  password:
+    "e1a88ca304b208dbf4544cb4fc698cc1:5274627b6ac84a28571303548ce3a8bc4bd5ab49342a3ee8e63e2f9596668378596710e41b4ad4e252e77fce5617e6600edf7af822d6c4c8bea37795829f5dbe",
+  createdAt: new Date(),
+  updatedAt: new Date(),
+}
+
+export const mockSessionGitHubAccount = {
+  id: createId(),
+  userId: mockUser1.id,
+  accountId: "1234567",
+  providerId: "github",
+  accessToken: null,
+  refreshToken: null,
+  accessTokenExpiresAt: null,
+  refreshTokenExpiresAt: null,
+  idToken: null,
+  scope: null,
+  password: null,
+  createdAt: new Date(),
+  updatedAt: new Date(),
+}
+
+export const mockPendingSession = {
+  data: null,
+  isPending: true,
+  error: null,
+}
+
+export const mockErrorSession = {
+  data: null,
+  isPending: false,
+  error: {
+    status: 500,
+    statusText: "Internal Server Error",
+    error: "Something went wrong",
+    name: "FetchError",
+    message: "Failed to fetch session",
+  },
 }

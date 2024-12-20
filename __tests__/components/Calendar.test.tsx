@@ -42,8 +42,8 @@ describe("Calendar Component", () => {
 
     fireEvent.click(screen.getByText("Select a date"))
 
-    const prevMonthButton: HTMLElement = screen.getByRole("button", { name: "Previous Month" })
-    const nextMonthButton: HTMLElement = screen.getByRole("button", { name: "Next Month" })
+    const prevMonthButton: HTMLElement = screen.getByRole("button", { name: /Previous Month/i })
+    const nextMonthButton: HTMLElement = screen.getByRole("button", { name: /Next Month/i })
 
     const currentDate: Date = new Date()
     const currentMonth: number = currentDate.getUTCMonth()

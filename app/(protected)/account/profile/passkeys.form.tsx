@@ -1,0 +1,187 @@
+"use client"
+
+import { FormEvent, ReactNode, useState } from "react"
+import { ValueError } from "@sinclair/typebox/errors"
+import { Value } from "@sinclair/typebox/value"
+import { Passkey } from "better-auth/plugins"
+import { LuPencilLine } from "react-icons/lu"
+import { LuTrash2 } from "react-icons/lu"
+import {
+  AddPasskeyFormValidationErrors,
+  AddPasskeyPayload,
+  addPasskeySchema,
+} from "@/app/(protected)/account/profile/passkey.schema"
+import AlertMessage from "@/components/ui/AlertMessage"
+import Button from "@/components/ui/Button"
+import Input from "@/components/ui/Input"
+import { INITIAL_FORM_STATE } from "@/constants/api"
+import { authClient } from "@/lib/auth-client"
+
+export function PasskeysForm(): ReactNode {
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [formState, setFormState] = useState<ApiResponse>(INITIAL_FORM_STATE)
+  const { data: passkeys, isPending, isRefetching } = authClient.useListPasskeys()
+
+  const handleAddPasskey = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
+    event.preventDefault()
+
+    const formData: FormData = new FormData(event.currentTarget)
+    const payload: AddPasskeyPayload = {
+      name: formData.get("passkeyName") as string,
+    }
+
+    const errors: ValueError[] = Array.from(Value.Errors(addPasskeySchema, payload))
+    const errorMessages: AddPasskeyFormValidationErrors = {}
+
+    for (const error of errors) {
+      switch (error.path.replace("/", "")) {
+        case "name":
+          errorMessages.name = "The name is invalid."
+          break
+        default:
+          console.error(`Add Passkey Action: Unknown error at ${error.path}`)
+          break
+      }
+    }
+
+    if (Object.keys(errorMessages).length > 0) {
+      setFormState({
+        success: false,
+        message: "Validation errors occurred.",
+        error: errorMessages,
+      })
+    } else {
+      await authClient.passkey.addPasskey(
+        {
+          name: payload.name,
+        },
+        {
+          onRequest: () => {
+            setIsLoading(true)
+            setFormState(INITIAL_FORM_STATE)
+          },
+          onSuccess: () => {
+            setIsLoading(false)
+            setFormState({
+              success: true,
+              message: `The passkey "${payload.name}" has been added!`,
+            })
+          },
+          onError: (ctx) => {
+            setIsLoading(false)
+            setFormState({
+              success: false,
+              message: ctx.error.message,
+            })
+          },
+        },
+      )
+    }
+  }
+
+  const handleUpdate = async (passkey: Passkey): Promise<void> => {
+    await authClient.passkey.updatePasskey(
+      {
+        id: passkey.id,
+        name: passkey.name ?? "",
+      },
+      {
+        onRequest: () => {
+          setIsLoading(true)
+          setFormState(INITIAL_FORM_STATE)
+        },
+        onSuccess: () => {
+          setIsLoading(false)
+          setFormState({
+            success: true,
+            message: "The passkey has been updated!",
+          })
+        },
+        onError: (ctx) => {
+          setIsLoading(false)
+          setFormState({
+            success: false,
+            message: ctx.error.message,
+          })
+        },
+      },
+    )
+  }
+
+  const handleDelete = async (passkey: Passkey): Promise<void> => {
+    await authClient.passkey.deletePasskey(
+      {
+        id: passkey.id,
+      },
+      {
+        onRequest: () => {
+          setIsLoading(true)
+          setFormState(INITIAL_FORM_STATE)
+        },
+        onSuccess: () => {
+          setIsLoading(false)
+          setFormState({
+            success: true,
+            message: `The passkey "${passkey.name}" has been deleted!`,
+          })
+        },
+        onError: (ctx) => {
+          setIsLoading(false)
+          setFormState({
+            success: false,
+            message: ctx.error.message,
+          })
+        },
+      },
+    )
+  }
+
+  return (
+    <>
+      <h3 className="text-lg font-semibold mb-4">Passkeys</h3>
+      <form className="w-full" noValidate onSubmit={handleAddPasskey}>
+        {formState?.message && (
+          <AlertMessage type={formState.success ? "success" : "error"}>{formState.message}</AlertMessage>
+        )}
+        <Input
+          type="text"
+          id="passkeyName"
+          label="Name"
+          placeholder="Enter a name for the passkey"
+          required
+          dataTestId="passkeys-name-input"
+          errorMessage={formState?.error?.name}
+        />
+        <Button type="submit" className="w-full" disabled={isLoading}>
+          Add Passkey
+        </Button>
+      </form>
+      {passkeys && passkeys?.length > 0 && <hr className="mt-6 mb-4" />}
+      <ul className="space-y-2">
+        {passkeys?.map((passkey: Passkey) => (
+          <li key={passkey.id} className="flex justify-between items-center p-2 border rounded bg-white">
+            <div className="flex-1">{passkey.name}</div>
+            <div className="flex-1 flex gap-3 justify-end items-center">
+              <Button
+                type="button"
+                disabled={isLoading || isPending || isRefetching}
+                aria-label={`Edit passkey ${passkey.name}`}
+                onClick={() => handleUpdate(passkey)}
+              >
+                <LuPencilLine className="w-5 h-5" />
+              </Button>
+              <Button
+                type="button"
+                disabled={isLoading || isPending || isRefetching}
+                aria-label={`Delete passkey ${passkey.name}`}
+                onClick={() => handleDelete(passkey)}
+              >
+                <LuTrash2 className="w-5 h-5" />
+              </Button>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </>
+  )
+}

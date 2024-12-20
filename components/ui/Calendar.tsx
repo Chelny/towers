@@ -1,6 +1,6 @@
 "use client"
 
-import React, { ReactNode, RefObject, useEffect, useRef, useState } from "react"
+import { ReactNode, RefObject, useEffect, useRef, useState } from "react"
 import clsx from "clsx/lite"
 import {
   PiCaretDoubleLeftDuotone,
@@ -310,7 +310,7 @@ export default function Calendar({
               aria-label="Previous Year"
               onClick={() => handleYearChange(-1)}
             >
-              <PiCaretDoubleLeftDuotone className="w-5 h-5" />
+              <PiCaretDoubleLeftDuotone className="w-5 h-5" aria-hidden="true" />
             </Button>
             <Button
               type="button"
@@ -318,7 +318,7 @@ export default function Calendar({
               aria-label="Previous Month"
               onClick={() => handleMonthChange(-1)}
             >
-              <PiCaretLeftDuotone className="w-5 h-5" />
+              <PiCaretLeftDuotone className="w-5 h-5" aria-hidden="true" />
             </Button>
             <Button
               type="button"
@@ -336,7 +336,7 @@ export default function Calendar({
               aria-label="Next Month"
               onClick={() => handleMonthChange(1)}
             >
-              <PiCaretRightDuotone className="w-5 h-5" />
+              <PiCaretRightDuotone className="w-5 h-5" aria-hidden="true" />
             </Button>
             <Button
               type="button"
@@ -344,7 +344,7 @@ export default function Calendar({
               aria-label="Next Year"
               onClick={() => handleYearChange(1)}
             >
-              <PiCaretDoubleRightDuotone className="w-5 h-5" />
+              <PiCaretDoubleRightDuotone className="w-5 h-5" aria-hidden="true" />
             </Button>
           </div>
 

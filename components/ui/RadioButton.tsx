@@ -43,8 +43,6 @@ export default function RadioButton({
           checked={checked}
           disabled={disabled}
           aria-labelledby={`${id}Label`}
-          aria-checked={checked}
-          aria-disabled={disabled}
           data-testid={dataTestId ? `${dataTestId}-${value}` : undefined}
           onChange={handleChange}
         />

@@ -1,77 +1,56 @@
-import { useActionState } from "react"
-import { render, screen } from "@testing-library/react"
+import { fireEvent, render, screen, waitFor } from "@testing-library/react"
+import { Mock } from "vitest"
 import { ForgotPasswordForm } from "@/app/(auth)/forgot-password/forgot-password.form"
 
-vi.mock("react", async (importActual) => {
-  const actual = await importActual<typeof import("react")>()
-
-  return {
-    ...actual,
-    useActionState: vi.fn(),
-  }
-})
-
-vi.mock("resend", () => {
-  return {
-    Resend: vi.fn().mockImplementation(() => {
-      return {
-        sendEmail: vi.fn().mockResolvedValue({ success: true }),
-      }
-    }),
-  }
-})
+vi.mock("@/lib/auth-client", () => ({
+  authClient: {
+    forgetPassword: vi.fn(),
+  },
+}))
 
 describe("Forgot Password Form", () => {
-  beforeEach(() => {
-    vi.mocked(useActionState).mockReturnValue([{ success: false, message: "", error: {} }, vi.fn(), false])
-  })
-
-  afterEach(() => {
-    vi.restoreAllMocks()
-  })
-
   it("should render the form with all elements", () => {
     render(<ForgotPasswordForm />)
 
     expect(screen.getByTestId("forgot-password-email-input")).toBeInTheDocument()
-    expect(screen.getByTestId("forgot-password-submit-button")).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: /Send Email/i })).toBeInTheDocument()
   })
 
-  it("should have correct required properties for form fields", () => {
+  it("should correctly mark form fields as required", () => {
     render(<ForgotPasswordForm />)
 
     expect(screen.getByTestId("forgot-password-email-input")).toHaveAttribute("required")
   })
 
-  it("should show error messages when submitting an empty form", async () => {
-    vi.mocked(useActionState).mockReturnValue([
-      { success: false, error: { email: "The email is required." } },
-      vi.fn(),
-      false,
-    ])
-
+  it("should display error messages when the form is submitted with empty fields", () => {
     render(<ForgotPasswordForm />)
+
+    fireEvent.click(screen.getByRole("button", { name: /Send Email/i }))
 
     expect(screen.getByText(/The email is required/i)).toBeInTheDocument()
   })
 
-  it("should disable the submit button when the form is submitting", () => {
-    vi.mocked(useActionState).mockReturnValue([{ success: false, message: "" }, vi.fn(), true])
+  it("should disable the submit button during form submission and show a success message on successful submission", async () => {
+    const { authClient } = await import("@/lib/auth-client")
+    const mockForgotPassword: Mock = authClient.forgetPassword as Mock
+
+    mockForgotPassword.mockImplementation(async (_, callbacks) => {
+      callbacks.onRequest()
+      await new Promise((resolve) => setTimeout(resolve, 100))
+      callbacks.onSuccess()
+    })
 
     render(<ForgotPasswordForm />)
 
-    expect(screen.getByTestId("forgot-password-submit-button")).toBeDisabled()
-  })
+    fireEvent.input(screen.getByTestId("forgot-password-email-input"), { target: { value: "john.doe@example.com" } })
 
-  it("should display a success message on form submission success", () => {
-    vi.mocked(useActionState).mockReturnValue([
-      { success: true, message: "A reset password link has been sent in your inbox!" },
-      vi.fn(),
-      false,
-    ])
+    const submitButton: HTMLButtonElement = screen.getByRole("button", { name: /Send Email/i })
+    fireEvent.click(submitButton)
 
-    render(<ForgotPasswordForm />)
+    expect(submitButton).toBeDisabled()
 
-    expect(screen.getByText(/A reset password link has been sent in your inbox/i)).toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByText(/A reset password link has been sent in your inbox/i)).toBeInTheDocument()
+    })
   })
 })

@@ -5,7 +5,7 @@ import { ITowersUserRoomTable } from "@prisma/client"
 import { formatDistanceToNow } from "date-fns"
 import Input from "@/components/ui/Input"
 import Modal from "@/components/ui/Modal"
-import { useSessionData } from "@/hooks/useSessionData"
+import { authClient } from "@/lib/auth-client"
 
 type PlayerInformationProps = {
   isOpen: boolean
@@ -20,7 +20,7 @@ export default function PlayerInformation({
   isRatingsVisible = false,
   onCancel,
 }: PlayerInformationProps): ReactNode {
-  const { data: session } = useSessionData()
+  const { data: session, isPending, error } = authClient.useSession()
   const [isCurrentUser, setIsCurrentUser] = useState<boolean>(false)
   const [reason, setReason] = useState<string>("")
   const [idleTime, setIdleTime] = useState<string>("")

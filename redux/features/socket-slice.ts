@@ -7,8 +7,8 @@ import {
   TableChatMessageType,
 } from "@prisma/client"
 import { ActionReducerMapBuilder, createSlice, PayloadAction } from "@reduxjs/toolkit"
-import { Session } from "next-auth"
 import { SocketState } from "@/interfaces/socket"
+import { Session } from "@/lib/auth-client"
 import { socketExtraReducers } from "@/redux/features/socket-extra-reducers"
 
 const initialState: SocketState = {
@@ -26,7 +26,7 @@ const socketSlice = createSlice({
     // * Socket IO Actions
     // **************************************************
 
-    initSocket: (state: SocketState, action: PayloadAction<{ session: Session | null }>): void => {
+    initSocket: (state: SocketState, action: PayloadAction<{ session: Session }>): void => {
       state.isConnected = false
       state.isLoading = true
       state.errorMessage = null

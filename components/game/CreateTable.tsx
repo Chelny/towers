@@ -7,7 +7,7 @@ import { Value, ValueError } from "@sinclair/typebox/value"
 import Checkbox from "@/components/ui/Checkbox"
 import Modal from "@/components/ui/Modal"
 import Select from "@/components/ui/Select"
-import { useSessionData } from "@/hooks/useSessionData"
+import { authClient } from "@/lib/auth-client"
 import { useAppDispatch } from "@/lib/hooks"
 import { roomErrorMessage } from "@/redux/features/socket-slice"
 import { AppDispatch } from "@/redux/store"
@@ -20,7 +20,7 @@ type CreateTableProps = {
 }
 
 export default function CreateTable({ isOpen, roomId, onSubmitSuccess, onCancel }: CreateTableProps): ReactNode {
-  const { data: session } = useSessionData()
+  const { data: session, isPending, error } = authClient.useSession()
   const dispatch: AppDispatch = useAppDispatch()
   const [errorMessages, setErrorMessages] = useState<CreateTableFormValidationErrors>({})
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)

@@ -1,39 +1,29 @@
-import { useActionState } from "react"
-import { useRouter } from "next/navigation"
-import { fireEvent, render, screen } from "@testing-library/react"
+import { fireEvent, render, screen, waitFor } from "@testing-library/react"
+import { Mock } from "vitest"
 import { SignInForm } from "@/app/(auth)/sign-in/sign-in.form"
 import { ROUTE_FORGOT_PASSWORD, ROUTE_SIGN_IN_WITH_MAGIC_LINK, ROUTE_SIGN_UP } from "@/constants/routes"
-import { mockRouter } from "@/vitest.setup"
+import { mockUseRouter } from "@/vitest.setup"
 
-vi.mock("react", async (importActual) => {
-  const actual = await importActual<typeof import("react")>()
+vi.mock("next/navigation", () => ({
+  useRouter: vi.fn(() => mockUseRouter),
+}))
 
-  return {
-    ...actual,
-    useActionState: vi.fn(),
-  }
-})
-
-vi.mock("next/navigation")
-
-vi.mock("resend", () => {
-  return {
-    Resend: vi.fn().mockImplementation(() => {
-      return {
-        sendEmail: vi.fn().mockResolvedValue({ success: true }),
-      }
-    }),
-  }
-})
+vi.mock("@/lib/auth-client", () => ({
+  authClient: {
+    signIn: {
+      email: vi.fn(),
+      passkey: vi.fn(),
+    },
+  },
+}))
 
 describe("Sign In Form", () => {
-  beforeEach(() => {
-    vi.mocked(useRouter).mockReturnValue(mockRouter)
-    vi.mocked(useActionState).mockReturnValue([{ success: false, message: "", error: {} }, vi.fn(), false])
-  })
-
-  afterEach(() => {
-    vi.restoreAllMocks()
+  beforeAll(() => {
+    // @ts-ignore
+    global.PublicKeyCredential = {
+      isConditionalMediationAvailable: vi.fn(),
+      isUserVerifyingPlatformAuthenticatorAvailable: vi.fn(),
+    }
   })
 
   it("should render the form with all elements", () => {
@@ -41,70 +31,113 @@ describe("Sign In Form", () => {
 
     expect(screen.getByTestId("sign-in-email-input")).toBeInTheDocument()
     expect(screen.getByTestId("sign-in-password-input")).toBeInTheDocument()
+    expect(screen.getByTestId("sign-in-remember-me-checkbox")).toBeInTheDocument()
     expect(screen.getByText(/Forgot Password/i)).toBeInTheDocument()
-    expect(screen.getByTestId("sign-in-submit-button")).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: /Sign in with email and password/i })).toBeInTheDocument()
     expect(screen.getByText(/Sign Up/i)).toBeInTheDocument()
-    expect(screen.getByTestId("sign-in-magic-link-button")).toBeInTheDocument()
-    // expect(screen.getByTestId("sign-up-passkey-button")).toBeInTheDocument()
-    // expect(screen.getByTestId("sign-in-passkey-button")).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: /Magic Link/i })).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: /Sign in with Discord/i })).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: /Sign in with Facebook/i })).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: /Sign in with GitHub/i })).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: /Sign in with GitLab/i })).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: /Sign in with Google/i })).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: /Sign in with Twitch/i })).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: /Sign in with Twitter\/X/i })).toBeInTheDocument()
   })
 
-  it("should have correct required properties for form fields", () => {
+  it("should correctly mark form fields as required", () => {
     render(<SignInForm />)
 
     expect(screen.getByTestId("sign-in-email-input")).toHaveAttribute("required")
     expect(screen.getByTestId("sign-in-password-input")).toHaveAttribute("required")
   })
 
-  it("should navigate to correct routes on link clicks", () => {
+  it("should display the forgot password link", () => {
     render(<SignInForm />)
 
-    const forgotPasswordLink = screen.getByText(/Forgot Password/i)
+    const forgotPasswordLink: HTMLElement = screen.getByTestId("sign-in-forgot-password-link")
     expect(forgotPasswordLink).toBeInTheDocument()
-    expect(forgotPasswordLink.closest("a")).toHaveAttribute("href", ROUTE_FORGOT_PASSWORD.PATH)
+    expect(forgotPasswordLink).toHaveAttribute("href", ROUTE_FORGOT_PASSWORD.PATH)
+  })
 
-    const signUpLink = screen.getByText(/Sign Up/i)
+  it("should display the sign up link", () => {
+    render(<SignInForm />)
+
+    const signUpLink: HTMLElement = screen.getByTestId("sign-in-sign-up-link")
     expect(signUpLink).toBeInTheDocument()
-    expect(signUpLink.closest("a")).toHaveAttribute("href", ROUTE_SIGN_UP.PATH)
-
-    fireEvent.click(screen.getByTestId("sign-in-magic-link-button"))
-    expect(mockRouter.push).toHaveBeenCalledWith(ROUTE_SIGN_IN_WITH_MAGIC_LINK.PATH)
+    expect(signUpLink).toHaveAttribute("href", ROUTE_SIGN_UP.PATH)
   })
 
-  it("should show error messages when submitting an empty form", () => {
-    vi.mocked(useActionState).mockReturnValue([
-      { success: false, message: "The email or the password is invalid." },
-      vi.fn(),
-      false,
-    ])
+  it("should navigate to the magic link page when the magic link button is clicked", () => {
+    const mockPush: Mock = vi.fn()
+    mockUseRouter.push = mockPush
 
     render(<SignInForm />)
+
+    fireEvent.click(screen.getByRole("button", { name: /Magic Link/i }))
+    expect(mockPush).toHaveBeenCalledWith(ROUTE_SIGN_IN_WITH_MAGIC_LINK.PATH)
+  })
+
+  it("should display error messages when the form is submitted with empty fields", () => {
+    render(<SignInForm />)
+
+    fireEvent.click(screen.getByRole("button", { name: /Sign in with email and password/i }))
 
     expect(screen.getByText(/The email or the password is invalid/i)).toBeInTheDocument()
   })
 
-  it("should show an error for invalid email or password format", () => {
-    vi.mocked(useActionState).mockReturnValue([
-      { success: false, message: "The email or the password is invalid." },
-      vi.fn(),
-      false,
-    ])
+  it("should display error messages for invalid email or password format", async () => {
+    const { authClient } = await import("@/lib/auth-client")
+    const mockSignInEmail: Mock = authClient.signIn.email as Mock
+
+    mockSignInEmail.mockImplementation(async (_, callbacks) => {
+      callbacks.onRequest()
+      await new Promise((resolve) => setTimeout(resolve, 100))
+      callbacks.onError({
+        error: { message: "Invalid email or password" },
+      })
+    })
 
     render(<SignInForm />)
 
-    expect(screen.getByText(/The email or the password is invalid/i)).toBeInTheDocument()
+    fireEvent.input(screen.getByTestId("sign-in-email-input"), { target: { value: "john.doe@example.com" } })
+    fireEvent.input(screen.getByTestId("sign-in-password-input"), { target: { value: "Password!" } })
+    fireEvent.click(screen.getByRole("button", { name: /Sign in with email and password/i }))
+
+    await waitFor(() => {
+      expect(screen.getByText(/Invalid email or password/i)).toBeInTheDocument()
+    })
   })
 
-  it("should disable the submit and social buttons when the form is submitting", () => {
-    vi.mocked(useActionState).mockReturnValue([{ success: false, message: "" }, vi.fn(), true])
+  it("should disable all sign in buttons during form submission", async () => {
+    const { authClient } = await import("@/lib/auth-client")
+    const mockSignInEmail: Mock = authClient.signIn.email as Mock
+
+    mockSignInEmail.mockImplementation(async (_, callbacks) => {
+      callbacks.onRequest()
+      await new Promise((resolve) => setTimeout(resolve, 100))
+      callbacks.onSuccess()
+    })
 
     render(<SignInForm />)
 
-    expect(screen.getByTestId("sign-in-submit-button")).toBeDisabled()
-    expect(screen.getByTestId("sign-in-magic-link-button")).toBeDisabled()
-    // expect(screen.getByTestId("sign-up-passkey-button")).toBeDisabled()
-    // expect(screen.getByTestId("sign-in-passkey-button")).toBeDisabled()
-    expect(screen.getByTestId("sign-in-github-button")).toBeDisabled()
-    expect(screen.getByTestId("sign-in-google-button")).toBeDisabled()
+    fireEvent.input(screen.getByTestId("sign-in-email-input"), { target: { value: "john.doe@example.com" } })
+    fireEvent.input(screen.getByTestId("sign-in-password-input"), { target: { value: "Password123!" } })
+
+    const submitButton: HTMLButtonElement = screen.getByRole("button", { name: /Sign in with email and password/i })
+    fireEvent.click(submitButton)
+
+    expect(submitButton).toBeDisabled()
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: /Magic Link/i })).toBeDisabled()
+      expect(screen.getByRole("button", { name: /Sign in with Discord/i })).toBeDisabled()
+      expect(screen.getByRole("button", { name: /Sign in with Facebook/i })).toBeDisabled()
+      expect(screen.getByRole("button", { name: /Sign in with GitHub/i })).toBeDisabled()
+      expect(screen.getByRole("button", { name: /Sign in with GitLab/i })).toBeDisabled()
+      expect(screen.getByRole("button", { name: /Sign in with Google/i })).toBeDisabled()
+      expect(screen.getByRole("button", { name: /Sign in with Twitch/i })).toBeDisabled()
+      expect(screen.getByRole("button", { name: /Sign in with Twitter\/X/i })).toBeDisabled()
+    })
   })
 })
