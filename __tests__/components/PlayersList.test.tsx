@@ -24,7 +24,7 @@ describe("PlayersList Component", () => {
   })
 
   it("should render the players list correctly", () => {
-    render(<PlayersList users={players} full={true} onSelectedPlayer={handleSelectedPlayer} />)
+    render(<PlayersList users={players} onSelectedPlayer={handleSelectedPlayer} />)
 
     players.forEach((player: ITowersUserRoomTable) => {
       expect(screen.getByText(player.userProfile?.user?.username!)).toBeInTheDocument()
@@ -32,7 +32,7 @@ describe("PlayersList Component", () => {
   })
 
   it("should sort players by name in ascending and descending order", () => {
-    render(<PlayersList users={players} full={true} onSelectedPlayer={handleSelectedPlayer} />)
+    render(<PlayersList users={players} onSelectedPlayer={handleSelectedPlayer} />)
 
     players.forEach((player: ITowersUserRoomTable) => {
       fireEvent.click(screen.getByText("Name"))
@@ -41,14 +41,14 @@ describe("PlayersList Component", () => {
   })
 
   it("should call onSelectedPlayer when a player row is clicked", () => {
-    render(<PlayersList users={players} full={true} onSelectedPlayer={handleSelectedPlayer} />)
+    render(<PlayersList users={players} onSelectedPlayer={handleSelectedPlayer} />)
 
     fireEvent.click(screen.getByText(players[0].userProfile?.user?.username!))
     expect(handleSelectedPlayer).toHaveBeenCalledWith(player1.id)
   })
 
   it("should open the PlayerInformation modal when a player row is double-clicked", () => {
-    render(<PlayersList users={players} full={true} onSelectedPlayer={handleSelectedPlayer} />)
+    render(<PlayersList users={players} onSelectedPlayer={handleSelectedPlayer} />)
 
     fireEvent.doubleClick(screen.getByText(players[0].userProfile?.user?.username!))
     expect(screen.getByTestId("player-information-modal")).toBeInTheDocument()

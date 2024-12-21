@@ -139,52 +139,42 @@ export default memo(function Table({ roomId, tableId }: TableProps): ReactNode {
   const [errorMessages, setErrorMessages] = useState<ChangeTableOptionsFormValidationErrors>({})
   const formRef: RefObject<HTMLFormElement | null> = useRef<HTMLFormElement | null>(null)
 
-  const initializeTable = useCallback(
-    (signal: AbortSignal): void => {
-      if (!isJoinedTable) {
-        dispatch(joinTable({ roomId, tableId }))
-          .unwrap()
-          .then(async (data: SocketTableThunkResponse) => {
-            if (data.towersUserRoomTable) {
-              dispatch(joinTableSocketRoom({ roomId, tableId, towersUserRoomTable: data.towersUserRoomTable }))
-            }
+  const initializeTable = useCallback((): void => {
+    if (!isJoinedTable) {
+      dispatch(joinTable({ roomId, tableId }))
+        .unwrap()
+        .then(async (data: SocketTableThunkResponse) => {
+          if (data.towersUserRoomTable) {
+            dispatch(joinTableSocketRoom({ roomId, tableId, towersUserRoomTable: data.towersUserRoomTable }))
+          }
 
-            // Fetch room and table data
-            dispatch(fetchRoomUsers({ roomId, signal }))
-            dispatch(fetchTableInfo({ roomId, tableId, signal }))
+          // Fetch room and table data
+          dispatch(fetchRoomUsers({ roomId }))
+          dispatch(fetchTableInfo({ roomId, tableId }))
 
-            const tableUsers: ITowersUserRoomTable[] = await dispatch(fetchTableUsers({ roomId, tableId })).unwrap()
-            dispatch(updateTable({ roomId, tableId, users: tableUsers }))
+          const tableUsers: ITowersUserRoomTable[] = await dispatch(fetchTableUsers({ roomId, tableId })).unwrap()
+          dispatch(updateTable({ roomId, tableId, users: tableUsers }))
 
-            if (session?.user.id) {
-              await dispatch(fetchTableChat({ roomId, tableId, session, signal })).unwrap()
+          if (session?.user.id) {
+            await dispatch(fetchTableChat({ roomId, tableId, session })).unwrap()
 
-              // Display join message
-              dispatch(
-                sendTableAutomatedChatMessage({
-                  roomId,
-                  tableId,
-                  message: `${session?.user.username} joined the table.`,
-                  type: TableChatMessageType.USER_ACTION,
-                }),
-              )
-            }
-          })
-      }
-    },
-    [isJoinedTable],
-  )
+            // Display join message
+            dispatch(
+              sendTableAutomatedChatMessage({
+                roomId,
+                tableId,
+                message: `${session?.user.username} joined the table.`,
+                type: TableChatMessageType.USER_ACTION,
+              }),
+            )
+          }
+        })
+    }
+  }, [isJoinedTable])
 
   useEffect(() => {
-    const abortController: AbortController = new AbortController()
-    const { signal } = abortController
-
     if (isConnected) {
-      initializeTable(signal)
-    }
-
-    return () => {
-      abortController.abort()
+      initializeTable()
     }
   }, [isConnected])
 
@@ -402,12 +392,12 @@ export default memo(function Table({ roomId, tableId }: TableProps): ReactNode {
 
   return (
     <>
-      <form ref={formRef} noValidate onSubmit={(event: FormEvent<HTMLFormElement>) => handleFormValidation(event)}>
-        <div className="grid [grid-template-areas:'banner_banner_banner''sidebar_game_game''sidebar_chat_chat'] grid-rows-table grid-cols-table h-screen -m-4 bg-gray-100 text-black">
+      <form ref={formRef} noValidate onSubmit={handleFormValidation}>
+        <div className="grid [grid-template-areas:'banner_banner_banner''sidebar_content_content''sidebar_content_content'] grid-rows-game grid-cols-game h-screen -m-4 -mb-8 bg-gray-100 text-black">
           <TableHeader room={roomInfo} table={tableInfo} />
 
           {/* Left sidebar */}
-          <div className="[grid-area:sidebar] flex flex-col justify-between w-56 p-2 bg-gray-200">
+          <div className="[grid-area:sidebar] flex flex-col justify-between p-2 bg-gray-200">
             <div className="space-y-2">
               <Button
                 className="w-full"
@@ -492,142 +482,148 @@ export default memo(function Table({ roomId, tableId }: TableProps): ReactNode {
             </div>
           </div>
 
-          {/* Center part */}
-          <div className="[grid-area:game] flex items-center gap-2 w-full px-2 pb-2">
-            <div className="flex items-center w-full h-full border bg-neutral-50">
-              <div className="relative grid grid-rows-table-team grid-cols-table-team gap-2 w-fit p-2 mx-auto bg-neutral-50">
-                {/* Game countdown */}
-                {isGameState === GameState.COUNTDOWN && (
-                  <div className="absolute left-1/2 -translate-x-1/2 bottom-[8px] z-30 flex flex-col items-center w-[450px] h-48 p-1 border-2 border-gray-400 bg-gray-200 shadow-lg">
-                    <div className="text-2xl">The next game is starting in</div>
-                    <div className="flex-1 flex items-center text-7xl text-orange-400 font-semibold normal-nums">
-                      14
+          {/* Content */}
+          <div className="[grid-area:content] grid [grid-template-areas:'seats''chat'] grid-rows-game-content gap-2 px-2 pb-2">
+            {/* Seats */}
+            <div className="[grid-area:seats] flex flex-col border bg-white">
+              <div className="flex items-center w-full h-full border bg-neutral-50">
+                <div className="relative grid grid-rows-table-team grid-cols-table-team w-fit p-2 mx-auto bg-neutral-50">
+                  {/* Game countdown */}
+                  {isGameState === GameState.COUNTDOWN && (
+                    <div className="absolute left-1/2 -translate-x-1/2 bottom-[8px] z-30 flex flex-col items-center w-[450px] h-48 p-1 border-2 border-gray-400 bg-gray-200 shadow-lg">
+                      <div className="text-2xl">The next game is starting in</div>
+                      <div className="flex-1 flex items-center text-7xl text-orange-400 font-semibold normal-nums">
+                        14
+                      </div>
+                      <div className="text-2xl">seconds</div>
                     </div>
-                    <div className="text-2xl">seconds</div>
-                  </div>
-                )}
+                  )}
 
-                {/* Game over */}
-                {isGameState === GameState.GAME_OVER && (
-                  <div className="absolute left-0 top-0 gap-8 z-30 flex flex-col justify-start items-center w-full h-max p-1 mt-16 font-medium [text-shadow:_4px_4px_0_rgb(0_0_0)] animate-move-up">
-                    <div className="text-8xl text-fuchsia-600">Game Over</div>
-                    <div className="text-6xl text-yellow-400">You win!</div>
-                    {/* <div className="flex flex-col gap-8 items-center text-6xl">
-                      <div className="text-yellow-400">You lose!</div>
-                      <div className="text-fuchsia-600">Congratulations</div>
-                      <div className="text-fuchsia-600">the_player1</div>
-                    </div> */}
-                  </div>
-                )}
+                  {/* Game over */}
+                  {isGameState === GameState.GAME_OVER && (
+                    <div className="absolute left-0 top-0 gap-8 z-30 flex flex-col justify-start items-center w-full h-max p-1 mt-16 font-medium [text-shadow:_4px_4px_0_rgb(0_0_0)] animate-move-up">
+                      <div className="text-8xl text-fuchsia-600">Game Over</div>
+                      <div className="text-6xl text-yellow-400">You win!</div>
+                      {/* <div className="flex flex-col gap-8 items-center text-6xl">
+                        <div className="text-yellow-400">You lose!</div>
+                        <div className="text-fuchsia-600">Congratulations</div>
+                        <div className="text-fuchsia-600">the_player1</div>
+                      </div> */}
+                    </div>
+                  )}
 
-                {/* Controls and game timer */}
-                <div className="row-span-3 flex flex-col justify-between items-start px-2 py-1 text-lg">
-                  <div>
-                    <div className="flex flex-row gap-2">
-                      <div>Left:</div> <div className="text-gray-500">Left Arrow</div>
+                  {/* Controls and game timer */}
+                  <div className="row-span-3 flex flex-col justify-evenly items-start px-2 py-1 text-lg">
+                    <div className="text-base">
+                      <div className="flex flex-row gap-2">
+                        <div>Left:</div> <div className="text-gray-500">Left Arrow</div>
+                      </div>
+                      <div className="flex flex-row gap-2">
+                        <div>Right:</div> <div className="text-gray-500">Right Arrow</div>
+                      </div>
+                      <div className="flex flex-row gap-2">
+                        <div>Drop:</div> <div className="text-gray-500">Down Arrow</div>
+                      </div>
+                      <div className="flex flex-row gap-2">
+                        <div>Cycle Color:</div> <div className="text-gray-500">Up Arrow</div>
+                      </div>
+                      <div className="flex flex-row gap-2">
+                        <div>Use Item:</div> <div className="text-gray-500">Space Bar</div>
+                      </div>
                     </div>
-                    <div className="flex flex-row gap-2">
-                      <div>Right:</div> <div className="text-gray-500">Right Arrow</div>
-                    </div>
-                    <div className="flex flex-row gap-2">
-                      <div>Drop:</div> <div className="text-gray-500">Down Arrow</div>
-                    </div>
-                    <div className="flex flex-row gap-2">
-                      <div>Cycle Color:</div> <div className="text-gray-500">Up Arrow</div>
-                    </div>
-                    <div className="flex flex-row gap-2">
-                      <div>Use Item:</div> <div className="text-gray-500">Space Bar</div>
-                    </div>
-                  </div>
-                  <div className="w-full border-double border-8 border-neutral-300 font-mono text-gray-400 text-6xl text-center tabular-nums">
-                    --:--
-                  </div>
-                </div>
-
-                {/* Game */}
-                {seatsCss.map((group: SeatsCss, index: number) => (
-                  <div
-                    key={index}
-                    className={clsx(
-                      `row-span-${group.rowSpan}`,
-                      index === 0 ? "flex flex-row justify-center items-center" : "",
-                    )}
-                  >
-                    <div className={index === 0 ? "contents" : "flex flex-row justify-center items-center"}>
-                      {group.seatNumbers.map((seat: number) => (
-                        <PlayerBoard
-                          key={seat}
-                          seatNumber={seat}
-                          isOpponentBoard={group.team > 1}
-                          isReversed={seat % 2 === 0}
-                          isSeated={seatedSeats.has(seat)}
-                          isSeatOccupied={seatUnavailable}
-                          onChooseSeat={handleSeatClick}
-                        />
-                      ))}
+                    <div className="w-full border-double border-8 border-neutral-300 font-mono text-gray-400 text-6xl text-center tabular-nums">
+                      --:--
                     </div>
                   </div>
-                ))}
 
-                {/* <div className="row-span-5 flex flex-row justify-center items-center">
-                  <PlayerBoard boardNumber={1} />
-                  <PlayerBoard boardNumber={2} isReversed />
-                </div>
-                <div className="row-span-3">
-                  <div className="flex flex-row justify-center items-center">
-                    <PlayerBoard boardNumber={5} isOpponentBoard />
-                    <PlayerBoard boardNumber={6} isOpponentBoard isReversed />
+                  {/* Game */}
+                  {seatsCss.map((group: SeatsCss, index: number) => (
+                    <div
+                      key={index}
+                      className={clsx(
+                        `row-span-${group.rowSpan}`,
+                        index === 0 ? "flex flex-row justify-center items-start h-max" : "",
+                      )}
+                    >
+                      <div className={index === 0 ? "contents" : "flex flex-row justify-center items-center"}>
+                        {group.seatNumbers.map((seat: number) => (
+                          <PlayerBoard
+                            key={seat}
+                            seatNumber={seat}
+                            isOpponentBoard={group.team > 1}
+                            isReversed={seat % 2 === 0}
+                            isSeated={seatedSeats.has(seat)}
+                            isSeatOccupied={seatUnavailable}
+                            onChooseSeat={handleSeatClick}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+
+                  {/* <div className="row-span-5 flex flex-row justify-center items-center">
+                    <PlayerBoard boardNumber={1} />
+                    <PlayerBoard boardNumber={2} isReversed />
                   </div>
-                </div>
-                <div className="row-span-3">
-                  <div className="flex flex-row justify-center items-center">
-                    <PlayerBoard boardNumber={3} isOpponentBoard />
-                    <PlayerBoard boardNumber={4} isOpponentBoard isReversed />
+                  <div className="row-span-3">
+                    <div className="flex flex-row justify-center items-center">
+                      <PlayerBoard boardNumber={5} isOpponentBoard />
+                      <PlayerBoard boardNumber={6} isOpponentBoard isReversed />
+                    </div>
                   </div>
-                </div>
-                <div className="row-span-3">
-                  <div className="flex flex-row justify-center items-center">
-                    <PlayerBoard boardNumber={7} isOpponentBoard />
-                    <PlayerBoard boardNumber={8} isOpponentBoard isReversed />
+                  <div className="row-span-3">
+                    <div className="flex flex-row justify-center items-center">
+                      <PlayerBoard boardNumber={3} isOpponentBoard />
+                      <PlayerBoard boardNumber={4} isOpponentBoard isReversed />
+                    </div>
                   </div>
-                </div> */}
+                  <div className="row-span-3">
+                    <div className="flex flex-row justify-center items-center">
+                      <PlayerBoard boardNumber={7} isOpponentBoard />
+                      <PlayerBoard boardNumber={8} isOpponentBoard isReversed />
+                    </div>
+                  </div> */}
 
-                <div className="row-span-1 flex flex-col justify-start w-[515px] px-2 bg-neutral-200 font-mono">
-                  {/* Next power to be used by current player */}
-                  <span className="w-full truncate">You can send a midas piece</span>
-                  {/* Power used by other players */}
-                  <span className="w-full text-gray-500 truncate">
-                    the_player1 mega defused the_player1abcdefghijklmnopqrstuvwxyz
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Chat and users list */}
-          <div className="[grid-area:chat] flex gap-2 px-2 pb-2">
-            <div className="flex-1 flex flex-col">
-              <ServerMessage roomId={roomId} tableId={tableId} />
-
-              {/* Chat */}
-              <div className="flex-1 flex flex-col gap-1 overflow-hidden p-2 border bg-white">
-                <input
-                  ref={messageInputRef}
-                  type="text"
-                  className="w-full p-2 border"
-                  placeholder="Write something..."
-                  maxLength={CHAT_MESSSAGE_MAX_LENGTH}
-                  disabled={isChatLoading}
-                  onKeyDown={handleSendMessage}
-                />
-                <div className="overflow-y-auto p-1">
-                  <Chat messages={chat} userId={session?.user.id} />
-                  <div ref={chatEndRef} />
+                  <div className="row-span-1 flex flex-col justify-start w-[488px] px-2 mt-2 bg-neutral-200 text-sm font-mono">
+                    {/* Next power to be used by current player */}
+                    <span className="w-full truncate">You can send a midas piece</span>
+                    {/* Power used by other players */}
+                    <span className="w-full text-gray-500 truncate">
+                      the_player1 mega defused the_player1abcdefghijklmnopqrstuvwxyz
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <PlayersList users={tableUsers} isRatingsVisible={roomInfo && roomInfo?.difficulty !== RoomLevel.SOCIAL} />
+            {/* Chat and users list */}
+            <div className="[grid-area:chat] flex gap-2">
+              <div className="flex-1 flex flex-col gap-1 border bg-white">
+                <ServerMessage roomId={roomId} tableId={tableId} />
+
+                {/* Chat */}
+                <div className="flex flex-col gap-1 h-full px-2">
+                  <input
+                    ref={messageInputRef}
+                    type="text"
+                    className="w-full p-2 border"
+                    placeholder="Write something..."
+                    maxLength={CHAT_MESSSAGE_MAX_LENGTH}
+                    disabled={isChatLoading}
+                    onKeyDown={handleSendMessage}
+                  />
+                  <div className="overflow-y-auto flex-1 my-1">
+                    <Chat messages={chat} userId={session?.user.id} />
+                    <div ref={chatEndRef} />
+                  </div>
+                </div>
+              </div>
+
+              <PlayersList
+                users={tableUsers}
+                isRatingsVisible={roomInfo && roomInfo?.difficulty !== RoomLevel.SOCIAL}
+              />
+            </div>
           </div>
         </div>
       </form>

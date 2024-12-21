@@ -65,7 +65,7 @@ export default function Modal({
       data-testid={dataTestId}
       onCancel={handleCancel}
     >
-      <form noValidate onSubmit={(event: FormEvent<HTMLFormElement>) => handleConfirm(event)}>
+      <form noValidate onSubmit={handleConfirm}>
         <div className="flex justify-between items-center px-4 py-3 border-b border-gray-300">
           <h3 className="text-2xl">{title}</h3>
           <button

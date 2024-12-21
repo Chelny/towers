@@ -1,6 +1,5 @@
 import { ReactNode } from "react"
 import { TowersLetter } from "@/interfaces/game"
-import styles from "./Block.module.scss"
 
 type DefenseBlockProps = {
   letter?: TowersLetter
@@ -9,12 +8,12 @@ type DefenseBlockProps = {
 export default function DefenseBlock(props: DefenseBlockProps): ReactNode {
   return (
     <>
-      <div className={`${styles.BlockCubeFace} ${styles.BlockCubeFront}`}>{props.letter}</div>
-      <div className={`${styles.BlockCubeFace} ${styles.BlockCubeRight}`}>{props.letter}</div>
-      <div className={`${styles.BlockCubeFace} ${styles.BlockCubeBack}`}>{props.letter}</div>
-      <div className={`${styles.BlockCubeFace} ${styles.BlockCubeLeft}`}>{props.letter}</div>
-      <div className={`${styles.BlockCubeFace} ${styles.BlockCubeTop}`}></div>
-      <div className={`${styles.BlockCubeFace} ${styles.BlockCubeBottom}`}></div>
+      <div className="block-cube--face block-cube--front">{props.letter}</div>
+      <div className="block-cube--face block-cube--right">{props.letter}</div>
+      <div className="block-cube--face block-cube--back">{props.letter}</div>
+      <div className="block-cube--face block-cube--left">{props.letter}</div>
+      <div className="block-cube--face block-cube--top"></div>
+      <div className="block-cube--face block-cube--bottom"></div>
     </>
   )
 }

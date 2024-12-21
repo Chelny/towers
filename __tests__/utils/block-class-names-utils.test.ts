@@ -18,7 +18,7 @@ describe("getClassNameForBlock Utility", () => {
       { ...defaultTowersBlockProps, letter: "R" },
       { ...defaultTowersBlockProps, letter: "S" },
     ]
-    const expectedClasses: string[] = ["BlockT", "BlockO", "BlockW", "BlockE", "BlockR", "BlockS"]
+    const expectedClasses: string[] = ["block-t", "block-o", "block-w", "block-e", "block-r", "block-s"]
 
     towersBlocks.forEach((block: TowersBlock, index: number) => {
       expect(getClassNameForBlock(block)).toBe(expectedClasses[index])
@@ -28,13 +28,13 @@ describe("getClassNameForBlock Utility", () => {
   it("should return the correct class name for Medusa block", () => {
     const medusaBlock: MedusaBlock = { letter: "ME" }
 
-    expect(getClassNameForBlock(medusaBlock)).toBe("BlockMedusa")
+    expect(getClassNameForBlock(medusaBlock)).toBe("block-medusa")
   })
 
   it("should return the correct class name for Midas block", () => {
     const midasBlock: MidasBlock = { letter: "MI" }
 
-    expect(getClassNameForBlock(midasBlock)).toBe("BlockMidas")
+    expect(getClassNameForBlock(midasBlock)).toBe("block-midas")
   })
 
   it("should return an empty string for special diamond", () => {
@@ -52,7 +52,7 @@ describe("getClassNameForBlockPowerType Utility", () => {
       powerLevel: "minor",
     }
 
-    expect(getClassNameForBlockPowerType(attackBlock)).toBe("AttackBlock")
+    expect(getClassNameForBlockPowerType(attackBlock)).toBe("attack-block")
   })
 
   it("should return the correct class name for defense power type", () => {
@@ -63,7 +63,7 @@ describe("getClassNameForBlockPowerType Utility", () => {
       powerLevel: "minor",
     }
 
-    expect(getClassNameForBlockPowerType(defenseBlock)).toBe("DefenseBlock")
+    expect(getClassNameForBlockPowerType(defenseBlock)).toBe("defense-block")
   })
 
   it("should return an empty string for unknown power types", () => {

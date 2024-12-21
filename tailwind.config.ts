@@ -12,13 +12,14 @@ const config: Config = {
     },
     extend: {
       gridTemplateRows: {
-        table: "max-content 2fr minmax(0, 1fr)",
+        game: "max-content 1fr max-content",
+        "game-content": "auto minmax(25%, 35%)",
         "table-team": "repeat(6, max-content)",
         "grid-container": "repeat(var(--grid-rows), calc(var(--grid-cell-size) * 1px))",
         "grid-container-opponent": "repeat(var(--grid-rows), calc(var(--grid-cell-size-opponent) * 1px))",
       },
       gridTemplateColumns: {
-        table: "max-content repeat(2, 1fr)",
+        game: "208px 1fr max-content",
         "table-team": "224px 1fr 224px", // player-board-opponent * 2
         "grid-row": "repeat(var(--grid-cols), calc(var(--grid-cell-size) * 1px))",
         "grid-row-opponent": "repeat(var(--grid-cols), calc(var(--grid-cell-size-opponent) * 1px))",
@@ -41,13 +42,22 @@ const config: Config = {
         "power-bar": "calc(var(--grid-cell-size) * 8px + 16px)",
       },
       keyframes: {
+        "move-background": {
+          "0%": { backgroundPosition: "bottom" },
+          "100%": { backgroundPosition: "top" },
+        },
         "move-up": {
           "0%": { transform: "translateY(100%)", opacity: "0" },
           "100%": { transform: "translateY(0)", opacity: "1" },
         },
       },
       animation: {
+        "move-background": "move-background 120s linear infinite",
         "move-up": "move-up 1.5s ease-in-out forwards",
+      },
+      screens: {
+        short: { raw: "(max-height: 991px)" },
+        tall: { raw: "(min-height: 992px)" },
       },
     },
   },

@@ -66,7 +66,6 @@ export function LinkedSocialAccountsForm(): ReactNode {
             setAccountsList((prev) => [...prev, { id: ctx.data.id, provider: providerName }])
           },
           onError: (ctx) => {
-            console.log("CHELNY onError", ctx)
             setIsLoading(false)
             setFormState({
               success: false,

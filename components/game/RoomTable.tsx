@@ -32,13 +32,13 @@ export default function RoomTable({ roomId, tableId }: RoomTableProps): ReactNod
 
   return (
     <div className="flex flex-col">
-      <div className="flex items-center border-b-2 border-b-gray-300">
-        <div className="basis-20 row-span-2 flex justify-center items-center h-full px-2 border-gray-300">
+      <div className="flex items-center border-b border-b-gray-300">
+        <div className="basis-16 row-span-2 flex justify-center items-center h-full px-2 border-gray-300">
           #{tableInfo?.tableNumber}
         </div>
         <div className="flex-1 flex flex-col gap-1 h-full px-2 border-l border-gray-300 divide-y divide-gray-200">
           <div className="flex flex-1 gap-1 pt-3 pb-2">
-            <div className="basis-32 border-gray-300">
+            <div className="basis-28 border-gray-300">
               <Button
                 className="w-full h-full"
                 disabled={isRoomTablesLoading || tableInfo?.tableType === TableType.PRIVATE}
@@ -57,14 +57,14 @@ export default function RoomTable({ roomId, tableId }: RoomTableProps): ReactNod
                     return userRoomTable?.userProfile?.user ? (
                       <div
                         key={colIndex}
-                        className="flex items-center justify-center w-36 p-1 border border-gray-300 rounded"
+                        className="flex items-center justify-center w-28 p-1 border border-gray-300 rounded"
                       >
                         <span className="truncate">{userRoomTable.userProfile?.user?.username}</span>
                       </div>
                     ) : (
                       <Button
                         key={colIndex}
-                        className="w-36"
+                        className="w-28"
                         disabled={
                           isRoomTablesLoading ||
                           tableInfo?.tableType === TableType.PROTECTED ||

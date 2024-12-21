@@ -1,6 +1,5 @@
 import { ReactNode } from "react"
 import { SpecialDiamond } from "@/interfaces/game"
-import styles from "./Block.module.scss"
 
 type SpecialDiamondBlockProps = {
   block: SpecialDiamond
@@ -10,21 +9,15 @@ export default function SpecialDiamondBlock(props: SpecialDiamondBlockProps): Re
   return (
     <>
       {props.block.specialDiamondType === "speed drop" && (
-        <div
-          className={`${styles.SpecialDiamond} ${styles.SpecialDiamond1}`}
-          data-testid="special-diamond-speed-drop"
-        ></div>
+        <div className="special-diamond special-diamond1" data-testid="special-diamond-speed-drop"></div>
       )}
 
       {props.block.specialDiamondType === "remove powers" && (
-        <div
-          className={`${styles.SpecialDiamond} ${styles.SpecialDiamond2}`}
-          data-testid="special-diamond-remove-powers"
-        ></div>
+        <div className="special-diamond special-diamond2" data-testid="special-diamond-remove-powers"></div>
       )}
 
       {props.block.specialDiamondType === "remove stones" && (
-        <div className={`${styles.SpecialDiamond}`} data-testid="special-diamond-remove-stones"></div>
+        <div className="special-diamond" data-testid="special-diamond-remove-stones"></div>
       )}
     </>
   )

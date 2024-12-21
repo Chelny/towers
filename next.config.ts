@@ -103,9 +103,6 @@ const nextConfig: NextConfig = {
   },
   poweredByHeader: false,
   reactStrictMode: true,
-  sassOptions: {
-    silenceDeprecations: ["legacy-js-api"],
-  },
   async headers() {
     return [
       {

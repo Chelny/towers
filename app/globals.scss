@@ -1,11 +1,12 @@
+@use "./styles/towers";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
   /* Board */
-  --grid-cell-size: 32;
-  --grid-cell-size-opponent: 16;
+  --grid-cell-size: 30;
+  --grid-cell-size-opponent: 15;
   --grid-rows: 13;
   --grid-cols: 6;
 
@@ -69,7 +70,7 @@ dialog::backdrop {
   @apply flex;
 }
 
-@media (min-width: 1350px) and (min-height: 768px) {
+@media (min-width: 1275px) and (min-height: 768px) {
   .small-screen-warning {
     @apply hidden;
   }

@@ -78,37 +78,27 @@ export default memo(function Room({ roomId }: RoomProps): ReactNode {
   const [isCreateTableModalOpen, setIsCreateTableModalOpen] = useState<boolean>(false)
   const [invitationModals, setInvitationModals] = useState<{ id: string; data: TableInvitationData }[]>([])
 
-  const initializeRoom = useCallback(
-    (signal: AbortSignal): void => {
-      if (!isJoinedRoom) {
-        dispatch(joinRoom({ roomId }))
-          .unwrap()
-          .then((data: SocketRoomThunkResponse) => {
-            if (data.towersUserRoomTable) {
-              dispatch(joinRoomSocketRoom({ roomId, towersUserRoomTable: data.towersUserRoomTable }))
-            }
+  const initializeRoom = useCallback((): void => {
+    if (!isJoinedRoom) {
+      dispatch(joinRoom({ roomId }))
+        .unwrap()
+        .then((data: SocketRoomThunkResponse) => {
+          if (data.towersUserRoomTable) {
+            dispatch(joinRoomSocketRoom({ roomId, towersUserRoomTable: data.towersUserRoomTable }))
+          }
 
-            // Fetch room data
-            dispatch(fetchRoomInfo({ roomId, signal }))
-            dispatch(fetchRoomChat({ roomId, signal }))
-            dispatch(fetchRoomUsers({ roomId, signal }))
-            dispatch(fetchRoomTables({ roomId, signal }))
-          })
-      }
-    },
-    [isJoinedRoom],
-  )
+          // Fetch room data
+          dispatch(fetchRoomInfo({ roomId }))
+          dispatch(fetchRoomChat({ roomId }))
+          dispatch(fetchRoomUsers({ roomId }))
+          dispatch(fetchRoomTables({ roomId }))
+        })
+    }
+  }, [isJoinedRoom])
 
   useEffect(() => {
-    const abortController: AbortController = new AbortController()
-    const { signal } = abortController
-
     if (roomId && isConnected) {
-      initializeRoom(signal)
-    }
-
-    return () => {
-      abortController.abort()
+      initializeRoom()
     }
   }, [roomId, isConnected])
 
@@ -190,122 +180,119 @@ export default memo(function Room({ roomId }: RoomProps): ReactNode {
 
   return (
     <>
-      <div className="flex flex-col h-screen -m-4 bg-gray-100 text-black">
+      <div className="grid [grid-template-areas:'banner_banner_banner''sidebar_content_content''sidebar_content_content'] grid-rows-game grid-cols-game h-screen -m-4 -mb-8 bg-gray-100 text-black">
         <RoomHeader room={roomInfo} />
 
-        <div className="flex-1 flex overflow-hidden">
-          {/* Left sidebar */}
-          <div className="flex flex-col justify-between w-52 p-4 bg-gray-200">
-            <div className="mb-4">
-              <Button className="w-full py-2 mb-2" disabled onClick={(event: MouseEvent<HTMLButtonElement>) => {}}>
-                Play Now
-              </Button>
-              <Button className="w-full py-2 mb-2" disabled={isInfoLoading} onClick={handleOpenCreateTableModal}>
-                Create Table
-              </Button>
+        {/* Left sidebar */}
+        <div className="[grid-area:sidebar] flex flex-col justify-between p-2 bg-gray-200">
+          <div className="mb-4">
+            <Button className="w-full py-2 mb-2" disabled onClick={(event: MouseEvent<HTMLButtonElement>) => {}}>
+              Play Now
+            </Button>
+            <Button className="w-full py-2 mb-2" disabled={isInfoLoading} onClick={handleOpenCreateTableModal}>
+              Create Table
+            </Button>
+          </div>
+          <div className="mt-4">
+            {roomInfo && roomInfo?.difficulty !== RoomLevel.SOCIAL && (
+              <>
+                <div>
+                  <span className="p-1 rounded-tl rounded-tr bg-sky-700 text-white text-sm">Ratings</span>
+                </div>
+                <div className="flex flex-col gap-4 p-2 bg-white text-gray-600 mb-4">
+                  <div className="flex items-center gap-1">
+                    <div className="w-4 h-4 bg-red-400"></div>
+                    <div>{RATING_MASTER}+</div>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <div className="w-4 h-4 bg-orange-400"></div>
+                    <div>
+                      {RATING_DIAMOND}-{RATING_MASTER - 1}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <div className="w-4 h-4 bg-purple-400"></div>
+                    <div>
+                      {RATING_PLATINUM}-{RATING_DIAMOND - 1}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <div className="w-4 h-4 bg-cyan-600"></div>
+                    <div>
+                      {RATING_GOLD}-{RATING_PLATINUM - 1}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <div className="w-4 h-4 bg-green-600"></div>
+                    <div>
+                      {RATING_SILVER}-{RATING_GOLD - 1}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <div className="w-4 h-4 bg-gray-400"></div>
+                    <div>provisional</div>
+                  </div>
+                </div>
+              </>
+            )}
+            <Button className="w-full py-2 mb-2" disabled onClick={(event: MouseEvent<HTMLButtonElement>) => {}}>
+              Options
+            </Button>
+            <Button className="w-full py-2 mb-2" onClick={handleExitRoom}>
+              Exit Room
+            </Button>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="[grid-area:content] grid [grid-template-areas:'tables''chat'] grid-rows-game-content gap-2 px-2 pb-2">
+          {/* Tables */}
+          <div className="[grid-area:tables] overflow-hidden flex flex-col border bg-white">
+            <div className="flex gap-1 py-2 bg-yellow-200">
+              <div className="flex justify-center items-center w-16 border-gray-300">Table</div>
+              <div className="flex justify-center items-center w-28 border-gray-300"></div>
+              <div className="flex justify-center items-center w-28 border-gray-300">Team 1-2</div>
+              <div className="flex justify-center items-center w-28 border-gray-300">Team 3-4</div>
+              <div className="flex justify-center items-center w-28 border-gray-300">Team 5-6</div>
+              <div className="flex justify-center items-center w-28 border-gray-300">Team 7-8</div>
+              <div className="flex-1 px-2">Who is Watching</div>
             </div>
-            <div className="mt-4">
-              {roomInfo && roomInfo?.difficulty !== RoomLevel.SOCIAL && (
-                <>
-                  <div>
-                    <span className="p-1 rounded-tl rounded-tr bg-sky-700 text-white text-sm">Ratings</span>
-                  </div>
-                  <div className="flex flex-col gap-4 p-2 bg-white text-gray-600 mb-4">
-                    <div className="flex items-center gap-1">
-                      <div className="w-4 h-4 bg-red-400"></div>
-                      <div>{RATING_MASTER}+</div>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <div className="w-4 h-4 bg-orange-400"></div>
-                      <div>
-                        {RATING_DIAMOND}-{RATING_MASTER - 1}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <div className="w-4 h-4 bg-purple-400"></div>
-                      <div>
-                        {RATING_PLATINUM}-{RATING_DIAMOND - 1}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <div className="w-4 h-4 bg-cyan-600"></div>
-                      <div>
-                        {RATING_GOLD}-{RATING_PLATINUM - 1}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <div className="w-4 h-4 bg-green-600"></div>
-                      <div>
-                        {RATING_SILVER}-{RATING_GOLD - 1}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <div className="w-4 h-4 bg-gray-400"></div>
-                      <div>provisional</div>
-                    </div>
-                  </div>
-                </>
+            <div className="overflow-y-auto">
+              {tables?.map(
+                (table: TowersTableState) =>
+                  table?.info?.id && <RoomTable key={table?.info?.id} roomId={roomId} tableId={table?.info?.id} />,
               )}
-              <Button className="w-full py-2 mb-2" disabled onClick={(event: MouseEvent<HTMLButtonElement>) => {}}>
-                Options
-              </Button>
-              <Button className="w-full py-2 mb-2" onClick={handleExitRoom}>
-                Exit Room
-              </Button>
             </div>
           </div>
 
-          <div className="flex-1 flex flex-col gap-2 px-2 pb-2">
-            {/* Tables */}
-            <div className="flex-1 flex flex-col overflow-hidden border bg-white">
-              <div className="flex gap-1 bg-yellow-200 py-2">
-                <div className="basis-20 px-2 border-gray-300 text-center">Table</div>
-                <div className="basis-32 px-2 border-gray-300"></div>
-                <div className="basis-36 px-2 border-gray-300 text-center">Team 1-2</div>
-                <div className="basis-36 px-2 border-gray-300 text-center">Team 3-4</div>
-                <div className="basis-36 px-2 border-gray-300 text-center">Team 5-6</div>
-                <div className="basis-36 px-2 border-gray-300 text-center">Team 7-8</div>
-                <div className="flex-1 px-2">Who is Watching</div>
-              </div>
-              <div className="flex-1 flex flex-col overflow-y-auto">
-                {tables?.map(
-                  (table: TowersTableState) =>
-                    table?.info?.id && <RoomTable key={table?.info?.id} roomId={roomId} tableId={table?.info?.id} />,
-                )}
-              </div>
-            </div>
+          {/* Chat and users list */}
+          <div className="[grid-area:chat] flex gap-2">
+            <div className="flex-1 flex flex-col gap-1 border bg-white">
+              <ServerMessage roomId={roomId} />
 
-            {/* Chat and users list */}
-            <div className="flex gap-2 h-96 p-2 border bg-white">
-              <div className="flex-1 flex flex-col">
-                <ServerMessage roomId={roomId} />
-
-                {/* Chat */}
-                <div className="flex-1 flex flex-col gap-1 overflow-hidden">
-                  <input
-                    ref={messageInputRef}
-                    type="text"
-                    className="w-full p-2 border"
-                    placeholder="Write something..."
-                    maxLength={CHAT_MESSSAGE_MAX_LENGTH}
-                    disabled={isChatLoading}
-                    onKeyDown={handleSendMessage}
-                  />
-                  <div className="flex-1 overflow-y-auto p-1 my-1">
-                    <Chat messages={chat} />
-                    <div ref={chatEndRef} />
-                  </div>
+              {/* Chat */}
+              <div className="flex flex-col gap-1 h-full px-2">
+                <input
+                  ref={messageInputRef}
+                  type="text"
+                  className="w-full p-2 border"
+                  placeholder="Write something..."
+                  maxLength={CHAT_MESSSAGE_MAX_LENGTH}
+                  disabled={isChatLoading}
+                  onKeyDown={handleSendMessage}
+                />
+                <div className="overflow-y-auto flex-1 my-1">
+                  <Chat messages={chat} />
+                  <div ref={chatEndRef} />
                 </div>
               </div>
-
-              <div className="w-1/4 lg:w-96 overflow-hidden">
-                <PlayersList
-                  users={roomUsers}
-                  full
-                  isRatingsVisible={roomInfo && roomInfo?.difficulty !== RoomLevel.SOCIAL}
-                />
-              </div>
             </div>
+
+            <PlayersList
+              users={roomUsers}
+              isRatingsVisible={roomInfo && roomInfo?.difficulty !== RoomLevel.SOCIAL}
+              isTableNumberVisible
+            />
           </div>
         </div>
       </div>
@@ -343,5 +330,5 @@ const Chat = dynamic(() => import("@/components/game/Chat"), {
 })
 
 const PlayersList = dynamic(() => import("@/components/game/PlayersList"), {
-  loading: () => <PlayersListSkeleton full />,
+  loading: () => <PlayersListSkeleton isTableNumberVisible />,
 })

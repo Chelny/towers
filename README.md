@@ -166,7 +166,7 @@ _TODO_
   - [ ] Prevent user from accessing their account while in a game room (show prompt on click)
 - Room
   - [ ] Prevent users from accessing a room directly by its URL (e.g., full rooms)
-  - [ ] Lower recommended window size to width = 992px (md) - Current: 1350px by 768px
+  - [x] Lower recommended window size - Current: 1350px by 768px
   - [ ] Invitation Request: Accept table invitation
   - [ ] Invitation Request: Decline table invitation: Emit socket event + send decline reason to the other user
   - [ ] Player Information: Send private message endpoint

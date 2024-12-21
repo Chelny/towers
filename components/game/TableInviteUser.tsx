@@ -36,12 +36,17 @@ export default function TableInviteUser({
       onCancel={onCancel}
     >
       <div className="overflow-y-auto h-72">
-        <PlayersList users={users} full isRatingsVisible={isRatingsVisible} onSelectedPlayer={setSelectedPlayerId} />
+        <PlayersList
+          users={users}
+          isRatingsVisible={isRatingsVisible}
+          isTableNumberVisible
+          onSelectedPlayer={setSelectedPlayerId}
+        />
       </div>
     </Modal>
   )
 }
 
 const PlayersList = dynamic(() => import("@/components/game/PlayersList"), {
-  loading: () => <PlayersListSkeleton full />,
+  loading: () => <PlayersListSkeleton isTableNumberVisible />,
 })

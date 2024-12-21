@@ -1,6 +1,4 @@
-@use "sass:math";
-
-.BlockT {
+.block-t {
   border-top: 0.125rem solid #cecfce;
   border-right: 0.125rem solid #313031;
   border-bottom: 0.125rem solid #313031;
@@ -9,7 +7,7 @@
   color: #313031;
 }
 
-.BlockO {
+.block-o {
   border-top: 0.125rem solid #9cff9c;
   border-right: 0.125rem solid #316500;
   border-bottom: 0.125rem solid #316500;
@@ -18,7 +16,7 @@
   color: #316500;
 }
 
-.BlockW {
+.block-w {
   border-top: 0.125rem solid #9ccfce;
   border-right: 0.125rem solid #31659c;
   border-bottom: 0.125rem solid #31659c;
@@ -27,7 +25,7 @@
   color: #003063;
 }
 
-.BlockE {
+.block-e {
   border-top: 0.125rem solid #9c9ace;
   border-right: 0.125rem solid #313063;
   border-bottom: 0.125rem solid #313063;
@@ -36,7 +34,7 @@
   color: #313063;
 }
 
-.BlockR {
+.block-r {
   border-top: 0.125rem solid #ffffce;
   border-right: 0.125rem solid #9c9a63;
   border-bottom: 0.125rem solid #9c9a63;
@@ -45,7 +43,7 @@
   color: #636531;
 }
 
-.BlockS {
+.block-s {
   border-top: 0.125rem solid #ffcf31;
   border-right: 0.125rem solid #9c6500;
   border-bottom: 0.125rem solid #9c6500;
@@ -54,7 +52,7 @@
   color: #9c6500;
 }
 
-.AttackBlock {
+.attack-block {
   position: relative;
   overflow: hidden;
 
@@ -98,7 +96,7 @@
   }
 }
 
-.DefenseBlock {
+.defense-block {
   position: relative;
   transform-style: preserve-3d;
   animation: rotate 16s linear infinite;
@@ -175,13 +173,13 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .DefenseBlock {
+  .defense-block {
     transform: rotateX(-90deg);
     animation: none;
   }
 }
 
-.BlockCubeFace {
+.block-cube--face {
   display: flex;
   position: absolute;
   align-items: center;
@@ -194,27 +192,27 @@
   color: inherit;
 }
 
-.BlockCubeFront {
+.block-cube--front {
   transform: rotateY(0deg) translateZ(1rem);
 }
 
-.BlockCubeRight {
+.block-cube--right {
   transform: rotateY(90deg) translateZ(1rem);
 }
 
-.BlockCubeBack {
+.block-cube--back {
   transform: rotateY(180deg) translateZ(1rem);
 }
 
-.BlockCubeLeft {
+.block-cube--left {
   transform: rotateY(270deg) translateZ(1rem);
 }
 
-.BlockCubeTop {
+.block-cube--top {
   transform: rotateX(90deg) translateZ(1rem);
 }
 
-.BlockCubeBottom {
+.block-cube--bottom {
   transform: rotateX(-90deg) translateZ(1rem);
 }
 
@@ -230,47 +228,11 @@
   }
 }
 
-.BlockBreak {
+.block-break {
   animation: 100ms ease-out forwards block-break-animation;
 }
 
-@function random-direction($distance: 7rem) {
-  $random-angle: math.random() * 360deg;
-  $x: math.round(cos($random-angle) * $distance);
-  $y: math.round(sin($random-angle) * $distance);
-
-  @return ($x, $y);
-}
-
-$total: 50;
-$distance: 7rem;
-
-@for $i from 1 through $total {
-  $translate: random-direction($distance);
-
-  @keyframes block-explode-animation-#{$i} {
-    0% {
-      transform: translate(0, 0);
-      opacity: 100%;
-    }
-
-    40% {
-      transform: translate(#{$translate});
-      opacity: 50%;
-    }
-
-    100% {
-      transform: translate(#{$translate});
-      opacity: 0%;
-    }
-  }
-
-  .BlockExplode-#{$i} {
-    animation: 420ms ease-out forwards block-explode-animation-#{$i};
-  }
-}
-
-.BlockMedusa {
+.block-medusa {
   border-top: 0.125rem solid #003031;
   border-right: 0.125rem solid #000;
   border-bottom: 0.125rem solid #000;
@@ -278,7 +240,7 @@ $distance: 7rem;
   background-color: #000;
 }
 
-.BlockMidas {
+.block-midas {
   width: 1.5rem;
   height: 1.5rem;
   margin: auto;
@@ -290,7 +252,7 @@ $distance: 7rem;
   background-color: #ffcf31;
 }
 
-.SpecialDiamond {
+.special-diamond {
   position: relative;
   width: 1.5rem;
   height: 1.5rem;
@@ -300,9 +262,9 @@ $distance: 7rem;
   background-color: white;
 }
 
-.SpecialDiamond1::before,
-.SpecialDiamond1::after,
-.SpecialDiamond2::before {
+.special-diamond1::before,
+.special-diamond1::after,
+.special-diamond2::before {
   content: "";
   position: absolute;
   top: 50%;
@@ -313,14 +275,14 @@ $distance: 7rem;
   background-color: gold;
 }
 
-.SpecialDiamond1::before {
+.special-diamond1::before {
   transform: rotate(0deg) translate(-50%, -50%);
 }
 
-.SpecialDiamond1::after {
+.special-diamond1::after {
   transform: rotate(90deg) translate(-50%, -50%);
 }
 
-.SpecialDiamond2::before {
+.special-diamond2::before {
   transform: rotate(90deg) translate(-50%, -50%);
 }

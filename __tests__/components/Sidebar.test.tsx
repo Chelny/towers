@@ -10,6 +10,7 @@ import { mockUseRouter } from "@/vitest.setup"
 vi.mock("next/navigation", () => ({
   usePathname: vi.fn(),
   useRouter: vi.fn(() => mockUseRouter),
+  useSearchParams: () => new URLSearchParams("roomId=123&tableId=456"),
 }))
 
 vi.mock("next/image", () => ({

@@ -6,7 +6,6 @@ import SpecialDiamondBlock from "@/components/towers/SpecialDiamondBlock"
 import { PowerBarBlock } from "@/interfaces/game"
 import { getClassNameForBlock, getClassNameForBlockPowerType } from "@/utils/block-class-names-utils"
 import { isPowerBarBlock, isSpecialDiamond } from "@/utils/block-guards-utils"
-import styles from "./Block.module.scss"
 
 type PowerBarProps = {
   blocks: PowerBarBlock[]
@@ -20,8 +19,8 @@ export default function PowerBar(props: PowerBarProps): ReactNode {
           key={blockIndex}
           className={clsx(
             "w-grid-cell h-grid-cell box-border text-center",
-            styles[getClassNameForBlock(block)],
-            styles[getClassNameForBlockPowerType(block)],
+            getClassNameForBlock(block),
+            getClassNameForBlockPowerType(block),
           )}
         >
           {isPowerBarBlock(block) &&

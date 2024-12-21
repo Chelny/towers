@@ -2,7 +2,6 @@ import { ITowersTable, ITowersTableChatMessage, ITowersUserRoomTable } from "@pr
 import { createAsyncThunk } from "@reduxjs/toolkit"
 import { Session } from "@/lib/auth-client"
 import { fetchRoomUsers } from "@/redux/thunks/room-thunks"
-import { isAbortError } from "@/utils/http-utils"
 
 export interface SocketTableThunkProps {
   roomId: string
@@ -17,12 +16,11 @@ export interface SocketTableThunkResponse {
 
 export const joinTable = createAsyncThunk<SocketTableThunkResponse, SocketTableThunkProps, { rejectValue: string }>(
   "socket/joinTable",
-  async ({ roomId, tableId }: SocketTableThunkProps, { signal, rejectWithValue }) => {
+  async ({ roomId, tableId }: SocketTableThunkProps, { rejectWithValue }) => {
     try {
       const response: Response = await fetch(`${process.env.BASE_URL}/api/socket/room/join`, {
         method: "PATCH",
         body: JSON.stringify({ roomId, tableId }),
-        signal,
       })
 
       if (!response.ok) {
@@ -33,12 +31,6 @@ export const joinTable = createAsyncThunk<SocketTableThunkResponse, SocketTableT
       const result: ApiResponse<ITowersUserRoomTable> = await response.json()
       return { roomId, tableId, towersUserRoomTable: result.data }
     } catch (error) {
-      if (isAbortError(error)) {
-        console.log("Join table request was cancelled")
-      } else {
-        console.error(error)
-      }
-
       return rejectWithValue("Failed to join table")
     }
   },
@@ -46,12 +38,11 @@ export const joinTable = createAsyncThunk<SocketTableThunkResponse, SocketTableT
 
 export const leaveTable = createAsyncThunk<SocketTableThunkResponse, SocketTableThunkProps, { rejectValue: string }>(
   "socket/leaveTable",
-  async ({ roomId, tableId }: SocketTableThunkProps, { signal, dispatch, rejectWithValue }) => {
+  async ({ roomId, tableId }: SocketTableThunkProps, { dispatch, rejectWithValue }) => {
     try {
       const response: Response = await fetch(`${process.env.BASE_URL}/api/socket/room/leave`, {
         method: "PATCH",
         body: JSON.stringify({ roomId, tableId }),
-        signal,
       })
 
       if (!response.ok) {
@@ -64,12 +55,6 @@ export const leaveTable = createAsyncThunk<SocketTableThunkResponse, SocketTable
 
       return { roomId, tableId }
     } catch (error) {
-      if (isAbortError(error)) {
-        console.log("Leave table request was cancelled")
-      } else {
-        console.error(error)
-      }
-
       return rejectWithValue("Failed to leave table")
     }
   },
@@ -77,13 +62,13 @@ export const leaveTable = createAsyncThunk<SocketTableThunkResponse, SocketTable
 
 export const fetchTableInfo = createAsyncThunk<
   ITowersTable,
-  { roomId: string; tableId: string; signal?: AbortSignal },
+  { roomId: string; tableId: string },
   { rejectValue: string }
->("table/fetchTableInfo", async ({ tableId, signal }, { rejectWithValue }) => {
+>("table/fetchTableInfo", async ({ tableId }, { rejectWithValue }) => {
   const errorMessage: string = "Failed to fetch table info"
 
   try {
-    const response: Response = await fetch(`/api/tables/${tableId}`, { signal })
+    const response: Response = await fetch(`/api/tables/${tableId}`)
 
     if (!response.ok) {
       const errorData: ApiResponse = await response.json()
@@ -98,25 +83,19 @@ export const fetchTableInfo = createAsyncThunk<
 
     return result.data
   } catch (error) {
-    if (isAbortError(error)) {
-      console.log("Fetch table info request was cancelled")
-    } else {
-      console.error(error)
-    }
-
     return rejectWithValue(errorMessage)
   }
 })
 
 export const fetchTableChat = createAsyncThunk<
   ITowersTableChatMessage[],
-  { roomId: string; tableId: string; session: Session; signal?: AbortSignal },
+  { roomId: string; tableId: string; session: Session },
   { rejectValue: string }
->("table/fetchTableChat", async ({ tableId, session, signal }, { rejectWithValue }) => {
+>("table/fetchTableChat", async ({ tableId, session }, { rejectWithValue }) => {
   const errorMessage: string = "Failed to fetch table chat"
 
   try {
-    const response: Response = await fetch(`/api/tables/${tableId}/chat?userId=${session?.user.id}`, { signal })
+    const response: Response = await fetch(`/api/tables/${tableId}/chat?userId=${session?.user.id}`)
 
     if (!response.ok) {
       const errorData: ApiResponse = await response.json()
@@ -131,25 +110,19 @@ export const fetchTableChat = createAsyncThunk<
 
     return result.data
   } catch (error) {
-    if (isAbortError(error)) {
-      console.log("Fetch table chat request was cancelled")
-    } else {
-      console.error(error)
-    }
-
     return rejectWithValue(errorMessage)
   }
 })
 
 export const fetchTableUsers = createAsyncThunk<
   ITowersUserRoomTable[],
-  { roomId: string; tableId: string; signal?: AbortSignal },
+  { roomId: string; tableId: string },
   { rejectValue: string }
->("table/fetchTableUsers", async ({ tableId, signal }, { dispatch, rejectWithValue }) => {
+>("table/fetchTableUsers", async ({ tableId }, { rejectWithValue }) => {
   const errorMessage: string = "Failed to fetch table users"
 
   try {
-    const response: Response = await fetch(`/api/tables/${tableId}/users`, { signal })
+    const response: Response = await fetch(`/api/tables/${tableId}/users`)
 
     if (!response.ok) {
       const errorData: ApiResponse = await response.json()
@@ -164,12 +137,6 @@ export const fetchTableUsers = createAsyncThunk<
 
     return result.data
   } catch (error) {
-    if (isAbortError(error)) {
-      console.log("Fetch table users request was cancelled")
-    } else {
-      console.error(error)
-    }
-
     return rejectWithValue(errorMessage)
   }
 })

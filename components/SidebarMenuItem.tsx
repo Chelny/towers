@@ -2,7 +2,7 @@
 
 import { PropsWithChildren, ReactNode, useEffect, useState } from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { ReadonlyURLSearchParams, usePathname, useSearchParams } from "next/navigation"
 import clsx from "clsx/lite"
 import { AiOutlineMinus, AiOutlinePlus } from "react-icons/ai"
 import { IconType } from "react-icons/lib"
@@ -32,8 +32,48 @@ export default function SidebarMenuItem({
   onClick,
 }: SidebarMenuItemProps): ReactNode {
   const pathname: string = usePathname()
+  const searchParams: ReadonlyURLSearchParams = useSearchParams()
   const [hasMounted, setHasMounted] = useState<boolean>(false)
   const [isAccordionOpen, setAccordionOpen] = useState<boolean>(false)
+  const currentParams: Record<string, string> = Object.fromEntries(searchParams.entries())
+
+  const isActive = (path: string): boolean => {
+    const [baseHref, queryString] = path.split("?")
+
+    if (pathname !== baseHref) return false
+
+    if (queryString) {
+      const linkParams: URLSearchParams = new URLSearchParams(queryString)
+
+      // Check if the link params match the current query parameters
+      for (const [key, value] of linkParams.entries()) {
+        if (currentParams[key] !== value) {
+          return false
+        }
+      }
+
+      // Ensure that all parameters in the link match the current URL parameters
+      const linkParamKeys: string[] = Array.from(linkParams.keys())
+      const currentParamKeys: string[] = Object.keys(currentParams)
+
+      // If the current URL contains extra parameters, return false
+      if (linkParamKeys.length !== currentParamKeys.length) {
+        return false
+      }
+
+      // Check if every query parameter in the link matches the current URL
+      for (let key of linkParamKeys) {
+        if (currentParams[key] !== linkParams.get(key)) {
+          return false
+        }
+      }
+
+      return true
+    }
+
+    // If there are no query parameters in the link, ensure the current URL also has no query parameters
+    return Object.keys(currentParams).length === 0
+  }
 
   const handleClick = (): void => {
     if (accordionLinks.length > 0) {
@@ -57,7 +97,7 @@ export default function SidebarMenuItem({
       className={clsx(
         "py-1 rounded-md overflow-hidden",
         isExpanded ? "w-full" : "w-auto",
-        href && isExpanded && pathname === href ? "bg-slate-700" : "text-white/70",
+        href && isExpanded && isActive(href) ? "bg-slate-700" : "text-white/70",
       )}
     >
       {/* Single menu item */}
@@ -67,14 +107,14 @@ export default function SidebarMenuItem({
           className={clsx(
             "flex items-center gap-4 w-full p-2",
             "disabled:opacity-50 disabled:cursor-not-allowed",
-            href && pathname === href && "font-semibold",
+            href && isActive(href) && "text-white/90 font-medium",
           )}
           aria-label={ariaLabel}
         >
           <span
             className={clsx(
               "p-2 border-2 rounded-md",
-              href && pathname === href
+              href && isActive(href)
                 ? "border-slate-300/50 bg-slate-400/50 text-white/90"
                 : "border-slate-600 bg-slate-700 text-white/70",
             )}
@@ -97,7 +137,9 @@ export default function SidebarMenuItem({
           className={clsx(
             "flex items-center gap-4 w-full p-2 rounded-md",
             "disabled:opacity-50 disabled:cursor-not-allowed",
-            isExpanded && accordionLinks.some((link: AccordionLink) => pathname?.includes(link.href)) && "bg-slate-600",
+            isExpanded &&
+              accordionLinks.some((link: AccordionLink) => isActive(link.href)) &&
+              "bg-slate-600 text-white/90 font-medium",
           )}
           disabled={hasMounted ? disabled : false}
           aria-label={ariaLabel}
@@ -106,7 +148,7 @@ export default function SidebarMenuItem({
           <span
             className={clsx(
               "relative p-2 border-2 rounded-md",
-              accordionLinks.some((link: AccordionLink) => pathname?.includes(link.href))
+              accordionLinks.some((link: AccordionLink) => isActive(link.href))
                 ? "border-slate-300/50 bg-slate-400/50 text-white/90"
                 : "border-slate-600 bg-slate-700 text-white/70",
             )}
@@ -155,7 +197,7 @@ export default function SidebarMenuItem({
               href={link.href}
               className={clsx(
                 "flex items-center gap-4 w-full p-2 rounded-md ms-2",
-                pathname?.includes(link.href) && "text-white/90 font-semibold",
+                isActive(link.href) && "text-white/85 font-medium",
               )}
               aria-label={ariaLabel}
             >

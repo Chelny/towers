@@ -12,7 +12,7 @@ describe("GridCell Component", () => {
     const cells: HTMLDivElement[] = screen.getAllByText("T")
     const cellsParent: HTMLElement | null = cells[0].parentElement
 
-    expect(cellsParent?.getAttribute("class")).toContain("DefenseBlock")
+    expect(cellsParent?.getAttribute("class")).toContain("defense-block")
   })
 
   it("should apply the correct styles for attack block", () => {
@@ -23,7 +23,7 @@ describe("GridCell Component", () => {
     const cell: HTMLDivElement = screen.getByText("O")
 
     expect(screen.queryByText("O")).toBeInTheDocument()
-    expect(cell.getAttribute("class")).toContain("AttackBlock")
+    expect(cell.getAttribute("class")).toContain("attack-block")
   })
 
   it("should render RegularBlock when block is not a defense type", () => {
@@ -35,7 +35,7 @@ describe("GridCell Component", () => {
     const cellsParent: HTMLElement | null = cells[0].parentElement
 
     expect(screen.queryByText("W")).toBeInTheDocument()
-    expect(cellsParent?.classList).not.toContain("DefenseBlock")
-    expect(cellsParent?.classList).not.toContain("AttackBlock")
+    expect(cellsParent?.classList).not.toContain("defense-block")
+    expect(cellsParent?.classList).not.toContain("attack-block")
   })
 })

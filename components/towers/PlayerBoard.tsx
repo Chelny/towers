@@ -8,7 +8,6 @@ import NextPiece from "@/components/towers/NextPiece"
 import PowerBar from "@/components/towers/PowerBar"
 import Button from "@/components/ui/Button"
 import { useTowers } from "@/hooks/useTowers"
-import styles from "./PlayerBoard.module.scss"
 
 type PlayerBoardProps = {
   seatNumber: number
@@ -56,12 +55,12 @@ export default function PlayerBoard(props: PlayerBoardProps): ReactNode {
       >
         <div
           className={clsx(
-            "[grid-area:board-grid-container] relative grid w-full text-neutral-300",
+            "[grid-area:board-grid-container] relative grid w-full text-neutral-200",
             isGameOver ? "bg-neutral-500" : "bg-neutral-100",
             props.isOpponentBoard
               ? "grid-rows-grid-container-opponent w-grid-container-opponent"
               : "grid-rows-grid-container w-grid-container",
-            styles.BoardContainer,
+            "before:content-[attr(data-seat-number)] before:absolute before:top-1/4 before:left-1/2 before:-translate-x-1/2 before:text-[7rem] before:font-bold before:text-center",
           )}
           data-seat-number={props.seatNumber}
           data-testid="player-board-grid-container"

@@ -199,20 +199,19 @@ export function SignInForm(): ReactNode {
           <PiMagicWandFill className="w-5 h-5" aria-hidden="true" />
           <span>Magic Link</span>
         </Button>
-        <div className="flex justify-evenly gap-2">
-          {AUTH_PROVIDERS.map(({ name, label, icon }: AuthProviderDetails) => (
-            <Button
-              key={name}
-              type="button"
-              className="flex justify-center items-center w-full"
-              disabled={isLoading}
-              aria-label={`Sign in with ${label}`}
-              onClick={() => handleSignInWithProvider(name)}
-            >
-              {icon}
-            </Button>
-          ))}
-        </div>
+        {AUTH_PROVIDERS.map(({ name, label, icon }: AuthProviderDetails) => (
+          <Button
+            key={name}
+            type="button"
+            className="flex justify-center items-center gap-2 w-full"
+            disabled={isLoading}
+            aria-label={`Sign in with ${label}`}
+            onClick={() => handleSignInWithProvider(name)}
+          >
+            {icon}
+            <span>{label}</span>
+          </Button>
+        ))}
       </div>
     </form>
   )

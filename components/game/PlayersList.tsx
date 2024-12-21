@@ -17,18 +17,18 @@ import { authClient } from "@/lib/auth-client"
 
 type PlayersListProps = {
   users: ITowersUserRoomTable[]
-  full?: boolean
   isRatingsVisible?: boolean | null
+  isTableNumberVisible?: boolean
   onSelectedPlayer?: (userId: string) => void
 }
 
 export default function PlayersList({
   users,
-  full = false,
   isRatingsVisible = false,
+  isTableNumberVisible = false,
   onSelectedPlayer,
 }: PlayersListProps): ReactNode {
-  const { data: session, isPending, error } = authClient.useSession()
+  const { data: session } = authClient.useSession()
   const [sortKey, setSortKey] = useState<"name" | "rating" | "table">("name")
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null)
@@ -90,31 +90,37 @@ export default function PlayersList({
 
   return (
     <>
-      <div className="flex flex-col h-fill border bg-white">
-        {full && (
-          <div className="flex border-b border-gray-200 divide-x-2 divide-gray-200 bg-gray-50">
+      <div className="grid grid-rows-[auto,1fr] w-[385px] border bg-white">
+        {/* Players List Heading */}
+        <div
+          className={clsx(
+            "grid gap-1 pe-3 border-b border-gray-200 divide-x-2 divide-gray-200 bg-gray-50",
+            isRatingsVisible && isTableNumberVisible ? "grid-cols-[6fr,3fr,3fr]" : "grid-cols-[9fr,3fr]",
+          )}
+        >
+          <div
+            className="flex items-center gap-2 p-2 cursor-pointer"
+            role="buton"
+            tabIndex={0}
+            onClick={() => handleSort("name")}
+          >
+            <span>Name</span>
+            {sortKey === "name" && (sortOrder === "asc" ? <BsSortAlphaDown /> : <BsSortAlphaDownAlt />)}
+          </div>
+          {isRatingsVisible && (
             <div
-              className={clsx("flex items-center gap-2 p-2 cursor-pointer", isRatingsVisible ? "w-6/12" : "w-9/12")}
+              className="flex items-center gap-2 p-2 cursor-pointer"
               role="buton"
               tabIndex={0}
-              onClick={() => handleSort("name")}
+              onClick={() => handleSort("rating")}
             >
-              <span>Name</span>
-              {sortKey === "name" && (sortOrder === "asc" ? <BsSortAlphaDown /> : <BsSortAlphaDownAlt />)}
+              <span>Rating</span>
+              {sortKey === "rating" && (sortOrder === "asc" ? <BsSortNumericDown /> : <BsSortNumericDownAlt />)}
             </div>
-            {isRatingsVisible && (
-              <div
-                className="flex items-center gap-2 w-3/12 p-2 cursor-pointer"
-                role="buton"
-                tabIndex={0}
-                onClick={() => handleSort("rating")}
-              >
-                <span>Rating</span>
-                {sortKey === "rating" && (sortOrder === "asc" ? <BsSortNumericDown /> : <BsSortNumericDownAlt />)}
-              </div>
-            )}
+          )}
+          {isTableNumberVisible && (
             <div
-              className="flex items-center gap-2 w-3/12 p-2 me-4 cursor-pointer"
+              className="flex items-center gap-2 p-2 cursor-pointer"
               role="buton"
               tabIndex={0}
               onClick={() => handleSort("table")}
@@ -122,16 +128,17 @@ export default function PlayersList({
               <span>Table</span>
               {sortKey === "table" && (sortOrder === "asc" ? <BsSortNumericDown /> : <BsSortNumericDownAlt />)}
             </div>
-          </div>
-        )}
-        <div className={clsx("overflow-y-scroll", full ? "flex-1 max-h-80" : "min-w-60 h-full")}>
+          )}
+        </div>
+        {/* Players List */}
+        <div className="overflow-y-scroll">
           {sortedPlayersList?.map((player: ITowersUserRoomTable) => (
             <div
               key={player.id}
               className={clsx(
-                "flex divide-gray-200",
-                full ? "divide-x-2 select-none" : "divide-x",
-                selectedPlayerId === player.id ? "bg-blue-100" : "bg-white",
+                "grid gap-1 divide-x-2 divide-gray-200 even:bg-gray-50",
+                isRatingsVisible && isTableNumberVisible ? "grid-cols-[6fr,3fr,3fr]" : "grid-cols-[9fr,3fr]",
+                selectedPlayerId === player.id && "!bg-blue-100",
                 player.userProfile?.userId === session?.user.id && "text-blue-700",
               )}
               role="button"
@@ -139,9 +146,9 @@ export default function PlayersList({
               onClick={() => handlePlayersRowClick(player.id)}
               onDoubleClick={handleOpenPlayerInfoModal}
             >
-              <div className={clsx("p-2 truncate", full && isRatingsVisible ? "w-6/12" : "w-9/12")}>
+              <div className="p-2 truncate">
                 <div className="flex items-center gap-1">
-                  {full && isRatingsVisible && (
+                  {isRatingsVisible && (
                     <div
                       className={clsx(
                         "flex-shrink-0 w-4 h-4",
@@ -164,17 +171,13 @@ export default function PlayersList({
                 </div>
               </div>
               {isRatingsVisible && (
-                <div className={clsx("p-2 text-end truncate", full ? "w-3/12" : "w-5/12")}>
+                <div className="p-2 text-end truncate">
                   {player.userProfile?.gamesCompleted >= PROVISIONAL_MAX_COMPLETED_GAMES
                     ? player.userProfile?.rating
                     : "provisional"}
                 </div>
               )}
-              {full && (
-                <div className={clsx("p-2 text-end truncate", isRatingsVisible ? "w-3/12" : "w-3/12")}>
-                  {player.table?.tableNumber}
-                </div>
-              )}
+              {isTableNumberVisible && <div className="p-2 text-end truncate">{player.table?.tableNumber}</div>}
             </div>
           ))}
         </div>

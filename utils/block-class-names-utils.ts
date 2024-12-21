@@ -11,24 +11,24 @@ export const getClassNameForBlock = (block: Block): string => {
   if (isTowersBlock(block)) {
     switch (block.letter) {
       case "T":
-        return "BlockT"
+        return "block-t"
       case "O":
-        return "BlockO"
+        return "block-o"
       case "W":
-        return "BlockW"
+        return "block-w"
       case "E":
-        return "BlockE"
+        return "block-e"
       case "R":
-        return "BlockR"
+        return "block-r"
       case "S":
-        return "BlockS"
+        return "block-s"
       default:
         return ""
     }
   } else if (isMedusaBlock(block)) {
-    return "BlockMedusa"
+    return "block-medusa"
   } else if (isMidasBlock(block)) {
-    return "BlockMidas"
+    return "block-midas"
   } else {
     return ""
   }
@@ -43,9 +43,9 @@ export const getClassNameForBlock = (block: Block): string => {
 export const getClassNameForBlockPowerType = (block: Block): string => {
   switch (block.powerType) {
     case "attack":
-      return "AttackBlock"
+      return "attack-block"
     case "defense":
-      return "DefenseBlock"
+      return "defense-block"
     default:
       return ""
   }

@@ -5,7 +5,6 @@ import RegularBlock from "@/components/towers/RegularBlock"
 import { Block, Piece } from "@/interfaces/game"
 import { getClassNameForBlock, getClassNameForBlockPowerType } from "@/utils/block-class-names-utils"
 import { isPowerPieceBlock, isTowersBlock } from "@/utils/block-guards-utils"
-import styles from "./Block.module.scss"
 
 type NextPieceProps = {
   nextPiece: Piece
@@ -19,8 +18,8 @@ export default function NextPiece(props: NextPieceProps): ReactNode {
           key={blockIndex}
           className={clsx(
             "w-grid-cell h-grid-cell box-border text-center",
-            styles[getClassNameForBlock(block)],
-            styles[getClassNameForBlockPowerType(block)],
+            getClassNameForBlock(block),
+            getClassNameForBlockPowerType(block),
           )}
         >
           {isTowersBlock(block) && block.powerType === "defense" ? (
