@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { betterFetch } from "@better-fetch/fetch"
-import { PROTECTED_ROUTES, PUBLIC_ROUTES, ROUTE_GAMES, ROUTE_SIGN_IN } from "@/constants/routes"
+import { PROTECTED_ROUTES, PUBLIC_ROUTES, ROUTE_GAMES, ROUTE_RESET_PASSWORD, ROUTE_SIGN_IN } from "@/constants/routes"
 import type { Session } from "better-auth/types"
 
 export default async function middleware(request: NextRequest) {
@@ -30,12 +30,11 @@ export default async function middleware(request: NextRequest) {
   })
 
   // Allow access to reset password page only if there is a token parameter
-  // if ([ROUTE_RESET_PASSWORD.PATH].includes(request.nextUrl.pathname)) {
-  //   const url: NextURL = request.nextUrl.clone()
-  //   const token: string | null = url.searchParams.get("token")
-  //   const newUrl: URL = new URL(ROUTE_SIGN_IN.PATH, request.nextUrl.origin)
-  //   if (!token) return NextResponse.redirect(newUrl)
-  // }
+  if ([ROUTE_RESET_PASSWORD.PATH].includes(request.nextUrl.pathname)) {
+    const token: string | null = request.nextUrl.clone().searchParams.get("token")
+    const newUrl: URL = new URL(ROUTE_SIGN_IN.PATH, request.nextUrl.origin)
+    if (!token) return NextResponse.redirect(newUrl)
+  }
 
   const { data: session } = await betterFetch<Session>("/api/auth/get-session", {
     baseURL: request.nextUrl.origin,
@@ -43,6 +42,7 @@ export default async function middleware(request: NextRequest) {
       // Get the cookie from the request
       cookie: request.headers.get("cookie") || "",
     },
+    cache: "force-cache",
   })
 
   if (session) {

@@ -151,10 +151,10 @@ _TODO_
 ## Roadmap
 
 - General
-  - [ ] Add Terms and Conditions and Privacy Policy links in `/sign-in` page
+  - [x] Add links to Terms of Service and Privacy Policy in `/sign-in` and `/sign-up` pages
   - [ ] Multi-language Support
     - [ ] French
-  - [ ] Redirect new user that signs up with OAuth to /new-user
+  - [ ] Redirect new user that signs up with OAuth to `/new-user` (with better-auth)
   - [ ] Fix delete user redirection from confirmation link
   - [ ] Fix passkeys (sign-in and profile) - Known issue: Will be fixed in 1.1.x
   - [ ] Add OTP (email and phone)

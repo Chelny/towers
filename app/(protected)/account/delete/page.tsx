@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 export default async function DeleteAccount(): Promise<ReactNode> {
   return (
     <>
-      <h2 className="mb-4 text-3xl">{ROUTE_DELETE_ACCOUNT.TITLE}</h2>
+      <h1 className="mb-4 text-3xl">{ROUTE_DELETE_ACCOUNT.TITLE}</h1>
       <DeleteAccountForm />
     </>
   )

@@ -25,7 +25,7 @@ export default async function Profile(): Promise<ReactNode> {
 
   return (
     <>
-      <h2 className="mb-4 text-3xl">{ROUTE_PROFILE.TITLE}</h2>
+      <h1 className="mb-4 text-3xl">{ROUTE_PROFILE.TITLE}</h1>
       <div
         className={clsx(
           "flex flex-col gap-6",

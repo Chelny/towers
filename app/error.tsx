@@ -17,7 +17,7 @@ export default function Error({ error, reset }: RootErrorProps): ReactNode {
   return (
     <div className="flex flex-col items-center justify-center w-full h-screen">
       <div className="flex flex-col items-center justify-center max-w-sm text-center">
-        <h5 className="mb-4 text-3xl">Something went wrong</h5>
+        <h2 className="mb-4 text-3xl">Something went wrong</h2>
         <Button
           className="mt-6"
           onClick={

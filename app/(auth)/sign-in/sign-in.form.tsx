@@ -17,8 +17,10 @@ import {
   ERROR_REDIRECT_URI,
   REDIRECT_URI,
   ROUTE_FORGOT_PASSWORD,
+  ROUTE_PRIVACY_POLICY,
   ROUTE_SIGN_IN_WITH_MAGIC_LINK,
   ROUTE_SIGN_UP,
+  ROUTE_TERMS_OF_SERVICE,
 } from "@/constants/routes"
 import { authClient } from "@/lib/auth-client"
 import { AuthProvider, AuthProviderDetails } from "@/lib/providers"
@@ -212,6 +214,17 @@ export function SignInForm(): ReactNode {
             <span>{label}</span>
           </Button>
         ))}
+      </div>
+      <div className="mt-4">
+        By signing in, you agree to our{" "}
+        <Anchor href={ROUTE_TERMS_OF_SERVICE.PATH} target="_blank">
+          Terms of Service
+        </Anchor>{" "}
+        and{" "}
+        <Anchor href={ROUTE_PRIVACY_POLICY.PATH} target="_blank">
+          Privacy Policy
+        </Anchor>
+        .
       </div>
     </form>
   )

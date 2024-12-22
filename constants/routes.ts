@@ -11,6 +11,8 @@ export const ROUTE_DELETE_ACCOUNT = { TITLE: "Delete Account", PATH: `${ROUTE_AC
 export const ROUTE_GAMES = { TITLE: "Games", PATH: "/games" }
 export const ROUTE_TOWERS = { TITLE: "Towers Rooms", PATH: `${ROUTE_GAMES.PATH}/towers` }
 export const ROUTE_ERROR = { TITLE: "Error", PATH: "/error" }
+export const ROUTE_TERMS_OF_SERVICE = { TITLE: "Terms of Service", PATH: "/terms-of-service" }
+export const ROUTE_PRIVACY_POLICY = { TITLE: "Privacy Policy", PATH: "/privacy-policy" }
 
 export const PUBLIC_ROUTES = [
   ROUTE_SIGN_UP.PATH,

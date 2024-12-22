@@ -4,10 +4,12 @@ import {
   ROUTE_FORGOT_PASSWORD,
   ROUTE_GAMES,
   ROUTE_HOME,
+  ROUTE_PRIVACY_POLICY,
   ROUTE_PROFILE,
   ROUTE_RESET_PASSWORD,
   ROUTE_SIGN_IN,
   ROUTE_SIGN_UP,
+  ROUTE_TERMS_OF_SERVICE,
   ROUTE_TOWERS,
 } from "@/constants/routes"
 
@@ -62,6 +64,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
 
     // Low-priority routes
+    {
+      url: `${baseUrl}${ROUTE_TERMS_OF_SERVICE.PATH}`,
+      lastModified: new Date().toISOString(),
+      changeFrequency: "yearly",
+      priority: 0.4,
+    },
+    {
+      url: `${baseUrl}${ROUTE_PRIVACY_POLICY.PATH}`,
+      lastModified: new Date().toISOString(),
+      changeFrequency: "yearly",
+      priority: 0.4,
+    },
     {
       url: `${baseUrl}${ROUTE_FORGOT_PASSWORD.PATH}`,
       lastModified: new Date().toISOString(),

@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 export default function SignInPage(): ReactNode {
   return (
     <>
-      <h2 className="mb-4 text-3xl">{ROUTE_SIGN_IN.TITLE}</h2>
+      <h1 className="mb-4 text-3xl">{ROUTE_SIGN_IN.TITLE}</h1>
       <SignInForm />
     </>
   )

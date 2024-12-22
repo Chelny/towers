@@ -7,7 +7,7 @@ import { TiTick } from "react-icons/ti"
 
 type CheckboxProps = {
   id: string
-  label: string
+  label: ReactNode
   defaultChecked?: boolean
   required?: boolean
   disabled?: boolean

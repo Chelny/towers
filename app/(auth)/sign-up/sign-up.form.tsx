@@ -11,7 +11,7 @@ import Calendar from "@/components/ui/Calendar"
 import Checkbox from "@/components/ui/Checkbox"
 import Input from "@/components/ui/Input"
 import { INITIAL_FORM_STATE } from "@/constants/api"
-import { REDIRECT_URI, ROUTE_SIGN_IN } from "@/constants/routes"
+import { REDIRECT_URI, ROUTE_PRIVACY_POLICY, ROUTE_SIGN_IN, ROUTE_TERMS_OF_SERVICE } from "@/constants/routes"
 import { authClient } from "@/lib/auth-client"
 
 export function SignUpForm(): ReactNode {
@@ -181,7 +181,19 @@ export function SignUpForm(): ReactNode {
       />
       <Checkbox
         id="termsAndConditions"
-        label="I agree to the terms and conditions."
+        label={
+          <span>
+            I agree to the{" "}
+            <Anchor href={ROUTE_TERMS_OF_SERVICE.PATH} target="_blank">
+              Terms of Service
+            </Anchor>{" "}
+            and{" "}
+            <Anchor href={ROUTE_PRIVACY_POLICY.PATH} target="_blank">
+              Privacy Policy
+            </Anchor>
+            .
+          </span>
+        }
         required
         dataTestId="sign-up-terms-and-conditions-checkbox"
         errorMessage={formState?.error?.termsAndConditions}

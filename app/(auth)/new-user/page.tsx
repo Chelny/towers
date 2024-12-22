@@ -16,7 +16,7 @@ export default async function NewUserPage(): Promise<ReactNode> {
 
   return (
     <>
-      <h2 className="mb-4 text-3xl">{ROUTE_NEW_USER.TITLE}</h2>
+      <h1 className="mb-4 text-3xl">{ROUTE_NEW_USER.TITLE}</h1>
       <ProfileForm session={session} />
       <div className="mt-4 text-center">
         <Anchor href={ROUTE_GAMES.PATH}>Skip this step</Anchor>
