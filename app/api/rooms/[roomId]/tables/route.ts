@@ -31,10 +31,6 @@ export async function GET(request: NextRequest, segmentData: { params: Params })
       orderBy: {
         tableNumber: "asc",
       },
-      cacheStrategy: {
-        ttl: 10,
-        swr: 30,
-      },
     })
 
     return NextResponse.json(

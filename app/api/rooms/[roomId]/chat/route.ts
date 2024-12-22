@@ -73,10 +73,6 @@ export async function GET(request: NextRequest, segmentData: { params: Params })
         updatedAt: "asc",
       },
       take: 50,
-      cacheStrategy: {
-        ttl: 5,
-        swr: 20,
-      },
     })
 
     return NextResponse.json(

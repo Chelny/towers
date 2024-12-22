@@ -14,10 +14,6 @@ export async function GET(request: NextRequest, segmentData: { params: Params })
       where: {
         id: roomId,
       },
-      cacheStrategy: {
-        ttl: 600,
-        swr: 900,
-      },
     })
 
     return NextResponse.json(

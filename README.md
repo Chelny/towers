@@ -83,9 +83,11 @@ This project is inspired by Yahoo! Towers but is an independent work. It is not 
 
 ### Prerequisites
 
-- npm
+- Postgres
+- pgAdmin
+- pnpm
   ```sh
-  npm install npm@latest -g
+  npm install -g pnpm
   ```
 
 ### Installation
@@ -94,25 +96,22 @@ This project is inspired by Yahoo! Towers but is an independent work. It is not 
 
    ```sh
    git clone git@github.com:Chelny/towers.git
+   cd towers
    ```
 
 1. Install dependencies
 
    ```sh
-   npm i
+   pnpm install
    ```
 
-1. Fill the environment file
+1. Create and fill the .env file
 
-   On the root directory of the project, create a new file named `.env` then copy and paste the content of `.env.example`.
+   ```sh
+   cp .env.example .env
+   ```
 
-   Steps:
-
-   - Change the `DATABASE_URL` (or the `DATABASE_URL` and `DIRECT_DATABASE_URL` if using [Prisma Accelerate](https://www.prisma.io/accelerate)) placeholders with your database info
-   - Generate a secret key for `BETTER_AUTH_SECRET` (command: `openssl rand -base64 32`)
-   - Register OAuth applications on providers websites to get the client ID and client secret
-   - Create an account at [resend.com](https://resend.com/) to test the email sending functionality and get the API key (`RESEND_API_KEY`) from there
-   - Get Google Analytics ID for `GOOGLE_ANALYTICS`
+1. Start Postgres server
 
 1. Push Prisma schema to database
 

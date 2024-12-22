@@ -26,10 +26,6 @@ export async function GET(request: NextRequest, segmentData: { params: Params })
           updatedAt: "desc",
         },
       },
-      cacheStrategy: {
-        ttl: 30,
-        swr: 60,
-      },
     })
 
     return NextResponse.json(

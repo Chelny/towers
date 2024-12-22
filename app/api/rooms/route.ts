@@ -14,10 +14,6 @@ export async function GET(): Promise<NextResponse> {
           distinct: ["userProfileId"],
         },
       },
-      cacheStrategy: {
-        ttl: 10,
-        swr: 30,
-      },
     })
 
     const roomsWithUsersCount: ITowersRoomWithUsersCount[] = rooms.map((room: IRoomListItem) => {
