@@ -1,6 +1,7 @@
 "use client"
 
 import { FormEvent, ReactNode, useState } from "react"
+import { useLingui } from "@lingui/react/macro"
 import { ITowersTableWithRelations, TableType } from "@prisma/client"
 import { Type } from "@sinclair/typebox"
 import { Value, ValueError } from "@sinclair/typebox/value"
@@ -20,10 +21,11 @@ type CreateTableProps = {
 }
 
 export default function CreateTable({ isOpen, roomId, onSubmitSuccess, onCancel }: CreateTableProps): ReactNode {
-  const { data: session, isPending, error } = authClient.useSession()
+  const { data: session } = authClient.useSession()
   const dispatch: AppDispatch = useAppDispatch()
   const [errorMessages, setErrorMessages] = useState<CreateTableFormValidationErrors>({})
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
+  const { t } = useLingui()
 
   const handleFormValidation = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
     const formElement: EventTarget & HTMLFormElement = event.currentTarget
@@ -39,17 +41,17 @@ export default function CreateTable({ isOpen, roomId, onSubmitSuccess, onCancel 
         case "tableType":
           setErrorMessages((prev: CreateTableFormValidationErrors) => ({
             ...prev,
-            tableType: "You must select a table type.",
+            tableType: t({ message: "You must select a table type." }),
           }))
           break
         case "rated":
           setErrorMessages((prev: CreateTableFormValidationErrors) => ({
             ...prev,
-            rated: "You must rate this game.",
+            rated: t({ message: "You must rate this game." }),
           }))
           break
         default:
-          console.error(`Create Table Action: Unknown error at ${error.path}`)
+          console.error(`Create Table Validation: Unknown error at ${error.path}`)
           break
       }
     }
@@ -90,8 +92,8 @@ export default function CreateTable({ isOpen, roomId, onSubmitSuccess, onCancel 
   return (
     <Modal
       isOpen={isOpen}
-      title="Create Table"
-      confirmText="Create"
+      title={t({ message: "Create Table" })}
+      confirmText={t({ message: "Create" })}
       isConfirmButtonDisabled={isSubmitting}
       dataTestId="create-table-modal"
       onConfirm={handleFormValidation}
@@ -99,7 +101,7 @@ export default function CreateTable({ isOpen, roomId, onSubmitSuccess, onCancel 
     >
       <Select
         id="tableType"
-        label="Table Type"
+        label={t({ message: "Table Type" })}
         defaultValue={TableType.PUBLIC}
         required
         errorMessage={errorMessages.tableType}
@@ -109,7 +111,12 @@ export default function CreateTable({ isOpen, roomId, onSubmitSuccess, onCancel 
         <Select.Option value={TableType.PRIVATE}>Private</Select.Option>
       </Select>
 
-      <Checkbox id="rated" label="Rated Game" defaultChecked={true} errorMessage={errorMessages.rated} />
+      <Checkbox
+        id="rated"
+        label={t({ message: "Rated Game" })}
+        defaultChecked={true}
+        errorMessage={errorMessages.rated}
+      />
     </Modal>
   )
 }

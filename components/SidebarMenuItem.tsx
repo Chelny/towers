@@ -33,7 +33,7 @@ export default function SidebarMenuItem({
 }: SidebarMenuItemProps): ReactNode {
   const pathname: string = usePathname()
   const searchParams: ReadonlyURLSearchParams = useSearchParams()
-  const [hasMounted, setHasMounted] = useState<boolean>(false)
+  const [isMounted, setIsMounted] = useState<boolean>(false)
   const [isAccordionOpen, setAccordionOpen] = useState<boolean>(false)
   const currentParams: Record<string, string> = Object.fromEntries(searchParams.entries())
 
@@ -89,7 +89,7 @@ export default function SidebarMenuItem({
   }
 
   useEffect(() => {
-    setHasMounted(true)
+    setIsMounted(true)
   }, [])
 
   return (
@@ -119,7 +119,7 @@ export default function SidebarMenuItem({
                 : "border-slate-600 bg-slate-700 text-white/70",
             )}
           >
-            <Icon className="w-5 h-5" aria-hidden="true" />
+            <Icon className={clsx("w-5 h-5", "rtl:-scale-y-100 rtl:-rotate-180")} aria-hidden="true" />
           </span>
           <span
             className={clsx(
@@ -141,7 +141,7 @@ export default function SidebarMenuItem({
               accordionLinks.some((link: AccordionLink) => isActive(link.href)) &&
               "bg-slate-600 text-white/90 font-medium",
           )}
-          disabled={hasMounted ? disabled : false}
+          disabled={isMounted ? disabled : false}
           aria-label={ariaLabel}
           onClick={handleClick}
         >
@@ -153,12 +153,13 @@ export default function SidebarMenuItem({
                 : "border-slate-600 bg-slate-700 text-white/70",
             )}
           >
-            <Icon className="w-5 h-5" aria-hidden="true" />
+            <Icon className={clsx("w-5 h-5", "rtl:-scale-y-100 rtl:-rotate-180")} aria-hidden="true" />
             {/* Accordion left line */}
             {accordionLinks.length > 0 && isExpanded && isAccordionOpen && (
               <span
                 className={clsx(
-                  "absolute left-1/2 top-[100%] w-[2px] bg-white/15 transform -translate-x-1/2 transition-all duration-300",
+                  "absolute start-1/2 top-[100%] w-[2px] bg-white/15 transform -translate-x-1/2 transition-all duration-300",
+                  "rtl:translate-x-1/2",
                   isAccordionOpen ? "h-screen" : "h-0",
                 )}
               />
@@ -187,7 +188,7 @@ export default function SidebarMenuItem({
       {accordionLinks.length > 0 && isExpanded && (
         <div
           className={clsx(
-            "pl-12 space-y-2 overflow-hidden transition-all duration-200",
+            "ps-12 space-y-2 overflow-hidden transition-all duration-200",
             isAccordionOpen ? "max-h-screen mt-2" : "max-h-0",
           )}
         >

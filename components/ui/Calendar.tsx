@@ -1,6 +1,7 @@
 "use client"
 
 import { ReactNode, RefObject, useEffect, useRef, useState } from "react"
+import { Trans, useLingui } from "@lingui/react/macro"
 import clsx from "clsx/lite"
 import {
   PiCaretDoubleLeftDuotone,
@@ -28,7 +29,7 @@ type CalendarProps = {
 export default function Calendar({
   id,
   label,
-  placeholder = "Select a date",
+  placeholder,
   minDate = new Date(new Date().getUTCFullYear() - 100, new Date().getUTCMonth(), new Date().getUTCDate()),
   maxDate = new Date(),
   defaultValue = undefined,
@@ -39,6 +40,7 @@ export default function Calendar({
   errorMessage = "",
   onChange,
 }: CalendarProps): ReactNode {
+  const { t } = useLingui()
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(defaultValue ? new Date(defaultValue) : undefined)
   const [browsingDate, setBrowsingDate] = useState<Date>(
     maxDate ? new Date(Math.min(maxDate.getTime(), new Date().getTime())) : new Date(),
@@ -49,20 +51,29 @@ export default function Calendar({
   const [currentDecade, setCurrentDecade] = useState<number>(Math.floor(browsingDate.getUTCFullYear() / 10) * 10)
   const calendarRef: RefObject<HTMLDivElement | null> = useRef<HTMLDivElement | null>(null)
   const monthNames: string[] = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
+    t({ message: "January" }),
+    t({ message: "February" }),
+    t({ message: "March" }),
+    t({ message: "April" }),
+    t({ message: "May" }),
+    t({ message: "June" }),
+    t({ message: "July" }),
+    t({ message: "August" }),
+    t({ message: "September" }),
+    t({ message: "October" }),
+    t({ message: "November" }),
+    t({ message: "December" }),
   ]
-  const daysOfWeek: string[] = ["S", "M", "T", "W", "T", "F", "S"]
+  const fullWeekDays: string[] = [
+    t({ message: "Sunday" }),
+    t({ message: "Monday" }),
+    t({ message: "Tuesday" }),
+    t({ message: "Wednesday" }),
+    t({ message: "Thursday" }),
+    t({ message: "Friday" }),
+    t({ message: "Saturday" }),
+  ]
+  const daysOfWeek: string[] = fullWeekDays.map((day: string) => day.charAt(0).toUpperCase())
 
   useEffect(() => {
     const year: number = browsingDate.getUTCFullYear()
@@ -211,7 +222,7 @@ export default function Calendar({
             disabled={currentDecade <= minDate.getUTCFullYear()}
             onClick={() => setCurrentDecade(currentDecade - 10)}
           >
-            Previous Decade
+            <Trans>Previous Decade</Trans>
           </Button>
           <Button
             type="button"
@@ -219,17 +230,18 @@ export default function Calendar({
             disabled={currentDecade + 10 > maxDate.getUTCFullYear()}
             onClick={() => setCurrentDecade(currentDecade + 10)}
           >
-            Next Decade
+            <Trans>Next Decade</Trans>
           </Button>
         </div>
+        <hr className="my-4" />
         <div className="grid grid-cols-4 gap-2 mt-2">
           {yearsInDecade.map(
             (year: number) =>
               year <= maxDate.getUTCFullYear() && (
-                <button
+                <Button
                   key={year}
                   type="button"
-                  className="p-2 text-center border rounded-sm hover:bg-gray-200"
+                  className="text-center border rounded-sm hover:bg-gray-200"
                   disabled={year > maxDate.getUTCFullYear() || year < minDate.getUTCFullYear()}
                   onClick={() => {
                     setBrowsingDate(new Date(year, browsingDate.getUTCMonth()))
@@ -237,7 +249,7 @@ export default function Calendar({
                   }}
                 >
                   {year}
-                </button>
+                </Button>
               ),
           )}
         </div>
@@ -255,7 +267,12 @@ export default function Calendar({
   return (
     <div className="relative mb-4">
       <label id={`${id}Label`} htmlFor={id} className="block mb-2 font-medium">
-        {label} {!required && <span className="text-neutral-500">(optional)</span>}
+        {label}{" "}
+        {!required && (
+          <span className="text-neutral-500">
+            (<Trans>optional</Trans>)
+          </span>
+        )}
       </label>
       <Button
         id={id}
@@ -275,7 +292,7 @@ export default function Calendar({
               day: "numeric",
               timeZone: "UTC",
             })
-          : placeholder}
+          : (placeholder ?? t({ message: "Select a date" }))}
       </Button>
       {description && (
         <p id={`${id}Description`} className="text-neutral-500">
@@ -299,7 +316,10 @@ export default function Calendar({
       {isCalendarVisible && (
         <div
           ref={calendarRef}
-          className="absolute left-1/2 z-10 min-w-96 max-w-max p-4 border border-gray-300 rounded shadow-md bg-white -translate-x-1/2"
+          className={clsx(
+            "absolute start-1/2 z-10 min-w-96 max-w-max p-4 border border-gray-300 rounded shadow-md bg-white -translate-x-1/2",
+            "rtl:translate-x-1/2",
+          )}
           role="dialog"
           aria-modal="true"
         >
@@ -307,18 +327,21 @@ export default function Calendar({
             <Button
               type="button"
               disabled={isPreviousYearDisabled}
-              aria-label="Previous Year"
+              aria-label={t({ message: "Previous Year" })}
               onClick={() => handleYearChange(-1)}
             >
-              <PiCaretDoubleLeftDuotone className="w-5 h-5" aria-hidden="true" />
+              <PiCaretDoubleLeftDuotone
+                className={clsx("w-5 h-5", "rtl:-scale-y-100 rtl:-rotate-180")}
+                aria-hidden="true"
+              />
             </Button>
             <Button
               type="button"
               disabled={isPreviousMonthDisabled}
-              aria-label="Previous Month"
+              aria-label={t({ message: "Previous Month" })}
               onClick={() => handleMonthChange(-1)}
             >
-              <PiCaretLeftDuotone className="w-5 h-5" aria-hidden="true" />
+              <PiCaretLeftDuotone className={clsx("w-5 h-5", "rtl:-scale-y-100 rtl:-rotate-180")} aria-hidden="true" />
             </Button>
             <Button
               type="button"
@@ -328,30 +351,33 @@ export default function Calendar({
             >
               {view === "month"
                 ? `${monthNames[browsingDate.getUTCMonth()]} ${browsingDate.getUTCFullYear()}`
-                : "Select Year"}
+                : t({ message: "Select Year" })}
             </Button>
             <Button
               type="button"
               disabled={isNextMonthDisabled}
-              aria-label="Next Month"
+              aria-label={t({ message: "Next Month" })}
               onClick={() => handleMonthChange(1)}
             >
-              <PiCaretRightDuotone className="w-5 h-5" aria-hidden="true" />
+              <PiCaretRightDuotone className={clsx("w-5 h-5", "rtl:-scale-y-100 rtl:-rotate-180")} aria-hidden="true" />
             </Button>
             <Button
               type="button"
               disabled={isNextYearDisabled}
-              aria-label="Next Year"
+              aria-label={t({ message: "Next Year" })}
               onClick={() => handleYearChange(1)}
             >
-              <PiCaretDoubleRightDuotone className="w-5 h-5" aria-hidden="true" />
+              <PiCaretDoubleRightDuotone
+                className={clsx("w-5 h-5", "rtl:-scale-y-100 rtl:-rotate-180")}
+                aria-hidden="true"
+              />
             </Button>
           </div>
 
           {view === "month" ? renderDayPicker() : renderYearPicker()}
 
           <Button className="mt-4 ms-auto" onClick={handleCloseCalendar}>
-            Close
+            <Trans>Close</Trans>
           </Button>
         </div>
       )}

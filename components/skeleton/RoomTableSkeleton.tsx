@@ -33,7 +33,7 @@ export default function RoomTable(): ReactNode {
                 </div>
               </div>
               <div className="flex py-1 text-sm">
-                <div className="w-16 h-4 rounded bg-gray-200 mr-2" />
+                <div className="w-16 h-4 rounded bg-gray-200 me-2" />
                 <div className="w-24 h-4 rounded bg-gray-200" />
               </div>
             </div>

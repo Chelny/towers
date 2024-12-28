@@ -7,6 +7,7 @@ const { loadEnvConfig } = pkg
 loadEnvConfig(process.cwd())
 
 export default defineConfig({
+  assetsInclude: ["**/*.po"],
   css: {
     preprocessorOptions: {
       scss: {
@@ -28,7 +29,7 @@ export default defineConfig({
         inline: ["next"],
       },
     },
-    setupFiles: ["vitest.setup.ts"],
+    setupFiles: ["vitest.setup.ts", "__mocks__/utils/lingui.tsx"],
     include: ["**/__tests__/**/*.test.ts", "**/__tests__/**/*.test.tsx"],
   },
 })

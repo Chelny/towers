@@ -1,6 +1,6 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { Mock } from "vitest"
-import { SignInWithMagicLinkForm } from "@/app/(auth)/sign-in-with-magic-link/sign-in-with-magic-link.form"
+import { SignInWithMagicLinkForm } from "@/app/[locale]/(auth)/sign-in-with-magic-link/sign-in-with-magic-link.form"
 
 vi.mock("@/lib/auth-client", () => ({
   authClient: {

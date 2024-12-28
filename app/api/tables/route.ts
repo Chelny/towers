@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { t } from "@lingui/core/macro"
 import { TowersTable, TowersUserProfile } from "@prisma/client"
 import { getPrismaError } from "@/lib/api"
 import prisma from "@/lib/prisma"
@@ -17,7 +18,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       return NextResponse.json(
         {
           success: false,
-          message: "The user profile was not found",
+          message: t({ message: "The user profile was not found" }),
         },
         { status: 404 },
       )

@@ -14,18 +14,14 @@ type TowersPageContentProps = {
 }
 
 export default function TowersPageContent({ roomId, tableId }: TowersPageContentProps): ReactNode {
-  const { data: session, isPending, error } = authClient.useSession()
+  const { data: session } = authClient.useSession()
   const isConnected: boolean = useAppSelector((state: RootState) => state.socket.isConnected)
   const dispatch: AppDispatch = useAppDispatch()
 
-  /**
-   * Polling the session every 1 hour
-   */
   useEffect(() => {
     const handleOnline = (): void => {
       console.info("You are online.")
       connectToSocket()
-      // update()
     }
 
     const handleOffline = (): void => {
@@ -33,43 +29,14 @@ export default function TowersPageContent({ roomId, tableId }: TowersPageContent
       dispatch(destroySocket())
     }
 
-    // TIP: You can also use `navigator.onLine` and some extra event handlers
-    // to check if the user is online and only update the session if they are.
-    // https://developer.mozilla.org/en-US/docs/Web/API/Navigator/onLine
-    // const interval: NodeJS.Timeout = setInterval(
-    //   () => {
-    //     if (navigator.onLine) update()
-    //   },
-    //   1000 * 60 * 60,
-    // )
-
     window.addEventListener("online", handleOnline)
     window.addEventListener("offline", handleOffline)
 
     return () => {
-      // clearInterval(interval)
       window.removeEventListener("online", handleOnline)
       window.removeEventListener("offline", handleOffline)
     }
-  }, [/*update, */ session, isConnected])
-
-  /**
-   * Listen for when the page is visible, if the user switches tabs
-   * and makes our tab visible again, re-fetch the session
-   */
-  // useEffect(() => {
-  //   const handleVisibility = (): void => {
-  //     if (document.visibilityState === "visible" && navigator.onLine) {
-  //       update()
-  //     }
-  //   }
-
-  //   window.addEventListener("visibilitychange", handleVisibility, false)
-
-  //   return () => {
-  //     window.removeEventListener("visibilitychange", handleVisibility, false)
-  //   }
-  // }, [update])
+  }, [session, isConnected])
 
   useEffect(() => {
     connectToSocket()

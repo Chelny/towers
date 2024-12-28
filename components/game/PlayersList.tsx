@@ -1,6 +1,7 @@
 "use client"
 
 import { ReactNode, useMemo, useState } from "react"
+import { Trans, useLingui } from "@lingui/react/macro"
 import { createId } from "@paralleldrive/cuid2"
 import { ITowersUserRoomTable } from "@prisma/client"
 import clsx from "clsx/lite"
@@ -33,6 +34,7 @@ export default function PlayersList({
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null)
   const [isPlayerInfoModalOpen, setIsPlayerInfoModalOpen] = useState<boolean>(false)
+  const { t } = useLingui()
 
   const handleSort = (key: "name" | "rating" | "table"): void => {
     if (sortKey === key) {
@@ -104,8 +106,15 @@ export default function PlayersList({
             tabIndex={0}
             onClick={() => handleSort("name")}
           >
-            <span>Name</span>
-            {sortKey === "name" && (sortOrder === "asc" ? <BsSortAlphaDown /> : <BsSortAlphaDownAlt />)}
+            <span>
+              <Trans>Name</Trans>
+            </span>
+            {sortKey === "name" &&
+              (sortOrder === "asc" ? (
+                <BsSortAlphaDown aria-label={t({ message: "Sort ascending" })} />
+              ) : (
+                <BsSortAlphaDownAlt aria-label={t({ message: "Sort descending" })} />
+              ))}
           </div>
           {isRatingsVisible && (
             <div
@@ -114,8 +123,15 @@ export default function PlayersList({
               tabIndex={0}
               onClick={() => handleSort("rating")}
             >
-              <span>Rating</span>
-              {sortKey === "rating" && (sortOrder === "asc" ? <BsSortNumericDown /> : <BsSortNumericDownAlt />)}
+              <span>
+                <Trans>Rating</Trans>
+              </span>
+              {sortKey === "rating" &&
+                (sortOrder === "asc" ? (
+                  <BsSortNumericDown aria-label={t({ message: "Sort ascending" })} />
+                ) : (
+                  <BsSortNumericDownAlt aria-label={t({ message: "Sort descending" })} />
+                ))}
             </div>
           )}
           {isTableNumberVisible && (
@@ -125,8 +141,15 @@ export default function PlayersList({
               tabIndex={0}
               onClick={() => handleSort("table")}
             >
-              <span>Table</span>
-              {sortKey === "table" && (sortOrder === "asc" ? <BsSortNumericDown /> : <BsSortNumericDownAlt />)}
+              <span>
+                <Trans>Table</Trans>
+              </span>
+              {sortKey === "table" &&
+                (sortOrder === "asc" ? (
+                  <BsSortNumericDown aria-label={t({ message: "Sort ascending" })} />
+                ) : (
+                  <BsSortNumericDownAlt aria-label={t({ message: "Sort descending" })} />
+                ))}
             </div>
           )}
         </div>

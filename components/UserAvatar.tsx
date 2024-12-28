@@ -2,10 +2,13 @@
 
 import { ReactNode } from "react"
 import Image from "next/image"
+import { Trans, useLingui } from "@lingui/react/macro"
 import { authClient } from "@/lib/auth-client"
 
 export default function UserAvatar(): ReactNode {
   const { data: session, isPending } = authClient.useSession()
+  const { t } = useLingui()
+  const username: string | undefined = session?.user.username
 
   if (!session || isPending) {
     return (
@@ -16,7 +19,7 @@ export default function UserAvatar(): ReactNode {
           width={40}
           height={40}
           priority
-          alt="User avatar placeholder"
+          alt={t({ message: "Avatar placeholder" })}
         />
       </div>
     )
@@ -30,7 +33,7 @@ export default function UserAvatar(): ReactNode {
         width={40}
         height={40}
         priority
-        alt={session?.user?.image ? `${session?.user?.username}’s avatar` : "User avatar placeholder"}
+        alt={session?.user?.image ? t({ message: `${username}’s avatar` }) : t({ message: "Avatar placeholder" })}
       />
     </div>
   )

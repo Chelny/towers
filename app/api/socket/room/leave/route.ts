@@ -1,8 +1,9 @@
 import { headers } from "next/headers"
 import { NextRequest, NextResponse } from "next/server"
+import { t } from "@lingui/core/macro"
 import { TowersTable, TowersUserProfile, TowersUserRoomTable } from "@prisma/client"
 import { updateUserLastActiveAt } from "@/data/user"
-import { getPrismaError, unauthorized } from "@/lib/api"
+import { getPrismaError, missingRoomIdResponse, unauthorized } from "@/lib/api"
 import { auth } from "@/lib/auth"
 import { Session } from "@/lib/auth-client"
 import prisma from "@/lib/prisma"
@@ -13,10 +14,7 @@ export async function PATCH(request: NextRequest): Promise<NextResponse> {
 
   try {
     const { roomId, tableId } = await request.json()
-
-    if (!roomId) {
-      return NextResponse.json({ success: false, message: "Room ID is required" }, { status: 400 })
-    }
+    if (!roomId) return missingRoomIdResponse()
 
     const towersUserProfile: TowersUserProfile | null = await prisma.towersUserProfile.findUnique({
       where: { userId: session.user.id },
@@ -26,7 +24,7 @@ export async function PATCH(request: NextRequest): Promise<NextResponse> {
       return NextResponse.json(
         {
           success: false,
-          message: "The user profile was not found",
+          message: t({ message: "The user profile was not found" }),
         },
         { status: 404 },
       )

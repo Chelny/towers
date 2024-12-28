@@ -1,11 +1,13 @@
 "use client"
 
 import { ChangeEvent, ReactNode, useEffect, useState } from "react"
+import { Trans, useLingui } from "@lingui/react/macro"
 import { ITowersUserRoomTable } from "@prisma/client"
 import { formatDistanceToNow } from "date-fns"
 import Input from "@/components/ui/Input"
 import Modal from "@/components/ui/Modal"
 import { authClient } from "@/lib/auth-client"
+import { enLocale, frLocale } from "@/translations/languages"
 
 type PlayerInformationProps = {
   isOpen: boolean
@@ -20,10 +22,21 @@ export default function PlayerInformation({
   isRatingsVisible = false,
   onCancel,
 }: PlayerInformationProps): ReactNode {
-  const { data: session, isPending, error } = authClient.useSession()
+  const { data: session } = authClient.useSession()
   const [isCurrentUser, setIsCurrentUser] = useState<boolean>(false)
   const [reason, setReason] = useState<string>("")
   const [idleTime, setIdleTime] = useState<string>("")
+  const { i18n, t } = useLingui()
+  const username: string | undefined = player?.userProfile?.user?.username
+  const rating: number | undefined = player?.userProfile?.rating
+  const gamesCompleted: number | undefined = player?.userProfile?.gamesCompleted
+  const wins: number | undefined = player?.userProfile?.wins
+  const loses: number | undefined = player?.userProfile?.loses
+  const streak: number | undefined = player?.userProfile?.streak
+
+  const handleSendMessage = (): void => {
+    onCancel?.()
+  }
 
   useEffect(() => {
     setIsCurrentUser(player?.userProfile?.userId === session?.user.id)
@@ -32,20 +45,19 @@ export default function PlayerInformation({
   useEffect(() => {
     if (player?.userProfile?.user.lastActiveAt) {
       const lastActiveAt: Date = new Date(player.userProfile?.user?.lastActiveAt)
-      const relativeTime: string = formatDistanceToNow(lastActiveAt, { addSuffix: true })
+      const relativeTime: string = formatDistanceToNow(lastActiveAt, {
+        addSuffix: true,
+        locale: i18n.locale === "fr" ? frLocale : enLocale,
+      })
       setIdleTime(relativeTime)
     }
-  }, [player?.userProfile?.user?.lastActiveAt])
-
-  const handleSendMessage = (): void => {
-    onCancel?.()
-  }
+  }, [player?.userProfile?.user?.lastActiveAt, i18n.locale])
 
   return (
     <Modal
       isOpen={isOpen}
-      title={`Player information of ${player?.userProfile?.user?.username}`}
-      confirmText={isCurrentUser ? undefined : "Send"}
+      title={t({ message: `Player information of ${username}` })}
+      confirmText={isCurrentUser ? undefined : t({ message: "Send" })}
       dataTestId="player-information-modal"
       onConfirm={isCurrentUser ? undefined : handleSendMessage}
       onCancel={onCancel}
@@ -54,23 +66,25 @@ export default function PlayerInformation({
         <div>
           {isRatingsVisible && (
             <>
-              Rating: {player?.userProfile?.rating} <br />
-              Games Completed: {player?.userProfile?.gamesCompleted} <br />
-              Wins: {player?.userProfile?.wins} <br />
-              Loses: {player?.userProfile?.loses} <br />
-              Streak: {player?.userProfile?.streak} <br />
+              <Trans>Rating: {rating}</Trans> <br />
+              <Trans>Games Completed: {gamesCompleted}</Trans> <br />
+              <Trans>Wins: {wins}</Trans> <br />
+              <Trans>Loses: {loses}</Trans> <br />
+              <Trans>Streak: {streak}</Trans> <br />
             </>
           )}
         </div>
         {!isCurrentUser && (
           <Input
             id="reason"
-            label="Send instant message"
+            label={t({ message: "Send instant message" })}
             defaultValue={reason}
             onInput={(event: ChangeEvent<HTMLInputElement>) => setReason(event.target.value)}
           />
         )}
-        <div>Idle Time: {idleTime || "Calculating..."}</div>
+        <div>
+          <Trans>Idle Time: {idleTime}</Trans>
+        </div>
       </div>
     </Modal>
   )

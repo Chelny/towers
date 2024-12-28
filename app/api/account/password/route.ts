@@ -1,5 +1,6 @@
 import { headers } from "next/headers"
 import { NextRequest, NextResponse } from "next/server"
+import { t } from "@lingui/core/macro"
 import { APIError } from "better-auth/api"
 import { Status } from "better-status-codes"
 import { auth } from "@/lib/auth"
@@ -30,7 +31,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   return NextResponse.json(
     {
       success: true,
-      message: "The password has been set!",
+      message: t({ message: "The password has been set!" }),
     },
     { status: 200 },
   )

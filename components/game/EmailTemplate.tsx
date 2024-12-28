@@ -1,31 +1,24 @@
 import { ReactNode } from "react"
+import { I18n } from "@lingui/core"
+import { initLingui } from "@/app/init-lingui"
 import { APP_CONFIG } from "@/constants/app"
-
-const brandColor: string = "#115e59"
-export const emailColors: Record<string, string> = {
-  background: "#efeef1",
-  text: "#444",
-  mainBackground: "#fff",
-  buttonBackground: brandColor,
-  buttonBorder: brandColor,
-  buttonText: "#fff",
-  footerText: "#999",
-}
-const bodyStyle: Record<string, string> = {
-  padding: "8px",
-  color: emailColors.text,
-  fontFamily: "sans-serif",
-  fontSize: "16px",
-  lineHeight: "22px",
-}
+import { BODY_STYLE, EMAIL_COLORS } from "@/constants/email"
+import { defaultLocale } from "@/translations/languages"
 
 type EmailTemplateProps = {
   html: string
+  locale: string
 }
 
-export default function EmailTemplate({ html }: EmailTemplateProps): ReactNode {
+export default function EmailTemplate({ html, locale = defaultLocale }: EmailTemplateProps): ReactNode {
+  const appName: string = APP_CONFIG.NAME
+  const startingYear: number = 2024
+  const currentYear: number = new Date().getFullYear()
+  const copyrightYear: string = startingYear === currentYear ? `${startingYear}` : `${startingYear}–${currentYear}`
+  const i18n: I18n = initLingui(locale)
+
   return (
-    <body style={{ paddingBottom: "32px", background: emailColors.background }}>
+    <body style={{ paddingBottom: "32px", background: EMAIL_COLORS.background }}>
       <table
         border={0}
         cellSpacing={20}
@@ -35,7 +28,7 @@ export default function EmailTemplate({ html }: EmailTemplateProps): ReactNode {
           maxWidth: "600px",
           borderRadius: "8px",
           margin: "32px auto 16px",
-          backgroundColor: emailColors.mainBackground,
+          backgroundColor: EMAIL_COLORS.mainBackground,
           wordBreak: "break-word",
         }}
       >
@@ -43,20 +36,20 @@ export default function EmailTemplate({ html }: EmailTemplateProps): ReactNode {
           <tr>
             <th>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/logo.png" alt={APP_CONFIG.NAME_SHORT} title={APP_CONFIG.NAME_SHORT} />
+              <img src="/images/logo.png" alt={APP_CONFIG.NAME} title={APP_CONFIG.NAME} />
             </th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td style={bodyStyle}>
+            <td style={BODY_STYLE}>
               <div dangerouslySetInnerHTML={{ __html: html }} />
             </td>
           </tr>
         </tbody>
         <tfoot>
           <tr>
-            <td style={bodyStyle}>— The Team</td>
+            <td style={BODY_STYLE}>— {i18n._("The {appName} Team", { appName })}</td>
           </tr>
         </tfoot>
       </table>
@@ -65,13 +58,13 @@ export default function EmailTemplate({ html }: EmailTemplateProps): ReactNode {
           <tr>
             <td
               style={{
-                color: emailColors.footerText,
+                color: EMAIL_COLORS.footerText,
                 fontFamily: "sans-serif",
                 fontSize: "12px",
                 textAlign: "center",
               }}
             >
-              &copy; 2024 {APP_CONFIG.NAME}, All Rights Reserved
+              {i18n._("© {copyrightYear} {appName}, All Rights Reserved", { copyrightYear, appName })}
               <br />
               {APP_CONFIG.ADDRESS}
             </td>

@@ -1,6 +1,8 @@
 "use client"
 
 import { FormEvent, PropsWithChildren, ReactNode, RefObject, useEffect, useRef } from "react"
+import { useLingui } from "@lingui/react/macro"
+import clsx from "clsx/lite"
 import Button from "@/components/ui/Button"
 
 type ModalProps = PropsWithChildren<{
@@ -18,14 +20,15 @@ export default function Modal({
   children,
   title,
   isOpen,
-  cancelText = "Cancel",
-  confirmText = "Confirm",
+  cancelText,
+  confirmText,
   isConfirmButtonDisabled = false,
   dataTestId = undefined,
   onCancel,
   onConfirm,
 }: ModalProps): ReactNode {
   const dialogRef: RefObject<HTMLDialogElement | null> = useRef<HTMLDialogElement | null>(null)
+  const { t } = useLingui()
 
   useEffect(() => {
     if (isOpen) {
@@ -61,7 +64,10 @@ export default function Modal({
   return (
     <dialog
       ref={dialogRef}
-      className="fixed top-1/2 left-1/2 z-40 w-full max-w-md rounded shadow-lg -translate-x-1/2 -translate-y-1/2"
+      className={clsx(
+        "fixed top-1/2 start-1/2 z-40 w-full max-w-md rounded shadow-lg -translate-x-1/2 -translate-y-1/2",
+        "rtl:translate-x-1/2",
+      )}
       data-testid={dataTestId}
       onCancel={handleCancel}
     >
@@ -70,7 +76,7 @@ export default function Modal({
           <h3 className="text-2xl">{title}</h3>
           <button
             className="self-start p-2 text-gray-400 hover:text-gray-500"
-            aria-label="Close modal"
+            aria-label={t({ message: "Close" })}
             onClick={handleCancel}
           >
             <svg
@@ -88,11 +94,11 @@ export default function Modal({
         <div className="flex justify-end gap-2 p-4 border-t border-gray-300">
           {onConfirm && (
             <Button type="submit" className="w-full" disabled={isConfirmButtonDisabled}>
-              {confirmText}
+              {confirmText ?? t({ message: "Confirm" })}
             </Button>
           )}
           <Button type="button" className="w-full !ring-0" onClick={handleCancel}>
-            {cancelText}
+            {cancelText ?? t({ message: "Cancel" })}
           </Button>
         </div>
       </form>

@@ -2,6 +2,7 @@
 
 import { ReactNode } from "react"
 import { useRouter } from "next/navigation"
+import { Trans } from "@lingui/react/macro"
 import { ITowersTable, ITowersUserRoomTable, TableType } from "@prisma/client"
 import Button from "@/components/ui/Button"
 import { ROUTE_TOWERS } from "@/constants/routes"
@@ -25,6 +26,7 @@ export default function RoomTable({ roomId, tableId }: RoomTableProps): ReactNod
     [1, 3, 5, 7],
     [2, 4, 6, 8],
   ]
+  const hostUsername: string | undefined = tableInfo?.host?.user?.username
 
   const handleJoinTable = (): void => {
     router.push(`${ROUTE_TOWERS.PATH}?room=${tableInfo?.roomId}&table=${tableInfo?.id}`)
@@ -36,7 +38,7 @@ export default function RoomTable({ roomId, tableId }: RoomTableProps): ReactNod
         <div className="basis-16 row-span-2 flex justify-center items-center h-full px-2 border-gray-300">
           #{tableInfo?.tableNumber}
         </div>
-        <div className="flex-1 flex flex-col gap-1 h-full px-2 border-l border-gray-300 divide-y divide-gray-200">
+        <div className="flex-1 flex flex-col gap-1 h-full px-2 border-s border-gray-300 divide-y divide-gray-200">
           <div className="flex flex-1 gap-1 pt-3 pb-2">
             <div className="basis-28 border-gray-300">
               <Button
@@ -44,7 +46,7 @@ export default function RoomTable({ roomId, tableId }: RoomTableProps): ReactNod
                 disabled={isRoomTablesLoading || tableInfo?.tableType === TableType.PRIVATE}
                 onClick={() => handleJoinTable()}
               >
-                Watch
+                <Trans>Watch</Trans>
               </Button>
             </div>
             <div className="flex flex-col gap-1 border-gray-300">
@@ -72,7 +74,7 @@ export default function RoomTable({ roomId, tableId }: RoomTableProps): ReactNod
                         }
                         onClick={() => handleJoinTable()}
                       >
-                        Join
+                        <Trans>Join</Trans>
                       </Button>
                     )
                   })}
@@ -88,8 +90,14 @@ export default function RoomTable({ roomId, tableId }: RoomTableProps): ReactNod
             </div>
           </div>
           <div className="flex py-1 text-sm">
-            {tableInfo?.rated && <span>Option: rated&nbsp;-&nbsp;</span>}
-            <span>Host: {tableInfo?.host?.user?.username}</span>
+            {tableInfo?.rated && (
+              <span>
+                <Trans>Option: rated</Trans>&nbsp;-&nbsp;
+              </span>
+            )}
+            <span>
+              <Trans>Host: {hostUsername}</Trans>
+            </span>
           </div>
         </div>
       </div>

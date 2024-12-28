@@ -2,6 +2,7 @@
 
 import { ReactNode, useState } from "react"
 import dynamic from "next/dynamic"
+import { useLingui } from "@lingui/react/macro"
 import { ITowersUserRoomTable } from "@prisma/client"
 import PlayersListSkeleton from "@/components/skeleton/PlayersListSkeleton"
 import Modal from "@/components/ui/Modal"
@@ -15,6 +16,7 @@ type TableBootUserProps = {
 
 export default function TableBootUser({ isOpen, users, isRatingsVisible, onCancel }: TableBootUserProps): ReactNode {
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null)
+  const { t } = useLingui()
 
   const handleSelectedPlayer = (): void => {
     onCancel?.()
@@ -23,8 +25,8 @@ export default function TableBootUser({ isOpen, users, isRatingsVisible, onCance
   return (
     <Modal
       isOpen={isOpen}
-      title="Boot User"
-      confirmText="Boot"
+      title={t({ message: "Boot User" })}
+      confirmText={t({ message: "Boot" })}
       isConfirmButtonDisabled={users?.length === 0}
       dataTestId="table-boot-user-modal"
       onConfirm={handleSelectedPlayer}

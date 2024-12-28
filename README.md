@@ -12,7 +12,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/Chelny/towers">
-    <img src="public/logo.png" alt="Logo" width="64" height="64">
+    <img src="public/images/logo.png" alt="Logo" width="64" height="64">
   </a>
 
   <h3 align="center">Towers</h3>
@@ -116,13 +116,13 @@ This project is inspired by Yahoo! Towers but is an independent work. It is not 
 1. Push Prisma schema to database
 
    ```sh
-   npm run prisma:push
+   pnpm prisma:push
    ```
 
 1. Seed the database
 
    ```sh
-   npm run prisma:seed:dev
+   pnpm prisma:seed:dev
    ```
 
    Initial data will be added in the database such as rooms.
@@ -130,7 +130,7 @@ This project is inspired by Yahoo! Towers but is an independent work. It is not 
 1. Run the client
 
    ```sh
-   npm run dev
+   pnpm dev
    ```
 
    This command starts the development server, allowing you to access your application locally at http://localhost:3000.
@@ -151,8 +151,8 @@ _TODO_
 
 - General
   - [x] Add links to Terms of Service and Privacy Policy in `/sign-in` and `/sign-up` pages
-  - [ ] Multi-language Support
-    - [ ] French
+  - [x] Multi-language Support
+    - [x] French
   - [ ] Redirect new user that signs up with OAuth to `/new-user` (with better-auth)
   - [ ] Fix delete user redirection from confirmation link
   - [ ] Fix passkeys (sign-in and profile) - Known issue: Will be fixed in 1.1.x

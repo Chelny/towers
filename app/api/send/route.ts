@@ -7,6 +7,7 @@ type SendEmailData = {
   subject: string
   html: string
   text: string
+  locale: string
 }
 
 const resend: Resend = new Resend(process.env.RESEND_API_KEY)
@@ -19,7 +20,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       from: process.env.EMAIL_SENDER as string,
       to: [process.env.EMAIL_RECIPIENT as string], // TODO: Production: Change to "body.email"
       subject: body.subject,
-      react: EmailTemplate({ html: body.html }),
+      react: EmailTemplate({ html: body.html, locale: body.locale }),
       text: body.text,
     })
 

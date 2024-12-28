@@ -15,6 +15,7 @@ import {
 } from "react"
 import dynamic from "next/dynamic"
 import { useRouter } from "next/navigation"
+import { Trans, useLingui } from "@lingui/react/macro"
 import { createId } from "@paralleldrive/cuid2"
 import {
   ITowersRoom,
@@ -31,6 +32,7 @@ import clsx from "clsx/lite"
 import ServerMessage from "@/components/game/ServerMessage"
 import TableBootUser from "@/components/game/TableBootUser"
 import TableInviteUser from "@/components/game/TableInviteUser"
+import Timer from "@/components/game/Timer"
 import ChatSkeleton from "@/components/skeleton/ChatSkeleton"
 import PlayersListSkeleton from "@/components/skeleton/PlayersListSkeleton"
 import TableHeaderSkeleton from "@/components/skeleton/TableHeaderSkeleton"
@@ -108,7 +110,8 @@ const areEqual = (prevProps: TableProps, nextProps: TableProps): boolean => {
 
 export default memo(function Table({ roomId, tableId }: TableProps): ReactNode {
   const router = useRouter()
-  const { data: session, isPending, error } = authClient.useSession()
+  const { i18n, t } = useLingui()
+  const { data: session } = authClient.useSession()
   const isConnected: boolean = useAppSelector((state: RootState) => state.socket.isConnected)
   const roomInfo: ITowersRoom | null = useAppSelector((state: RootState) => selectRoomInfo(state, roomId))
   const isJoinedTable: boolean = useAppSelector((state: RootState) => selectTableIsJoined(state, roomId, tableId))
@@ -138,6 +141,18 @@ export default memo(function Table({ roomId, tableId }: TableProps): ReactNode {
   const [seatUnavailable, setSeatUnavailable] = useState<boolean>(false)
   const [errorMessages, setErrorMessages] = useState<ChangeTableOptionsFormValidationErrors>({})
   const formRef: RefObject<HTMLFormElement | null> = useRef<HTMLFormElement | null>(null)
+  const [gameStartCountdown, setGameStartCountdown] = useState<number>(14)
+  const [winningPlayer, setWinningPlayer] = useState<string>("the_player1")
+  const [controls, setControls] = useState<Record<string, { label: string; key: string }>>({
+    left: { label: t({ message: "Left Arrow" }), key: "ArrowLeft" },
+    right: { label: t({ message: "Right Arrow" }), key: "ArrowRight" },
+    drop: { label: t({ message: "Drop Arrow" }), key: "ArrowDown" },
+    cycleColor: { label: t({ message: "Up Arrow" }), key: "ArrowUp" },
+    useItem: { label: t({ message: "Space Bar" }), key: "Space" },
+  })
+  const activePlayer: string = "the_player1"
+  const targetPlayer: string = "the_player1abcdefghijklmnopqrstuvwxyz"
+  const pieceName: string = t({ message: "midas piece" })
 
   const initializeTable = useCallback((): void => {
     if (!isJoinedTable) {
@@ -163,7 +178,7 @@ export default memo(function Table({ roomId, tableId }: TableProps): ReactNode {
               sendTableAutomatedChatMessage({
                 roomId,
                 tableId,
-                message: `${session?.user.username} joined the table.`,
+                message: `${session?.user.username} joined the table.`, // TODO: Translate in chat based on locale
                 type: TableChatMessageType.USER_ACTION,
               }),
             )
@@ -214,14 +229,14 @@ export default memo(function Table({ roomId, tableId }: TableProps): ReactNode {
 
   const handleTableTypeChange = (tableType: string): void => {
     if (session) {
-      let message: string = "Anyone may play or watch your table now."
+      let message: string = t({ message: "Anyone may play or watch your table now." })
 
       switch (tableType) {
         case TableType.PROTECTED:
-          message = "Only people you have invited may play now."
+          message = t({ message: "Only people you have invited may play now." })
           break
         case TableType.PRIVATE:
-          message = "Only people you have invited may play or watch your table now."
+          message = t({ message: "Only people you have invited may play or watch your table now." })
           break
         default:
           break
@@ -263,17 +278,17 @@ export default memo(function Table({ roomId, tableId }: TableProps): ReactNode {
         case "tableType":
           setErrorMessages((prev: ChangeTableOptionsFormValidationErrors) => ({
             ...prev,
-            tableType: "You must select a table type.",
+            tableType: t({ message: "You must select a table type." }),
           }))
           break
         case "rated":
           setErrorMessages((prev: ChangeTableOptionsFormValidationErrors) => ({
             ...prev,
-            rated: "You must rate this game.",
+            rated: t({ message: "You must rate this game." }),
           }))
           break
         default:
-          console.error(`Change Table Options Action: Unknown error at ${error.path}`)
+          console.error(`Change Table Options Validation: Unknown error at ${error.path}`)
           break
       }
     }
@@ -404,14 +419,14 @@ export default memo(function Table({ roomId, tableId }: TableProps): ReactNode {
                 disabled={isInfoLoading}
                 onClick={(event: MouseEvent<HTMLButtonElement>) => {}}
               >
-                Start
+                <Trans>Start</Trans>
               </Button>
               <hr className="border-1 border-gray-400" />
               <Button className="w-full" disabled onClick={(event: MouseEvent<HTMLButtonElement>) => {}}>
-                Change Keys
+                <Trans>Change Keys</Trans>
               </Button>
               <Button className="w-full" disabled onClick={(event: MouseEvent<HTMLButtonElement>) => {}}>
-                Demo
+                <Trans>Demo</Trans>
               </Button>
               <hr className="border-1 border-gray-400" />
               <Button
@@ -419,10 +434,12 @@ export default memo(function Table({ roomId, tableId }: TableProps): ReactNode {
                 disabled={isInfoLoading}
                 onClick={(event: MouseEvent<HTMLButtonElement>) => {}}
               >
-                Stand
+                <Trans>Stand</Trans>
               </Button>
               <div>
-                <span className="p-1 rounded-tl rounded-tr bg-sky-700 text-white text-sm">Table Type</span>
+                <span className="p-1 rounded-tl rounded-tr bg-sky-700 text-white text-sm">
+                  <Trans>Table Type</Trans>
+                </span>
               </div>
               <Select
                 id="tableType"
@@ -434,30 +451,38 @@ export default memo(function Table({ roomId, tableId }: TableProps): ReactNode {
                   handleTableTypeChange(tableType)
                 }}
               >
-                <Select.Option value={TableType.PUBLIC}>Public</Select.Option>
-                <Select.Option value={TableType.PROTECTED}>Protected</Select.Option>
-                <Select.Option value={TableType.PRIVATE}>Private</Select.Option>
+                <Select.Option value={TableType.PUBLIC}>
+                  <Trans>Public</Trans>
+                </Select.Option>
+                <Select.Option value={TableType.PROTECTED}>
+                  <Trans>Protected</Trans>
+                </Select.Option>
+                <Select.Option value={TableType.PRIVATE}>
+                  <Trans>Private</Trans>
+                </Select.Option>
               </Select>
               <Button
                 className="w-full"
                 disabled={isInfoLoading || session?.user.id !== tableInfo?.host?.userId}
                 onClick={handleOpenInviteUserModal}
               >
-                Invite
+                <Trans>Invite</Trans>
               </Button>
               <Button
                 className="w-full"
                 disabled={isInfoLoading || session?.user.id !== tableInfo?.host?.userId}
                 onClick={handleOpenBootUserModal}
               >
-                Boot
+                <Trans>Boot</Trans>
               </Button>
               <div>
-                <span className="p-1 rounded-tl rounded-tr bg-sky-700 text-white text-sm">Options</span>
+                <span className="p-1 rounded-tl rounded-tr bg-sky-700 text-white text-sm">
+                  <Trans>Options</Trans>
+                </span>
               </div>
               <Checkbox
                 id="rated"
-                label="Rated Game"
+                label={t({ message: "Rated Game" })}
                 defaultChecked={isRated}
                 disabled={isInfoLoading || session?.user.id !== tableInfo?.host?.userId}
                 onChange={(event: ChangeEvent<HTMLInputElement>) => {
@@ -467,17 +492,17 @@ export default memo(function Table({ roomId, tableId }: TableProps): ReactNode {
               />
               <Checkbox
                 id="sound"
-                label="Sound"
+                label={t({ message: "Sound" })}
                 disabled
                 onChange={(event: ChangeEvent<HTMLInputElement>) => console.log(event.target.checked)}
               />
             </div>
             <div className="flex gap-1">
               <Button className="w-full" disabled onClick={(event: MouseEvent<HTMLButtonElement>) => {}}>
-                Help
+                <Trans>Help</Trans>
               </Button>
               <Button className="w-full" onClick={handleQuitTable}>
-                Quit
+                <Trans>Quit</Trans>
               </Button>
             </div>
           </div>
@@ -490,50 +515,78 @@ export default memo(function Table({ roomId, tableId }: TableProps): ReactNode {
                 <div className="relative grid grid-rows-table-team grid-cols-table-team w-fit p-2 mx-auto bg-neutral-50">
                   {/* Game countdown */}
                   {isGameState === GameState.COUNTDOWN && (
-                    <div className="absolute left-1/2 -translate-x-1/2 bottom-[8px] z-30 flex flex-col items-center w-[450px] h-48 p-1 border-2 border-gray-400 bg-gray-200 shadow-lg">
-                      <div className="text-2xl">The next game is starting in</div>
-                      <div className="flex-1 flex items-center text-7xl text-orange-400 font-semibold normal-nums">
-                        14
-                      </div>
-                      <div className="text-2xl">seconds</div>
+                    <div
+                      className={clsx(
+                        "absolute start-1/2 -translate-x-1/2 bottom-[8px] z-30 flex flex-col items-center w-[450px] h-48 p-1 border-2 border-gray-400 bg-gray-200 shadow-lg",
+                        "rtl:translate-x-1/2",
+                      )}
+                    >
+                      <Trans>
+                        <div className="text-2xl">The next game is starting in</div>
+                        <div className="flex-1 flex items-center text-7xl text-orange-400 font-semibold normal-nums">
+                          {gameStartCountdown}
+                        </div>
+                        <div className="text-2xl">seconds</div>
+                      </Trans>
                     </div>
                   )}
 
                   {/* Game over */}
                   {isGameState === GameState.GAME_OVER && (
-                    <div className="absolute left-0 top-0 gap-8 z-30 flex flex-col justify-start items-center w-full h-max p-1 mt-16 font-medium [text-shadow:_4px_4px_0_rgb(0_0_0)] animate-move-up">
-                      <div className="text-8xl text-fuchsia-600">Game Over</div>
-                      <div className="text-6xl text-yellow-400">You win!</div>
-                      {/* <div className="flex flex-col gap-8 items-center text-6xl">
-                        <div className="text-yellow-400">You lose!</div>
-                        <div className="text-fuchsia-600">Congratulations</div>
-                        <div className="text-fuchsia-600">the_player1</div>
-                      </div> */}
+                    <div className="absolute start-0 top-0 gap-8 z-30 flex flex-col justify-start items-center w-full h-max p-1 mt-16 font-medium [text-shadow:_4px_4px_0_rgb(0_0_0)] animate-move-up">
+                      <div className="text-8xl text-fuchsia-600">
+                        <Trans>Game Over</Trans>
+                      </div>
+                      <div className="text-6xl text-yellow-400">
+                        <Trans>You win!</Trans>
+                      </div>
+                      <div className="flex flex-col gap-8 items-center text-6xl">
+                        <div className="text-yellow-400">
+                          <Trans>You lose!</Trans>
+                        </div>
+                        <Trans>
+                          <div className="text-fuchsia-600">Congratulations</div>
+                          <div className="text-fuchsia-600">{winningPlayer}</div>
+                        </Trans>
+                      </div>
                     </div>
                   )}
 
                   {/* Controls and game timer */}
-                  <div className="row-span-3 flex flex-col justify-evenly items-start px-2 py-1 text-lg">
-                    <div className="text-base">
-                      <div className="flex flex-row gap-2">
-                        <div>Left:</div> <div className="text-gray-500">Left Arrow</div>
+                  <div className="row-span-3 flex flex-col justify-evenly items-start gap-2 px-2 pb-2 text-lg">
+                    <div className="text-sm">
+                      <div className="grid grid-cols-[1fr_1fr] gap-2">
+                        <div>
+                          <Trans>Left:</Trans>
+                        </div>{" "}
+                        <div className="text-gray-500">{controls.left.label}</div>
                       </div>
-                      <div className="flex flex-row gap-2">
-                        <div>Right:</div> <div className="text-gray-500">Right Arrow</div>
+                      <div className="grid grid-cols-[1fr_1fr] gap-2">
+                        <div>
+                          <Trans>Right:</Trans>
+                        </div>{" "}
+                        <div className="text-gray-500">{controls.right.label}</div>
                       </div>
-                      <div className="flex flex-row gap-2">
-                        <div>Drop:</div> <div className="text-gray-500">Down Arrow</div>
+                      <div className="grid grid-cols-[1fr_1fr] gap-2">
+                        <div>
+                          <Trans>Drop:</Trans>
+                        </div>{" "}
+                        <div className="text-gray-500">{controls.drop.label}</div>
                       </div>
-                      <div className="flex flex-row gap-2">
-                        <div>Cycle Color:</div> <div className="text-gray-500">Up Arrow</div>
+                      <div className="grid grid-cols-[1fr_1fr] gap-2">
+                        <div>
+                          <Trans>Cycle Color:</Trans>
+                        </div>{" "}
+                        <div className="text-gray-500">{controls.cycleColor.label}</div>
                       </div>
-                      <div className="flex flex-row gap-2">
-                        <div>Use Item:</div> <div className="text-gray-500">Space Bar</div>
+                      <div className="grid grid-cols-[1fr_1fr] gap-2">
+                        <div>
+                          <Trans>Use Item:</Trans>
+                        </div>{" "}
+                        <div className="text-gray-500">{controls.useItem.label}</div>
                       </div>
                     </div>
-                    <div className="w-full border-double border-8 border-neutral-300 font-mono text-gray-400 text-6xl text-center tabular-nums">
-                      --:--
-                    </div>
+                    <Timer isActive={isGameState === GameState.STARTED} />
                   </div>
 
                   {/* Game */}
@@ -544,6 +597,7 @@ export default memo(function Table({ roomId, tableId }: TableProps): ReactNode {
                         `row-span-${group.rowSpan}`,
                         index === 0 ? "flex flex-row justify-center items-start h-max" : "",
                       )}
+                      dir="ltr"
                     >
                       <div className={index === 0 ? "contents" : "flex flex-row justify-center items-center"}>
                         {group.seatNumbers.map((seat: number) => (
@@ -586,10 +640,14 @@ export default memo(function Table({ roomId, tableId }: TableProps): ReactNode {
 
                   <div className="row-span-1 flex flex-col justify-start w-[488px] px-2 mt-2 bg-neutral-200 text-sm font-mono">
                     {/* Next power to be used by current player */}
-                    <span className="w-full truncate">You can send a midas piece</span>
+                    <span className="w-full truncate">
+                      <Trans>You can send a {pieceName}</Trans>
+                    </span>
                     {/* Power used by other players */}
                     <span className="w-full text-gray-500 truncate">
-                      the_player1 mega defused the_player1abcdefghijklmnopqrstuvwxyz
+                      <Trans>
+                        {activePlayer} mega defused {targetPlayer}
+                      </Trans>
                     </span>
                   </div>
                 </div>
@@ -607,7 +665,7 @@ export default memo(function Table({ roomId, tableId }: TableProps): ReactNode {
                     ref={messageInputRef}
                     type="text"
                     className="w-full p-2 border"
-                    placeholder="Write something..."
+                    placeholder={t({ message: "Write something..." })}
                     maxLength={CHAT_MESSSAGE_MAX_LENGTH}
                     disabled={isChatLoading}
                     onKeyDown={handleSendMessage}

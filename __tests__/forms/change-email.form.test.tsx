@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { Mock } from "vitest"
 import { mockSession } from "@/__mocks__/data/users"
-import { ChangeEmailForm } from "@/app/(protected)/account/profile/change-email.form"
+import { ChangeEmailForm } from "@/app/[locale]/(protected)/account/profile/change-email.form"
 import { mockUseRouter } from "@/vitest.setup"
 
 vi.mock("next/navigation", () => ({

@@ -55,7 +55,9 @@ export default function Checkbox({
           data-testid={dataTestId}
           onChange={handleChange}
         />
-        <TiTick className={clsx("absolute hidden w-5 h-5 mt-1 text-gray-600", "peer-checked:block")} />
+        <TiTick
+          className={clsx("absolute hidden w-5 h-5 mt-1 text-gray-600 pointer-events-none", "peer-checked:block")}
+        />
         <label
           id={`${id}Label`}
           htmlFor={id}

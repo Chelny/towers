@@ -1,4 +1,4 @@
-import { MutableRefObject, ReactNode, useEffect, useRef } from "react"
+import { ReactNode, RefObject, useEffect, useRef } from "react"
 import GridRow from "@/components/towers/GridRow"
 import { Board, BoardRow } from "@/interfaces/game"
 
@@ -8,7 +8,7 @@ type GridProps = {
 }
 
 export default function Grid(props: GridProps): ReactNode {
-  const boardRef: MutableRefObject<HTMLDivElement | null> = useRef<HTMLDivElement | null>(null)
+  const boardRef: RefObject<HTMLDivElement | null> = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     boardRef.current?.focus()

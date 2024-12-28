@@ -1,4 +1,4 @@
-import { ITowersRoomWithUsersCount } from "@prisma/client"
+import { ITowersRoomWithUsersCount, RoomLevel } from "@prisma/client"
 import { fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { Mock } from "vitest"
 import { mockRoom1, mockRoom2, mockRoom3 } from "@/__mocks__/data/rooms"
@@ -47,6 +47,18 @@ describe("RoomsList Component", () => {
     },
   ]
 
+  const getRoomDifficulty = (difficulty: string): string => {
+    return difficulty === RoomLevel.SOCIAL
+      ? "Social"
+      : difficulty === RoomLevel.BEGINNER
+        ? "Beginner"
+        : difficulty === RoomLevel.INTERMEDIATE
+          ? "Intermediate"
+          : difficulty === RoomLevel.ADVANCED
+            ? "Advanced"
+            : ""
+  }
+
   beforeEach(() => {
     vi.mocked(useAppDispatch).mockReturnValue(mockAppDispatch)
     vi.mocked(authClient.useSession).mockReturnValue(mockSession)
@@ -68,13 +80,13 @@ describe("RoomsList Component", () => {
     render(<RoomsList rooms={mockRooms} />)
 
     expect(screen.getByText(mockRoom1.name)).toBeInTheDocument()
-    expect(screen.getByText(mockRoom1.difficulty)).toBeInTheDocument()
+    expect(screen.getByText(getRoomDifficulty(mockRoom1.difficulty))).toBeInTheDocument()
     expect(screen.getByText(`${mockRooms[0].usersCount} users`)).toBeInTheDocument()
     expect(screen.getByText(mockRoom2.name)).toBeInTheDocument()
-    expect(screen.getByText(mockRoom2.difficulty)).toBeInTheDocument()
+    expect(screen.getByText(getRoomDifficulty(mockRoom2.difficulty))).toBeInTheDocument()
     expect(screen.getByText(`${mockRooms[1].usersCount} users`)).toBeInTheDocument()
     expect(screen.getByText(mockRoom3.name)).toBeInTheDocument()
-    expect(screen.getByText(mockRoom3.difficulty)).toBeInTheDocument()
+    expect(screen.getByText(getRoomDifficulty(mockRoom3.difficulty))).toBeInTheDocument()
     expect(screen.getByText(`${mockRooms[2].usersCount} users`)).toBeInTheDocument()
 
     const buttons: HTMLButtonElement[] = screen.getAllByRole("button", { name: /Join/i })

@@ -1,5 +1,6 @@
 import { headers } from "next/headers"
 import { NextRequest, NextResponse } from "next/server"
+import { t } from "@lingui/core/macro"
 import { TowersTableChatMessage, TowersUserProfile } from "@prisma/client"
 import DOMPurify from "isomorphic-dompurify"
 import { updateUserLastActiveAt } from "@/data/user"
@@ -29,7 +30,7 @@ export async function GET(request: NextRequest, segmentData: { params: Params })
       return NextResponse.json(
         {
           success: false,
-          message: "The user profile was not found",
+          message: t({ message: "The user profile was not found" }),
         },
         { status: 404 },
       )
@@ -45,7 +46,7 @@ export async function GET(request: NextRequest, segmentData: { params: Params })
       return NextResponse.json(
         {
           success: false,
-          message: "The user has not yet joined the table",
+          message: t({ message: "The user has not yet joined the table" }),
         },
         { status: 404 },
       )
@@ -100,7 +101,7 @@ export async function POST(request: NextRequest, segmentData: { params: Params }
       return NextResponse.json(
         {
           success: false,
-          message: "Unable to find the requested user profile.",
+          message: t({ message: "Unable to find the requested user profile." }),
         },
         { status: 404 },
       )
@@ -112,7 +113,7 @@ export async function POST(request: NextRequest, segmentData: { params: Params }
       return NextResponse.json(
         {
           success: false,
-          message: "Invalid input. XSS attack detected.",
+          message: t({ message: "Invalid input. XSS attack detected." }),
         },
         { status: 400 },
       )

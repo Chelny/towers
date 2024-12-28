@@ -2,6 +2,7 @@
 
 import { ChangeEvent, PropsWithChildren, ReactElement, ReactNode, useState } from "react"
 import React from "react"
+import { Trans } from "@lingui/react/macro"
 import clsx from "clsx/lite"
 import RadioButton from "./RadioButton"
 
@@ -52,7 +53,12 @@ export default function RadioButtonGroup({
       data-testid={dataTestId}
     >
       <legend id={`${id}Label`} className="mb-1 font-medium">
-        {label} {!required && <span className="text-neutral-500">(optional)</span>}
+        {label}{" "}
+        {!required && (
+          <span className="text-neutral-500">
+            (<Trans>optional</Trans>)
+          </span>
+        )}
       </legend>
       <div className={clsx("flex justify-evenly gap-2 mb-1", inline ? "flex-col md:flex-row" : "flex-col")}>
         {options.map((option: ReactElement<RadioButtonOptionProps>) => (

@@ -2,6 +2,7 @@
 
 import { ReactNode, useState } from "react"
 import dynamic from "next/dynamic"
+import { useLingui } from "@lingui/react/macro"
 import { ITowersUserRoomTable } from "@prisma/client"
 import PlayersListSkeleton from "@/components/skeleton/PlayersListSkeleton"
 import Modal from "@/components/ui/Modal"
@@ -20,6 +21,7 @@ export default function TableInviteUser({
   onCancel,
 }: TableInviteUserProps): ReactNode {
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null)
+  const { t } = useLingui()
 
   const handleUserToInvite = (): void => {
     onCancel?.()
@@ -28,8 +30,8 @@ export default function TableInviteUser({
   return (
     <Modal
       isOpen={isOpen}
-      title="Invite User"
-      confirmText="Invite"
+      title={t({ message: "Invite User" })}
+      confirmText={t({ message: "Invite" })}
       isConfirmButtonDisabled={users?.length == 0}
       dataTestId="table-invite-user-modal"
       onConfirm={handleUserToInvite}

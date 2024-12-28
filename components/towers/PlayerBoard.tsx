@@ -2,6 +2,7 @@
 
 import { ReactNode } from "react"
 import Image from "next/image"
+import { Trans } from "@lingui/react/macro"
 import clsx from "clsx/lite"
 import Grid from "@/components/towers/Grid"
 import NextPiece from "@/components/towers/NextPiece"
@@ -60,7 +61,7 @@ export default function PlayerBoard(props: PlayerBoardProps): ReactNode {
             props.isOpponentBoard
               ? "grid-rows-grid-container-opponent w-grid-container-opponent"
               : "grid-rows-grid-container w-grid-container",
-            "before:content-[attr(data-seat-number)] before:absolute before:top-1/4 before:left-1/2 before:-translate-x-1/2 before:text-[7rem] before:font-bold before:text-center",
+            "before:content-[attr(data-seat-number)] before:absolute before:top-1/4 before:start-1/2 before:-translate-x-1/2 before:text-[7rem] before:font-bold before:text-center",
           )}
           data-seat-number={props.seatNumber}
           data-testid="player-board-grid-container"
@@ -68,7 +69,7 @@ export default function PlayerBoard(props: PlayerBoardProps): ReactNode {
           {!isPlaying && (
             <div
               className={clsx(
-                "absolute left-1/2 -translate-x-1/2 z-20 flex flex-col gap-2 shadow-md bg-neutral-800 text-center",
+                "absolute start-1/2 -translate-x-1/2 z-20 flex flex-col gap-2 shadow-md bg-neutral-800 text-center",
                 props.isOpponentBoard
                   ? "top-[90%] -translate-y-[90%] px-1 py-2 w-full"
                   : "top-1/2 -translate-y-1/2 px-3 py-2 w-11/12",
@@ -81,22 +82,26 @@ export default function PlayerBoard(props: PlayerBoardProps): ReactNode {
                     props.isOpponentBoard ? "h-8 text-sm line-clamp-2" : "h-16 text-xl",
                   )}
                 >
-                  <span>Waiting for more players</span>
-                  <span>Ready</span>
+                  <span>
+                    <Trans>Waiting for more players</Trans>
+                  </span>
+                  <span>
+                    <Trans>Ready</Trans>
+                  </span>
                 </p>
               ) : (
                 <>
                   {props.isSeated ? (
                     <>
                       <Button className="w-full" tabIndex={props.seatNumber} onClick={() => handleSeatChange(null)}>
-                        Stand
+                        <Trans>Stand</Trans>
                       </Button>
                       <Button
                         className="w-full border-t-yellow-400 border-e-yellow-600 border-b-yellow-600 border-s-yellow-400 bg-yellow-500 font-medium"
                         tabIndex={props.seatNumber}
                         onClick={startGame}
                       >
-                        Start
+                        <Trans>Start</Trans>
                       </Button>
                     </>
                   ) : (
@@ -105,7 +110,7 @@ export default function PlayerBoard(props: PlayerBoardProps): ReactNode {
                       tabIndex={props.seatNumber}
                       onClick={() => handleSeatChange(props.seatNumber)}
                     >
-                      Join
+                      <Trans>Join</Trans>
                     </Button>
                   )}
                 </>

@@ -5,7 +5,9 @@ describe("SmallScreenWarning Component", () => {
   it("should render warning message", () => {
     render(<SmallScreenWarning />)
 
-    expect(screen.getByText("Screen Too Small")).toBeInTheDocument()
-    expect(screen.getByText(/Resize the window \(recommended size: 1275px by 768px\)/)).toBeInTheDocument()
+    expect(screen.getByText(/Screen Too Small/i)).toBeInTheDocument()
+    expect(
+      screen.getByText(/Resize the window.*\d+px by \d+px.*or use a computer for a better experience/i),
+    ).toBeInTheDocument()
   })
 })

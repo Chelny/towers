@@ -3,7 +3,7 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { Passkey } from "better-auth/plugins"
 import { Mock } from "vitest"
 import { mockSession } from "@/__mocks__/data/users"
-import { PasskeysForm } from "@/app/(protected)/account/profile/passkeys.form"
+import { PasskeysForm } from "@/app/[locale]/(protected)/account/profile/passkeys.form"
 import { authClient } from "@/lib/auth-client"
 
 vi.mock("@/lib/auth-client", () => ({
@@ -71,11 +71,11 @@ describe("Passkeys Form", () => {
     render(<PasskeysForm />)
 
     expect(screen.getByText(/Passkey 1/i)).toBeInTheDocument()
-    expect(screen.getByRole("button", { name: /Edit passkey Passkey 1/i })).toBeInTheDocument()
-    expect(screen.getByRole("button", { name: /Delete passkey Passkey 1/i })).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: /Edit "Passkey 1" passkey/i })).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: /Delete "Passkey 1" passkey/i })).toBeInTheDocument()
     expect(screen.getByText(/Passkey 2/i)).toBeInTheDocument()
-    expect(screen.getByRole("button", { name: /Edit passkey Passkey 2/i })).toBeInTheDocument()
-    expect(screen.getByRole("button", { name: /Delete passkey Passkey 2/i })).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: /Edit "Passkey 2" passkey/i })).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: /Delete "Passkey 2" passkey/i })).toBeInTheDocument()
   })
 
   it("should display error messages when submitting an empty form", () => {
@@ -141,8 +141,8 @@ describe("Passkeys Form", () => {
     await waitFor(() => {
       expect(screen.getByText(/The passkey "Test Passkey 1" has been added!/i)).toBeInTheDocument()
       expect(screen.getByText("Test Passkey 1")).toBeInTheDocument()
-      expect(screen.getByRole("button", { name: /Edit passkey Test Passkey 1/i })).toBeInTheDocument()
-      expect(screen.getByRole("button", { name: /Delete passkey Test Passkey 1/i })).toBeInTheDocument()
+      expect(screen.getByRole("button", { name: /Edit "Test Passkey 1" passkey/i })).toBeInTheDocument()
+      expect(screen.getByRole("button", { name: /Delete "Test Passkey 1" passkey/i })).toBeInTheDocument()
     })
   })
 })

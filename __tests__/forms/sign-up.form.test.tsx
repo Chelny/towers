@@ -1,7 +1,7 @@
 import React from "react"
 import { fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { Mock } from "vitest"
-import { SignUpForm } from "@/app/(auth)/sign-up/sign-up.form"
+import { SignUpForm } from "@/app/[locale]/(auth)/sign-up/sign-up.form"
 import { ROUTE_SIGN_IN } from "@/constants/routes"
 
 vi.mock("@/lib/auth-client", () => ({

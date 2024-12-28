@@ -3,6 +3,7 @@
 import { KeyboardEvent, memo, MouseEvent, ReactNode, RefObject, useCallback, useEffect, useRef, useState } from "react"
 import dynamic from "next/dynamic"
 import { useRouter } from "next/navigation"
+import { Trans, useLingui } from "@lingui/react/macro"
 import {
   ITowersRoom,
   ITowersRoomChatMessage,
@@ -63,7 +64,7 @@ const areEqual = (prevProps: RoomProps, nextProps: RoomProps): boolean => {
 
 export default memo(function Room({ roomId }: RoomProps): ReactNode {
   const router = useRouter()
-  const { data: session, isPending, error } = authClient.useSession()
+  const { data: session } = authClient.useSession()
   const isConnected: boolean = useAppSelector((state: RootState) => state.socket.isConnected)
   const isJoinedRoom: boolean = useAppSelector((state: RootState) => selectRoomIsJoined(state, roomId))
   const roomInfo: ITowersRoom | null = useAppSelector((state: RootState) => selectRoomInfo(state, roomId))
@@ -77,6 +78,7 @@ export default memo(function Room({ roomId }: RoomProps): ReactNode {
   const chatEndRef: RefObject<HTMLDivElement | null> = useRef<HTMLDivElement | null>(null)
   const [isCreateTableModalOpen, setIsCreateTableModalOpen] = useState<boolean>(false)
   const [invitationModals, setInvitationModals] = useState<{ id: string; data: TableInvitationData }[]>([])
+  const { t } = useLingui()
 
   const initializeRoom = useCallback((): void => {
     if (!isJoinedRoom) {
@@ -187,17 +189,19 @@ export default memo(function Room({ roomId }: RoomProps): ReactNode {
         <div className="[grid-area:sidebar] flex flex-col justify-between p-2 bg-gray-200">
           <div className="mb-4">
             <Button className="w-full py-2 mb-2" disabled onClick={(event: MouseEvent<HTMLButtonElement>) => {}}>
-              Play Now
+              <Trans>Play Now</Trans>
             </Button>
             <Button className="w-full py-2 mb-2" disabled={isInfoLoading} onClick={handleOpenCreateTableModal}>
-              Create Table
+              <Trans>Create Table</Trans>
             </Button>
           </div>
           <div className="mt-4">
             {roomInfo && roomInfo?.difficulty !== RoomLevel.SOCIAL && (
               <>
                 <div>
-                  <span className="p-1 rounded-tl rounded-tr bg-sky-700 text-white text-sm">Ratings</span>
+                  <span className="p-1 rounded-tl rounded-tr bg-sky-700 text-white text-sm">
+                    <Trans>Ratings</Trans>
+                  </span>
                 </div>
                 <div className="flex flex-col gap-4 p-2 bg-white text-gray-600 mb-4">
                   <div className="flex items-center gap-1">
@@ -230,16 +234,18 @@ export default memo(function Room({ roomId }: RoomProps): ReactNode {
                   </div>
                   <div className="flex items-center gap-1">
                     <div className="w-4 h-4 bg-gray-400"></div>
-                    <div>provisional</div>
+                    <div>
+                      <Trans>provisional</Trans>
+                    </div>
                   </div>
                 </div>
               </>
             )}
             <Button className="w-full py-2 mb-2" disabled onClick={(event: MouseEvent<HTMLButtonElement>) => {}}>
-              Options
+              <Trans>Options</Trans>
             </Button>
             <Button className="w-full py-2 mb-2" onClick={handleExitRoom}>
-              Exit Room
+              <Trans>Exit Room</Trans>
             </Button>
           </div>
         </div>
@@ -249,13 +255,25 @@ export default memo(function Room({ roomId }: RoomProps): ReactNode {
           {/* Tables */}
           <div className="[grid-area:tables] overflow-hidden flex flex-col border bg-white">
             <div className="flex gap-1 py-2 bg-yellow-200">
-              <div className="flex justify-center items-center w-16 border-gray-300">Table</div>
+              <div className="flex justify-center items-center w-16 border-gray-300">
+                <Trans>Table</Trans>
+              </div>
               <div className="flex justify-center items-center w-28 border-gray-300"></div>
-              <div className="flex justify-center items-center w-28 border-gray-300">Team 1-2</div>
-              <div className="flex justify-center items-center w-28 border-gray-300">Team 3-4</div>
-              <div className="flex justify-center items-center w-28 border-gray-300">Team 5-6</div>
-              <div className="flex justify-center items-center w-28 border-gray-300">Team 7-8</div>
-              <div className="flex-1 px-2">Who is Watching</div>
+              <div className="flex justify-center items-center w-28 border-gray-300">
+                <Trans>Team 1-2</Trans>
+              </div>
+              <div className="flex justify-center items-center w-28 border-gray-300">
+                <Trans>Team 3-4</Trans>
+              </div>
+              <div className="flex justify-center items-center w-28 border-gray-300">
+                <Trans>Team 5-6</Trans>
+              </div>
+              <div className="flex justify-center items-center w-28 border-gray-300">
+                <Trans>Team 7-8</Trans>
+              </div>
+              <div className="flex-1 px-2">
+                <Trans>Who is Watching</Trans>
+              </div>
             </div>
             <div className="overflow-y-auto">
               {tables?.map(
@@ -276,7 +294,7 @@ export default memo(function Room({ roomId }: RoomProps): ReactNode {
                   ref={messageInputRef}
                   type="text"
                   className="w-full p-2 border"
-                  placeholder="Write something..."
+                  placeholder={t({ message: "Write something..." })}
                   maxLength={CHAT_MESSSAGE_MAX_LENGTH}
                   disabled={isChatLoading}
                   onKeyDown={handleSendMessage}
@@ -319,16 +337,20 @@ export default memo(function Room({ roomId }: RoomProps): ReactNode {
 
 const RoomHeader = dynamic(() => import("@/components/game/RoomHeader"), {
   loading: () => <RoomHeaderSkeleton />,
+  ssr: false,
 })
 
 const RoomTable = dynamic(() => import("@/components/game/RoomTable"), {
   loading: () => <RoomTableSkeleton />,
+  ssr: false,
 })
 
 const Chat = dynamic(() => import("@/components/game/Chat"), {
   loading: () => <ChatSkeleton />,
+  ssr: false,
 })
 
 const PlayersList = dynamic(() => import("@/components/game/PlayersList"), {
   loading: () => <PlayersListSkeleton isTableNumberVisible />,
+  ssr: false,
 })

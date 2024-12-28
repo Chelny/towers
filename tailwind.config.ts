@@ -1,3 +1,4 @@
+import plugin from "tailwindcss/plugin"
 import type { Config } from "tailwindcss"
 
 const config: Config = {
@@ -6,6 +7,7 @@ const config: Config = {
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
+  darkMode: "class",
   theme: {
     container: {
       center: true,
@@ -41,6 +43,9 @@ const config: Config = {
         "preview-piece": "calc(var(--grid-cell-size) * 3px + 16px)",
         "power-bar": "calc(var(--grid-cell-size) * 8px + 16px)",
       },
+      backgroundColor: {
+        "towers-primary": "theme('colors.teal.800')",
+      },
       keyframes: {
         "move-background": {
           "0%": { backgroundPosition: "bottom" },
@@ -52,7 +57,7 @@ const config: Config = {
         },
       },
       animation: {
-        "move-background": "move-background 120s linear infinite",
+        "move-background": "move-background 180s linear infinite",
         "move-up": "move-up 1.5s ease-in-out forwards",
       },
       screens: {
@@ -61,5 +66,28 @@ const config: Config = {
       },
     },
   },
+  plugins: [
+    plugin(({ addUtilities }) => {
+      addUtilities({
+        ".towers-bg-animate::before": {
+          content: "' '",
+          position: "absolute",
+          top: "-50%",
+          left: "-50%",
+          width: "200%",
+          height: "200%",
+          padding: "1rem",
+          backgroundClip: "content-box",
+          backgroundOrigin: "content-box",
+          backgroundRepeat: "round",
+          backgroundSize: "auto",
+          backgroundImage: "url('/images/logo.png')",
+          opacity: "0.5",
+          transform: "rotate(-12deg)",
+          animation: "move-background 180s linear infinite",
+        },
+      })
+    }),
+  ],
 }
 export default config

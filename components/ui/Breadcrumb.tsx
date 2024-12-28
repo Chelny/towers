@@ -1,51 +1,82 @@
-"use client"
-
-import { ReactNode } from "react"
-import { usePathname } from "next/navigation"
+import { ComponentProps, ComponentPropsWithoutRef, forwardRef, ReactNode } from "react"
+import { i18n } from "@lingui/core"
+import { t } from "@lingui/core/macro"
+import { clsx } from "clsx/lite"
 import Anchor from "@/components/ui/Anchor"
-import { ROUTE_ERROR, ROUTE_HOME } from "@/constants/routes"
 
-export default function Breadcrumb(): ReactNode {
-  const pathname: string = usePathname()
-  const pathSegments: string[] = pathname.split("/").filter((path: string) => path)
+const Breadcrumb = forwardRef<
+  HTMLElement,
+  ComponentPropsWithoutRef<"nav"> & {
+    separator?: ReactNode
+  }
+>(({ ...props }, ref) => <nav ref={ref} aria-label={t({ message: "breadcrumb" })} {...props} />)
+Breadcrumb.displayName = "Breadcrumb"
 
-  // Do not show breadcrumb on error page
-  if (pathname === ROUTE_ERROR.PATH) return null
+const BreadcrumbList = forwardRef<HTMLOListElement, ComponentPropsWithoutRef<"ol">>(({ className, ...props }, ref) => (
+  <ol ref={ref} className={clsx("flex flex-wrap items-center gap-1.5 break-words sm:gap-2.5", className)} {...props} />
+))
+BreadcrumbList.displayName = "BreadcrumbList"
 
-  return (
-    <nav className="mb-6" aria-label="breadcrumb">
-      <ol className="flex">
-        {/* Home link */}
-        <li>
-          <Anchor href={ROUTE_HOME.PATH}>Home</Anchor>
-          {pathSegments.length > 0 && <span className="mx-2 text-gray-400">/</span>}
-        </li>
+const BreadcrumbItem = forwardRef<HTMLLIElement, ComponentPropsWithoutRef<"li">>(({ className, ...props }, ref) => (
+  <li ref={ref} className={clsx("inline-flex items-center gap-1.5", className)} {...props} />
+))
+BreadcrumbItem.displayName = "BreadcrumbItem"
 
-        {/* Generate breadcrumb links based on path segments */}
-        {pathSegments.map((segment: string, index: number) => {
-          // Build the path for each segment
-          const href: string = "/" + pathSegments.slice(0, index + 1).join("/")
+const BreadcrumbLink = forwardRef<
+  HTMLAnchorElement,
+  ComponentPropsWithoutRef<"a"> & {
+    asChild?: boolean
+  }
+>(({ asChild, className, ...props }, ref) => {
+  const Comp = asChild ? "span" : Anchor
 
-          // Check if it’s the last segment
-          const isLast: boolean = index === pathSegments.length - 1
+  return <Comp ref={ref} className={className} href={props.href as string} {...props} />
+})
+BreadcrumbLink.displayName = "BreadcrumbLink"
 
-          const formattedSegment: string = segment
-            .split("-")
-            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(" ")
+const BreadcrumbPage = forwardRef<HTMLSpanElement, ComponentPropsWithoutRef<"span">>(({ className, ...props }, ref) => (
+  <span
+    ref={ref}
+    className={clsx("text-black font-medium", className)}
+    role="link"
+    aria-current="page"
+    aria-disabled="true"
+    {...props}
+  />
+))
+BreadcrumbPage.displayName = "BreadcrumbPage"
 
-          return (
-            <li key={href}>
-              {!isLast ? (
-                <Anchor href={href}>{formattedSegment}</Anchor>
-              ) : (
-                <span className="text-black font-medium">{formattedSegment}</span>
-              )}
-              {!isLast && <span className="mx-2 text-gray-400">/</span>}
-            </li>
-          )
-        })}
-      </ol>
-    </nav>
-  )
+const BreadcrumbSeparator = ({ children, className, ...props }: ComponentProps<"li">) => (
+  <li
+    className={clsx("[&>svg]:size-3.5", "rtl:-scale-x-100", className)}
+    role="presentation"
+    aria-hidden="true"
+    {...props}
+  >
+    {children ?? <span className="text-gray-400 rtl:rotate-180">/</span>}
+  </li>
+)
+BreadcrumbSeparator.displayName = "BreadcrumbSeparator"
+
+const BreadcrumbEllipsis = ({ className, ...props }: ComponentProps<"span">) => (
+  <span
+    className={clsx("flex justify-center items-center", className)}
+    role="presentation"
+    aria-hidden="true"
+    {...props}
+  >
+    <span className="text-gray-400">...</span>
+    <span className="sr-only">{i18n._("More")}</span>
+  </span>
+)
+BreadcrumbEllipsis.displayName = "BreadcrumbEllipsis"
+
+export {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+  BreadcrumbEllipsis,
 }

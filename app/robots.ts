@@ -9,7 +9,7 @@ export default function robots(): MetadataRoute.Robots {
           "/apple-touch-icon-120x120.png",
           "/apple-touch-icon-precomposed.png",
           "/apple-touch-icon-120x120-precomposed.png",
-          "/api/",
+          "/api",
           "/account",
           "/games",
         ],

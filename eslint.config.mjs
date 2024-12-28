@@ -4,6 +4,7 @@ import path from "node:path"
 import { fileURLToPath } from "node:url"
 import js from "@eslint/js"
 import { FlatCompat } from "@eslint/eslintrc"
+import pluginLingui from "eslint-plugin-lingui"
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -18,6 +19,7 @@ export default [
     ignores: ["node_modules/", ".next/"],
   },
   ...compat.extends("next/core-web-vitals"),
+  pluginLingui.configs["flat/recommended"],
   {
     files: ["**/*.js", "**/*.ts", "**/*.tsx"],
 
@@ -60,40 +62,15 @@ export default [
               position: "before",
             },
             {
-              pattern: "i18next",
-              group: "external",
-              position: "before",
-            },
-            {
-              pattern: "@/app/globals.scss",
-              group: "internal",
-              position: "after",
-            },
-            {
-              pattern: "@/app/**",
-              group: "internal",
-              position: "before",
-            },
-            {
-              pattern: "@/components/**",
-              group: "internal",
-              position: "before",
-            },
-            {
-              pattern: "@/hooks/**",
-              group: "internal",
-              position: "before",
-            },
-            {
               pattern: "@/**",
               group: "internal",
-              position: "after",
+              position: "before",
             },
             {
               pattern: "**/*.scss",
               group: "internal",
-              position: "before",
-            },
+              position: "after",
+            }
           ],
 
           pathGroupsExcludedImportTypes: ["internal"],
@@ -138,8 +115,8 @@ export default [
         },
       ],
 
-      quotes: ["error", "double"],
-      semi: ["error", "never"],
+      "quotes": ["error", "double"],
+      "semi": ["error", "never"],
 
       "sort-imports": [
         "error",

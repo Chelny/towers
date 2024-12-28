@@ -1,6 +1,6 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { Mock } from "vitest"
-import { ForgotPasswordForm } from "@/app/(auth)/forgot-password/forgot-password.form"
+import { ForgotPasswordForm } from "@/app/[locale]/(auth)/forgot-password/forgot-password.form"
 
 vi.mock("@/lib/auth-client", () => ({
   authClient: {
@@ -27,7 +27,7 @@ describe("Forgot Password Form", () => {
 
     fireEvent.click(screen.getByRole("button", { name: /Send Email/i }))
 
-    expect(screen.getByText(/The email is required/i)).toBeInTheDocument()
+    expect(screen.getByText(/The email is invalid/i)).toBeInTheDocument()
   })
 
   it("should disable the submit button during form submission and show a success message on successful submission", async () => {

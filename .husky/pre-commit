@@ -1,5 +1,11 @@
+# Extract messages from files that are staged for commit
+
+lingui extract $(git diff --name-only --staged)
+
 # Run linting
-npx lint-staged
+
+pnpm exec lint-staged
 
 # Run tests
-npx vitest --run
+
+pnpm exec vitest --run

@@ -11,6 +11,7 @@ import {
   useState,
 } from "react"
 import React from "react"
+import { Trans } from "@lingui/react/macro"
 import clsx from "clsx/lite"
 import { PiCaretDownDuotone, PiCaretDownFill } from "react-icons/pi"
 
@@ -90,7 +91,12 @@ export default function Select({
     <div className="relative w-full mb-4">
       {label && (
         <label id={`${id}Label`} className="mb-1 font-medium">
-          {label} {!required && <span className="text-neutral-500">(optional)</span>}
+          {label}{" "}
+          {!required && (
+            <span className="text-neutral-500">
+              (<Trans>optional</Trans>)
+            </span>
+          )}
         </label>
       )}
       <div
@@ -124,22 +130,22 @@ export default function Select({
           {placeholder}
         </span>
         <span>{options.find((option) => option.props.value === selectedValue)?.props.children}</span>
-        {disabled ? <PiCaretDownDuotone /> : <PiCaretDownFill className="ml-2" />}
+        {disabled ? <PiCaretDownDuotone /> : <PiCaretDownFill className="ms-2" />}
       </div>
       {isDropdownOpen && (
         <div
           ref={dropdownRef}
           id={`${id}Dropdown`}
           className="absolute z-20 mt-1 py-1 overflow-y-auto w-full max-h-60 border border-gray-300 shadow-lg rounded bg-white"
-          aria-activedescendant={selectedValue ? `${id}-${selectedValue}` : undefined}
           role="listbox"
+          aria-activedescendant={selectedValue ? `${id}-${selectedValue}` : undefined}
         >
           {options.map((option: ReactElement<SelectOptionProps>) => (
             <div
               key={option.props.value}
               id={`${id}-${option.props.value}`}
               className={clsx(
-                "block w-full px-2 py-2 text-left cursor-pointer",
+                "block w-full px-2 py-2 text-start cursor-pointer",
                 "hover:bg-gray-200",
                 option.props.value === selectedValue && "bg-blue-100",
               )}

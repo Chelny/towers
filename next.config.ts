@@ -7,7 +7,6 @@ const nextConfig: NextConfig = {
     PORT: process.env.PORT,
     BASE_URL: process.env.BASE_URL,
     DATABASE_URL: process.env.DATABASE_URL,
-    DIRECT_DATABASE_URL: process.env.DIRECT_DATABASE_URL,
     BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET,
     DISCORD_CLIENT_ID: process.env.DISCORD_CLIENT_ID,
     DISCORD_CLIENT_SECRET: process.env.DISCORD_CLIENT_SECRET,
@@ -48,14 +47,27 @@ const nextConfig: NextConfig = {
     ],
   },
   experimental: {
+    swcPlugins: [["@lingui/swc-plugin", {}]],
     turbo: {
       rules: {
-        "*.scss": {
-          loaders: ["sass-loader"],
-          as: "*.css",
+        "*.po": {
+          loaders: ["@lingui/loader"],
+          as: "*.ts",
         },
       },
     },
+  },
+  headers: async () => {
+    return [
+      {
+        source: "/api/:path((?!auth/reference).*)",
+        headers: [
+          { key: "Access-Control-Allow-Credentials", value: "true" },
+          { key: "Access-Control-Allow-Origin", value: process.env.BASE_URL || "*" },
+          { key: "Content-Type", value: "application/json" },
+        ],
+      },
+    ]
   },
   images: {
     remotePatterns: [
@@ -72,26 +84,32 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "cdn.discordapp.com",
+        pathname: "/avatars/**",
       },
       {
         protocol: "https",
         hostname: "avatars.githubusercontent.com",
+        pathname: "/u/**",
       },
       {
         protocol: "https",
         hostname: "gitlab.com",
+        pathname: "/uploads/-/system/user/avatar/**",
       },
       {
         protocol: "https",
         hostname: "lh3.googleusercontent.com",
+        pathname: "/a-/AOh14Gz**",
       },
       {
         protocol: "https",
         hostname: "static-cdn.jtvnw.net", // Twitch
+        pathname: "/user-avatars/**",
       },
       {
         protocol: "https",
         hostname: "pbs.twimg.com", // Twitter/X
+        pathname: "/profile_images/**",
       },
     ],
   },
@@ -103,19 +121,7 @@ const nextConfig: NextConfig = {
   },
   poweredByHeader: false,
   reactStrictMode: true,
-  async headers() {
-    return [
-      {
-        source: "/api/:path((?!auth/reference).*)",
-        headers: [
-          { key: "Access-Control-Allow-Credentials", value: "true" },
-          { key: "Access-Control-Allow-Origin", value: process.env.BASE_URL || "*" },
-          { key: "Content-Type", value: "application/json" },
-        ],
-      },
-    ]
-  },
-  async redirects() {
+  redirects: async () => {
     return [
       {
         source: "/",
@@ -133,6 +139,14 @@ const nextConfig: NextConfig = {
         permanent: false,
       },
     ]
+  },
+  webpack: (config) => {
+    config.cache = false
+    config.module.rules.push({
+      test: /\.po$/,
+      use: ["@lingui/loader"],
+    })
+    return config
   },
 }
 

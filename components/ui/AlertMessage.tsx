@@ -1,3 +1,5 @@
+"use client"
+
 import { PropsWithChildren, ReactNode } from "react"
 import clsx from "clsx/lite"
 

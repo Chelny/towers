@@ -1,6 +1,7 @@
 "use client"
 
 import { ChangeEvent, ClipboardEvent, FocusEvent, ForwardedRef, forwardRef, ReactNode, useState } from "react"
+import { Trans, useLingui } from "@lingui/react/macro"
 import clsx from "clsx/lite"
 import { FaEye, FaEyeSlash } from "react-icons/fa6"
 
@@ -44,6 +45,7 @@ export default forwardRef<HTMLInputElement, InputProps>(function Input(
 ): ReactNode {
   const [value, setValue] = useState<string | null | undefined>(defaultValue)
   const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false)
+  const { t } = useLingui()
 
   const handleInput = (event: ChangeEvent<HTMLInputElement>): void => {
     setValue(event.target.value)
@@ -63,7 +65,12 @@ export default forwardRef<HTMLInputElement, InputProps>(function Input(
   return (
     <div className="flex flex-col mb-4">
       <label id={`${id}Label`} htmlFor={id} className="mb-1 font-medium">
-        {label} {!required && <span className="text-neutral-500">(optional)</span>}
+        {label}{" "}
+        {!required && (
+          <span className="text-neutral-500">
+            (<Trans>optional</Trans>)
+          </span>
+        )}
       </label>
       <div className="relative">
         <input
@@ -97,8 +104,8 @@ export default forwardRef<HTMLInputElement, InputProps>(function Input(
         {type === "password" && (
           <button
             type="button"
-            className="absolute inset-y-0 right-2 flex items-center text-gray-800"
-            aria-label={isPasswordVisible ? "Hide password" : "Show password"}
+            className="absolute inset-y-0 end-2 flex items-center text-gray-800"
+            aria-label={isPasswordVisible ? t({ message: "Hide password" }) : t({ message: "Show password" })}
             onClick={handleTogglePasswordVisibility}
           >
             {isPasswordVisible ? <FaEyeSlash /> : <FaEye />}
