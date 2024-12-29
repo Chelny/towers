@@ -29,7 +29,7 @@ export default defineConfig({
         inline: ["next"],
       },
     },
-    setupFiles: ["vitest.setup.ts", "__mocks__/utils/lingui.tsx"],
-    include: ["**/__tests__/**/*.test.ts", "**/__tests__/**/*.test.tsx"],
+    setupFiles: ["vitest.setup.ts", "test/utils/lingui.tsx"],
+    include: ["**/*.test.ts", "**/*.test.tsx"],
   },
 })

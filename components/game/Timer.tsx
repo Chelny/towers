@@ -22,9 +22,7 @@ export default function Timer({ isActive }: TimerProps): ReactNode {
       setTimeElapsed(0)
 
       timerId = setInterval(() => {
-        setTimeElapsed((prevTime: number | null) => {
-          return (prevTime ?? 0) + 1
-        })
+        setTimeElapsed((prevTime: number | null) => (prevTime ?? 0) + 1)
       }, 1000)
     } else {
       if (timerId) clearInterval(timerId)

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { CreateEmailResponse, Resend } from "resend"
-import EmailTemplate from "@/components/game/EmailTemplate"
+import EmailTemplate from "@/components/EmailTemplate"
 
 type SendEmailData = {
   email: string
