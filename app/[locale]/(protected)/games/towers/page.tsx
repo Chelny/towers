@@ -43,7 +43,7 @@ export async function generateMetadata({ params, searchParams }: TowersProps): P
 
         if (tableHost) {
           const tableNumber: number = table.tableNumber
-          const tableHostUsername: string = tableHost.user.username
+          const tableHostUsername: string | undefined = tableHost.user.username
           title += ` - ${t({ message: `Table: ${tableNumber} - Host: ${tableHostUsername}` })}`
         }
       }

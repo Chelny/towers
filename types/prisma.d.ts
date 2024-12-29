@@ -9,6 +9,7 @@ import {
   TowersUserRoomTable,
   User,
 } from "@prisma/client"
+import { Session } from "@/lib/auth-client"
 
 declare module "@prisma/client" {
   interface IUserWithRelations extends User {
@@ -25,7 +26,7 @@ declare module "@prisma/client" {
   }
 
   interface ITowersUserProfileWithRelations extends TowersUserProfile {
-    user: User
+    user: Session["user"]
     userRoomTables?: ITowersUserRoomTableWithRelations[]
   }
 

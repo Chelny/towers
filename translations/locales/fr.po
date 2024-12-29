@@ -14,6 +14,16 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. js-lingui-explicit-id
+#: components/EmailTemplate.tsx:52
+msgid "The {appName} Team"
+msgstr "L'équipe {appName}"
+
+#. js-lingui-explicit-id
+#: components/EmailTemplate.tsx:67
+msgid "© {copyrightYear} {appName}, All Rights Reserved"
+msgstr "© {copyrightYear} {appName}, Tous droits réservés"
+
+#. js-lingui-explicit-id
 #: app/api/account/settings/route.ts:31
 msgid "The settings have been updated!"
 msgstr "Les paramètres ont été mise à jour avec succès !"
@@ -27,16 +37,6 @@ msgstr "Jeu d'arcade basé sur Yahoo! Towers"
 #: components/ui/Breadcrumb.tsx:100
 msgid "More"
 msgstr "Plus"
-
-#. js-lingui-explicit-id
-#: components/game/EmailTemplate.tsx:54
-msgid "The {appName} Team"
-msgstr "L'équipe {appName}"
-
-#. js-lingui-explicit-id
-#: components/game/EmailTemplate.tsx:69
-msgid "© {copyrightYear} {appName}, All Rights Reserved"
-msgstr "© {copyrightYear} {appName}, Tous droits réservés"
 
 #. js-lingui-explicit-id
 #: lib/email.ts:16
@@ -1116,7 +1116,6 @@ msgid "Table Type"
 msgstr "Type de table"
 
 #: app/[locale]/(protected)/games/towers/page.tsx:47
-#: components/game/TableHeader.tsx:21
 msgid "Table: {tableNumber} - Host: {tableHostUsername}"
 msgstr "Table : {tableNumber} - Hôte : {tableHostUsername}"
 
