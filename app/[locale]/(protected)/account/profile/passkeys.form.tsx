@@ -4,7 +4,7 @@ import { FormEvent, ReactNode, useState } from "react"
 import { Trans, useLingui } from "@lingui/react/macro"
 import { ValueError } from "@sinclair/typebox/errors"
 import { Value } from "@sinclair/typebox/value"
-import { Passkey } from "better-auth/plugins"
+import { Passkey } from "better-auth/plugins/passkey"
 import { LuPencilLine } from "react-icons/lu"
 import { LuTrash2 } from "react-icons/lu"
 import {

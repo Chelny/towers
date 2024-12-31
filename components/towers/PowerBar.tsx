@@ -11,10 +11,10 @@ type PowerBarProps = {
   blocks: PowerBarBlock[]
 }
 
-export default function PowerBar(props: PowerBarProps): ReactNode {
+export default function PowerBar({ blocks }: PowerBarProps): ReactNode {
   return (
     <>
-      {props.blocks.map((block: PowerBarBlock, blockIndex: number) => (
+      {blocks.map((block: PowerBarBlock, blockIndex: number) => (
         <div
           key={blockIndex}
           className={clsx(

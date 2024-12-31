@@ -1,6 +1,6 @@
 import { createId } from "@paralleldrive/cuid2"
 import { fireEvent, render, screen, waitFor } from "@testing-library/react"
-import { Passkey } from "better-auth/plugins"
+import { Passkey } from "better-auth/plugins/passkey"
 import { Mock } from "vitest"
 import { PasskeysForm } from "@/app/[locale]/(protected)/account/profile/passkeys.form"
 import { authClient } from "@/lib/auth-client"
@@ -45,10 +45,11 @@ describe("Passkeys Form", () => {
           name: "Passkey 1",
           publicKey: "",
           userId: mockSession.data.user.id,
-          webauthnUserID: "",
+          credentialID: "",
           counter: 0,
           deviceType: "singleDevice",
           backedUp: false,
+          transports: "",
           createdAt: new Date(),
         },
         {
@@ -56,10 +57,11 @@ describe("Passkeys Form", () => {
           name: "Passkey 2",
           publicKey: "",
           userId: mockSession.data.user.id,
-          webauthnUserID: "",
+          credentialID: "",
           counter: 0,
           deviceType: "singleDevice",
           backedUp: false,
+          transports: "",
           createdAt: new Date(),
         },
       ],
@@ -119,10 +121,11 @@ describe("Passkeys Form", () => {
         name: "Test Passkey 1",
         publicKey: "",
         userId: mockSession.data.user.id,
-        webauthnUserID: "",
+        credentialID: "",
         counter: 0,
         deviceType: "singleDevice",
         backedUp: false,
+        transports: "",
         createdAt: new Date(),
       }
       passkeys = [...passkeys, newPasskey]

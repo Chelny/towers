@@ -5,5 +5,5 @@ type BreadcrumbLayoutProps = PropsWithChildren<{
 }>
 
 export default function BreadcrumbLayout({ children }: BreadcrumbLayoutProps): ReactNode {
-  return <div>{children}</div>
+  return <>{children}</>
 }

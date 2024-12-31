@@ -5,18 +5,18 @@ type SpecialDiamondBlockProps = {
   block: SpecialDiamond
 }
 
-export default function SpecialDiamondBlock(props: SpecialDiamondBlockProps): ReactNode {
+export default function SpecialDiamondBlock({ block }: SpecialDiamondBlockProps): ReactNode {
   return (
     <>
-      {props.block.specialDiamondType === "speed drop" && (
+      {block.specialDiamondType === "speed drop" && (
         <div className="special-diamond special-diamond1" data-testid="special-diamond-speed-drop"></div>
       )}
 
-      {props.block.specialDiamondType === "remove powers" && (
+      {block.specialDiamondType === "remove powers" && (
         <div className="special-diamond special-diamond2" data-testid="special-diamond-remove-powers"></div>
       )}
 
-      {props.block.specialDiamondType === "remove stones" && (
+      {block.specialDiamondType === "remove stones" && (
         <div className="special-diamond" data-testid="special-diamond-remove-stones"></div>
       )}
     </>

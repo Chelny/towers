@@ -36,13 +36,8 @@ describe("Sign In Form", () => {
     expect(screen.getByRole("button", { name: /Sign in with email and password/i })).toBeInTheDocument()
     expect(screen.getByText(/Sign Up/i)).toBeInTheDocument()
     expect(screen.getByRole("button", { name: /Magic Link/i })).toBeInTheDocument()
-    expect(screen.getByRole("button", { name: /Sign in with Discord/i })).toBeInTheDocument()
-    expect(screen.getByRole("button", { name: /Sign in with Facebook/i })).toBeInTheDocument()
     expect(screen.getByRole("button", { name: /Sign in with GitHub/i })).toBeInTheDocument()
-    expect(screen.getByRole("button", { name: /Sign in with GitLab/i })).toBeInTheDocument()
     expect(screen.getByRole("button", { name: /Sign in with Google/i })).toBeInTheDocument()
-    expect(screen.getByRole("button", { name: /Sign in with Twitch/i })).toBeInTheDocument()
-    expect(screen.getByRole("button", { name: /Sign in with Twitter\/X/i })).toBeInTheDocument()
   })
 
   it("should correctly mark form fields as required", () => {
@@ -131,13 +126,8 @@ describe("Sign In Form", () => {
 
     await waitFor(() => {
       expect(screen.getByRole("button", { name: /Magic Link/i })).toBeDisabled()
-      expect(screen.getByRole("button", { name: /Sign in with Discord/i })).toBeDisabled()
-      expect(screen.getByRole("button", { name: /Sign in with Facebook/i })).toBeDisabled()
       expect(screen.getByRole("button", { name: /Sign in with GitHub/i })).toBeDisabled()
-      expect(screen.getByRole("button", { name: /Sign in with GitLab/i })).toBeDisabled()
       expect(screen.getByRole("button", { name: /Sign in with Google/i })).toBeDisabled()
-      expect(screen.getByRole("button", { name: /Sign in with Twitch/i })).toBeDisabled()
-      expect(screen.getByRole("button", { name: /Sign in with Twitter\/X/i })).toBeDisabled()
     })
   })
 })

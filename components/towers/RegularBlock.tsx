@@ -5,6 +5,6 @@ type RegularBlockProps = {
   letter?: BlockLetter
 }
 
-export default function RegularBlock(props: RegularBlockProps): ReactNode {
-  return <>{props.letter}</>
+export default function RegularBlock({ letter }: RegularBlockProps): ReactNode {
+  return <>{letter}</>
 }

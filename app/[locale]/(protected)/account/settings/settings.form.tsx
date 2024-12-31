@@ -15,7 +15,7 @@ import Button from "@/components/ui/Button"
 import Select from "@/components/ui/Select"
 import { INITIAL_FORM_STATE } from "@/constants/api"
 import { Session } from "@/lib/auth-client"
-import { defaultLocale, i18nLocale, Language, languages } from "@/translations/languages"
+import { defaultLocale, Language, languages, SupportedLocales } from "@/translations/languages"
 
 type SettingsFormProps = {
   session: Session | null
@@ -33,7 +33,7 @@ export function SettingsForm({ session }: SettingsFormProps): ReactNode {
 
     const formData: FormData = new FormData(event.currentTarget)
     const payload: SettingsPayload = {
-      language: formData.get("language") as i18nLocale,
+      language: formData.get("language") as SupportedLocales,
     }
 
     const errors: ValueError[] = Array.from(Value.Errors(settingsSchema, payload))

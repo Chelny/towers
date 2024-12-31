@@ -10,10 +10,10 @@ type NextPieceProps = {
   nextPiece: Piece
 }
 
-export default function NextPiece(props: NextPieceProps): ReactNode {
+export default function NextPiece({ nextPiece }: NextPieceProps): ReactNode {
   return (
     <>
-      {props.nextPiece?.map((block: Block, blockIndex: number) => (
+      {nextPiece?.map((block: Block, blockIndex: number) => (
         <div
           key={blockIndex}
           className={clsx(

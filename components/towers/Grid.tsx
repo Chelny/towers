@@ -7,7 +7,7 @@ type GridProps = {
   isOpponentBoard?: boolean
 }
 
-export default function Grid(props: GridProps): ReactNode {
+export default function Grid({ board, isOpponentBoard }: GridProps): ReactNode {
   const boardRef: RefObject<HTMLDivElement | null> = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
@@ -16,8 +16,8 @@ export default function Grid(props: GridProps): ReactNode {
 
   return (
     <div ref={boardRef} className="static z-10" role="grid" tabIndex={0}>
-      {props.board.map((row: BoardRow, rowIndex: number) => (
-        <GridRow key={rowIndex} rowIndex={rowIndex} row={row} isOpponentBoard={props.isOpponentBoard} />
+      {board.map((row: BoardRow, rowIndex: number) => (
+        <GridRow key={rowIndex} rowIndex={rowIndex} row={row} isOpponentBoard={isOpponentBoard} />
       ))}
     </div>
   )

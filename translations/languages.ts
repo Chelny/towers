@@ -10,8 +10,8 @@ export interface Language {
   rtl: boolean
 }
 
-export type i18nLocale = "en" | "fr" | "pseudo-LOCALE"
-export const defaultLocale: i18nLocale = "en"
+export type SupportedLocales = "en" | "fr" | "pseudo-LOCALE"
+export const defaultLocale: SupportedLocales = "en"
 
 // date-fns
 export const enLocale: Locale = enUS

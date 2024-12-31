@@ -5,7 +5,3 @@ lingui extract $(git diff --name-only --staged)
 # Run linting
 
 pnpm exec lint-staged
-
-# Run tests
-
-pnpm exec vitest --run

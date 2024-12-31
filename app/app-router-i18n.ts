@@ -8,6 +8,12 @@ type SupportedLocales = string
 async function loadCatalog(locale: SupportedLocales): Promise<{
   [k: string]: Messages
 }> {
+  // Fix for "ERROR [Better Auth]: [#better-auth]: Couldn't read your auth config.
+  // TypeError [ERR_UNKNOWN_FILE_EXTENSION]: Unknown file extension ".po" for /.../towers/translations/locales/*.po"
+  if (process.env.BETTER_AUTH_CLI) {
+    return { [locale]: {} }
+  }
+
   const { messages } = await import(`@/translations/locales/${locale}.po`)
   // const { messages } = await import(`@lingui/loader!@/translations/locales/${locale}.po`)
   return {

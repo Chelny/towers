@@ -33,22 +33,25 @@ export function SignInForm(): ReactNode {
   const { t } = useLingui()
 
   const checkWebAuthnSupport = async (): Promise<void> => {
-    const isWebAuthnAvailable: boolean =
-      typeof PublicKeyCredential !== "undefined" &&
-      typeof PublicKeyCredential.isConditionalMediationAvailable === "function"
+    const isWebAuthnAvailable: boolean = typeof PublicKeyCredential !== "undefined"
 
-    if (isWebAuthnAvailable) {
-      const isAuthenticatorAvailable: boolean =
-        await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()
-
-      if (isAuthenticatorAvailable) {
-        await authClient.signIn.passkey({ autoFill: true })
-        console.info("Passkey sign-in initiated.")
-      } else {
-        console.warn("Passkeys are not supported on this device.")
-      }
-    } else {
+    if (!isWebAuthnAvailable) {
       console.warn("WebAuthn is not supported in this browser.")
+      return
+    }
+
+    const isAuthenticatorAvailable: boolean = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()
+
+    if (!isAuthenticatorAvailable) {
+      console.warn("Passkeys are not supported on this device.")
+      return
+    }
+
+    try {
+      await authClient.signIn.passkey({ autoFill: false })
+      console.info("Passkey sign-in initiated.")
+    } catch (error) {
+      console.error("Error initiating passkey sign-in:", error)
     }
   }
 
@@ -220,19 +223,21 @@ export function SignInForm(): ReactNode {
             <Trans>Magic Link</Trans>
           </span>
         </Button>
-        {AUTH_PROVIDERS.map(({ name, label: provider, icon }: AuthProviderDetails) => (
-          <Button
-            key={name}
-            type="button"
-            className="flex justify-center items-center gap-2 w-full"
-            disabled={isLoading}
-            aria-label={t({ message: `Sign in with ${provider}` })}
-            onClick={() => handleSignInWithProvider(name)}
-          >
-            {icon}
-            <span>{provider}</span>
-          </Button>
-        ))}
+        <div className="flex gap-2">
+          {AUTH_PROVIDERS.map(({ name, label: provider, icon }: AuthProviderDetails) => (
+            <Button
+              key={name}
+              type="button"
+              className="flex-1 flex justify-center items-center gap-2 w-full"
+              disabled={isLoading}
+              aria-label={t({ message: `Sign in with ${provider}` })}
+              onClick={() => handleSignInWithProvider(name)}
+            >
+              {icon}
+              <span>{provider}</span>
+            </Button>
+          ))}
+        </div>
       </div>
       <div className="mt-4 text-center">
         <Trans>

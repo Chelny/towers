@@ -154,8 +154,8 @@ _TODO_
   - [x] Multi-language Support
     - [x] French
   - [ ] Redirect new user that signs up with OAuth to `/new-user` (with better-auth)
-  - [ ] Fix delete user redirection from confirmation link
-  - [ ] Fix passkeys (sign-in and profile) - Known issue: Will be fixed in 1.1.x
+  - [x] Fix delete user redirection from confirmation link
+  - [ ] Fix passkeys (sign-in and profile)
   - [ ] Add OTP (email and phone)
   - [x] Add analytics
   - [ ] Add tooltip

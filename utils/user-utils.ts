@@ -1,7 +1,7 @@
 import { USERNAME_PATTERN } from "@/constants/regex"
 
 const sanitizeBase = (base: string): string => {
-  return base.replace(/^[_\.]+|[_\.]+$/g, "") // Remove leading/trailing `_` or `.`
+  return base.split("@")[0].replace(/^[_\.]+|[_\.]+$/g, "") // Remove leading/trailing `_` or `.`
 }
 
 export const generateRandomUsername = (base: string): string => {

@@ -5,13 +5,13 @@ import { useState } from "react"
 import { usePathname, useRouter } from "next/navigation"
 import { useLingui } from "@lingui/react/macro"
 import Select from "@/components/ui/Select"
-import { i18nLocale, Language, languages } from "@/translations/languages"
+import { Language, languages, SupportedLocales } from "@/translations/languages"
 
 export default function LanguageSwitcher(): ReactNode {
   const router = useRouter()
   const pathname: string = usePathname()
   const { i18n } = useLingui()
-  const [locale, setLocale] = useState<i18nLocale>(pathname?.split("/")[1] as i18nLocale)
+  const [locale, setLocale] = useState<SupportedLocales>(pathname?.split("/")[1] as SupportedLocales)
 
   const handleChange = (locale: string): void => {
     const pathNameWithoutLocale: string[] = pathname?.split("/")?.slice(2) ?? []

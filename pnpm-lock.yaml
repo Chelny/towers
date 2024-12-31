@@ -41,8 +41,8 @@ dependencies:
     specifier: 0.1.0
     version: registry.npmjs.org/bcrypt-edge@0.1.0
   better-auth:
-    specifier: 1.0.22
-    version: registry.npmjs.org/better-auth@1.0.22
+    specifier: 1.1.4
+    version: registry.npmjs.org/better-auth@1.1.4
   better-status-codes:
     specifier: 2.0.7
     version: registry.npmjs.org/better-status-codes@2.0.7
@@ -100,8 +100,8 @@ devDependencies:
     specifier: 7.26.0
     version: registry.npmjs.org/@babel/core@7.26.0
   '@better-auth/cli':
-    specifier: 1.0.22
-    version: registry.npmjs.org/@better-auth/cli@1.0.22(@babel/core@7.26.0)(@types/react@19.0.1)(react@19.0.0)
+    specifier: 1.1.4
+    version: registry.npmjs.org/@better-auth/cli@1.1.4(@babel/core@7.26.0)(@types/react@19.0.1)(react@19.0.0)
   '@commitlint/cli':
     specifier: 19.6.0
     version: registry.npmjs.org/@commitlint/cli@19.6.0(@types/node@22.9.3)(typescript@5.6.3)
@@ -736,11 +736,11 @@ packages:
       '@babel/helper-string-parser': registry.npmjs.org/@babel/helper-string-parser@7.25.9
       '@babel/helper-validator-identifier': registry.npmjs.org/@babel/helper-validator-identifier@7.25.9
 
-  registry.npmjs.org/@better-auth/cli@1.0.22(@babel/core@7.26.0)(@types/react@19.0.1)(react@19.0.0):
-    resolution: {integrity: sha512-bVp5A0eNjbSlyQN9+RDfP3mmLEQBlAEneIO5d+6fKtjx7+uBM3Q03rCnhc/q4fDo3wGV4zTheO+WykCrRBtblQ==, registry: https://registry.npmjs.com/, tarball: https://registry.npmjs.org/@better-auth/cli/-/cli-1.0.22.tgz}
-    id: registry.npmjs.org/@better-auth/cli/1.0.22
+  registry.npmjs.org/@better-auth/cli@1.1.4(@babel/core@7.26.0)(@types/react@19.0.1)(react@19.0.0):
+    resolution: {integrity: sha512-Rz3u9BvzVVO4CBWnD00OvfYBnJsS8UqicRZYz38j9JQR1UHe1fuvP/XYuEsl1H9H8V5FEeInekLPev+ZGJP/uQ==, registry: https://registry.npmjs.com/, tarball: https://registry.npmjs.org/@better-auth/cli/-/cli-1.1.4.tgz}
+    id: registry.npmjs.org/@better-auth/cli/1.1.4
     name: '@better-auth/cli'
-    version: 1.0.22
+    version: 1.1.4
     hasBin: true
     dependencies:
       '@babel/preset-react': registry.npmjs.org/@babel/preset-react@7.26.3(@babel/core@7.26.0)
@@ -749,7 +749,7 @@ packages:
       '@prisma/client': registry.npmjs.org/@prisma/client@5.22.0(prisma@5.22.0)
       '@types/better-sqlite3': registry.npmjs.org/@types/better-sqlite3@7.6.12
       '@types/prompts': registry.npmjs.org/@types/prompts@2.4.9
-      better-auth: registry.npmjs.org/better-auth@1.0.22
+      better-auth: registry.npmjs.org/better-auth@1.1.4
       better-sqlite3: registry.npmjs.org/better-sqlite3@11.7.0
       c12: registry.npmjs.org/c12@2.0.1
       chalk: registry.npmjs.org/chalk@5.4.1
@@ -792,6 +792,13 @@ packages:
       - sqlite3
       - supports-color
     dev: true
+
+  registry.npmjs.org/@better-auth/utils@0.2.2:
+    resolution: {integrity: sha512-YlOin3pX3sc8VPRdzCOWqz6uHKitwxm/k8p6/2I1JYI0hgMWmEqqismyvEjtOKoiSTnu1huwSq+yzcN7ehu59w==, registry: https://registry.npmjs.com/, tarball: https://registry.npmjs.org/@better-auth/utils/-/utils-0.2.2.tgz}
+    name: '@better-auth/utils'
+    version: 0.2.2
+    dependencies:
+      uncrypto: registry.npmjs.org/uncrypto@0.1.3
 
   registry.npmjs.org/@better-fetch/fetch@1.1.12:
     resolution: {integrity: sha512-B3bfloI/2UBQWIATRN6qmlORrvx3Mp0kkNjmXLv0b+DtbtR+pP4/I5kQA/rDUv+OReLywCCldf6co4LdDmh8JA==, registry: https://registry.npmjs.com/, tarball: https://registry.npmjs.org/@better-fetch/fetch/-/fetch-1.1.12.tgz}
@@ -1094,6 +1101,7 @@ packages:
     requiresBuild: true
     dependencies:
       tslib: registry.npmjs.org/tslib@2.8.1
+    dev: false
     optional: true
 
   registry.npmjs.org/@emnapi/runtime@0.45.0:
@@ -1103,6 +1111,7 @@ packages:
     requiresBuild: true
     dependencies:
       tslib: registry.npmjs.org/tslib@2.8.1
+    dev: false
     optional: true
 
   registry.npmjs.org/@emnapi/runtime@1.3.1:
@@ -2410,6 +2419,7 @@ packages:
     cpu: [arm]
     os: [android]
     requiresBuild: true
+    dev: false
     optional: true
 
   registry.npmjs.org/@node-rs/argon2-android-arm64@1.7.0:
@@ -2420,6 +2430,7 @@ packages:
     cpu: [arm64]
     os: [android]
     requiresBuild: true
+    dev: false
     optional: true
 
   registry.npmjs.org/@node-rs/argon2-darwin-arm64@1.7.0:
@@ -2430,6 +2441,7 @@ packages:
     cpu: [arm64]
     os: [darwin]
     requiresBuild: true
+    dev: false
     optional: true
 
   registry.npmjs.org/@node-rs/argon2-darwin-x64@1.7.0:
@@ -2440,6 +2452,7 @@ packages:
     cpu: [x64]
     os: [darwin]
     requiresBuild: true
+    dev: false
     optional: true
 
   registry.npmjs.org/@node-rs/argon2-freebsd-x64@1.7.0:
@@ -2450,6 +2463,7 @@ packages:
     cpu: [x64]
     os: [freebsd]
     requiresBuild: true
+    dev: false
     optional: true
 
   registry.npmjs.org/@node-rs/argon2-linux-arm-gnueabihf@1.7.0:
@@ -2460,6 +2474,7 @@ packages:
     cpu: [arm]
     os: [linux]
     requiresBuild: true
+    dev: false
     optional: true
 
   registry.npmjs.org/@node-rs/argon2-linux-arm64-gnu@1.7.0:
@@ -2470,6 +2485,7 @@ packages:
     cpu: [arm64]
     os: [linux]
     requiresBuild: true
+    dev: false
     optional: true
 
   registry.npmjs.org/@node-rs/argon2-linux-arm64-musl@1.7.0:
@@ -2480,6 +2496,7 @@ packages:
     cpu: [arm64]
     os: [linux]
     requiresBuild: true
+    dev: false
     optional: true
 
   registry.npmjs.org/@node-rs/argon2-linux-x64-gnu@1.7.0:
@@ -2490,6 +2507,7 @@ packages:
     cpu: [x64]
     os: [linux]
     requiresBuild: true
+    dev: false
     optional: true
 
   registry.npmjs.org/@node-rs/argon2-linux-x64-musl@1.7.0:
@@ -2500,6 +2518,7 @@ packages:
     cpu: [x64]
     os: [linux]
     requiresBuild: true
+    dev: false
     optional: true
 
   registry.npmjs.org/@node-rs/argon2-wasm32-wasi@1.7.0:
@@ -2514,6 +2533,7 @@ packages:
       '@emnapi/runtime': registry.npmjs.org/@emnapi/runtime@0.45.0
       '@tybys/wasm-util': registry.npmjs.org/@tybys/wasm-util@0.8.3
       memfs-browser: registry.npmjs.org/memfs-browser@3.5.10302
+    dev: false
     optional: true
 
   registry.npmjs.org/@node-rs/argon2-win32-arm64-msvc@1.7.0:
@@ -2524,6 +2544,7 @@ packages:
     cpu: [arm64]
     os: [win32]
     requiresBuild: true
+    dev: false
     optional: true
 
   registry.npmjs.org/@node-rs/argon2-win32-ia32-msvc@1.7.0:
@@ -2534,6 +2555,7 @@ packages:
     cpu: [ia32]
     os: [win32]
     requiresBuild: true
+    dev: false
     optional: true
 
   registry.npmjs.org/@node-rs/argon2-win32-x64-msvc@1.7.0:
@@ -2544,6 +2566,7 @@ packages:
     cpu: [x64]
     os: [win32]
     requiresBuild: true
+    dev: false
     optional: true
 
   registry.npmjs.org/@node-rs/argon2@1.7.0:
@@ -2566,6 +2589,7 @@ packages:
       '@node-rs/argon2-win32-arm64-msvc': registry.npmjs.org/@node-rs/argon2-win32-arm64-msvc@1.7.0
       '@node-rs/argon2-win32-ia32-msvc': registry.npmjs.org/@node-rs/argon2-win32-ia32-msvc@1.7.0
       '@node-rs/argon2-win32-x64-msvc': registry.npmjs.org/@node-rs/argon2-win32-x64-msvc@1.7.0
+    dev: false
 
   registry.npmjs.org/@node-rs/bcrypt-android-arm-eabi@1.9.0:
     resolution: {integrity: sha512-nOCFISGtnodGHNiLrG0WYLWr81qQzZKYfmwHc7muUeq+KY0sQXyHOwZk9OuNQAWv/lnntmtbwkwT0QNEmOyLvA==, registry: https://registry.npmjs.com/, tarball: https://registry.npmjs.org/@node-rs/bcrypt-android-arm-eabi/-/bcrypt-android-arm-eabi-1.9.0.tgz}
@@ -2575,6 +2599,7 @@ packages:
     cpu: [arm]
     os: [android]
     requiresBuild: true
+    dev: false
     optional: true
 
   registry.npmjs.org/@node-rs/bcrypt-android-arm64@1.9.0:
@@ -2585,6 +2610,7 @@ packages:
     cpu: [arm64]
     os: [android]
     requiresBuild: true
+    dev: false
     optional: true
 
   registry.npmjs.org/@node-rs/bcrypt-darwin-arm64@1.9.0:
@@ -2595,6 +2621,7 @@ packages:
     cpu: [arm64]
     os: [darwin]
     requiresBuild: true
+    dev: false
     optional: true
 
   registry.npmjs.org/@node-rs/bcrypt-darwin-x64@1.9.0:
@@ -2605,6 +2632,7 @@ packages:
     cpu: [x64]
     os: [darwin]
     requiresBuild: true
+    dev: false
     optional: true
 
   registry.npmjs.org/@node-rs/bcrypt-freebsd-x64@1.9.0:
@@ -2615,6 +2643,7 @@ packages:
     cpu: [x64]
     os: [freebsd]
     requiresBuild: true
+    dev: false
     optional: true
 
   registry.npmjs.org/@node-rs/bcrypt-linux-arm-gnueabihf@1.9.0:
@@ -2625,6 +2654,7 @@ packages:
     cpu: [arm]
     os: [linux]
     requiresBuild: true
+    dev: false
     optional: true
 
   registry.npmjs.org/@node-rs/bcrypt-linux-arm64-gnu@1.9.0:
@@ -2635,6 +2665,7 @@ packages:
     cpu: [arm64]
     os: [linux]
     requiresBuild: true
+    dev: false
     optional: true
 
   registry.npmjs.org/@node-rs/bcrypt-linux-arm64-musl@1.9.0:
@@ -2645,6 +2676,7 @@ packages:
     cpu: [arm64]
     os: [linux]
     requiresBuild: true
+    dev: false
     optional: true
 
   registry.npmjs.org/@node-rs/bcrypt-linux-x64-gnu@1.9.0:
@@ -2655,6 +2687,7 @@ packages:
     cpu: [x64]
     os: [linux]
     requiresBuild: true
+    dev: false
     optional: true
 
   registry.npmjs.org/@node-rs/bcrypt-linux-x64-musl@1.9.0:
@@ -2665,6 +2698,7 @@ packages:
     cpu: [x64]
     os: [linux]
     requiresBuild: true
+    dev: false
     optional: true
 
   registry.npmjs.org/@node-rs/bcrypt-wasm32-wasi@1.9.0:
@@ -2679,6 +2713,7 @@ packages:
       '@emnapi/runtime': registry.npmjs.org/@emnapi/runtime@0.45.0
       '@tybys/wasm-util': registry.npmjs.org/@tybys/wasm-util@0.8.3
       memfs-browser: registry.npmjs.org/memfs-browser@3.5.10302
+    dev: false
     optional: true
 
   registry.npmjs.org/@node-rs/bcrypt-win32-arm64-msvc@1.9.0:
@@ -2689,6 +2724,7 @@ packages:
     cpu: [arm64]
     os: [win32]
     requiresBuild: true
+    dev: false
     optional: true
 
   registry.npmjs.org/@node-rs/bcrypt-win32-ia32-msvc@1.9.0:
@@ -2699,6 +2735,7 @@ packages:
     cpu: [ia32]
     os: [win32]
     requiresBuild: true
+    dev: false
     optional: true
 
   registry.npmjs.org/@node-rs/bcrypt-win32-x64-msvc@1.9.0:
@@ -2709,6 +2746,7 @@ packages:
     cpu: [x64]
     os: [win32]
     requiresBuild: true
+    dev: false
     optional: true
 
   registry.npmjs.org/@node-rs/bcrypt@1.9.0:
@@ -2731,6 +2769,7 @@ packages:
       '@node-rs/bcrypt-win32-arm64-msvc': registry.npmjs.org/@node-rs/bcrypt-win32-arm64-msvc@1.9.0
       '@node-rs/bcrypt-win32-ia32-msvc': registry.npmjs.org/@node-rs/bcrypt-win32-ia32-msvc@1.9.0
       '@node-rs/bcrypt-win32-x64-msvc': registry.npmjs.org/@node-rs/bcrypt-win32-x64-msvc@1.9.0
+    dev: false
 
   registry.npmjs.org/@nodelib/fs.scandir@2.1.5:
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==, registry: https://registry.npmjs.com/, tarball: https://registry.npmjs.org/@nodelib/fs.scandir/-/fs.scandir-2.1.5.tgz}
@@ -3373,17 +3412,15 @@ packages:
       selderee: registry.npmjs.org/selderee@0.11.0
     dev: false
 
-  registry.npmjs.org/@simplewebauthn/browser@10.0.0:
-    resolution: {integrity: sha512-hG0JMZD+LiLUbpQcAjS4d+t4gbprE/dLYop/CkE01ugU/9sKXflxV5s0DRjdz3uNMFecatRfb4ZLG3XvF8m5zg==, registry: https://registry.npmjs.com/, tarball: https://registry.npmjs.org/@simplewebauthn/browser/-/browser-10.0.0.tgz}
+  registry.npmjs.org/@simplewebauthn/browser@13.0.0:
+    resolution: {integrity: sha512-7d/+gxoFoDQxq2EkLl/PuTIQ/rnSrA3bmr8L2Ij7bRyicJoCJX/NDGUNExyctB9nSDrEkkcrJMDkwpCYOGU3Lg==, registry: https://registry.npmjs.com/, tarball: https://registry.npmjs.org/@simplewebauthn/browser/-/browser-13.0.0.tgz}
     name: '@simplewebauthn/browser'
-    version: 10.0.0
-    dependencies:
-      '@simplewebauthn/types': registry.npmjs.org/@simplewebauthn/types@10.0.0
+    version: 13.0.0
 
-  registry.npmjs.org/@simplewebauthn/server@10.0.1:
-    resolution: {integrity: sha512-djNWcRn+H+6zvihBFJSpG3fzb0NQS9c/Mw5dYOtZ9H+oDw8qn9Htqxt4cpqRvSOAfwqP7rOvE9rwqVaoGGc3hg==, registry: https://registry.npmjs.com/, tarball: https://registry.npmjs.org/@simplewebauthn/server/-/server-10.0.1.tgz}
+  registry.npmjs.org/@simplewebauthn/server@13.0.0:
+    resolution: {integrity: sha512-Tb3hJRpeT4cgT2uPORc465qu9LGXcDoIegFmkIgqw7XNZtsaoHzn3xI1DiFH7ukzs6JbhfQBRyY4rlfCdTwkNw==, registry: https://registry.npmjs.com/, tarball: https://registry.npmjs.org/@simplewebauthn/server/-/server-13.0.0.tgz}
     name: '@simplewebauthn/server'
-    version: 10.0.1
+    version: 13.0.0
     engines: {node: '>=20.0.0'}
     dependencies:
       '@hexagon/base64': registry.npmjs.org/@hexagon/base64@1.1.28
@@ -3393,15 +3430,9 @@ packages:
       '@peculiar/asn1-rsa': registry.npmjs.org/@peculiar/asn1-rsa@2.3.13
       '@peculiar/asn1-schema': registry.npmjs.org/@peculiar/asn1-schema@2.3.13
       '@peculiar/asn1-x509': registry.npmjs.org/@peculiar/asn1-x509@2.3.13
-      '@simplewebauthn/types': registry.npmjs.org/@simplewebauthn/types@10.0.0
       cross-fetch: registry.npmjs.org/cross-fetch@4.1.0
     transitivePeerDependencies:
       - encoding
-
-  registry.npmjs.org/@simplewebauthn/types@10.0.0:
-    resolution: {integrity: sha512-SFXke7xkgPRowY2E+8djKbdEznTVnD5R6GO7GPTthpHrokLvNKw8C3lFZypTxLI7KkCfGPfhtqB3d7OVGGa9jQ==, registry: https://registry.npmjs.com/, tarball: https://registry.npmjs.org/@simplewebauthn/types/-/types-10.0.0.tgz}
-    name: '@simplewebauthn/types'
-    version: 10.0.0
 
   registry.npmjs.org/@sinclair/typebox@0.27.8:
     resolution: {integrity: sha512-+Fj43pSMwJs4KRrH/938Uf+uAELIgVBmQzg/q1YG10djyfA3TnrU8N8XzqCh/okZdszqBQTZf96idMfE5lnwTA==, registry: https://registry.npmjs.com/, tarball: https://registry.npmjs.org/@sinclair/typebox/-/typebox-0.27.8.tgz}
@@ -3519,6 +3550,7 @@ packages:
     requiresBuild: true
     dependencies:
       tslib: registry.npmjs.org/tslib@2.8.1
+    dev: false
     optional: true
 
   registry.npmjs.org/@types/aria-query@5.0.4:
@@ -4626,24 +4658,21 @@ packages:
     version: 0.1.0
     dev: false
 
-  registry.npmjs.org/better-auth@1.0.22:
-    resolution: {integrity: sha512-C21pYaxmQJXBsms/6emM7cqUwX3JlI4o0NU2B5pphdVIKF7i2ORM/mGAXjjk5ojMpMQco+R5Rh4n+LfwESOqkw==, registry: https://registry.npmjs.com/, tarball: https://registry.npmjs.org/better-auth/-/better-auth-1.0.22.tgz}
+  registry.npmjs.org/better-auth@1.1.4:
+    resolution: {integrity: sha512-WOESW3uIxrP8qZhdoqNxcJd5Kg7JvAxg30Y1MhRjDaWT5VQN914tC+NQqCMTgAVpv3Ng42RtkxdWeFGprAFOFg==, registry: https://registry.npmjs.com/, tarball: https://registry.npmjs.org/better-auth/-/better-auth-1.1.4.tgz}
     name: better-auth
-    version: 1.0.22
+    version: 1.1.4
     dependencies:
+      '@better-auth/utils': registry.npmjs.org/@better-auth/utils@0.2.2
       '@better-fetch/fetch': registry.npmjs.org/@better-fetch/fetch@1.1.12
       '@noble/ciphers': registry.npmjs.org/@noble/ciphers@0.6.0
       '@noble/hashes': registry.npmjs.org/@noble/hashes@1.6.1
-      '@simplewebauthn/browser': registry.npmjs.org/@simplewebauthn/browser@10.0.0
-      '@simplewebauthn/server': registry.npmjs.org/@simplewebauthn/server@10.0.1
+      '@simplewebauthn/browser': registry.npmjs.org/@simplewebauthn/browser@13.0.0
+      '@simplewebauthn/server': registry.npmjs.org/@simplewebauthn/server@13.0.0
       better-call: registry.npmjs.org/better-call@0.3.3-beta.4
-      consola: registry.npmjs.org/consola@3.3.0
       defu: registry.npmjs.org/defu@6.1.4
       jose: registry.npmjs.org/jose@5.9.6
       kysely: registry.npmjs.org/kysely@0.27.5
-      nanoid: registry.npmjs.org/nanoid@5.0.9
-      nanostores: registry.npmjs.org/nanostores@0.11.3
-      oslo: registry.npmjs.org/oslo@1.2.1
       uncrypto: registry.npmjs.org/uncrypto@0.1.3
       zod: registry.npmjs.org/zod@3.24.1
     transitivePeerDependencies:
@@ -5190,6 +5219,7 @@ packages:
     name: consola
     version: 3.3.0
     engines: {node: ^14.18.0 || >=16.10.0}
+    dev: true
 
   registry.npmjs.org/conventional-changelog-angular@7.0.0:
     resolution: {integrity: sha512-ROjNchA9LgfNMTTFSIWPzebCwOGFdgkEq45EnvvrmSLvCtAw0HSmrCs7/ty+wAeYUZyNay0YMUNYFTRL72PkBQ==, registry: https://registry.npmjs.com/, tarball: https://registry.npmjs.org/conventional-changelog-angular/-/conventional-changelog-angular-7.0.0.tgz}
@@ -6840,6 +6870,7 @@ packages:
     name: fs-monkey
     version: 1.0.6
     requiresBuild: true
+    dev: false
     optional: true
 
   registry.npmjs.org/fsevents@2.3.3:
@@ -8311,6 +8342,7 @@ packages:
     requiresBuild: true
     dependencies:
       memfs: registry.npmjs.org/memfs@3.5.3
+    dev: false
     optional: true
 
   registry.npmjs.org/memfs@3.5.3:
@@ -8321,6 +8353,7 @@ packages:
     requiresBuild: true
     dependencies:
       fs-monkey: registry.npmjs.org/fs-monkey@1.0.6
+    dev: false
     optional: true
 
   registry.npmjs.org/meow@12.1.1:
@@ -8537,19 +8570,6 @@ packages:
     version: 3.3.8
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
-
-  registry.npmjs.org/nanoid@5.0.9:
-    resolution: {integrity: sha512-Aooyr6MXU6HpvvWXKoVoXwKMs/KyVakWwg7xQfv5/S/RIgJMy0Ifa45H9qqYy7pTCszrHzP21Uk4PZq2HpEM8Q==, registry: https://registry.npmjs.com/, tarball: https://registry.npmjs.org/nanoid/-/nanoid-5.0.9.tgz}
-    name: nanoid
-    version: 5.0.9
-    engines: {node: ^18 || >=20}
-    hasBin: true
-
-  registry.npmjs.org/nanostores@0.11.3:
-    resolution: {integrity: sha512-TUes3xKIX33re4QzdxwZ6tdbodjmn3tWXCEc1uokiEmo14sI1EaGYNs2k3bU2pyyGNmBqFGAVl6jAGWd06AVIg==, registry: https://registry.npmjs.com/, tarball: https://registry.npmjs.org/nanostores/-/nanostores-0.11.3.tgz}
-    name: nanostores
-    version: 0.11.3
-    engines: {node: ^18.0.0 || >=20.0.0}
 
   registry.npmjs.org/napi-build-utils@1.0.2:
     resolution: {integrity: sha512-ONmRUqK7zj7DWX0D9ADe03wbwOBZxNAfF20PlGfCWQcD3+/MakShIHrMqx9YwPTfxDdF1zLeL+RGZiR9kGMLdg==, registry: https://registry.npmjs.com/, tarball: https://registry.npmjs.org/napi-build-utils/-/napi-build-utils-1.0.2.tgz}
@@ -8936,6 +8956,7 @@ packages:
     dependencies:
       '@node-rs/argon2': registry.npmjs.org/@node-rs/argon2@1.7.0
       '@node-rs/bcrypt': registry.npmjs.org/@node-rs/bcrypt@1.9.0
+    dev: false
 
   registry.npmjs.org/p-limit@2.3.0:
     resolution: {integrity: sha512-//88mFWSJx8lxCzwdAABTJL2MyWB12+eIY7MDL2SqLmAkeKU9qxRvWuSyTjm3FUmpBEMuFfckAIqEaVGUDxb6w==, registry: https://registry.npmjs.com/, tarball: https://registry.npmjs.org/p-limit/-/p-limit-2.3.0.tgz}

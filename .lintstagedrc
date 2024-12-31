@@ -1,10 +1,11 @@
 {
   "*.scss": [
     "prettier --write",
-    "npm run lint:scss -- --fix"
+    "pnpm lint:scss --fix"
   ],
-  "*.{tsx,ts}": [
+  "*.{ts,tsx}": [
     "prettier --write",
-    "npm run lint:ts -- --fix"
+    "pnpm lint:ts --fix",
+    "pnpm exec vitest related --run"
   ]
 }

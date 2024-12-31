@@ -23,6 +23,7 @@ export default async function middleware(request: NextRequest) {
     base-uri 'self';
     form-action 'self';
     frame-ancestors 'none';
+    connect-src 'self' https://www.google-analytics.com;
     ${process.env.NODE_ENV === "production" ? "upgrade-insecure-requests;" : ""}
   `
 

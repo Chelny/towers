@@ -30,7 +30,8 @@
     "prisma:seed:dev": "prisma db seed -- --environment development",
     "prisma:seed:prod": "prisma db seed -- --environment production",
     "prisma:studio": "prisma studio --port 5555 --browser none",
-    "prisma:reset": "prisma db push --force-reset"
+    "prisma:reset": "prisma db push --force-reset",
+    "better-auth:generate": "BETTER_AUTH_CLI=true npx @better-auth/cli generate"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -49,7 +50,7 @@
     "@types/react": "19.0.1",
     "axios": "1.7.7",
     "bcrypt-edge": "0.1.0",
-    "better-auth": "1.0.22",
+    "better-auth": "1.1.4",
     "better-status-codes": "2.0.7",
     "clsx": "2.1.1",
     "date-fns": "4.1.0",
@@ -70,7 +71,7 @@
   },
   "devDependencies": {
     "@babel/core": "7.26.0",
-    "@better-auth/cli": "1.0.22",
+    "@better-auth/cli": "1.1.4",
     "@commitlint/cli": "19.6.0",
     "@commitlint/config-conventional": "19.6.0",
     "@eslint/eslintrc": "3.2.0",

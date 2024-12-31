@@ -60,16 +60,12 @@ const config: Config = {
         "move-background": "move-background 180s linear infinite",
         "move-up": "move-up 1.5s ease-in-out forwards",
       },
-      screens: {
-        short: { raw: "(max-height: 991px)" },
-        tall: { raw: "(min-height: 992px)" },
-      },
     },
   },
   plugins: [
     plugin(({ addUtilities }) => {
       addUtilities({
-        ".towers-bg-animate::before": {
+        ".towers-game-bg::before": {
           content: "' '",
           position: "absolute",
           top: "-50%",
@@ -84,7 +80,6 @@ const config: Config = {
           backgroundImage: "url('/images/logo.png')",
           opacity: "0.5",
           transform: "rotate(-12deg)",
-          animation: "move-background 180s linear infinite",
         },
       })
     }),

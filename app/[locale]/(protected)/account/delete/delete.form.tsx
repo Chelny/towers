@@ -12,6 +12,7 @@ import AlertMessage from "@/components/ui/AlertMessage"
 import Button from "@/components/ui/Button"
 import Input from "@/components/ui/Input"
 import { INITIAL_FORM_STATE } from "@/constants/api"
+import { ROUTE_HOME } from "@/constants/routes"
 import { authClient } from "@/lib/auth-client"
 
 export function DeleteAccountForm(): ReactNode {
@@ -49,7 +50,9 @@ export function DeleteAccountForm(): ReactNode {
       })
     } else {
       await authClient.deleteUser(
-        {},
+        {
+          callbackURL: ROUTE_HOME.PATH,
+        },
         {
           onRequest: () => {
             setIsLoading(true)
