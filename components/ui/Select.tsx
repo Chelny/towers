@@ -102,7 +102,7 @@ export default function Select({
       <div
         id={id}
         className={clsx(
-          "flex justify-between items-center w-full h-8 px-1 py-4 overflow-hidden border-2 border-t-gray-200 border-e-gray-400 border-b-gray-400 border-s-gray-200 rounded-sm ring-1 ring-black bg-gray-300 text-black line-clamp-1",
+          "flex justify-between items-center w-full h-8 px-1 py-4 overflow-hidden border-2 border-t-gray-200 border-e-gray-400 border-b-gray-400 border-s-gray-200 rounded-sm ring-1 ring-black bg-gray-300 text-black line-clamp-1 cursor-pointer",
           disabled && "bg-gray-200 opacity-50 cursor-not-allowed",
           className,
         )}

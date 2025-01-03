@@ -50,7 +50,7 @@ describe("Calendar Component", () => {
     const currentYear: number = currentDate.getUTCFullYear()
 
     const prevMonth: Date = new Date(currentYear, currentMonth - 1)
-    const nextMonth: Date = new Date(currentYear, prevMonth.getUTCMonth() + 1)
+    const nextMonth: Date = new Date(prevMonth.getFullYear(), prevMonth.getUTCMonth() + 1)
 
     const prevMonthName: string = prevMonth.toLocaleString("en-US", { month: "long", year: "numeric" })
     const nextMonthName: string = nextMonth.toLocaleString("en-US", { month: "long", year: "numeric" })
@@ -66,7 +66,8 @@ describe("Calendar Component", () => {
     render(<Calendar id="test-calendar" label="Select Date" />)
 
     fireEvent.click(screen.getByText("Select a date"))
-    fireEvent.click(screen.getByText(/2024/i))
+    const currentYear: number = new Date().getFullYear()
+    fireEvent.click(screen.getByText(new RegExp(currentYear.toString())))
 
     expect(screen.getByText("Previous Decade")).toBeInTheDocument()
     expect(screen.getByText("Next Decade")).toBeInTheDocument()

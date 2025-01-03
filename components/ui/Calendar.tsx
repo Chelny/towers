@@ -131,16 +131,20 @@ export default function Calendar({
       ),
     )
 
-    setBrowsingDate(newBrowsingDate)
+    if (newBrowsingDate >= minDate && newBrowsingDate <= maxDate) {
+      setBrowsingDate(newBrowsingDate)
+    }
   }
 
   const handleMonthChange = (direction: number): void => {
     const newMonth: number = browsingDate.getUTCMonth() + direction
     const newYear: number = browsingDate.getUTCFullYear() + Math.floor(newMonth / 12)
-    const adjustedMonth: number = newMonth % 12
+    const adjustedMonth: number = (newMonth + 12) % 12
     const newBrowsingDate: Date = new Date(newYear, adjustedMonth)
 
-    setBrowsingDate(newBrowsingDate)
+    if (newBrowsingDate >= minDate && newBrowsingDate <= maxDate) {
+      setBrowsingDate(newBrowsingDate)
+    }
   }
 
   const renderDayPicker = (): ReactNode => {
@@ -258,7 +262,8 @@ export default function Calendar({
   }
 
   const isPreviousYearDisabled: boolean = browsingDate.getUTCFullYear() <= minDate.getUTCFullYear()
-  const isNextYearDisabled: boolean = browsingDate.getUTCFullYear() >= maxDate.getUTCFullYear()
+  const isNextYearDisabled: boolean =
+    new Date(browsingDate.getUTCFullYear() + 1, browsingDate.getUTCMonth(), browsingDate.getUTCDate()) > maxDate
   const isPreviousMonthDisabled: boolean =
     browsingDate.getUTCFullYear() === minDate.getUTCFullYear() && browsingDate.getUTCMonth() <= minDate.getUTCMonth()
   const isNextMonthDisabled: boolean =

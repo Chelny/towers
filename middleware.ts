@@ -5,6 +5,8 @@ import { PROTECTED_ROUTES, PUBLIC_ROUTES, ROUTE_GAMES, ROUTE_SIGN_IN } from "@/c
 import { Session } from "@/lib/auth-client"
 import { defaultLocale, Language, languages } from "@/translations/languages"
 
+const COOKIE_LOCALE = "towers.locale"
+
 export default async function middleware(request: NextRequest) {
   const requestHeaders: Headers = new Headers(request.headers)
 
@@ -42,8 +44,8 @@ export default async function middleware(request: NextRequest) {
 
   // Localization
   const { origin, pathname } = request.nextUrl
-  const userLocale: string | null | undefined = session?.user?.language || null
-  const cookieLocale: string | undefined = request.cookies.get("locale")?.value
+  const userLocale: string | null | undefined = session?.user?.language
+  const cookieLocale: string | undefined = request.cookies.get(COOKIE_LOCALE)?.value
   const acceptLocale: string = getRequestLocale(request.headers)
   let locale: string = userLocale || cookieLocale || acceptLocale || defaultLocale
 
@@ -61,7 +63,7 @@ export default async function middleware(request: NextRequest) {
 
   if (pathnameLocale !== cookieLocale) {
     // If the locale in the cookie doesn't match the pathname locale, update the cookie
-    response.cookies.set("towers.locale", pathnameLocale, {
+    response.cookies.set(COOKIE_LOCALE, pathnameLocale, {
       httpOnly: true,
       path: "/",
       maxAge: 60 * 60 * 24 * 30, // Cache for 30 days,
