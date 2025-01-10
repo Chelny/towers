@@ -9,9 +9,9 @@ import { SocketState } from "@/interfaces/socket"
 import { authClient } from "@/lib/auth-client"
 import socketReducer from "@/redux/features/socket-slice"
 import { mockRoom1 } from "@/test/data/rooms"
+import { mockSession } from "@/test/data/session"
 import { mockSocketInitialState, mockSocketRoom1Id } from "@/test/data/socketState"
 import { mockRoom1Table1TowersUserProfile1 } from "@/test/data/towersUserProfiles"
-import { mockSession } from "@/test/data/users"
 
 vi.stubGlobal("fetch", vi.fn())
 

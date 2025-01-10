@@ -7,8 +7,8 @@ import { authClient } from "@/lib/auth-client"
 import { useAppDispatch, useAppSelector } from "@/lib/hooks"
 import { RootState } from "@/redux/store"
 import { mockRoom1, mockRoom2, mockRoom3 } from "@/test/data/rooms"
+import { mockSession } from "@/test/data/session"
 import { mockSocketRoom3Id, mockSocketState, mockStoreReducers } from "@/test/data/socketState"
-import { mockSession } from "@/test/data/users"
 import { mockUseRouter } from "@/vitest.setup"
 
 vi.mock("next/navigation", () => ({
@@ -36,14 +36,17 @@ describe("RoomsList Component", () => {
     {
       ...mockRoom1,
       usersCount: 123,
+      isUserInRoom: true,
     },
     {
       ...mockRoom2,
       usersCount: 300,
+      isUserInRoom: false,
     },
     {
       ...mockRoom3,
       usersCount: 234,
+      isUserInRoom: false,
     },
   ]
 

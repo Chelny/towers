@@ -14,7 +14,7 @@ vi.mock("@/lib/auth-client", () => ({
 
 describe("Sign Up Form", () => {
   it("should display the sign-in link", () => {
-    render(<SignUpForm />)
+    render(<SignUpForm locale="en" />)
 
     const signUpLink: HTMLElement = screen.getByTestId("sign-up-sign-in-link")
     expect(signUpLink).toBeInTheDocument()
@@ -22,7 +22,7 @@ describe("Sign Up Form", () => {
   })
 
   it("should render the form with all elements", () => {
-    render(<SignUpForm />)
+    render(<SignUpForm locale="en" />)
 
     expect(screen.getByTestId("sign-up-name-input")).toBeInTheDocument()
     expect(screen.getByTestId("sign-up-birthdate-calendar")).toBeInTheDocument()
@@ -34,7 +34,7 @@ describe("Sign Up Form", () => {
   })
 
   it("should apply correct required properties to form fields", () => {
-    render(<SignUpForm />)
+    render(<SignUpForm locale="en" />)
 
     expect(screen.getByTestId("sign-up-name-input")).toHaveAttribute("required")
     expect(screen.getByTestId("sign-up-birthdate-calendar")).not.toHaveAttribute("required")
@@ -45,7 +45,7 @@ describe("Sign Up Form", () => {
   })
 
   it("should display error messages when submitting an empty form", () => {
-    render(<SignUpForm />)
+    render(<SignUpForm locale="en" />)
 
     fireEvent.click(screen.getByRole("button", { name: /Sign Up/i }))
 
@@ -58,7 +58,7 @@ describe("Sign Up Form", () => {
   })
 
   it("should display error messages for invalid required fields", () => {
-    render(<SignUpForm />)
+    render(<SignUpForm locale="en" />)
 
     fireEvent.input(screen.getByTestId("sign-up-name-input"), { target: { value: "John Doe #1" } })
     fireEvent.input(screen.getByTestId("sign-up-email-input"), { target: { value: "john.doe@@example.com" } })
@@ -77,7 +77,7 @@ describe("Sign Up Form", () => {
   })
 
   it("should display error messages if passwords do not match", () => {
-    render(<SignUpForm />)
+    render(<SignUpForm locale="en" />)
 
     fireEvent.input(screen.getByTestId("sign-up-name-input"), { target: { value: "John Doe" } })
     fireEvent.input(screen.getByTestId("sign-up-email-input"), { target: { value: "john.doe@example.com" } })
@@ -101,7 +101,7 @@ describe("Sign Up Form", () => {
       callbacks.onSuccess()
     })
 
-    render(<SignUpForm />)
+    render(<SignUpForm locale="en" />)
 
     fireEvent.input(screen.getByTestId("sign-up-name-input"), { target: { value: "John Doe" } })
     fireEvent.input(screen.getByTestId("sign-up-email-input"), { target: { value: "john.doe@example.com" } })

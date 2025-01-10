@@ -20,10 +20,10 @@ export default function ServerMessage({ roomId, tableId }: ServerMessageProps): 
       return state.socket.errorMessage
     } else {
       if (roomId && tableId) {
-        return state.socket.towers[roomId]?.tables?.[tableId]?.errorMessage
+        return state.socket.towers.tables?.[tableId]?.errorMessage
       }
 
-      return state.socket.towers[roomId]?.errorMessage
+      return state.socket.towers.rooms[roomId]?.errorMessage
     }
   })
   const [isInitialized, setIsInitialized] = useState<boolean>(false)
@@ -40,7 +40,7 @@ export default function ServerMessage({ roomId, tableId }: ServerMessageProps): 
   }, [session])
 
   if (!isInitialized) {
-    return null
+    return <AlertMessage>&nbsp;</AlertMessage>
   }
 
   if (isConnected) {

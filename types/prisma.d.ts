@@ -6,33 +6,31 @@ import {
   TowersTable,
   TowersTableChatMessage,
   TowersUserProfile,
-  TowersUserRoomTable,
+  TowersUserRoom,
+  TowersUserTable,
   User,
 } from "@prisma/client"
-import { Session } from "@/lib/auth-client"
 
 declare module "@prisma/client" {
-  interface IUserWithRelations extends User {
-    towersUserProfile?: TowersUserProfileWithRelations
-  }
-
-  interface IUserProfile extends User {
-    accounts: Account[]
-  }
-
   interface ITowersTableWithRelations extends TowersTable {
+    room: TowersRoom
     host: ITowersUserProfileWithRelations
-    userRoomTables?: ITowersUserRoomTableWithRelations[]
+    userTables: ITowersUserTableWithRelations[]
   }
 
   interface ITowersUserProfileWithRelations extends TowersUserProfile {
-    user: Session["user"]
-    userRoomTables?: ITowersUserRoomTableWithRelations[]
+    user: User
+    userRooms?: ITowersUserRoomWithRelations[]
+    userTables?: ITowersUserTableWithRelations[]
   }
 
-  interface ITowersUserRoomTableWithRelations extends TowersUserRoomTable {
+  interface ITowersUserRoomWithRelations extends TowersUserRoom {
+    userProfile: TowersUserProfile
+  }
+
+  interface ITowersUserTableWithRelations extends TowersUserTable {
     userProfile: ITowersUserProfileWithRelations
-    table: TowersTable
+    table: TowersTable | null
   }
 
   // **************************************************
@@ -40,11 +38,12 @@ declare module "@prisma/client" {
   // **************************************************
 
   interface IRoomListItem extends TowersRoom {
-    userRoomTables: { userProfileId: string }[]
+    userRooms: { userProfileId: string }[]
   }
 
   interface ITowersRoomWithUsersCount extends TowersRoom {
     usersCount: number
+    isUserInRoom: boolean
   }
 
   // **************************************************
@@ -73,5 +72,7 @@ declare module "@prisma/client" {
 
   interface ITowersUserProfile extends ITowersUserProfileWithRelations {}
 
-  interface ITowersUserRoomTable extends ITowersUserRoomTableWithRelations {}
+  interface ITowersUserRoom extends ITowersUserRoomWithRelations {}
+
+  interface ITowersUserTable extends ITowersUserTableWithRelations {}
 }

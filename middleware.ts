@@ -1,17 +1,24 @@
 import { NextRequest, NextResponse } from "next/server"
 import { betterFetch } from "@better-fetch/fetch"
 import Negotiator from "negotiator"
+import { APP_COOKIES } from "@/constants/app"
 import { PROTECTED_ROUTES, PUBLIC_ROUTES, ROUTE_GAMES, ROUTE_SIGN_IN } from "@/constants/routes"
 import { Session } from "@/lib/auth-client"
 import { defaultLocale, Language, languages } from "@/translations/languages"
 
-const COOKIE_LOCALE = "towers.locale"
-
 export default async function middleware(request: NextRequest) {
+  const { origin, pathname } = request.nextUrl
   const requestHeaders: Headers = new Headers(request.headers)
 
   // Fetch session
-  const { data: session } = await fetchSession(request)
+  const { data: session, error: sessionError } = await betterFetch<Session>("/api/auth/get-session", {
+    baseURL: origin,
+    headers: { cookie: request.headers.get("cookie") || "" },
+  })
+
+  if (sessionError) {
+    console.error(`Failed to fetch session: ${sessionError.message}`)
+  }
 
   // Content Security Policy (CSP)
   const nonce: string = Buffer.from(crypto.randomUUID()).toString("base64")
@@ -43,10 +50,9 @@ export default async function middleware(request: NextRequest) {
   response.headers.set("Content-Security-Policy", contentSecurityPolicyHeader)
 
   // Localization
-  const { origin, pathname } = request.nextUrl
   const userLocale: string | null | undefined = session?.user?.language
-  const cookieLocale: string | undefined = request.cookies.get(COOKIE_LOCALE)?.value
-  const acceptLocale: string = getRequestLocale(request.headers)
+  const cookieLocale: string | undefined = request.cookies.get(APP_COOKIES.LOCALE)?.value
+  const acceptLocale: string = getAcceptLanguage(request.headers)
   let locale: string = userLocale || cookieLocale || acceptLocale || defaultLocale
 
   const pathnameLocale: string = pathname.split("/")[1]
@@ -63,7 +69,7 @@ export default async function middleware(request: NextRequest) {
 
   if (pathnameLocale !== cookieLocale) {
     // If the locale in the cookie doesn't match the pathname locale, update the cookie
-    response.cookies.set(COOKIE_LOCALE, pathnameLocale, {
+    response.cookies.set(APP_COOKIES.LOCALE, pathnameLocale, {
       httpOnly: true,
       path: "/",
       maxAge: 60 * 60 * 24 * 30, // Cache for 30 days,
@@ -88,28 +94,11 @@ export default async function middleware(request: NextRequest) {
 /**
  * Determine the locale from the "accept-language" header or fallback to the default locale.
  */
-function getRequestLocale(headers: Headers): string {
+function getAcceptLanguage(headers: Headers): string {
   const acceptLanguage: string | undefined = headers.get("accept-language") || undefined
-  const locales: string[] = languages.map((language: Language) => language.locale)
   const negotiator: Negotiator = new Negotiator({ headers: { "accept-language": acceptLanguage } })
-  const preferredLanguages: string[] = negotiator.languages(locales.slice())
-  return preferredLanguages[0] || locales[0] || defaultLocale
-}
-
-/**
- * Fetch session information using better-fetch.
- */
-async function fetchSession(request: NextRequest): Promise<{ data: Session | null }> {
-  try {
-    const { origin } = request.nextUrl
-    return betterFetch<Session>("/api/auth/get-session", {
-      baseURL: origin,
-      headers: { cookie: request.headers.get("cookie") || "" },
-    })
-  } catch (error) {
-    console.error(`Failed to fetch session: ${error}`)
-    return { data: null }
-  }
+  const locales: string[] = languages.map((language: Language) => language.locale)
+  return negotiator.languages(locales.slice())[0]
 }
 
 export const config = {

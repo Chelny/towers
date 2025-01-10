@@ -1,7 +1,19 @@
 import { createId } from "@paralleldrive/cuid2"
-import { Session } from "@/lib/auth-client"
+import { User } from "@prisma/client"
 
-export const mockUser1: Session["user"] = {
+const commonUserProperties = {
+  language: "en",
+  role: "user",
+  isOnline: true,
+  lastActiveAt: new Date(),
+  banned: false,
+  banReason: null,
+  banExpires: null,
+  createdAt: new Date(),
+  updatedAt: new Date(),
+}
+
+export const mockUser1: User = {
   id: createId(),
   name: "John Doe",
   birthdate: new Date("2000-01-01"),
@@ -9,15 +21,10 @@ export const mockUser1: Session["user"] = {
   emailVerified: true,
   username: "john.doe",
   image: "https://example.com/avatar.jpg",
-  language: "en",
-  isOnline: true,
-  lastActiveAt: new Date(),
-  banned: false,
-  createdAt: new Date(),
-  updatedAt: new Date(),
+  ...commonUserProperties,
 }
 
-export const mockUser2: Session["user"] = {
+export const mockUser2: User = {
   id: createId(),
   name: "Jane Smith",
   birthdate: new Date("1985-05-15"),
@@ -25,15 +32,10 @@ export const mockUser2: Session["user"] = {
   emailVerified: true,
   username: "janesmith",
   image: null,
-  language: "en",
-  isOnline: true,
-  lastActiveAt: new Date(),
-  banned: false,
-  createdAt: new Date(),
-  updatedAt: new Date(),
+  ...commonUserProperties,
 }
 
-export const mockUser3: Session["user"] = {
+export const mockUser3: User = {
   id: createId(),
   name: "Sam Lee",
   birthdate: new Date("2000-07-21"),
@@ -41,15 +43,10 @@ export const mockUser3: Session["user"] = {
   emailVerified: true,
   username: "samlee",
   image: null,
-  language: "en",
-  isOnline: true,
-  lastActiveAt: new Date(),
-  banned: false,
-  createdAt: new Date(),
-  updatedAt: new Date(),
+  ...commonUserProperties,
 }
 
-export const mockUser4: Session["user"] = {
+export const mockUser4: User = {
   id: createId(),
   name: "Chris Green",
   birthdate: null,
@@ -57,15 +54,10 @@ export const mockUser4: Session["user"] = {
   emailVerified: true,
   username: "chrisgreen",
   image: null,
-  language: "en",
-  isOnline: true,
-  lastActiveAt: new Date(),
-  banned: false,
-  createdAt: new Date(),
-  updatedAt: new Date(),
+  ...commonUserProperties,
 }
 
-export const mockUser5: Session["user"] = {
+export const mockUser5: User = {
   id: createId(),
   name: "Patricia White",
   birthdate: new Date("1992-02-28"),
@@ -73,78 +65,5 @@ export const mockUser5: Session["user"] = {
   emailVerified: true,
   username: "patwhite",
   image: null,
-  language: "en",
-  isOnline: true,
-  lastActiveAt: new Date(),
-  banned: false,
-  createdAt: new Date(),
-  updatedAt: new Date(),
-}
-
-export const mockSession = {
-  data: {
-    user: mockUser1,
-    session: {
-      id: createId(),
-      userId: mockUser1.id,
-      token: "mockToken",
-      expiresAt: new Date(),
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    },
-    accounts: [],
-  },
-  isPending: false,
-  error: null,
-}
-
-export const mockSessionCredentialAccount = {
-  id: createId(),
-  userId: mockUser1.id,
-  accountId: mockUser1.id,
-  providerId: "credential",
-  accessToken: null,
-  refreshToken: null,
-  accessTokenExpiresAt: null,
-  refreshTokenExpiresAt: null,
-  idToken: null,
-  scope: null,
-  password:
-    "e1a88ca304b208dbf4544cb4fc698cc1:5274627b6ac84a28571303548ce3a8bc4bd5ab49342a3ee8e63e2f9596668378596710e41b4ad4e252e77fce5617e6600edf7af822d6c4c8bea37795829f5dbe",
-  createdAt: new Date(),
-  updatedAt: new Date(),
-}
-
-export const mockSessionGitHubAccount = {
-  id: createId(),
-  userId: mockUser1.id,
-  accountId: "1234567",
-  providerId: "github",
-  accessToken: null,
-  refreshToken: null,
-  accessTokenExpiresAt: null,
-  refreshTokenExpiresAt: null,
-  idToken: null,
-  scope: null,
-  password: null,
-  createdAt: new Date(),
-  updatedAt: new Date(),
-}
-
-export const mockPendingSession = {
-  data: null,
-  isPending: true,
-  error: null,
-}
-
-export const mockErrorSession = {
-  data: null,
-  isPending: false,
-  error: {
-    status: 500,
-    statusText: "Internal Server Error",
-    error: "Something went wrong",
-    name: "FetchError",
-    message: "Failed to fetch session",
-  },
+  ...commonUserProperties,
 }

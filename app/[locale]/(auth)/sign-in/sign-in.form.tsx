@@ -15,8 +15,9 @@ import Input from "@/components/ui/Input"
 import { INITIAL_FORM_STATE } from "@/constants/api"
 import { AUTH_PROVIDERS } from "@/constants/auth-providers"
 import {
-  ERROR_REDIRECT_URI,
-  REDIRECT_URI,
+  CALLBACK_URL,
+  ERROR_CALLBACK_URL,
+  NEW_USER_CALLBACK_URL,
   ROUTE_FORGOT_PASSWORD,
   ROUTE_PRIVACY_POLICY,
   ROUTE_SIGN_IN_WITH_MAGIC_LINK,
@@ -94,7 +95,7 @@ export function SignInForm(): ReactNode {
           email: payload.email,
           password: payload.password,
           rememberMe: payload.rememberMe,
-          callbackURL: REDIRECT_URI,
+          callbackURL: CALLBACK_URL,
         },
         {
           onRequest: () => {
@@ -126,8 +127,9 @@ export function SignInForm(): ReactNode {
     await authClient.signIn.social(
       {
         provider: provider,
-        callbackURL: REDIRECT_URI,
-        errorCallbackURL: ERROR_REDIRECT_URI,
+        newUserCallbackURL: NEW_USER_CALLBACK_URL,
+        callbackURL: CALLBACK_URL,
+        errorCallbackURL: ERROR_CALLBACK_URL,
       },
       {
         onRequest: () => {

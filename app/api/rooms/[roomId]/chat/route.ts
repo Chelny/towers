@@ -2,8 +2,6 @@ import { headers } from "next/headers"
 import { NextRequest, NextResponse } from "next/server"
 import { t } from "@lingui/core/macro"
 import { TowersRoomChatMessage, TowersUserProfile } from "@prisma/client"
-import DOMPurify from "isomorphic-dompurify"
-import { updateUserLastActiveAt } from "@/data/user"
 import { getPrismaError, missingRoomIdResponse, unauthorized } from "@/lib/api"
 import { auth } from "@/lib/auth"
 import { Session } from "@/lib/auth-client"
@@ -33,7 +31,7 @@ export async function GET(request: NextRequest, segmentData: { params: Params })
       )
     }
 
-    const towersUserRoomTable: { updatedAt: Date } | null = await prisma.towersUserRoomTable.findFirst({
+    const towersUserRoom: { updatedAt: Date } | null = await prisma.towersUserRoom.findFirst({
       where: {
         userProfileId: towersUserProfile.id,
         roomId,
@@ -46,7 +44,7 @@ export async function GET(request: NextRequest, segmentData: { params: Params })
       },
     })
 
-    if (!towersUserRoomTable) {
+    if (!towersUserRoom) {
       return NextResponse.json(
         {
           success: false,
@@ -65,8 +63,12 @@ export async function GET(request: NextRequest, segmentData: { params: Params })
       },
       include: {
         userProfile: {
-          include: {
-            user: true,
+          select: {
+            user: {
+              select: {
+                username: true,
+              },
+            },
           },
         },
       },
@@ -82,71 +84,6 @@ export async function GET(request: NextRequest, segmentData: { params: Params })
         data: chatMessages,
       },
       { status: 200 },
-    )
-  } catch (error) {
-    return getPrismaError(error)
-  }
-}
-
-export async function POST(request: NextRequest, segmentData: { params: Params }): Promise<NextResponse> {
-  const body = await request.json()
-
-  const { roomId } = await segmentData.params
-  if (!roomId) return missingRoomIdResponse()
-
-  const session: Session | null = await auth.api.getSession({ headers: await headers() })
-  if (!session) return unauthorized()
-
-  try {
-    const towersUserProfile: TowersUserProfile | null = await prisma.towersUserProfile.findUnique({
-      where: { userId: session.user.id },
-    })
-
-    if (!towersUserProfile) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: t({ message: "Unable to find the requested user profile." }),
-        },
-        { status: 404 },
-      )
-    }
-
-    let message: string = DOMPurify.sanitize(body.message)
-
-    if (message.trim().length === 0) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: t({ message: "Invalid input. XSS attack detected." }),
-        },
-        { status: 400 },
-      )
-    }
-
-    const chatMessage: TowersRoomChatMessage = await prisma.towersRoomChatMessage.create({
-      data: {
-        roomId,
-        userProfileId: towersUserProfile.id,
-        message,
-      },
-      include: {
-        userProfile: {
-          include: {
-            user: true,
-          },
-        },
-      },
-    })
-
-    await updateUserLastActiveAt(session.user.id)
-
-    return NextResponse.json(
-      {
-        success: true,
-        data: chatMessage,
-      },
-      { status: 201 },
     )
   } catch (error) {
     return getPrismaError(error)

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { TowersUserRoomTable } from "@prisma/client"
+import { TowersUserProfile } from "@prisma/client"
 import { getPrismaError, missingTableIdResponse } from "@/lib/api"
 import prisma from "@/lib/prisma"
 
@@ -10,26 +10,28 @@ export async function GET(request: NextRequest, segmentData: { params: Params })
   if (!tableId) return missingTableIdResponse()
 
   try {
-    const towersUserRoomTables: TowersUserRoomTable[] = await prisma.towersUserRoomTable.findMany({
-      where: { tableId },
-      include: {
-        userProfile: {
-          include: {
-            user: true,
+    const towersUserProfiles: TowersUserProfile[] = await prisma.towersUserProfile.findMany({
+      where: {
+        userTables: {
+          some: {
+            tableId,
           },
         },
-        table: true,
       },
-      distinct: ["userProfileId"],
-      orderBy: {
-        updatedAt: "desc",
+      include: {
+        user: {
+          select: {
+            username: true,
+            lastActiveAt: true,
+          },
+        },
       },
     })
 
     return NextResponse.json(
       {
         success: true,
-        data: towersUserRoomTables,
+        data: towersUserProfiles,
       },
       { status: 200 },
     )

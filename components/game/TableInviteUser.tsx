@@ -3,23 +3,31 @@
 import { ReactNode, useState } from "react"
 import dynamic from "next/dynamic"
 import { useLingui } from "@lingui/react/macro"
-import { ITowersUserRoomTable } from "@prisma/client"
+import { ITowersUserProfile } from "@prisma/client"
 import PlayersListSkeleton from "@/components/skeleton/PlayersListSkeleton"
 import Modal from "@/components/ui/Modal"
+import { authClient } from "@/lib/auth-client"
+import { useAppSelector } from "@/lib/hooks"
+import { selectRoomUsersInvite } from "@/redux/selectors/socket-selectors"
+import { RootState } from "@/redux/store"
 
 type TableInviteUserProps = {
+  tableId: string
   isOpen: boolean
-  users: ITowersUserRoomTable[]
-  isRatingsVisible: boolean | null
+  isRatingsVisible: boolean | undefined
   onCancel: () => void
 }
 
 export default function TableInviteUser({
+  tableId,
   isOpen,
-  users,
   isRatingsVisible,
   onCancel,
 }: TableInviteUserProps): ReactNode {
+  const { data: session } = authClient.useSession()
+  const users: ITowersUserProfile[] = useAppSelector((state: RootState) =>
+    selectRoomUsersInvite(state, tableId, session),
+  )
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null)
   const { t } = useLingui()
 

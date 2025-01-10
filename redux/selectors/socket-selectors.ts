@@ -1,6 +1,6 @@
-import { ITowersUserRoomTable } from "@prisma/client"
+import { ITowersUserProfile, ITowersUserTableWithRelations } from "@prisma/client"
 import { createSelector } from "@reduxjs/toolkit"
-import { TowersRoomState, TowersTableState } from "@/interfaces/socket"
+import { TowersRoomState, TowersRoomTableState, TowersTableState } from "@/interfaces/socket"
 import { Session } from "@/lib/auth-client"
 import { RootState } from "@/redux/store"
 
@@ -8,10 +8,13 @@ import { RootState } from "@/redux/store"
 // * Room Selectors
 // **************************************************
 
-export const selectRooms = (state: RootState) => state.socket.towers
+export const selectRooms = (state: RootState) => state.socket?.towers?.rooms
 export const selectRoomById = (state: RootState, roomId: string) => selectRooms(state)?.[roomId]
 
-export const selectRoomIsJoined = createSelector([selectRoomById], (room: TowersRoomState) => room?.isJoined)
+export const selectRoomIsJoined = createSelector(
+  [selectRooms, (state: RootState, roomId: string) => roomId],
+  (rooms: Record<string, TowersRoomState>, roomId: string) => !!rooms[roomId],
+)
 
 export const selectRoomInfo = createSelector([selectRoomById], (room: TowersRoomState) => room?.info || null)
 export const selectIsRoomInfoLoading = createSelector([selectRoomById], (room: TowersRoomState) => room?.isInfoLoading)
@@ -26,7 +29,7 @@ export const selectIsRoomUsersLoading = createSelector(
 )
 
 export const selectRoomTables = createSelector([selectRoomById], (room: TowersRoomState) => {
-  return room?.tables ? Object.values(room.tables).map((table: TowersTableState) => table) : []
+  return room?.tables ? Object.values(room.tables).map((table: TowersRoomTableState) => table) : []
 })
 export const selectIsRoomTablesLoading = createSelector(
   [selectRoomById],
@@ -37,11 +40,13 @@ export const selectIsRoomTablesLoading = createSelector(
 // * Table Selectors
 // **************************************************
 
-export const selectTablesByRoomId = (state: RootState, roomId: string) => selectRoomById(state, roomId)?.tables
-export const selectTableById = (state: RootState, roomId: string, tableId: string) =>
-  selectRoomById(state, roomId)?.tables?.[tableId]
+export const selectTables = (state: RootState) => state.socket?.towers?.tables
+export const selectTableById = (state: RootState, tableId: string) => selectTables(state)?.[tableId]
 
-export const selectTableIsJoined = createSelector([selectTableById], (table: TowersTableState) => table?.isJoined)
+export const selectTableIsJoined = createSelector(
+  [selectTables, (state: RootState, tableId: string) => tableId],
+  (tables: Record<string, TowersTableState>, tableId: string) => !!tables[tableId],
+)
 
 export const selectTableInfo = createSelector([selectTableById], (table: TowersTableState) => table?.info || null)
 export const selectIsTableInfoLoading = createSelector(
@@ -61,17 +66,37 @@ export const selectIsTableUsersLoading = createSelector(
   (table: TowersTableState) => table?.isUsersLoading,
 )
 export const selectRoomUsersInvite = createSelector(
-  [selectRoomById, (state: RootState, roomId: string, tableId: string) => tableId],
-  (room: TowersRoomState, tableId: string) =>
-    room?.users?.filter((towersUserRoomTable: ITowersUserRoomTable) => towersUserRoomTable.tableId !== tableId),
+  [
+    selectRoomById,
+    (state: RootState, tableId: string) => tableId,
+    (state: RootState, tableId: string, session: Session | null) => session,
+  ],
+  (room: TowersRoomState, tableId: string, session: Session | null) => {
+    if (!room || !session?.user.id) return []
+
+    return (
+      room.users?.filter((towersUserProfile: ITowersUserProfile) => {
+        // Exclude the current user (session.user)
+        if (towersUserProfile.userId === session.user.id) return false
+
+        // Check if the user is already in the table
+        const isUserInTable: boolean | undefined = towersUserProfile.userTables?.some(
+          (userTable: ITowersUserTableWithRelations) => userTable.tableId === tableId,
+        )
+
+        // Exclude users already in the table
+        return !isUserInTable
+      }) || []
+    )
+  },
 )
 export const selectTableUsersBoot = createSelector(
-  [
-    selectTableById,
-    (state: RootState, roomId: string, tableId: string, session: Session | null) => session?.user.id ?? null,
-  ],
-  (table: TowersTableState, sessionUserId: string | null) =>
-    table?.users?.filter(
-      (towersUserRoomTable: ITowersUserRoomTable) => towersUserRoomTable.userProfile?.userId !== sessionUserId,
-    ),
+  [selectTableById, (state: RootState, tableId: string, session: Session | null) => session],
+  (table: TowersTableState, session: Session | null) => {
+    if (!table || !session?.user.id) return []
+
+    return (
+      table.users?.filter((towersUserProfile: ITowersUserProfile) => towersUserProfile.userId !== session.user.id) || []
+    )
+  },
 )

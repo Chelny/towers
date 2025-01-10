@@ -17,7 +17,7 @@ export const getUserByUsername = async (username: string): Promise<User | null> 
  * Update isOnline and lastActiveAt on POST, PUT, PATCH, DELETE requests
  * @param id
  */
-export const updateUserLastActiveAt = async (id: string): Promise<void> => {
+export const setUserLastActiveAt = async (id: string): Promise<void> => {
   await prisma.user.update({
     where: { id },
     data: { isOnline: true, lastActiveAt: new Date() },

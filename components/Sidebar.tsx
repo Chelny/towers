@@ -92,7 +92,7 @@ export default function Sidebar(): ReactNode {
       {/* User image and collapse icon */}
       <div className={clsx("flex items-center gap-2", isExpanded ? "w-full" : "w-auto")}>
         <div className={clsx("flex-1 flex items-center gap-4", isExpanded && "ps-2")}>
-          <UserAvatar />
+          <UserAvatar user={session?.user} isLoading={isPending} />
           {isExpanded && <span className="font-medium">{session?.user.name}</span>}
         </div>
         <div className={isExpanded ? "flex" : "hidden"}>
@@ -113,16 +113,6 @@ export default function Sidebar(): ReactNode {
 
       <nav className="flex flex-col items-center w-full" aria-label={t({ message: "User" })}>
         <SidebarMenuItem
-          Icon={LuGamepad2}
-          ariaLabel={t({ message: "Rooms" })}
-          isExpanded={isExpanded}
-          isLinkTextVisible={isLinkTextVisible}
-          href={ROUTE_TOWERS.PATH}
-          disabled
-        >
-          <Trans>Rooms</Trans>
-        </SidebarMenuItem>
-        <SidebarMenuItem
           Icon={RiUserLine}
           ariaLabel={t({ message: "Account" })}
           isExpanded={isExpanded}
@@ -132,6 +122,16 @@ export default function Sidebar(): ReactNode {
           onClick={() => setIsExpanded(true)}
         >
           <Trans>Account</Trans>
+        </SidebarMenuItem>
+        <SidebarMenuItem
+          Icon={LuGamepad2}
+          ariaLabel={t({ message: "Rooms" })}
+          isExpanded={isExpanded}
+          isLinkTextVisible={isLinkTextVisible}
+          href={ROUTE_TOWERS.PATH}
+          disabled
+        >
+          <Trans>Rooms</Trans>
         </SidebarMenuItem>
       </nav>
 

@@ -6,3 +6,11 @@ export const APP_CONFIG = {
     SUPPORT: "support@towers.dev",
   },
 }
+
+export const COOKIE_PREFIX = "towers"
+export const APP_COOKIES = {
+  LOCALE: `${COOKIE_PREFIX}.locale`,
+  NEW_USER: `${COOKIE_PREFIX}.new_user`,
+  SETTINGS_FORM_STATE: `${COOKIE_PREFIX}.formState`,
+  THEME: `${COOKIE_PREFIX}.theme`,
+}

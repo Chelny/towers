@@ -153,7 +153,7 @@ _TODO_
   - [x] Add links to Terms of Service and Privacy Policy in `/sign-in` and `/sign-up` pages
   - [x] Multi-language Support
     - [x] French
-  - [ ] Redirect new user that signs up with OAuth to `/new-user` (with better-auth)
+  - [x] Redirect new user that signs up with OAuth to `/new-user`
   - [x] Fix delete user redirection from confirmation link
   - [ ] Fix passkeys (sign-in and profile)
   - [ ] Add OTP (email and phone)
@@ -177,7 +177,7 @@ _TODO_
   - [ ] Game: Attacks should be sent to the opponents’ board
   - [ ] Game: Seated users from teams 2–4 must play their game from team 1’s seat
   - [ ] Game: Consider other team players’ boards when placing pieces
-  - [ ] Chat: Ratings update: `[username]’s old rating: 2050; new rating: 2040`
+  - [ ] Chat: Ratings update: `*** [username]’s old rating: 2050; new rating: 2040`
   - [ ] Chat: Cipher key:
     - [ ] Cipher key text: For each Tower made on the game board. Example: `*** V ==> M`
     - [ ] Code after winning 25 games in 2 hours: `2FKK 2OF W1VAM2FO 91MO 8EWOF2 NF9 7HW3FE` (no asterisks at the beginning)

@@ -3,18 +3,26 @@
 import { ReactNode, useState } from "react"
 import dynamic from "next/dynamic"
 import { useLingui } from "@lingui/react/macro"
-import { ITowersUserRoomTable } from "@prisma/client"
+import { ITowersUserProfile } from "@prisma/client"
 import PlayersListSkeleton from "@/components/skeleton/PlayersListSkeleton"
 import Modal from "@/components/ui/Modal"
+import { authClient } from "@/lib/auth-client"
+import { useAppSelector } from "@/lib/hooks"
+import { selectTableUsersBoot } from "@/redux/selectors/socket-selectors"
+import { RootState } from "@/redux/store"
 
 type TableBootUserProps = {
+  tableId: string
   isOpen: boolean
-  users: ITowersUserRoomTable[]
-  isRatingsVisible: boolean | null
+  isRatingsVisible: boolean | undefined
   onCancel: () => void
 }
 
-export default function TableBootUser({ isOpen, users, isRatingsVisible, onCancel }: TableBootUserProps): ReactNode {
+export default function TableBootUser({ tableId, isOpen, isRatingsVisible, onCancel }: TableBootUserProps): ReactNode {
+  const { data: session } = authClient.useSession()
+  const users: ITowersUserProfile[] = useAppSelector((state: RootState) =>
+    selectTableUsersBoot(state, tableId, session),
+  )
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null)
   const { t } = useLingui()
 

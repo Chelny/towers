@@ -1,21 +1,18 @@
-import { i18n, MessageDescriptor } from "@lingui/core"
+import { MessageDescriptor } from "@lingui/core"
 import { msg } from "@lingui/core/macro"
 import { enUS, frCA, Locale } from "date-fns/locale"
 
 export interface Language {
   locale: string
   msg: MessageDescriptor
-  flag?: string
+  flag: string
   territory?: string
   rtl: boolean
+  dateFnsLocale?: Locale
 }
 
 export type SupportedLocales = "en" | "fr" | "pseudo-LOCALE"
 export const defaultLocale: SupportedLocales = "en"
-
-// date-fns
-export const enLocale: Locale = enUS
-export const frLocale: Locale = frCA
 
 export const languages: Language[] = [
   {
@@ -24,6 +21,7 @@ export const languages: Language[] = [
     territory: "US",
     flag: "🇺🇸",
     rtl: false,
+    dateFnsLocale: enUS,
   },
   {
     locale: "fr",
@@ -31,6 +29,7 @@ export const languages: Language[] = [
     territory: "CA",
     flag: "🇨🇦",
     rtl: false,
+    dateFnsLocale: frCA,
   },
 ]
 
@@ -42,4 +41,9 @@ if (process.env.NODE_ENV !== "production") {
     flag: "🔤",
     rtl: true,
   })
+}
+
+export const getDateFnsLocale = (locale: string): Locale => {
+  const language: Language | undefined = languages.find((language: Language) => language.locale === locale)
+  return language?.dateFnsLocale || enUS
 }

@@ -1,6 +1,7 @@
 "use client"
 
 import { ReactNode, useEffect } from "react"
+import { useSearchParams } from "next/navigation"
 import Room from "@/components/game/Room"
 import Table from "@/components/game/Table"
 import { authClient } from "@/lib/auth-client"
@@ -8,15 +9,25 @@ import { useAppDispatch, useAppSelector } from "@/lib/hooks"
 import { destroySocket, initSocket } from "@/redux/features/socket-slice"
 import { AppDispatch, RootState } from "@/redux/store"
 
-type TowersPageContentProps = {
-  roomId: string
-  tableId: string
-}
+export default function TowersPageContent(): ReactNode {
+  const searchParams = useSearchParams()
+  const dispatch: AppDispatch = useAppDispatch()
 
-export default function TowersPageContent({ roomId, tableId }: TowersPageContentProps): ReactNode {
+  const roomId: string | null = searchParams.get("room")
+  const tableId: string | null = searchParams.get("table")
+
+  if (!roomId) {
+    throw new Error("Room ID is required")
+  }
+
   const { data: session } = authClient.useSession()
   const isConnected: boolean = useAppSelector((state: RootState) => state.socket.isConnected)
-  const dispatch: AppDispatch = useAppDispatch()
+
+  const connectToSocket = (): void => {
+    if (session && !isConnected) {
+      dispatch(initSocket({ session }))
+    }
+  }
 
   useEffect(() => {
     const handleOnline = (): void => {
@@ -42,11 +53,5 @@ export default function TowersPageContent({ roomId, tableId }: TowersPageContent
     connectToSocket()
   }, [session, isConnected])
 
-  const connectToSocket = (): void => {
-    if (session && !isConnected) {
-      dispatch(initSocket({ session }))
-    }
-  }
-
-  return <>{tableId ? <Table roomId={roomId} tableId={tableId} /> : <Room roomId={roomId} />}</>
+  return <>{tableId ? <Table /> : <Room />}</>
 }

@@ -1,0 +1,134 @@
+model TowersRoom {
+  id           String                  @id @default(cuid(2))
+  name         String                  @unique
+  difficulty   RoomLevel               @default(SOCIAL)
+  full         Boolean                 @default(false)
+  chatMessages TowersRoomChatMessage[]
+  userRooms    TowersUserRoom[]
+  tables       TowersTable[]
+  userTables   TowersUserTable[]
+  games        TowersGame[]
+  createdAt    DateTime                @default(now())
+  updatedAt    DateTime                @updatedAt
+}
+
+model TowersRoomChatMessage {
+  id            String            @id @default(cuid(2))
+  roomId        String
+  room          TowersRoom        @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  userProfileId String
+  userProfile   TowersUserProfile @relation(fields: [userProfileId], references: [id], onDelete: Cascade)
+  message       String
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+}
+
+model TowersTable {
+  id           String                   @id @default(cuid(2))
+  roomId       String
+  room         TowersRoom               @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  tableNumber  Int
+  hostId       String
+  host         TowersUserProfile        @relation("TableHost", fields: [hostId], references: [id])
+  tableType    TableType                @default(PUBLIC)
+  rated        Boolean                  @default(true)
+  chatMessages TowersTableChatMessage[]
+  userTables   TowersUserTable[]
+  userBoots    TowersTableUserBoot[]
+  games        TowersGame[]
+  createdAt    DateTime                 @default(now())
+  updatedAt    DateTime                 @updatedAt
+
+  @@unique([roomId, tableNumber])
+}
+
+model TowersTableChatMessage {
+  id               String               @id @default(cuid(2))
+  tableId          String
+  table            TowersTable          @relation(fields: [tableId], references: [id], onDelete: Cascade)
+  userProfileId    String
+  userProfile      TowersUserProfile    @relation(fields: [userProfileId], references: [id], onDelete: Cascade)
+  message          String?
+  messageVariables Json?
+  type             TableChatMessageType @default(CHAT)
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+}
+
+model TowersTableUserBoot {
+  id                    String            @id @default(cuid(2))
+  userProfileId         String
+  userProfile           TowersUserProfile @relation(name: "BootedUser", fields: [userProfileId], references: [id], onDelete: Cascade)
+  bootedByUserProfileId String
+  bootedByUserProfile   TowersUserProfile @relation(name: "BootedBy", fields: [bootedByUserProfileId], references: [id], onDelete: Cascade)
+  tableId               String
+  table                 TowersTable       @relation(fields: [tableId], references: [id], onDelete: Cascade)
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+}
+
+model TowersUserProfile {
+  id                String                   @id @default(cuid(2))
+  userId            String                   @unique
+  user              User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rating            Int                      @default(0)
+  gamesCompleted    Int                      @default(0)
+  wins              Int                      @default(0)
+  loses             Int                      @default(0)
+  streak            Int                      @default(0)
+  controls          Json
+  userRooms         TowersUserRoom[]
+  roomChatMessages  TowersRoomChatMessage[]
+  userTables        TowersUserTable[]
+  hostedTables      TowersTable[]            @relation("TableHost")
+  tableChatMessages TowersTableChatMessage[]
+  tableUserBooted   TowersTableUserBoot[]    @relation("BootedUser")
+  tableUserBootedBy TowersTableUserBoot[]    @relation("BootedBy")
+  createdAt         DateTime                 @default(now())
+  updatedAt         DateTime                 @updatedAt
+}
+
+model TowersUserRoom {
+  id            String            @id @default(cuid(2))
+  userProfileId String
+  userProfile   TowersUserProfile @relation(fields: [userProfileId], references: [id], onDelete: Cascade)
+  roomId        String
+  room          TowersRoom?       @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  tables        TowersUserTable[]
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  @@unique([userProfileId, roomId])
+}
+
+model TowersUserTable {
+  id            String            @id @default(cuid(2))
+  userProfileId String
+  userProfile   TowersUserProfile @relation(fields: [userProfileId], references: [id], onDelete: Cascade)
+  roomId        String
+  room          TowersRoom?       @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  tableId       String
+  table         TowersTable?      @relation(fields: [tableId], references: [id], onDelete: Cascade)
+  seatNumber    Int?
+  userRoomId    String?
+  userRoom      TowersUserRoom?   @relation(fields: [userRoomId], references: [id], onDelete: Cascade)
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  @@unique([userProfileId, tableId])
+  @@unique([tableId, seatNumber])
+}
+
+model TowersGame {
+  id        String      @id @default(cuid(2))
+  roomId    String
+  room      TowersRoom  @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  tableId   String
+  table     TowersTable @relation(fields: [tableId], references: [id], onDelete: Cascade)
+  state     Json // Store game state (blocks, scores, etc.)
+  startedAt DateTime    @default(now())
+  endedAt   DateTime?
+  winnerId  String?
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+}

@@ -9,7 +9,7 @@ import { LinguiClientProvider } from "@/app/[locale]/lingui-client-provider"
 import { allMessages } from "@/app/app-router-i18n"
 import { initLingui } from "@/app/init-lingui"
 import { StoreProvider } from "@/app/store-provider"
-import { APP_CONFIG } from "@/constants/app"
+import { APP_CONFIG, APP_COOKIES } from "@/constants/app"
 import { Language, languages } from "@/translations/languages"
 import "../globals.scss"
 
@@ -60,7 +60,7 @@ export default async function RootLayout({ children, params }: Readonly<RootLayo
       <body className={inter.className}>
         <ThemeProvider
           attribute="class"
-          storageKey="towers.theme"
+          storageKey={APP_COOKIES.THEME}
           enableSystem
           defaultTheme="system"
           forcedTheme="light"

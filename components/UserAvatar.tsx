@@ -2,22 +2,29 @@
 
 import { ReactNode } from "react"
 import Image from "next/image"
-import { Trans, useLingui } from "@lingui/react/macro"
-import { authClient } from "@/lib/auth-client"
+import { useLingui } from "@lingui/react/macro"
+import clsx from "clsx/lite"
+import { Session } from "@/lib/auth-client"
 
-export default function UserAvatar(): ReactNode {
-  const { data: session, isPending } = authClient.useSession()
+type UserAvatarProps = {
+  user: Session["user"] | undefined | null
+  isLoading?: boolean
+  className?: string
+  size?: number
+}
+
+export default function UserAvatar({ user, isLoading, className, size = 40 }: UserAvatarProps): ReactNode {
   const { t } = useLingui()
-  const username: string | undefined = session?.user.username
+  const username: string | undefined = user?.username
 
-  if (!session || isPending) {
+  if (isLoading || !user) {
     return (
-      <div className="w-10 h-10 rounded-md bg-zinc-400">
+      <div className={clsx("flex w-10 h-10 rounded-md bg-zinc-400", className)}>
         <Image
           className="rounded-md"
           src="https://placehold.co/40x40.png?text=?"
-          width={40}
-          height={40}
+          width={size}
+          height={size}
           priority
           alt={t({ message: "Avatar placeholder" })}
         />
@@ -26,14 +33,14 @@ export default function UserAvatar(): ReactNode {
   }
 
   return (
-    <div className="w-10 h-10 rounded-md bg-zinc-400">
+    <div className={clsx("flex w-10 h-10 rounded-md bg-zinc-400", className)}>
       <Image
         className="rounded-md"
-        src={session?.user?.image ?? "https://placehold.co/40x40.png?text=?"}
-        width={40}
-        height={40}
+        src={user?.image ?? "https://placehold.co/40x40.png?text=?"}
+        width={size}
+        height={size}
         priority
-        alt={session?.user?.image ? t({ message: `${username}’s avatar` }) : t({ message: "Avatar placeholder" })}
+        alt={user?.image ? t({ message: `${username}’s avatar` }) : t({ message: "Avatar placeholder" })}
       />
     </div>
   )

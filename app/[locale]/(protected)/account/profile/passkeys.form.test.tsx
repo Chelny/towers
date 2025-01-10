@@ -4,7 +4,7 @@ import { Passkey } from "better-auth/plugins/passkey"
 import { Mock } from "vitest"
 import { PasskeysForm } from "@/app/[locale]/(protected)/account/profile/passkeys.form"
 import { authClient } from "@/lib/auth-client"
-import { mockSession } from "@/test/data/users"
+import { mockSession } from "@/test/data/session"
 
 vi.mock("@/lib/auth-client", () => ({
   authClient: {

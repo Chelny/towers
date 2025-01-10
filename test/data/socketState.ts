@@ -3,15 +3,16 @@ import {
   ITowersRoomChatMessage,
   ITowersTable,
   ITowersTableChatMessage,
-  ITowersUserRoomTable,
+  ITowersUserProfile,
 } from "@prisma/client"
-import { SocketState } from "@/interfaces/socket"
+import { SocketState, TowersRoomState, TowersRoomTableState, TowersState, TowersTableState } from "@/interfaces/socket"
 import { SidebarState } from "@/redux/features/sidebar-slice"
 import { mockRoom1, mockRoom2, mockRoom3 } from "@/test/data/rooms"
 import { mockRoom1Table1, mockRoom1Table2, mockRoom1Table3 } from "@/test/data/tables"
 import { mockRoom1TowersRoomChatMessage1, mockRoom1TowersRoomChatMessage2 } from "@/test/data/towersRoomChatMessages"
 import {
   mockRoom1Table1TowersChatMessage1,
+  mockRoom1Table1TowersChatMessage10,
   mockRoom1Table1TowersChatMessage2,
   mockRoom1Table1TowersChatMessage3,
   mockRoom1Table1TowersChatMessage4,
@@ -29,12 +30,12 @@ import {
   mockRoom1Table1TowersUserProfile5,
 } from "@/test/data/towersUserProfiles"
 import {
-  mockRoom1Table1TowersUserRoomTable1,
-  mockRoom1Table1TowersUserRoomTable2,
-  mockRoom1Table1TowersUserRoomTable3,
-  mockRoom1Table1TowersUserRoomTable4,
-  mockRoom1Table1TowersUserRoomTable5,
-} from "@/test/data/towersUserRoomTables"
+  mockRoom1Table1TowersUserTable1,
+  mockRoom1Table1TowersUserTable2,
+  mockRoom1Table1TowersUserTable3,
+  mockRoom1Table1TowersUserTable4,
+  mockRoom1Table1TowersUserTable5,
+} from "@/test/data/towersUserTables"
 import { mockUser1, mockUser2, mockUser3, mockUser4, mockUser5 } from "@/test/data/users"
 
 /**
@@ -60,46 +61,40 @@ const mockRoom1Chat: ITowersRoomChatMessage[] = [
   },
 ]
 
-const mockRoom1Users: ITowersUserRoomTable[] = [
+const mockRoom1Users: ITowersUserProfile[] = [
   {
-    ...mockRoom1Table1TowersUserRoomTable1,
-    userProfile: {
-      ...mockRoom1Table1TowersUserProfile1,
-      user: mockUser1,
-    },
-    table: mockRoom1Table1,
+    ...mockRoom1Table1TowersUserProfile1,
+    user: mockUser1,
+    // userTables: [
+    //   {
+    //     ...mockRoom1Table1TowersUserTable1,
+    //     userProfile: {
+    //       ...mockRoom1Table1TowersUserProfile1,
+    //       user: mockUser1,
+    //     },
+    //     table:
+    //   },
+    // ],
   },
   {
-    ...mockRoom1Table1TowersUserRoomTable2,
-    userProfile: {
-      ...mockRoom1Table1TowersUserProfile2,
-      user: mockUser2,
-    },
-    table: mockRoom1Table1,
+    ...mockRoom1Table1TowersUserProfile2,
+    user: mockUser2,
+    // userTables: [mockRoom1Table1TowersUserTable2],
   },
   {
-    ...mockRoom1Table1TowersUserRoomTable3,
-    userProfile: {
-      ...mockRoom1Table1TowersUserProfile3,
-      user: mockUser3,
-    },
-    table: mockRoom1Table1,
+    ...mockRoom1Table1TowersUserProfile3,
+    user: mockUser3,
+    // userTables: [mockRoom1Table1TowersUserTable3],
   },
   {
-    ...mockRoom1Table1TowersUserRoomTable4,
-    userProfile: {
-      ...mockRoom1Table1TowersUserProfile4,
-      user: mockUser4,
-    },
-    table: mockRoom1Table2,
+    ...mockRoom1Table1TowersUserProfile4,
+    user: mockUser4,
+    // userTables: [mockRoom1Table1TowersUserTable4],
   },
   {
-    ...mockRoom1Table1TowersUserRoomTable5,
-    userProfile: {
-      ...mockRoom1Table1TowersUserProfile5,
-      user: mockUser5,
-    },
-    table: mockRoom1Table3,
+    ...mockRoom1Table1TowersUserProfile5,
+    user: mockUser5,
+    // userTables: [mockRoom1Table1TowersUserTable5],
   },
 ]
 
@@ -109,10 +104,37 @@ const mockRoom1Users: ITowersUserRoomTable[] = [
 
 const mockRoom1Table1Info: ITowersTable = {
   ...mockRoom1Table1,
+  room: mockRoom1,
   host: {
     ...mockRoom1Table1TowersUserProfile1,
     user: mockUser1,
   },
+  userTables: [
+    {
+      ...mockRoom1Table1TowersUserTable1,
+      userProfile: {
+        ...mockRoom1Table1TowersUserProfile1,
+        user: mockUser1,
+      },
+      table: mockRoom1Table1,
+    },
+    {
+      ...mockRoom1Table1TowersUserTable2,
+      userProfile: {
+        ...mockRoom1Table1TowersUserProfile2,
+        user: mockUser2,
+      },
+      table: mockRoom1Table1,
+    },
+    {
+      ...mockRoom1Table1TowersUserTable3,
+      userProfile: {
+        ...mockRoom1Table1TowersUserProfile3,
+        user: mockUser3,
+      },
+      table: mockRoom1Table1,
+    },
+  ],
 }
 
 const mockRoom1Table1Chat: ITowersTableChatMessage[] = [
@@ -179,32 +201,27 @@ const mockRoom1Table1Chat: ITowersTableChatMessage[] = [
       user: mockUser1,
     },
   },
-]
-
-const mockRoom1Table1Users: ITowersUserRoomTable[] = [
   {
-    ...mockRoom1Table1TowersUserRoomTable1,
+    ...mockRoom1Table1TowersChatMessage10,
     userProfile: {
       ...mockRoom1Table1TowersUserProfile1,
       user: mockUser1,
     },
-    table: mockRoom1Table1,
+  },
+]
+
+const mockRoom1Table1Users: ITowersUserProfile[] = [
+  {
+    ...mockRoom1Table1TowersUserProfile1,
+    user: mockUser1,
   },
   {
-    ...mockRoom1Table1TowersUserRoomTable2,
-    userProfile: {
-      ...mockRoom1Table1TowersUserProfile2,
-      user: mockUser2,
-    },
-    table: mockRoom1Table1,
+    ...mockRoom1Table1TowersUserProfile2,
+    user: mockUser2,
   },
   {
-    ...mockRoom1Table1TowersUserRoomTable3,
-    userProfile: {
-      ...mockRoom1Table1TowersUserProfile3,
-      user: mockUser3,
-    },
-    table: mockRoom1Table1,
+    ...mockRoom1Table1TowersUserProfile3,
+    user: mockUser3,
   },
 ]
 
@@ -215,7 +232,10 @@ const mockRoom1Table1Users: ITowersUserRoomTable[] = [
 export const mockSocketInitialState: SocketState = {
   isConnected: false,
   isLoading: false,
-  towers: {},
+  towers: {
+    rooms: {},
+    tables: {},
+  },
   errorMessage: null,
 }
 
@@ -231,51 +251,55 @@ export const mockSocketState: SocketState = {
   isConnected: true,
   isLoading: false,
   towers: {
-    [mockSocketRoom1Id]: {
-      isJoined: false,
-      info: mockRoom1Info,
-      isInfoLoading: false,
-      chat: mockRoom1Chat,
-      isChatLoading: false,
-      users: mockRoom1Users,
-      isUsersLoading: false,
-      tables: {
-        [mockSocketRoom1Table1Id]: {
-          isJoined: false,
-          info: mockRoom1Table1Info,
-          isInfoLoading: false,
-          chat: mockRoom1Table1Chat,
-          isChatLoading: false,
-          users: mockRoom1Table1Users,
-          isUsersLoading: false,
-          errorMessage: null,
+    rooms: {
+      [mockSocketRoom1Id]: {
+        info: mockRoom1Info,
+        isInfoLoading: false,
+        chat: mockRoom1Chat,
+        isChatLoading: false,
+        users: mockRoom1Users,
+        isUsersLoading: false,
+        tables: {
+          [mockSocketRoom1Table1Id]: {
+            info: mockRoom1Table1Info,
+            users: mockRoom1Table1Users,
+          },
         },
-        // [mockSocketRoom1Table2Id]: {},
-        // [mockSocketRoom1Table3Id]: {},
+        isTablesLoading: false,
+        errorMessage: null,
       },
-      isTablesLoading: false,
-      errorMessage: null,
+    },
+    tables: {
+      [mockSocketRoom1Table1Id]: {
+        info: mockRoom1Table1Info,
+        isInfoLoading: false,
+        chat: mockRoom1Table1Chat,
+        isChatLoading: false,
+        users: mockRoom1Table1Users,
+        isUsersLoading: false,
+        errorMessage: null,
+      },
     },
   },
   errorMessage: null,
 }
 
-export const mockTowers = mockSocketState.towers
+export const mockTowers: TowersState = mockSocketState.towers
 
-export const mockTowersRoomState1 = mockSocketState.towers[mockSocketRoom1Id]
-export const mockTowersRoomState1IsJoined = mockSocketState.towers[mockSocketRoom1Id].isJoined
-export const mockTowersRoomState1Info = mockSocketState.towers[mockSocketRoom1Id].info
-export const mockTowersRoomState1Chat = mockSocketState.towers[mockSocketRoom1Id].chat
-export const mockTowersRoomState1Users = mockSocketState.towers[mockSocketRoom1Id].users
-export const mockTowersRoomState1Tables = mockSocketState.towers[mockSocketRoom1Id].tables
+export const mockTowersRoomState1: TowersRoomState = mockSocketState.towers.rooms[mockSocketRoom1Id]
+export const mockTowersRoomState1Info: ITowersRoom | null = mockSocketState.towers.rooms[mockSocketRoom1Id].info
+export const mockTowersRoomState1Chat: ITowersRoomChatMessage[] = mockSocketState.towers.rooms[mockSocketRoom1Id].chat
+export const mockTowersRoomState1Users: ITowersUserProfile[] = mockSocketState.towers.rooms[mockSocketRoom1Id].users
+export const mockTowersRoomState1Tables: Record<string, TowersRoomTableState> =
+  mockSocketState.towers.rooms[mockSocketRoom1Id].tables
 
-export const mockTowersTableState11 = mockSocketState.towers[mockSocketRoom1Id].tables[mockSocketRoom1Table1Id]
-export const mockTowersTableState11IsJoined =
-  mockSocketState.towers[mockSocketRoom1Id].tables[mockSocketRoom1Table1Id].isJoined
-export const mockTowersTableState11Info = mockSocketState.towers[mockSocketRoom1Id].tables[mockSocketRoom1Table1Id].info
-export const mockTowersTableState11Chat = mockSocketState.towers[mockSocketRoom1Id].tables[mockSocketRoom1Table1Id].chat
-export const mockTowersTableState11Users =
-  mockSocketState.towers[mockSocketRoom1Id].tables[mockSocketRoom1Table1Id].users
+export const mockTowersTableState11: TowersTableState = mockSocketState.towers.tables[mockSocketRoom1Table1Id]
+export const mockTowersTableState11Info: ITowersTable | null =
+  mockSocketState.towers.tables[mockSocketRoom1Table1Id].info
+export const mockTowersTableState11Chat: ITowersTableChatMessage[] =
+  mockSocketState.towers.tables[mockSocketRoom1Table1Id].chat
+export const mockTowersTableState11Users: ITowersUserProfile[] =
+  mockSocketState.towers.tables[mockSocketRoom1Table1Id].users
 
 /**
  * Redux States

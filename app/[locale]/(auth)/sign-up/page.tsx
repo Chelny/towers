@@ -25,7 +25,7 @@ export default async function SignUp({ params }: SignUpProps): Promise<ReactNode
   return (
     <>
       <h1 className="mb-4 text-3xl">{i18n._(ROUTE_SIGN_UP.TITLE)}</h1>
-      <SignUpForm />
+      <SignUpForm locale={routeParams.locale} />
     </>
   )
 }

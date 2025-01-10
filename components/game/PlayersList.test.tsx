@@ -1,10 +1,10 @@
-import { ITowersUserRoomTable } from "@prisma/client"
+import { ITowersUserProfile } from "@prisma/client"
 import { fireEvent, render, screen } from "@testing-library/react"
 import { Mock } from "vitest"
 import PlayersList from "@/components/game/PlayersList"
 import { authClient } from "@/lib/auth-client"
+import { mockSession } from "@/test/data/session"
 import { mockTowersRoomState1Users } from "@/test/data/socketState"
-import { mockSession } from "@/test/data/users"
 
 vi.mock("@/lib/auth-client", () => ({
   authClient: {
@@ -14,8 +14,8 @@ vi.mock("@/lib/auth-client", () => ({
 
 describe("PlayersList Component", () => {
   const handleSelectedPlayer: Mock = vi.fn()
-  const players: ITowersUserRoomTable[] = mockTowersRoomState1Users
-  const player1: ITowersUserRoomTable = mockTowersRoomState1Users[0]
+  const players: ITowersUserProfile[] = mockTowersRoomState1Users
+  const player1: ITowersUserProfile = mockTowersRoomState1Users[0]
 
   beforeAll(() => {
     HTMLDialogElement.prototype.showModal = vi.fn()
@@ -26,31 +26,31 @@ describe("PlayersList Component", () => {
   it("should render the players list correctly", () => {
     render(<PlayersList users={players} onSelectedPlayer={handleSelectedPlayer} />)
 
-    players.forEach((player: ITowersUserRoomTable) => {
-      expect(screen.getByText(player.userProfile?.user?.username!)).toBeInTheDocument()
+    players.forEach((player: ITowersUserProfile) => {
+      expect(screen.getByText(player.user?.username!)).toBeInTheDocument()
     })
   })
 
   it("should sort players by name in ascending and descending order", () => {
     render(<PlayersList users={players} onSelectedPlayer={handleSelectedPlayer} />)
 
-    players.forEach((player: ITowersUserRoomTable) => {
+    players.forEach((player: ITowersUserProfile) => {
       fireEvent.click(screen.getByText("Name"))
-      expect(screen.getByText(player.userProfile?.user?.username!)).toBeInTheDocument()
+      expect(screen.getByText(player.user?.username!)).toBeInTheDocument()
     })
   })
 
   it("should call onSelectedPlayer when a player row is clicked", () => {
     render(<PlayersList users={players} onSelectedPlayer={handleSelectedPlayer} />)
 
-    fireEvent.click(screen.getByText(players[0].userProfile?.user?.username!))
+    fireEvent.click(screen.getByText(players[0].user?.username!))
     expect(handleSelectedPlayer).toHaveBeenCalledWith(player1.id)
   })
 
   it("should open the PlayerInformation modal when a player row is double-clicked", () => {
     render(<PlayersList users={players} onSelectedPlayer={handleSelectedPlayer} />)
 
-    fireEvent.doubleClick(screen.getByText(players[0].userProfile?.user?.username!))
+    fireEvent.doubleClick(screen.getByText(players[0].user?.username!))
     expect(screen.getByTestId("player-information-modal")).toBeInTheDocument()
   })
 })

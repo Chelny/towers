@@ -3,47 +3,40 @@
 import { ReactNode } from "react"
 import { useRouter } from "next/navigation"
 import { Trans } from "@lingui/react/macro"
-import { ITowersTable, ITowersUserRoomTable, TableType } from "@prisma/client"
+import { ITowersUserProfile, ITowersUserTableWithRelations, TableType } from "@prisma/client"
 import Button from "@/components/ui/Button"
 import { ROUTE_TOWERS } from "@/constants/routes"
-import { useAppSelector } from "@/lib/hooks"
-import { selectIsRoomTablesLoading, selectTableInfo, selectTableUsers } from "@/redux/selectors/socket-selectors"
-import { RootState } from "@/redux/store"
+import { TowersRoomTableState } from "@/interfaces/socket"
 
 type RoomTableProps = {
-  roomId: string
-  tableId: string
+  table: TowersRoomTableState
+  isTablesLoading: boolean
 }
 
-export default function RoomTable({ roomId, tableId }: RoomTableProps): ReactNode {
+export default function RoomTable({ table, isTablesLoading = true }: RoomTableProps): ReactNode {
   const router = useRouter()
-  const isRoomTablesLoading: boolean = useAppSelector((state: RootState) => selectIsRoomTablesLoading(state, roomId))
-  const tableInfo: ITowersTable | null = useAppSelector((state: RootState) => selectTableInfo(state, roomId, tableId))
-  const tableUsers: ITowersUserRoomTable[] = useAppSelector((state: RootState) =>
-    selectTableUsers(state, roomId, tableId),
-  )
   const seatMapping: number[][] = [
     [1, 3, 5, 7],
     [2, 4, 6, 8],
   ]
-  const hostUsername: string | undefined = tableInfo?.host?.user?.username
+  const hostUsername: string | undefined = table?.info?.host?.user?.username
 
   const handleJoinTable = (): void => {
-    router.push(`${ROUTE_TOWERS.PATH}?room=${tableInfo?.roomId}&table=${tableInfo?.id}`)
+    router.push(`${ROUTE_TOWERS.PATH}?room=${table?.info?.roomId}&table=${table?.info?.id}`)
   }
 
   return (
     <div className="flex flex-col">
       <div className="flex items-center border-b border-b-gray-300">
         <div className="basis-16 row-span-2 flex justify-center items-center h-full px-2 border-gray-300">
-          #{tableInfo?.tableNumber}
+          #{table?.info?.tableNumber}
         </div>
         <div className="flex-1 flex flex-col gap-1 h-full px-2 border-s border-gray-300 divide-y divide-gray-200">
           <div className="flex flex-1 gap-1 pt-3 pb-2">
             <div className="basis-28 border-gray-300">
               <Button
                 className="w-full h-full"
-                disabled={isRoomTablesLoading || tableInfo?.tableType === TableType.PRIVATE}
+                disabled={isTablesLoading || table?.info?.tableType === TableType.PRIVATE}
                 onClick={() => handleJoinTable()}
               >
                 <Trans>Watch</Trans>
@@ -53,24 +46,28 @@ export default function RoomTable({ roomId, tableId }: RoomTableProps): ReactNod
               {seatMapping.map((row: number[], rowIndex: number) => (
                 <div key={rowIndex} className="flex flex-row gap-1">
                   {row.map((seatNumber: number, colIndex: number) => {
-                    const userRoomTable: ITowersUserRoomTable | undefined = tableUsers?.find(
-                      (userRoomTable: ITowersUserRoomTable) => userRoomTable.seatNumber === seatNumber,
+                    const seatedUser: ITowersUserProfile | undefined = table?.users?.find(
+                      (userProfile: ITowersUserProfile) =>
+                        userProfile.userTables?.some(
+                          (userTable: ITowersUserTableWithRelations) => userTable.seatNumber === seatNumber,
+                        ),
                     )
-                    return userRoomTable?.userProfile?.user ? (
+
+                    return seatedUser ? (
                       <div
                         key={colIndex}
                         className="flex items-center justify-center w-28 p-1 border border-gray-300 rounded"
                       >
-                        <span className="truncate">{userRoomTable.userProfile?.user?.username}</span>
+                        <span className="truncate">{seatedUser.user?.username}</span>
                       </div>
                     ) : (
                       <Button
                         key={colIndex}
                         className="w-28"
                         disabled={
-                          isRoomTablesLoading ||
-                          tableInfo?.tableType === TableType.PROTECTED ||
-                          tableInfo?.tableType === TableType.PRIVATE
+                          isTablesLoading ||
+                          table?.info?.tableType === TableType.PROTECTED ||
+                          table?.info?.tableType === TableType.PRIVATE
                         }
                         onClick={() => handleJoinTable()}
                       >
@@ -83,14 +80,18 @@ export default function RoomTable({ roomId, tableId }: RoomTableProps): ReactNod
             </div>
             <div className="flex-1 px-2 line-clamp-3">
               {/* List non-seated players by username, separated by commas */}
-              {tableUsers
-                ?.filter((userRoomTable: ITowersUserRoomTable) => !userRoomTable.seatNumber)
-                .map((userRoomTable: ITowersUserRoomTable) => userRoomTable.userProfile?.user?.username)
+              {table?.users
+                ?.filter((towersUserProfile: ITowersUserProfile) =>
+                  towersUserProfile.userTables?.some(
+                    (userTable: ITowersUserTableWithRelations) => !userTable.seatNumber,
+                  ),
+                )
+                .map((towersUserProfile: ITowersUserProfile) => towersUserProfile.user?.username)
                 .join(", ")}
             </div>
           </div>
           <div className="flex py-1 text-sm">
-            {tableInfo?.rated && (
+            {table?.info?.rated && (
               <span>
                 <Trans>Option: rated</Trans>&nbsp;-&nbsp;
               </span>

@@ -3,36 +3,44 @@ import {
   ITowersRoomChatMessage,
   ITowersTable,
   ITowersTableChatMessage,
-  ITowersUserRoomTable,
+  ITowersUserProfile,
 } from "@prisma/client"
 
 export interface SocketState {
   isConnected: boolean
+  towers: TowersState
   isLoading: boolean
-  towers: Record<string, TowersRoomState>
   errorMessage: string | null
 }
 
+export interface TowersState {
+  rooms: Record<string, TowersRoomState>
+  tables: Record<string, TowersTableState>
+}
+
 export interface TowersRoomState {
-  isJoined: boolean
   info: ITowersRoom | null
   isInfoLoading: boolean
   chat: ITowersRoomChatMessage[]
   isChatLoading: boolean
-  users: ITowersUserRoomTable[]
+  users: ITowersUserProfile[]
   isUsersLoading: boolean
-  tables: Record<string, TowersTableState>
+  tables: Record<string, TowersRoomTableState>
   isTablesLoading: boolean
   errorMessage: string | null
 }
 
+export interface TowersRoomTableState {
+  info: ITowersTable | null
+  users: ITowersUserProfile[]
+}
+
 export interface TowersTableState {
-  isJoined: boolean
   info: ITowersTable | null
   isInfoLoading: boolean
   chat: ITowersTableChatMessage[]
   isChatLoading: boolean
-  users: ITowersUserRoomTable[]
+  users: ITowersUserProfile[]
   isUsersLoading: boolean
   errorMessage: string | null
 }

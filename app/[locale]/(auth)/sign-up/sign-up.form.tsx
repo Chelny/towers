@@ -12,10 +12,15 @@ import Calendar from "@/components/ui/Calendar"
 import Checkbox from "@/components/ui/Checkbox"
 import Input from "@/components/ui/Input"
 import { INITIAL_FORM_STATE } from "@/constants/api"
-import { REDIRECT_URI, ROUTE_PRIVACY_POLICY, ROUTE_SIGN_IN, ROUTE_TERMS_OF_SERVICE } from "@/constants/routes"
+import { CALLBACK_URL, ROUTE_PRIVACY_POLICY, ROUTE_SIGN_IN, ROUTE_TERMS_OF_SERVICE } from "@/constants/routes"
 import { authClient } from "@/lib/auth-client"
+import { SupportedLocales } from "@/translations/languages"
 
-export function SignUpForm(): ReactNode {
+type SignUpFormProps = {
+  locale: SupportedLocales
+}
+
+export function SignUpForm({ locale }: SignUpFormProps): ReactNode {
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [formState, setFormState] = useState<ApiResponse>(INITIAL_FORM_STATE)
   const { t } = useLingui()
@@ -87,7 +92,9 @@ export function SignUpForm(): ReactNode {
           username: payload.username,
           password: payload.password,
           // image: payload.image ? convertImageToBase64(payload.image) : null,
-          callbackURL: REDIRECT_URI,
+          // @ts-ignore
+          language: locale,
+          callbackURL: CALLBACK_URL,
         },
         {
           onRequest: () => {

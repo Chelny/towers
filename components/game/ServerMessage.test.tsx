@@ -4,8 +4,8 @@ import ServerMessage from "@/components/game/ServerMessage"
 import { authClient } from "@/lib/auth-client"
 import { useAppSelector } from "@/lib/hooks"
 import { RootState } from "@/redux/store"
+import { mockPendingSession, mockSession } from "@/test/data/session"
 import { mockSocketRoom1Id, mockSocketState, mockStoreReducers } from "@/test/data/socketState"
-import { mockPendingSession, mockSession } from "@/test/data/users"
 
 vi.mock("@/lib/auth-client", () => ({
   authClient: {
@@ -25,13 +25,6 @@ describe("ServerMessage Component", () => {
   afterEach(() => {
     vi.clearAllMocks()
     vi.useRealTimers()
-  })
-
-  it("should render nothing when not initialized", () => {
-    vi.mocked(authClient.useSession).mockReturnValue(mockPendingSession)
-
-    const { container } = render(<ServerMessage roomId={mockSocketRoom1Id} />)
-    expect(container.firstChild).toBeNull()
   })
 
   it("should render \"You are not logged in\" when unauthenticated and connected", () => {

@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux"
 import { Mock } from "vitest"
 import Sidebar from "@/components/Sidebar"
 import { authClient } from "@/lib/auth-client"
-import { mockSession } from "@/test/data/users"
+import { mockSession } from "@/test/data/session"
 import { mockUseRouter } from "@/vitest.setup"
 
 vi.mock("next/navigation", () => ({

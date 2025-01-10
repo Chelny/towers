@@ -2,10 +2,11 @@ import {
   ITowersRoomChatMessage,
   ITowersTable,
   ITowersTableChatMessage,
-  ITowersTableWithRelations,
-  ITowersUserRoomTable,
   TableChatMessageType,
+  TowersUserTable,
 } from "@prisma/client"
+import { ITowersUserProfile } from "@prisma/client"
+import { JsonObject } from "@prisma/client/runtime/library"
 import { ActionReducerMapBuilder, createSlice, PayloadAction } from "@reduxjs/toolkit"
 import { SocketState } from "@/interfaces/socket"
 import { Session } from "@/lib/auth-client"
@@ -14,7 +15,10 @@ import { socketExtraReducers } from "@/redux/features/socket-extra-reducers"
 const initialState: SocketState = {
   isConnected: false,
   isLoading: false,
-  towers: {},
+  towers: {
+    rooms: {},
+    tables: {},
+  },
   errorMessage: null,
 }
 
@@ -60,216 +64,367 @@ const socketSlice = createSlice({
     // * Room Actions
     // **************************************************
 
-    joinRoomSocketRoom: (
+    joinRoom: (state: SocketState, action: PayloadAction<{ roomId: string }>): void => {},
+    joinRoomSuccess: (
       state: SocketState,
-      action: PayloadAction<{ roomId: string; towersUserRoomTable: ITowersUserRoomTable }>,
-    ): void => {},
-    leaveRoomSocketRoom: (
-      state: SocketState,
-      action: PayloadAction<{ roomId: string; tablesToQuit: { id: string; isLastUser: boolean }[] }>,
-    ): void => {},
-
-    sendRoomChatMessage: (state: SocketState, action: PayloadAction<{ roomId: string; message: string }>): void => {},
-    addMessageToRoomChat: (
-      state: SocketState,
-      action: PayloadAction<{ roomId: string; message: ITowersRoomChatMessage }>,
+      action: PayloadAction<{ roomId: string; towersUserProfile: ITowersUserProfile }>,
     ): void => {
-      const { roomId, message } = action.payload
+      const { roomId, towersUserProfile } = action.payload
 
-      if (state.towers[roomId]?.chat) {
-        state.towers[roomId].chat.push(message)
+      if (!state.towers.rooms[roomId]) {
+        state.towers.rooms[roomId] = {
+          info: null,
+          isInfoLoading: false,
+          chat: [],
+          isChatLoading: false,
+          users: [],
+          isUsersLoading: false,
+          tables: {},
+          isTablesLoading: false,
+          errorMessage: null,
+        }
       }
-    },
 
-    addUserToRoom: (
-      state: SocketState,
-      action: PayloadAction<{ roomId: string; towersUserRoomTable: ITowersUserRoomTable }>,
-    ): void => {
-      const { roomId, towersUserRoomTable } = action.payload
-
-      if (state.towers[roomId]?.users) {
-        const roomUserIndex: number = state.towers[roomId].users.findIndex(
-          (user: ITowersUserRoomTable) => user.userProfileId === towersUserRoomTable.userProfileId,
+      if (!state.towers.rooms[roomId].users || state.towers.rooms[roomId].users?.length === 0) {
+        state.towers.rooms[roomId].users = [towersUserProfile]
+      } else {
+        const roomUserIndex: number = state.towers.rooms[roomId].users.findIndex(
+          (userProfile: ITowersUserProfile) => userProfile.id === towersUserProfile.id,
         )
 
         if (roomUserIndex !== -1) {
-          state.towers[roomId].users[roomUserIndex] = towersUserRoomTable
+          state.towers.rooms[roomId].users[roomUserIndex] = towersUserProfile
         } else {
-          state.towers[roomId].users.push(towersUserRoomTable)
+          state.towers.rooms[roomId].users.push(towersUserProfile)
         }
       }
     },
-    updateUsers: (
-      state: SocketState,
-      action: PayloadAction<{ roomId: string; users: ITowersUserRoomTable[] }>,
-    ): void => {},
-    updateUsersInRoom: (
-      state: SocketState,
-      action: PayloadAction<{ roomId: string; users: ITowersUserRoomTable[] }>,
-    ): void => {
-      const { roomId, users } = action.payload
 
-      if (state.towers[roomId]) {
-        state.towers[roomId].users = [...(state.towers[roomId].users ?? []), ...(users ?? [])]
-          .sort(
-            (a: ITowersUserRoomTable, b: ITowersUserRoomTable) =>
-              new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
-          )
-          .filter(
-            (user: ITowersUserRoomTable, index: number, users: ITowersUserRoomTable[]) =>
-              index === users.findIndex((u: ITowersUserRoomTable) => u?.userProfileId === user?.userProfileId),
-          )
-      }
-    },
-    removeUserFromRoom: (state: SocketState, action: PayloadAction<{ roomId: string; userId: string }>): void => {
+    leaveRoom: (state: SocketState, action: PayloadAction<{ roomId: string }>): void => {},
+    leaveRoomSuccess: (state: SocketState, action: PayloadAction<{ roomId: string; userId: string }>): void => {
       const { roomId, userId } = action.payload
 
-      if (state.towers[roomId]?.users) {
-        state.towers[roomId].users = state.towers[roomId].users.filter(
-          (towersUserRoomTable: ITowersUserRoomTable) => towersUserRoomTable.userProfile?.userId !== userId,
+      if (!state.towers.rooms[roomId]) return
+
+      if (state.towers.rooms[roomId].users) {
+        state.towers.rooms[roomId].users = state.towers.rooms[roomId].users.filter(
+          (towersUserProfile: ITowersUserProfile) => towersUserProfile.userId !== userId,
         )
+      }
+    },
+    removeRoomSelf: (state: SocketState, action: PayloadAction<{ roomId: string }>): void => {
+      const { roomId } = action.payload
+
+      if (state.towers.rooms[roomId]) {
+        delete state.towers.rooms[roomId]
+      }
+    },
+
+    updateRoomUser: (
+      state: SocketState,
+      action: PayloadAction<{ roomId: string; towersUserProfile: ITowersUserProfile }>,
+    ): void => {
+      const { roomId, towersUserProfile } = action.payload
+
+      if (!state.towers.rooms[roomId]) return
+
+      if (state.towers.rooms[roomId].users) {
+        const towersUserProfileIndex: number = state.towers.rooms[roomId].users.findIndex(
+          (userProfile: ITowersUserProfile) => userProfile.id !== towersUserProfile.id,
+        )
+
+        if (towersUserProfileIndex !== -1) {
+          state.towers.rooms[roomId].users[towersUserProfileIndex] = towersUserProfile
+        }
+      }
+    },
+
+    addChatMessageToRoom: (state: SocketState, action: PayloadAction<{ roomId: string; message: string }>): void => {},
+    addChatMessageToRoomSuccess: (
+      state: SocketState,
+      action: PayloadAction<{ roomId: string; chatMessage: ITowersRoomChatMessage }>,
+    ): void => {
+      const { roomId, chatMessage } = action.payload
+
+      if (!state.towers.rooms[roomId]) return
+
+      if (!state.towers.rooms[roomId]?.chat) {
+        state.towers.rooms[roomId].chat = [chatMessage]
+      } else {
+        const chatMessages: ITowersRoomChatMessage[] = state.towers.rooms[roomId].chat
+
+        if (chatMessages) {
+          const isDuplicate: boolean = chatMessages.some(
+            (message: ITowersRoomChatMessage) => message.id === chatMessage.id,
+          )
+          if (!isDuplicate) chatMessages.push(chatMessage)
+        }
+      }
+    },
+
+    addTableToRoom: (state: SocketState, action: PayloadAction<{ roomId: string; table: ITowersTable }>): void => {},
+    addTableToRoomSuccess: (
+      state: SocketState,
+      action: PayloadAction<{ roomId: string; table: ITowersTable }>,
+    ): void => {
+      const { roomId, table } = action.payload
+
+      if (!state.towers.rooms[roomId]) return
+
+      if (!state.towers.rooms[roomId].tables) {
+        state.towers.rooms[roomId].tables = {
+          [table.id]: { info: table, users: [] },
+        }
+      } else {
+        state.towers.rooms[roomId].tables = {
+          ...state.towers.rooms[roomId].tables,
+          [table.id]: {
+            ...state.towers.rooms[roomId].tables[table.id],
+            info: table,
+          },
+        }
+      }
+    },
+    updateRoomTable: (
+      state: SocketState,
+      action: PayloadAction<{
+        roomId: string
+        tableId: string
+        table?: ITowersTable
+        towersUserProfiles?: ITowersUserProfile[]
+      }>,
+    ): void => {},
+    updateRoomTableSuccess: (
+      state: SocketState,
+      action: PayloadAction<{
+        roomId: string
+        tableId: string
+        table?: ITowersTable
+        towersUserProfiles?: ITowersUserProfile[]
+      }>,
+    ): void => {
+      const { roomId, tableId, table, towersUserProfiles } = action.payload
+
+      if (!state.towers.rooms[roomId]) return
+
+      if (!state.towers.rooms[roomId]?.tables[tableId]) {
+        state.towers.tables[tableId] = {
+          ...state.towers.tables[tableId],
+          info: table ?? null,
+          users: towersUserProfiles ?? [],
+        }
+      } else {
+        if (table) {
+          state.towers.tables[tableId].info = {
+            ...state.towers.tables[tableId].info,
+            ...table,
+          }
+        }
+
+        if (towersUserProfiles) {
+          state.towers.rooms[roomId].tables[tableId].users = [
+            ...state.towers.rooms[roomId].tables[tableId].users,
+            ...towersUserProfiles,
+          ]
+            .sort(
+              (a: ITowersUserProfile, b: ITowersUserProfile) =>
+                new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+            )
+            .filter(
+              (user: ITowersUserProfile, index: number, users: ITowersUserProfile[]) =>
+                users.findIndex((u: ITowersUserProfile) => u.id === user.id) === index,
+            )
+        }
+      }
+    },
+    removeTableFromRoom: (state: SocketState, action: PayloadAction<{ roomId: string; tableId: string }>): void => {},
+    removeTableFromRoomSuccess: (
+      state: SocketState,
+      action: PayloadAction<{ roomId: string; tableId: string }>,
+    ): void => {
+      const { roomId, tableId } = action.payload
+
+      if (!state.towers.rooms[roomId]) return
+
+      if (state.towers.rooms[roomId].tables[tableId]) {
+        delete state.towers.rooms[roomId].tables[tableId]
       }
     },
 
     roomErrorMessage: (state: SocketState, action: PayloadAction<{ roomId: string; message: string }>): void => {
       const { roomId, message } = action.payload
-      state.towers[roomId].errorMessage = message
+      state.towers.rooms[roomId].errorMessage = message
     },
 
     // **************************************************
     // * Table Actions
     // **************************************************
 
-    joinTableSocketRoom: (
+    joinTable: (state: SocketState, action: PayloadAction<{ roomId: string; tableId: string }>): void => {},
+    joinTableSuccess: (
       state: SocketState,
-      action: PayloadAction<{ roomId: string; tableId: string; towersUserRoomTable: ITowersUserRoomTable }>,
-    ): void => {},
-    leaveTableSocketRoom: (state: SocketState, action: PayloadAction<{ roomId: string; tableId: string }>): void => {},
-
-    addTable: (
-      state: SocketState,
-      action: PayloadAction<{ roomId: string; info: ITowersTableWithRelations }>,
-    ): void => {},
-    addTableToRoom: (
-      state: SocketState,
-      action: PayloadAction<{ roomId: string; info: ITowersTableWithRelations }>,
+      action: PayloadAction<{ roomId: string; tableId: string; towersUserProfile: ITowersUserProfile }>,
     ): void => {
-      const { roomId, info } = action.payload
+      const { roomId, tableId, towersUserProfile } = action.payload
 
-      if (state.towers[roomId]?.tables) {
-        state.towers[roomId].tables = {
-          ...state.towers[roomId].tables,
-          [info.id]: {
-            ...state.towers[roomId].tables[info.id],
-            info,
-          },
+      if (!state.towers.rooms[roomId]) {
+        state.towers.rooms[roomId] = {
+          info: null,
+          isInfoLoading: false,
+          chat: [],
+          isChatLoading: false,
+          users: [],
+          isUsersLoading: false,
+          tables: {},
+          isTablesLoading: false,
+          errorMessage: null,
         }
       }
-    },
-    updateTable: (
-      state: SocketState,
-      action: PayloadAction<{ roomId: string; tableId: string; info?: ITowersTable; users?: ITowersUserRoomTable[] }>,
-    ): void => {},
-    updateTableInRoom: (
-      state: SocketState,
-      action: PayloadAction<{ roomId: string; tableId: string; info?: ITowersTable; users?: ITowersUserRoomTable[] }>,
-    ): void => {
-      const { roomId, tableId, info, users } = action.payload
 
-      if (state.towers[roomId]) {
-        state.towers[roomId].users = [...(state.towers[roomId].users ?? []), ...(users ?? [])]
-          .sort(
-            (a: ITowersUserRoomTable, b: ITowersUserRoomTable) =>
-              new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
-          )
-          .filter(
-            (user: ITowersUserRoomTable, index: number, users: ITowersUserRoomTable[]) =>
-              index === users.findIndex((u: ITowersUserRoomTable) => u?.userProfileId === user?.userProfileId),
-          )
-      }
+      // Add user in room users list
+      if (!state.towers.rooms[roomId].users) {
+        state.towers.rooms[roomId].users = [towersUserProfile]
+      } else {
+        const roomUserIndex = state.towers.rooms[roomId].users.findIndex(
+          (userProfile: ITowersUserProfile) => userProfile.id === towersUserProfile.id,
+        )
 
-      if (state.towers[roomId].tables[tableId]) {
-        state.towers[roomId].tables[tableId].info = {
-          ...((state.towers[roomId].tables[tableId].info ?? {}) as ITowersTable),
-          ...(info ?? {}),
+        if (roomUserIndex !== -1) {
+          state.towers.rooms[roomId].users[roomUserIndex] = towersUserProfile
+        } else {
+          state.towers.rooms[roomId].users.push(towersUserProfile)
         }
-
-        state.towers[roomId].tables[tableId].users = [
-          ...(state.towers[roomId].tables[tableId].users ?? []),
-          ...(users ?? []),
-        ]
-          .sort(
-            (a: ITowersUserRoomTable, b: ITowersUserRoomTable) =>
-              new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
-          )
-          .filter(
-            (user: ITowersUserRoomTable, index: number, users: ITowersUserRoomTable[]) =>
-              index === users.findIndex((u: ITowersUserRoomTable) => u?.userProfileId === user?.userProfileId),
-          )
       }
-    },
-    removeTable: (state: SocketState, action: PayloadAction<{ roomId: string; tableId: string }>): void => {},
-    removeTableFromRoom: (state: SocketState, action: PayloadAction<{ roomId: string; tableId: string }>): void => {
-      const { roomId, tableId } = action.payload
 
-      if (state.towers[roomId].tables[tableId]) {
-        delete state.towers[roomId].tables[tableId]
+      if (!state.towers.tables[tableId]) {
+        state.towers.tables[tableId] = {
+          info: null,
+          isInfoLoading: false,
+          chat: [],
+          isChatLoading: false,
+          users: [],
+          isUsersLoading: false,
+          errorMessage: null,
+        }
       }
-    },
 
-    sendTableChatMessage: (
-      state: SocketState,
-      action: PayloadAction<{ roomId: string; tableId: string; message: string }>,
-    ): void => {},
-    addMessageToTableChat: (
-      state: SocketState,
-      action: PayloadAction<{ roomId: string; tableId: string; message: ITowersTableChatMessage }>,
-    ): void => {
-      const { roomId, tableId, message } = action.payload
-
-      if (state.towers[roomId].tables[tableId]?.chat) {
-        state.towers[roomId].tables[tableId].chat.push(message)
-      }
-    },
-    sendTableAutomatedChatMessage: (
-      state: SocketState,
-      action: PayloadAction<{
-        roomId: string
-        tableId: string
-        message: string
-        type: TableChatMessageType
-        privateToUserId?: string
-      }>,
-    ): void => {},
-
-    addUserToTable: (
-      state: SocketState,
-      action: PayloadAction<{ roomId: string; tableId: string; towersUserRoomTable: ITowersUserRoomTable }>,
-    ): void => {
-      const { roomId, tableId, towersUserRoomTable } = action.payload
-
-      if (state.towers[roomId].tables[tableId]?.users) {
-        const tableUserIndex: number = state.towers[roomId].tables[tableId].users.findIndex(
-          (user: ITowersUserRoomTable) => user.userProfileId === towersUserRoomTable.userProfileId,
+      // Add user in table users list
+      if (!state.towers.tables[tableId].users) {
+        state.towers.tables[tableId].users = [towersUserProfile]
+      } else {
+        const tableUserIndex: number = state.towers.tables[tableId].users.findIndex(
+          (userProfile: ITowersUserProfile) => userProfile.id === towersUserProfile.id,
         )
 
         if (tableUserIndex !== -1) {
-          state.towers[roomId].tables[tableId].users[tableUserIndex] = towersUserRoomTable
+          state.towers.tables[tableId].users[tableUserIndex] = towersUserProfile
         } else {
-          state.towers[roomId].tables[tableId].users.push(towersUserRoomTable)
+          state.towers.tables[tableId].users.push(towersUserProfile)
         }
       }
     },
-    removeUserFromTable: (
+
+    leaveTable: (state: SocketState, action: PayloadAction<{ roomId: string; tableId: string }>): void => {},
+    leaveTableSuccess: (
       state: SocketState,
       action: PayloadAction<{ roomId: string; tableId: string; userId: string }>,
     ): void => {
       const { roomId, tableId, userId } = action.payload
 
-      if (state.towers[roomId].tables[tableId]?.users) {
-        state.towers[roomId].tables[tableId].users = state.towers[roomId].tables[tableId].users.filter(
-          (towersUserRoomTable: ITowersUserRoomTable) => towersUserRoomTable.userProfile?.userId !== userId,
+      // Remove user in room users list
+      if (state.towers.rooms[roomId].users) {
+        state.towers.rooms[roomId].users = state.towers.rooms[roomId].users.map(
+          (towersUserProfile: ITowersUserProfile) => {
+            if (towersUserProfile.userId === userId) {
+              return {
+                ...towersUserProfile,
+                userTables: towersUserProfile.userTables?.filter(
+                  (userTable: TowersUserTable) => userTable.tableId !== tableId,
+                ),
+              }
+            }
+            return towersUserProfile
+          },
         )
+      }
+
+      // Remove user in table users list
+      if (state.towers.tables[tableId].users) {
+        state.towers.tables[tableId].users = state.towers.tables[tableId].users.filter(
+          (towersUserProfile: ITowersUserProfile) => towersUserProfile.userId !== userId,
+        )
+      }
+    },
+    removeTableSelf: (state: SocketState, action: PayloadAction<{ tableId: string }>): void => {
+      const { tableId } = action.payload
+
+      if (state.towers.tables[tableId]) {
+        delete state.towers.tables[tableId]
+      }
+    },
+
+    updateTableUser: (
+      state: SocketState,
+      action: PayloadAction<{ roomId: string; tableId: string; towersUserProfile: ITowersUserProfile }>,
+    ): void => {
+      const { roomId, tableId, towersUserProfile } = action.payload
+
+      if (!state.towers.rooms[roomId]) return
+
+      // Update user in room users list
+      if (state.towers.rooms[roomId].users) {
+        const roomUserIndex = state.towers.rooms[roomId].users.findIndex(
+          (userProfile: ITowersUserProfile) => userProfile.id === towersUserProfile.id,
+        )
+
+        if (roomUserIndex !== -1) {
+          state.towers.rooms[roomId].users[roomUserIndex] = towersUserProfile
+        }
+      }
+
+      if (!state.towers.tables[tableId]) return
+
+      // Update user in table users list
+      if (state.towers.tables[tableId].users) {
+        const towersUserProfileIndex: number = state.towers.tables[tableId].users.findIndex(
+          (userProfile: ITowersUserProfile) => userProfile.id === towersUserProfile.id,
+        )
+
+        if (towersUserProfileIndex !== -1) {
+          state.towers.tables[tableId].users[towersUserProfileIndex] = towersUserProfile
+        }
+      }
+    },
+
+    addChatMessageToTable: (
+      state: SocketState,
+      action: PayloadAction<{
+        roomId: string
+        tableId: string
+        message?: string
+        messageVariables?: JsonObject
+        type?: TableChatMessageType
+      }>,
+    ): void => {},
+    addChatMessageToTableSuccess: (
+      state: SocketState,
+      action: PayloadAction<{ roomId: string; tableId: string; chatMessage: ITowersTableChatMessage }>,
+    ): void => {
+      const { roomId, tableId, chatMessage } = action.payload
+
+      if (!state.towers.rooms[roomId]) return
+
+      if (!state.towers.tables[tableId]?.chat) {
+        state.towers.tables[tableId].chat = []
+      } else {
+        const chatMessages: ITowersTableChatMessage[] = state.towers.tables[tableId].chat
+
+        if (chatMessages) {
+          const isDuplicate: boolean = chatMessages.some(
+            (message: ITowersTableChatMessage) => message.id === chatMessage.id,
+          )
+          if (!isDuplicate) chatMessages.push(chatMessage)
+        }
       }
     },
 
@@ -278,7 +433,7 @@ const socketSlice = createSlice({
       action: PayloadAction<{ roomId: string; tableId: string; message: string }>,
     ): void => {
       const { roomId, tableId, message } = action.payload
-      state.towers[roomId].tables[tableId].errorMessage = message
+      state.towers.tables[tableId].errorMessage = message
     },
   },
   extraReducers: (builder: ActionReducerMapBuilder<SocketState>): void => {
@@ -292,28 +447,28 @@ export const {
   connectionEstablished,
   connectionLost,
   serverError,
-  joinRoomSocketRoom,
-  leaveRoomSocketRoom,
-  sendRoomChatMessage,
-  addMessageToRoomChat,
-  addUserToRoom,
-  updateUsers,
-  updateUsersInRoom,
-  removeUserFromRoom,
+  joinRoom,
+  leaveRoom,
+  removeRoomSelf,
+  addChatMessageToRoom,
+  addChatMessageToRoomSuccess,
+  joinRoomSuccess,
+  updateRoomUser,
+  leaveRoomSuccess,
+  removeTableSelf,
   roomErrorMessage,
-  joinTableSocketRoom,
-  leaveTableSocketRoom,
-  addTable,
+  joinTable,
+  leaveTable,
   addTableToRoom,
-  updateTable,
-  updateTableInRoom,
-  removeTable,
+  addTableToRoomSuccess,
+  updateRoomTable,
+  updateRoomTableSuccess,
   removeTableFromRoom,
-  sendTableChatMessage,
-  addMessageToTableChat,
-  sendTableAutomatedChatMessage,
-  addUserToTable,
-  removeUserFromTable,
+  removeTableFromRoomSuccess,
+  addChatMessageToTable,
+  addChatMessageToTableSuccess,
+  joinTableSuccess,
+  leaveTableSuccess,
   tableErrorMessage,
 } = socketSlice.actions
 

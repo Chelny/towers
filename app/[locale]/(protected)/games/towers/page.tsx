@@ -65,7 +65,7 @@ export default async function Towers({ params, searchParams }: TowersProps): Pro
   const roomId: string = routeSearchParams.room as string
   const tableId: string = routeSearchParams.table as string
 
-  if (!roomId) {
+  if (!roomId && !tableId) {
     const response: NextResponse = await GET()
     const result = await response.json()
     const rooms: ITowersRoomWithUsersCount[] = result.data
@@ -78,5 +78,5 @@ export default async function Towers({ params, searchParams }: TowersProps): Pro
     )
   }
 
-  return <TowersPageContent roomId={roomId} tableId={tableId} />
+  return <TowersPageContent />
 }

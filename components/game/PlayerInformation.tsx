@@ -2,16 +2,16 @@
 
 import { ChangeEvent, ReactNode, useEffect, useState } from "react"
 import { Trans, useLingui } from "@lingui/react/macro"
-import { ITowersUserRoomTable } from "@prisma/client"
+import { ITowersUserProfileWithRelations } from "@prisma/client"
 import { formatDistanceToNow } from "date-fns"
 import Input from "@/components/ui/Input"
 import Modal from "@/components/ui/Modal"
 import { authClient } from "@/lib/auth-client"
-import { enLocale, frLocale } from "@/translations/languages"
+import { getDateFnsLocale } from "@/translations/languages"
 
 type PlayerInformationProps = {
   isOpen: boolean
-  player: ITowersUserRoomTable | undefined
+  player: ITowersUserProfileWithRelations | undefined
   isRatingsVisible?: boolean | null
   onCancel: () => void
 }
@@ -27,31 +27,31 @@ export default function PlayerInformation({
   const [reason, setReason] = useState<string>("")
   const [idleTime, setIdleTime] = useState<string>("")
   const { i18n, t } = useLingui()
-  const username: string | undefined = player?.userProfile?.user?.username
-  const rating: number | undefined = player?.userProfile?.rating
-  const gamesCompleted: number | undefined = player?.userProfile?.gamesCompleted
-  const wins: number | undefined = player?.userProfile?.wins
-  const loses: number | undefined = player?.userProfile?.loses
-  const streak: number | undefined = player?.userProfile?.streak
+  const username: string | undefined = player?.user?.username
+  const rating: number | undefined = player?.rating
+  const gamesCompleted: number | undefined = player?.gamesCompleted
+  const wins: number | undefined = player?.wins
+  const loses: number | undefined = player?.loses
+  const streak: number | undefined = player?.streak
 
   const handleSendMessage = (): void => {
     onCancel?.()
   }
 
   useEffect(() => {
-    setIsCurrentUser(player?.userProfile?.userId === session?.user.id)
+    setIsCurrentUser(player?.userId === session?.user.id)
   }, [player, session])
 
   useEffect(() => {
-    if (player?.userProfile?.user.lastActiveAt) {
-      const lastActiveAt: Date = new Date(player.userProfile?.user?.lastActiveAt)
+    if (player?.user.lastActiveAt) {
+      const lastActiveAt: Date = new Date(player.user?.lastActiveAt)
       const relativeTime: string = formatDistanceToNow(lastActiveAt, {
         addSuffix: true,
-        locale: i18n.locale === "fr" ? frLocale : enLocale,
+        locale: getDateFnsLocale(i18n.locale),
       })
       setIdleTime(relativeTime)
     }
-  }, [player?.userProfile?.user?.lastActiveAt, i18n.locale])
+  }, [player?.user?.lastActiveAt, i18n.locale])
 
   return (
     <Modal

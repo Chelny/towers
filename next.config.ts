@@ -16,6 +16,7 @@ const nextConfig: NextConfig = {
     EMAIL_SENDER: process.env.EMAIL_SENDER,
     EMAIL_RECIPIENT: process.env.EMAIL_RECIPIENT,
     GOOGLE_ANALYTICS: process.env.GOOGLE_ANALYTICS,
+    BYPASS_LINGUI_ERRORS: process.env.BYPASS_LINGUI_ERRORS,
   },
   eslint: {
     ignoreDuringBuilds: true,

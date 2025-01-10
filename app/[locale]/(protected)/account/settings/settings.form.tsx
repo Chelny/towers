@@ -14,6 +14,7 @@ import AlertMessage from "@/components/ui/AlertMessage"
 import Button from "@/components/ui/Button"
 import Select from "@/components/ui/Select"
 import { INITIAL_FORM_STATE } from "@/constants/api"
+import { APP_COOKIES } from "@/constants/app"
 import { Session } from "@/lib/auth-client"
 import { defaultLocale, Language, languages, SupportedLocales } from "@/translations/languages"
 
@@ -71,7 +72,7 @@ export function SettingsForm({ session }: SettingsFormProps): ReactNode {
           setFormState(data)
 
           if (data.success) {
-            localStorage.setItem("towers.formState", JSON.stringify(data))
+            localStorage.setItem(APP_COOKIES.SETTINGS_FORM_STATE, JSON.stringify(data))
           }
 
           // Dynamically change language
@@ -88,11 +89,11 @@ export function SettingsForm({ session }: SettingsFormProps): ReactNode {
   }
 
   useEffect(() => {
-    const savedState: string | null = localStorage.getItem("towers.formState")
+    const savedState: string | null = localStorage.getItem(APP_COOKIES.SETTINGS_FORM_STATE)
 
     if (savedState) {
       setFormState(JSON.parse(savedState))
-      localStorage.removeItem("towers.formState")
+      localStorage.removeItem(APP_COOKIES.SETTINGS_FORM_STATE)
     }
   }, [])
 

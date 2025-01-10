@@ -38,6 +38,13 @@ export const DIRECTIONS = [
   { row: 1, col: -1 }, // Bottom-left
   { row: 1, col: 1 }, // Bottom-right
 ]
+export const DEFAULT_TOWERS_CONTROLS = {
+  moveLeft: "ArrowLeft",
+  moveRight: "ArrowRight",
+  cycleColor: "ArrowUp",
+  drop: "ArrowDown",
+  power: "Space",
+}
 
 /**************************************************
  * Game Ratings

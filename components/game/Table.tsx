@@ -4,28 +4,19 @@ import {
   ChangeEvent,
   FormEvent,
   KeyboardEvent,
-  memo,
   MouseEvent,
   ReactNode,
   RefObject,
-  useCallback,
   useEffect,
   useRef,
   useState,
 } from "react"
 import dynamic from "next/dynamic"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { Trans, useLingui } from "@lingui/react/macro"
 import { createId } from "@paralleldrive/cuid2"
-import {
-  ITowersRoom,
-  ITowersTable,
-  ITowersTableChatMessage,
-  ITowersUserRoomTable,
-  RoomLevel,
-  TableChatMessageType,
-  TableType,
-} from "@prisma/client"
+import { ITowersTable, ITowersTableChatMessage, RoomLevel, TableChatMessageType, TableType } from "@prisma/client"
+import { ITowersUserProfile } from "@prisma/client"
 import { Type } from "@sinclair/typebox"
 import { Value, ValueError } from "@sinclair/typebox/value"
 import clsx from "clsx/lite"
@@ -40,108 +31,60 @@ import PlayerBoard from "@/components/towers/PlayerBoard"
 import Button from "@/components/ui/Button"
 import Checkbox from "@/components/ui/Checkbox"
 import Select from "@/components/ui/Select"
-import { CHAT_MESSSAGE_MAX_LENGTH } from "@/constants/game"
 import { ROUTE_TOWERS } from "@/constants/routes"
+import { GameState } from "@/enums/towers"
+import { useSeatAssignment } from "@/hooks/useTableSeatAssignment"
+import { TowersSeat, TowersTeam } from "@/interfaces/table"
 import { authClient } from "@/lib/auth-client"
 import { useAppDispatch, useAppSelector } from "@/lib/hooks"
 import { addLinks, removeLink } from "@/redux/features/sidebar-slice"
 import {
-  joinTableSocketRoom,
-  leaveTableSocketRoom,
-  removeTable,
-  sendTableAutomatedChatMessage,
-  sendTableChatMessage,
+  addChatMessageToTable,
+  joinTable,
+  leaveTable,
   tableErrorMessage,
-  updateTable,
-  updateUsers,
+  updateRoomTable,
 } from "@/redux/features/socket-slice"
 import {
   selectIsTableChatLoading,
   selectIsTableInfoLoading,
-  selectRoomInfo,
-  selectRoomUsersInvite,
   selectTableChat,
   selectTableInfo,
   selectTableIsJoined,
   selectTableUsers,
-  selectTableUsersBoot,
 } from "@/redux/selectors/socket-selectors"
 import { AppDispatch, RootState } from "@/redux/store"
-import { fetchRoomUsers } from "@/redux/thunks/room-thunks"
-import {
-  fetchTableChat,
-  fetchTableInfo,
-  fetchTableUsers,
-  joinTable,
-  leaveTable,
-  SocketTableThunkResponse,
-} from "@/redux/thunks/table-thunks"
+import { fetchTableChat, fetchTableInfo, fetchTableUsers } from "@/redux/thunks/table-thunks"
 
-enum GameState {
-  WAITING_FOR_PLAYERS = 0,
-  READY = 1,
-  COUNTDOWN = 2,
-  STARTED = 3,
-  GAME_OVER = 4,
-  ERROR = 5,
-}
-
-interface SeatsCss {
-  rowSpan: number
-  seatNumbers: number[]
-  team: number
-}
-
-const INITIAL_SEATS_CSS = [
-  { rowSpan: 5, seatNumbers: [1, 2], team: 1 },
-  { rowSpan: 3, seatNumbers: [5, 6], team: 3 },
-  { rowSpan: 3, seatNumbers: [3, 4], team: 2 },
-  { rowSpan: 3, seatNumbers: [7, 8], team: 4 },
-]
-
-type TableProps = {
-  roomId: string
-  tableId: string
-}
-
-const areEqual = (prevProps: TableProps, nextProps: TableProps): boolean => {
-  return prevProps.roomId === nextProps.roomId && prevProps.tableId === nextProps.tableId
-}
-
-export default memo(function Table({ roomId, tableId }: TableProps): ReactNode {
+export default function Table(): ReactNode {
   const router = useRouter()
-  const { i18n, t } = useLingui()
-  const { data: session } = authClient.useSession()
-  const isConnected: boolean = useAppSelector((state: RootState) => state.socket.isConnected)
-  const roomInfo: ITowersRoom | null = useAppSelector((state: RootState) => selectRoomInfo(state, roomId))
-  const isJoinedTable: boolean = useAppSelector((state: RootState) => selectTableIsJoined(state, roomId, tableId))
-  const tableInfo: ITowersTable | null = useAppSelector((state: RootState) => selectTableInfo(state, roomId, tableId))
-  const isInfoLoading: boolean = useAppSelector((state: RootState) => selectIsTableInfoLoading(state, roomId, tableId))
-  const chat: ITowersTableChatMessage[] = useAppSelector((state: RootState) => selectTableChat(state, roomId, tableId))
-  const isChatLoading: boolean = useAppSelector((state: RootState) => selectIsTableChatLoading(state, roomId, tableId))
-  const tableUsers: ITowersUserRoomTable[] = useAppSelector((state: RootState) =>
-    selectTableUsers(state, roomId, tableId),
-  )
-  const roomUsersInvite: ITowersUserRoomTable[] = useAppSelector((state: RootState) =>
-    selectRoomUsersInvite(state, roomId, tableId),
-  )
-  const tableUsersBoot: ITowersUserRoomTable[] = useAppSelector((state: RootState) =>
-    selectTableUsersBoot(state, roomId, tableId, session),
-  )
+  const searchParams = useSearchParams()
   const dispatch: AppDispatch = useAppDispatch()
+
+  const roomId: string | null = searchParams.get("room")
+  const tableId: string | null = searchParams.get("table")
+
+  if (!roomId || !tableId) {
+    throw new Error("Room ID and Table ID are required")
+  }
+
+  const { t } = useLingui()
+  const { data: session } = authClient.useSession()
+  const isConnected: boolean = useAppSelector((state: RootState) => state.socket?.isConnected)
+  const isJoinedTable: boolean = useAppSelector((state: RootState) => selectTableIsJoined(state, tableId))
+  const tableInfo: ITowersTable | null = useAppSelector((state: RootState) => selectTableInfo(state, tableId))
+  const isInfoLoading: boolean = useAppSelector((state: RootState) => selectIsTableInfoLoading(state, tableId))
+  const chat: ITowersTableChatMessage[] = useAppSelector((state: RootState) => selectTableChat(state, tableId))
+  const isChatLoading: boolean = useAppSelector((state: RootState) => selectIsTableChatLoading(state, tableId))
+  const tableUsers: ITowersUserProfile[] = useAppSelector((state: RootState) => selectTableUsers(state, tableId))
+  const formRef: RefObject<HTMLFormElement | null> = useRef<HTMLFormElement | null>(null)
   const messageInputRef: RefObject<HTMLInputElement | null> = useRef<HTMLInputElement | null>(null)
-  const chatEndRef: RefObject<HTMLDivElement | null> = useRef<HTMLDivElement | null>(null)
   const [tableType, setTableType] = useState<string>(TableType.PUBLIC)
   const [isRated, setIsRated] = useState<boolean>(true)
   const [isInviteUserModalOpen, setIsInviteUserModalOpen] = useState<boolean>(false)
   const [isBootUserModalOpen, setIsBootUserModalOpen] = useState<boolean>(false)
-  const [seatsCss, setSeatsCss] = useState<SeatsCss[]>(INITIAL_SEATS_CSS)
-  const [seatedSeats, setSeatedSeats] = useState<Set<number>>(new Set())
-  const [isGameState, setGameState] = useState<GameState>(GameState.WAITING_FOR_PLAYERS)
-  const [seatUnavailable, setSeatUnavailable] = useState<boolean>(false)
+  const [isGameState, setGameState] = useState<GameState>(GameState.LOBBY)
   const [errorMessages, setErrorMessages] = useState<ChangeTableOptionsFormValidationErrors>({})
-  const formRef: RefObject<HTMLFormElement | null> = useRef<HTMLFormElement | null>(null)
-  const [gameStartCountdown, setGameStartCountdown] = useState<number>(14)
   const [winningPlayer, setWinningPlayer] = useState<string>("the_player1")
   const [controls, setControls] = useState<Record<string, { label: string; key: string }>>({
     left: { label: t({ message: "Left Arrow" }), key: "ArrowLeft" },
@@ -153,73 +96,7 @@ export default memo(function Table({ roomId, tableId }: TableProps): ReactNode {
   const activePlayer: string = "the_player1"
   const targetPlayer: string = "the_player1abcdefghijklmnopqrstuvwxyz"
   const pieceName: string = t({ message: "midas piece" })
-
-  const initializeTable = useCallback((): void => {
-    if (!isJoinedTable) {
-      dispatch(joinTable({ roomId, tableId }))
-        .unwrap()
-        .then(async (data: SocketTableThunkResponse) => {
-          if (data.towersUserRoomTable) {
-            dispatch(joinTableSocketRoom({ roomId, tableId, towersUserRoomTable: data.towersUserRoomTable }))
-          }
-
-          // Fetch room and table data
-          dispatch(fetchRoomUsers({ roomId }))
-          dispatch(fetchTableInfo({ roomId, tableId }))
-
-          const tableUsers: ITowersUserRoomTable[] = await dispatch(fetchTableUsers({ roomId, tableId })).unwrap()
-          dispatch(updateTable({ roomId, tableId, users: tableUsers }))
-
-          if (session?.user.id) {
-            await dispatch(fetchTableChat({ roomId, tableId, session })).unwrap()
-
-            // Display join message
-            dispatch(
-              sendTableAutomatedChatMessage({
-                roomId,
-                tableId,
-                message: `${session?.user.username} joined the table.`, // TODO: Translate in chat based on locale
-                type: TableChatMessageType.USER_ACTION,
-              }),
-            )
-          }
-        })
-    }
-  }, [isJoinedTable])
-
-  useEffect(() => {
-    if (isConnected) {
-      initializeTable()
-    }
-  }, [isConnected])
-
-  useEffect(() => {
-    if (tableInfo) {
-      setIsRated(tableInfo.rated)
-      setTableType(tableInfo.tableType)
-    }
-  }, [tableInfo])
-
-  useEffect(() => {
-    if (roomInfo && tableInfo) {
-      dispatch(
-        addLinks([
-          {
-            href: `${ROUTE_TOWERS.PATH}?room=${roomId}`,
-            label: roomInfo.name,
-          },
-          {
-            href: `${ROUTE_TOWERS.PATH}?room=${roomId}&table=${tableId}`,
-            label: `${roomInfo.name} - Table ${tableInfo.tableNumber}`,
-          },
-        ]),
-      )
-    }
-  }, [roomInfo, tableInfo])
-
-  useEffect(() => {
-    scrollChatToBottom()
-  }, [chat])
+  const { seatedSeats, seatsSwap, gameStartCountdown, handleChooseSeat, handleReady } = useSeatAssignment()
 
   const handleOpenBootUserModal = (): void => setIsBootUserModalOpen(true)
   const handleCloseBootUserModal = (): void => setIsBootUserModalOpen(false)
@@ -228,30 +105,14 @@ export default memo(function Table({ roomId, tableId }: TableProps): ReactNode {
   const handleCloseInviteUserModal = (): void => setIsInviteUserModalOpen(false)
 
   const handleTableTypeChange = (tableType: string): void => {
-    if (session) {
-      let message: string = t({ message: "Anyone may play or watch your table now." })
-
-      switch (tableType) {
-        case TableType.PROTECTED:
-          message = t({ message: "Only people you have invited may play now." })
-          break
-        case TableType.PRIVATE:
-          message = t({ message: "Only people you have invited may play or watch your table now." })
-          break
-        default:
-          break
-      }
-
-      dispatch(
-        sendTableAutomatedChatMessage({
-          roomId,
-          tableId,
-          message,
-          type: TableChatMessageType.TABLE_TYPE,
-          privateToUserId: session?.user.id,
-        }),
-      )
-    }
+    dispatch(
+      addChatMessageToTable({
+        roomId,
+        tableId,
+        messageVariables: { tableType },
+        type: TableChatMessageType.TABLE_TYPE,
+      }),
+    )
   }
 
   const handleOptionChange = (): void => {
@@ -311,62 +172,10 @@ export default memo(function Table({ roomId, tableId }: TableProps): ReactNode {
       }
 
       const result = await response.json()
-      dispatch(updateTable({ roomId, tableId, info: result.data }))
+      dispatch(updateRoomTable({ roomId, tableId, table: result.data }))
     } catch (error) {
       dispatch(tableErrorMessage({ roomId, tableId, message: error as string }))
     }
-  }
-
-  const handleSeatClick = (seat: number | null): void => {
-    setSeatedSeats((prevSeatedSeats: Set<number>) => {
-      const newSeats: Set<number> = new Set<number>(prevSeatedSeats)
-
-      if (seat === null) {
-        newSeats.clear()
-        setSeatsCss(INITIAL_SEATS_CSS)
-      } else {
-        if (newSeats.has(seat)) {
-          newSeats.delete(seat)
-        } else {
-          newSeats.add(seat)
-        }
-      }
-
-      return newSeats
-    })
-
-    setSeatsCss((prevSeatsCss: SeatsCss[]) => {
-      if (!seat || seat === 1 || seat === 2) return prevSeatsCss
-
-      const clickedTeamGroup: SeatsCss | undefined = prevSeatsCss.find((group: SeatsCss) =>
-        group.seatNumbers.includes(seat),
-      )
-      if (!clickedTeamGroup) return prevSeatsCss
-
-      const clickedTeamSeats: number[] = clickedTeamGroup.seatNumbers
-      const clickedTeam: number = clickedTeamGroup.team
-
-      const otherTeamsGroups: SeatsCss[] = prevSeatsCss.filter((group: SeatsCss) => group.team !== clickedTeam)
-      if (otherTeamsGroups.length === 0) return prevSeatsCss
-
-      const teamToSwapWithGroup: SeatsCss = otherTeamsGroups[0]
-      const teamToSwapWithSeats: number[] = teamToSwapWithGroup.seatNumbers
-
-      const newSeatsMapping: Record<number, number> = {}
-
-      clickedTeamSeats.forEach((seat: number, index: number) => {
-        newSeatsMapping[seat] = teamToSwapWithSeats[index % teamToSwapWithSeats.length]
-      })
-
-      teamToSwapWithSeats.forEach((seat: number, index: number) => {
-        newSeatsMapping[seat] = clickedTeamSeats[index % clickedTeamSeats.length]
-      })
-
-      return prevSeatsCss.map((group: SeatsCss) => ({
-        ...group,
-        seatNumbers: group.seatNumbers.map((seat: number) => newSeatsMapping[seat] || seat),
-      }))
-    })
   }
 
   const handleSendMessage = (event: KeyboardEvent<HTMLInputElement>): void => {
@@ -374,42 +183,59 @@ export default memo(function Table({ roomId, tableId }: TableProps): ReactNode {
       const message: string = messageInputRef.current.value.trim()
 
       if (message !== "") {
-        dispatch(sendTableChatMessage({ roomId, tableId, message }))
+        dispatch(addChatMessageToTable({ roomId, tableId, message }))
         messageInputRef.current.value = ""
       }
     }
   }
 
-  const scrollChatToBottom = (): void => {
-    chatEndRef.current?.scrollIntoView({ behavior: "instant", block: "end" })
-  }
-
   const handleQuitTable = (): void => {
     dispatch(leaveTable({ roomId, tableId }))
-      .unwrap()
-      .then(async () => {
-        dispatch(leaveTableSocketRoom({ roomId, tableId }))
-
-        const updatedTableUsers: ITowersUserRoomTable[] = await dispatch(fetchTableUsers({ roomId, tableId })).unwrap()
-
-        if (updatedTableUsers.length === 0) {
-          dispatch(removeTable({ roomId, tableId }))
-        }
-
-        // Update room users' table number
-        const updatedRoomUsers: ITowersUserRoomTable[] = await dispatch(fetchRoomUsers({ roomId })).unwrap()
-        dispatch(updateUsers({ roomId, users: updatedRoomUsers }))
-
-        dispatch(removeLink(`${ROUTE_TOWERS.PATH}?room=${roomId}&table=${tableId}`))
-        router.push(`${ROUTE_TOWERS.PATH}?room=${roomId}`)
-      })
+    dispatch(removeLink(`${ROUTE_TOWERS.PATH}?room=${roomId}&table=${tableId}`))
+    router.push(`${ROUTE_TOWERS.PATH}?room=${roomId}`)
   }
+
+  useEffect(() => {
+    if (isConnected) {
+      if (isJoinedTable) {
+        dispatch(fetchTableInfo({ roomId, tableId }))
+        dispatch(fetchTableChat({ roomId, tableId }))
+        dispatch(fetchTableUsers({ roomId, tableId }))
+      } else {
+        dispatch(joinTable({ roomId, tableId }))
+      }
+    }
+  }, [isConnected, isJoinedTable, dispatch])
+
+  useEffect(() => {
+    if (tableInfo) {
+      setIsRated(tableInfo.rated)
+      setTableType(tableInfo.tableType)
+    }
+  }, [tableInfo])
+
+  useEffect(() => {
+    if (tableInfo) {
+      dispatch(
+        addLinks([
+          {
+            href: `${ROUTE_TOWERS.PATH}?room=${roomId}`,
+            label: tableInfo?.room?.name,
+          },
+          {
+            href: `${ROUTE_TOWERS.PATH}?room=${roomId}&table=${tableId}`,
+            label: `${tableInfo?.room?.name} - Table ${tableInfo.tableNumber}`,
+          },
+        ]),
+      )
+    }
+  }, [tableInfo])
 
   return (
     <>
       <form ref={formRef} noValidate onSubmit={handleFormValidation}>
         <div className="grid [grid-template-areas:'banner_banner_banner''sidebar_content_content''sidebar_content_content'] grid-rows-game grid-cols-game h-screen -m-4 -mb-8 bg-gray-100 text-black">
-          <TableHeader room={roomInfo} table={tableInfo} />
+          <TableHeader table={tableInfo} />
 
           {/* Left sidebar */}
           <div className="[grid-area:sidebar] flex flex-col justify-between p-2 bg-gray-200">
@@ -590,25 +416,27 @@ export default memo(function Table({ roomId, tableId }: TableProps): ReactNode {
                   </div>
 
                   {/* Game */}
-                  {seatsCss.map((group: SeatsCss, index: number) => (
+                  {seatsSwap.map((group: TowersTeam, index: number) => (
                     <div
                       key={index}
                       className={clsx(
                         `row-span-${group.rowSpan}`,
-                        index === 0 ? "flex flex-row justify-center items-start h-max" : "",
+                        index === 0 && "flex flex-row justify-center items-start h-max",
                       )}
                       dir="ltr"
                     >
                       <div className={index === 0 ? "contents" : "flex flex-row justify-center items-center"}>
-                        {group.seatNumbers.map((seat: number) => (
+                        {group.seats.map((seat: TowersSeat) => (
                           <PlayerBoard
-                            key={seat}
-                            seatNumber={seat}
-                            isOpponentBoard={group.team > 1}
-                            isReversed={seat % 2 === 0}
-                            isSeated={seatedSeats.has(seat)}
-                            isSeatOccupied={seatUnavailable}
-                            onChooseSeat={handleSeatClick}
+                            key={seat.number}
+                            seatNumber={seat.number}
+                            user={seat.user}
+                            isOpponentBoard={group.teamNumber > 1}
+                            isReversed={seat.number % 2 === 0}
+                            isSeated={seatedSeats.has(seat.number)}
+                            isReady={seat.isReady}
+                            onChooseSeat={handleChooseSeat}
+                            onReady={handleReady}
                           />
                         ))}
                       </div>
@@ -656,31 +484,26 @@ export default memo(function Table({ roomId, tableId }: TableProps): ReactNode {
 
             {/* Chat and users list */}
             <div className="[grid-area:chat] flex gap-2">
-              <div className="flex-1 flex flex-col gap-1 border bg-white">
+              <div className="overflow-hidden flex-1 flex flex-col gap-1 border bg-white">
                 <ServerMessage roomId={roomId} tableId={tableId} />
 
                 {/* Chat */}
-                <div className="flex flex-col gap-1 h-full px-2">
-                  <input
-                    ref={messageInputRef}
-                    type="text"
-                    className="w-full p-2 border"
-                    placeholder={t({ message: "Write something..." })}
-                    maxLength={CHAT_MESSSAGE_MAX_LENGTH}
-                    disabled={isChatLoading}
-                    onKeyDown={handleSendMessage}
+                <div className="overflow-hidden flex flex-col gap-1 h-full px-2">
+                  <Chat
+                    messages={chat}
+                    messageInputRef={messageInputRef}
+                    isMessageInputDisabled={isChatLoading}
+                    onSendMessage={handleSendMessage}
                   />
-                  <div className="overflow-y-auto flex-1 my-1">
-                    <Chat messages={chat} userId={session?.user.id} />
-                    <div ref={chatEndRef} />
-                  </div>
                 </div>
               </div>
 
-              <PlayersList
-                users={tableUsers}
-                isRatingsVisible={roomInfo && roomInfo?.difficulty !== RoomLevel.SOCIAL}
-              />
+              <div className="w-[385px]">
+                <PlayersList
+                  users={tableUsers}
+                  isRatingsVisible={tableInfo?.room && tableInfo?.room?.difficulty !== RoomLevel.SOCIAL}
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -688,22 +511,22 @@ export default memo(function Table({ roomId, tableId }: TableProps): ReactNode {
 
       <TableInviteUser
         key={createId()}
+        tableId={tableId}
         isOpen={isInviteUserModalOpen}
-        users={roomUsersInvite}
-        isRatingsVisible={roomInfo && roomInfo?.difficulty !== RoomLevel.SOCIAL}
+        isRatingsVisible={tableInfo?.room && tableInfo?.room?.difficulty !== RoomLevel.SOCIAL}
         onCancel={handleCloseInviteUserModal}
       />
 
       <TableBootUser
         key={createId()}
+        tableId={tableId}
         isOpen={isBootUserModalOpen}
-        users={tableUsersBoot}
-        isRatingsVisible={roomInfo && roomInfo?.difficulty !== RoomLevel.SOCIAL}
+        isRatingsVisible={tableInfo?.room && tableInfo?.room?.difficulty !== RoomLevel.SOCIAL}
         onCancel={handleCloseBootUserModal}
       />
     </>
   )
-}, areEqual)
+}
 
 const TableHeader = dynamic(() => import("@/components/game/TableHeader"), {
   loading: () => <TableHeaderSkeleton />,

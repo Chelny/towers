@@ -52,8 +52,14 @@ describe("Calendar Component", () => {
     const prevMonth: Date = new Date(currentYear, currentMonth - 1)
     const nextMonth: Date = new Date(prevMonth.getFullYear(), prevMonth.getUTCMonth() + 1)
 
-    const prevMonthName: string = prevMonth.toLocaleString("en-US", { month: "long", year: "numeric" })
-    const nextMonthName: string = nextMonth.toLocaleString("en-US", { month: "long", year: "numeric" })
+    const formatter: Intl.DateTimeFormat = new Intl.DateTimeFormat("en-US", {
+      month: "long",
+      year: "numeric",
+      timeZone: "UTC",
+    })
+
+    const prevMonthName: string = formatter.format(prevMonth)
+    const nextMonthName: string = formatter.format(nextMonth)
 
     fireEvent.click(prevMonthButton)
     expect(screen.getByText(prevMonthName)).toBeInTheDocument()

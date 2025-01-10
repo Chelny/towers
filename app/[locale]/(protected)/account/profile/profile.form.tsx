@@ -1,6 +1,6 @@
 "use client"
 
-import { FormEvent, ReactNode, useEffect, useState } from "react"
+import { FormEvent, ReactNode, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Trans, useLingui } from "@lingui/react/macro"
 import { Value, ValueError } from "@sinclair/typebox/value"
@@ -20,14 +20,13 @@ import { Session } from "@/lib/auth-client"
 
 type ProfileFormProps = {
   session: Session | null
+  isNewUser?: string
 }
 
-export function ProfileForm({ session }: ProfileFormProps): ReactNode {
+export function ProfileForm({ session, isNewUser }: ProfileFormProps): ReactNode {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [formState, setFormState] = useState<ApiResponse>(INITIAL_FORM_STATE)
-  const [isNewUserSuccess, setIsNewUserSuccess] = useState<boolean>(false)
-  const isNewUser: boolean = !session?.user.username
   const { t } = useLingui()
 
   const handleUpdateUser = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
@@ -87,14 +86,22 @@ export function ProfileForm({ session }: ProfileFormProps): ReactNode {
             setIsLoading(true)
             setFormState(INITIAL_FORM_STATE)
           },
-          onSuccess: () => {
+          onSuccess: async () => {
             setIsLoading(false)
             setFormState({
               success: true,
-              message: isNewUserSuccess
-                ? t({ message: "Your profile has been updated! You will be redirected in 3 seconds..." })
-                : t({ message: "Your profile has been updated!" }),
+              message:
+                isNewUser === "true"
+                  ? t({ message: "Your profile has been updated! You will be redirected in 3 seconds..." })
+                  : t({ message: "Your profile has been updated!" }),
             })
+
+            if (isNewUser === "true") {
+              await fetch("/api/users/cookie", { method: "DELETE" })
+              setTimeout(() => {
+                router.push(ROUTE_TOWERS.PATH)
+              }, 3000)
+            }
           },
           onError: (ctx) => {
             setIsLoading(false)
@@ -107,17 +114,6 @@ export function ProfileForm({ session }: ProfileFormProps): ReactNode {
       )
     }
   }
-
-  useEffect(() => {
-    if (formState?.success) {
-      if (isNewUser) {
-        setIsNewUserSuccess(true)
-        setTimeout(() => {
-          router.push(ROUTE_TOWERS.PATH)
-        }, 3000)
-      }
-    }
-  }, [formState])
 
   return (
     <>
@@ -171,7 +167,7 @@ export function ProfileForm({ session }: ProfileFormProps): ReactNode {
           errorMessage={formState?.error?.username}
         />
         <Button type="submit" className="w-full" disabled={isLoading}>
-          {isNewUser ? t({ message: "Complete Registration" }) : t({ message: "Update Profile" })}
+          {isNewUser === "true" ? t({ message: "Complete Registration" }) : t({ message: "Update Profile" })}
         </Button>
       </form>
     </>

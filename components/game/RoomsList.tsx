@@ -1,6 +1,6 @@
 "use client"
 
-import { ReactNode, useEffect, useState } from "react"
+import { ReactNode } from "react"
 import { useRouter } from "next/navigation"
 import { plural } from "@lingui/core/macro"
 import { Trans, useLingui } from "@lingui/react/macro"
@@ -8,10 +8,7 @@ import { ITowersRoomWithUsersCount, RoomLevel } from "@prisma/client"
 import clsx from "clsx/lite"
 import Button from "@/components/ui/Button"
 import { ROUTE_TOWERS } from "@/constants/routes"
-import { TowersRoomState } from "@/interfaces/socket"
 import { authClient } from "@/lib/auth-client"
-import { useAppSelector } from "@/lib/hooks"
-import { RootState } from "@/redux/store"
 
 type RoomsListProps = {
   rooms: ITowersRoomWithUsersCount[]
@@ -20,17 +17,11 @@ type RoomsListProps = {
 export default function RoomsList({ rooms }: RoomsListProps): ReactNode {
   const router = useRouter()
   const { isPending } = authClient.useSession()
-  const [isMounted, setIsMounted] = useState<boolean>(false)
-  const joinedRooms: Record<string, TowersRoomState> = useAppSelector((state: RootState) => state.socket.towers)
   const { t } = useLingui()
 
   const handleJoinRoom = (roomId: string): void => {
     router.push(`${ROUTE_TOWERS.PATH}?room=${roomId}`)
   }
-
-  useEffect(() => {
-    setIsMounted(true)
-  }, [])
 
   return (
     <ul className="grid grid-cols-[repeat(auto-fill,_minmax(14rem,_1fr))] gap-8">
@@ -61,10 +52,10 @@ export default function RoomsList({ rooms }: RoomsListProps): ReactNode {
               <Button
                 type="button"
                 className="w-full"
-                disabled={isMounted ? isPending || room.full || !!joinedRooms[room.id] : false}
+                disabled={isPending || room.full || room.isUserInRoom}
                 onClick={() => handleJoinRoom(room.id)}
               >
-                {!!joinedRooms[room.id] ? t({ message: "Joined" }) : t({ message: "Join" })}
+                {room.isUserInRoom ? t({ message: "Joined" }) : t({ message: "Join" })}
               </Button>
             </div>
           </li>

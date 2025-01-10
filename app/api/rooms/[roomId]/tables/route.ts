@@ -15,14 +15,31 @@ export async function GET(request: NextRequest, segmentData: { params: Params })
       include: {
         host: {
           include: {
-            user: true,
+            user: {
+              select: {
+                username: true,
+              },
+            },
           },
         },
-        userRoomTables: {
-          include: {
+        userTables: {
+          select: {
             userProfile: {
               include: {
-                user: true,
+                user: {
+                  select: {
+                    username: true,
+                  },
+                },
+                userTables: {
+                  select: {
+                    seatNumber: true,
+                  },
+                  orderBy: {
+                    createdAt: "desc",
+                  },
+                  take: 1,
+                },
               },
             },
           },

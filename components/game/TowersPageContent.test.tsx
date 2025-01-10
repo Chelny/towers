@@ -1,21 +1,15 @@
 import { ImgHTMLAttributes } from "react"
-import { render, screen } from "@testing-library/react"
+import { render, screen, waitFor } from "@testing-library/react"
 import { Mock } from "vitest"
 import TowersPageContent from "@/components/game/TowersPageContent"
 import { authClient } from "@/lib/auth-client"
 import { useAppDispatch } from "@/lib/hooks"
 import { destroySocket, initSocket } from "@/redux/features/socket-slice"
+import { mockRoom1 } from "@/test/data/rooms"
+import { mockSession } from "@/test/data/session"
 import { mockSocketRoom1Id, mockSocketRoom1Table1Id } from "@/test/data/socketState"
-import { mockSession } from "@/test/data/users"
-
-const { useRouter } = vi.hoisted(() => {
-  const mockRouterPush: Mock = vi.fn()
-
-  return {
-    useRouter: () => ({ push: mockRouterPush }),
-    mockRouterPush,
-  }
-})
+import { mockRoom1Table1 } from "@/test/data/tables"
+import { mockUseRouter, mockUseSearchParams } from "@/vitest.setup"
 
 vi.mock("next/image", () => ({
   __esModule: true,
@@ -27,14 +21,17 @@ vi.mock("next/image", () => ({
   },
 }))
 
-vi.mock("next/navigation", async () => {
-  const actual = await vi.importActual("next/navigation")
-
-  return {
-    ...actual,
-    useRouter,
-  }
-})
+vi.mock("next/navigation", () => ({
+  useRouter: vi.fn(() => mockUseRouter),
+  useSearchParams: vi.fn(() => ({
+    ...mockUseSearchParams,
+    // get: vi.fn((key: string) => {
+    //   if (key === "room") return mockRoom1.id
+    //   if (key === "table") return mockRoom1Table1.id
+    //   return null
+    // }),
+  })),
+}))
 
 vi.mock("@/lib/auth-client", () => ({
   authClient: {
@@ -69,27 +66,48 @@ describe("TowersPageContent Component", () => {
   })
 
   it("should render Room component if tableId is not provided", () => {
-    render(<TowersPageContent roomId={mockSocketRoom1Id} tableId="" />)
+    vi.mocked(mockUseSearchParams.get).mockImplementation((key) => {
+      if (key === "room") return mockRoom1.id
+      return null
+    })
+
+    render(<TowersPageContent />)
 
     expect(screen.getByText("Play Now")).toBeInTheDocument()
     expect(screen.getByText("Exit Room")).toBeInTheDocument()
   })
 
   it("should render Table component if tableId is provided", () => {
-    render(<TowersPageContent roomId={mockSocketRoom1Id} tableId={mockSocketRoom1Table1Id} />)
+    vi.mocked(mockUseSearchParams.get).mockImplementation((key) => {
+      if (key === "room") return mockRoom1.id
+      if (key === "table") return mockRoom1Table1.id
+      return null
+    })
+
+    render(<TowersPageContent />)
 
     expect(screen.getByText("Start")).toBeInTheDocument()
     expect(screen.getByText("Quit")).toBeInTheDocument()
   })
 
   it("should dispatch initSocket when not connected and session is authenticated", () => {
-    render(<TowersPageContent roomId={mockSocketRoom1Id} tableId="" />)
+    vi.mocked(mockUseSearchParams.get).mockImplementation((key) => {
+      if (key === "room") return mockRoom1.id
+      return null
+    })
+
+    render(<TowersPageContent />)
 
     expect(mockAppDispatch).toHaveBeenCalledWith(initSocket({ session: mockSession.data }))
   })
 
   it("should dispatche destroySocket when offline event is triggered", () => {
-    render(<TowersPageContent roomId={mockSocketRoom1Id} tableId="" />)
+    vi.mocked(mockUseSearchParams.get).mockImplementation((key) => {
+      if (key === "room") return mockRoom1.id
+      return null
+    })
+
+    render(<TowersPageContent />)
 
     window.dispatchEvent(new Event("offline"))
     expect(mockAppDispatch).toHaveBeenCalledWith(destroySocket())

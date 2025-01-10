@@ -1,12 +1,14 @@
+import { cookies } from "next/headers"
 import { Account, User } from "@prisma/client"
 import { betterAuth } from "better-auth"
 import { prismaAdapter } from "better-auth/adapters/prisma"
 import { nextCookies } from "better-auth/next-js"
 import { admin, customSession, magicLink, openAPI, username } from "better-auth/plugins"
 import { passkey } from "better-auth/plugins/passkey"
-import { APP_CONFIG } from "@/constants/app"
+import { APP_CONFIG, APP_COOKIES, COOKIE_PREFIX } from "@/constants/app"
 import { getAccountsByUserId } from "@/data/account"
 import { getUserById } from "@/data/user"
+import { getTowersUserProfileIdByUserId } from "@/data/user-profile"
 import {
   sendDeleteUserEmail,
   sendEmailChangeEmail,
@@ -107,11 +109,18 @@ export const auth = betterAuth({
         before: async (user) => {
           const username: string = generateRandomUsername(user.email)
 
+          // @ts-ignore
+          if (!user.username) {
+            const cookiesStore = await cookies()
+            cookiesStore.set(APP_COOKIES.NEW_USER, "true")
+          }
+
           return {
             data: {
               ...user,
               // @ts-ignore
               ...(!user.username ? { username } : {}),
+              role: "user",
             },
           }
         },
@@ -120,7 +129,7 @@ export const auth = betterAuth({
   },
   advanced: {
     generateId: false,
-    cookiePrefix: "towers",
+    cookiePrefix: COOKIE_PREFIX,
   },
   rateLimit: {
     storage: "database",
@@ -131,6 +140,7 @@ export const auth = betterAuth({
     customSession(async (session) => {
       const user: User | null = await getUserById(session.user.id)
       const accounts: Account[] = await getAccountsByUserId(session.user.id)
+      const towersUserProfileId: string | undefined = await getTowersUserProfileIdByUserId(session.user.id)
 
       return {
         user: {
@@ -139,6 +149,9 @@ export const auth = betterAuth({
         },
         session: session.session,
         accounts,
+        userProfileIds: {
+          towers: towersUserProfileId,
+        },
       }
     }),
     username(),

@@ -1,28 +1,46 @@
+import { headers } from "next/headers"
 import { NextResponse } from "next/server"
-import { IRoomListItem, ITowersRoomWithUsersCount } from "@prisma/client"
-import { getPrismaError } from "@/lib/api"
+import { IRoomListItem, ITowersRoomWithUsersCount, ITowersUserRoom } from "@prisma/client"
+import { getPrismaError, unauthorized } from "@/lib/api"
+import { auth } from "@/lib/auth"
+import { Session } from "@/lib/auth-client"
 import prisma from "@/lib/prisma"
 
 export async function GET(): Promise<NextResponse> {
+  const session: Session | null = await auth.api.getSession({ headers: await headers() })
+  if (!session) return unauthorized()
+
   try {
     const rooms: IRoomListItem[] = await prisma.towersRoom.findMany({
       include: {
-        userRoomTables: {
+        userRooms: {
           select: {
             userProfileId: true,
           },
-          distinct: ["userProfileId"],
         },
       },
     })
 
+    const userRooms: { roomId: string }[] = await prisma.towersUserRoom.findMany({
+      where: {
+        userProfileId: session.userProfileIds.towers,
+      },
+      select: {
+        roomId: true,
+      },
+    })
+
+    const userRoomIds: string[] = userRooms.map((towersUserRoom: { roomId: string }) => towersUserRoom.roomId)
+
     const roomsWithUsersCount: ITowersRoomWithUsersCount[] = rooms.map((room: IRoomListItem) => {
-      const usersCount = room.userRoomTables?.length
-      const { userRoomTables, ...roomWithoutUserRoomTables } = room
+      const { userRooms, ...roomWithoutUserRoomTables } = room
+      const usersCount: number = room.userRooms?.length
+      const isUserInRoom: boolean = userRoomIds.includes(room.id)
 
       return {
         ...roomWithoutUserRoomTables,
         usersCount,
+        isUserInRoom,
       }
     })
 

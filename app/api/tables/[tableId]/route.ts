@@ -18,16 +18,25 @@ export async function GET(request: NextRequest, segmentData: { params: Params })
         id: tableId,
       },
       include: {
+        room: true,
         host: {
           include: {
-            user: true,
+            user: {
+              select: {
+                username: true,
+              },
+            },
           },
         },
-        userRoomTables: {
+        userTables: {
           include: {
             userProfile: {
               include: {
-                user: true,
+                user: {
+                  select: {
+                    username: true,
+                  },
+                },
               },
             },
           },

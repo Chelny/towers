@@ -3,6 +3,7 @@
 import { ReactNode, RefObject, useEffect, useRef, useState } from "react"
 import { Trans, useLingui } from "@lingui/react/macro"
 import clsx from "clsx/lite"
+import { format } from "date-fns"
 import {
   PiCaretDoubleLeftDuotone,
   PiCaretDoubleRightDuotone,
@@ -10,6 +11,7 @@ import {
   PiCaretRightDuotone,
 } from "react-icons/pi"
 import Button from "@/components/ui/Button"
+import { getDateFnsLocale } from "@/translations/languages"
 
 type CalendarProps = {
   id: string
@@ -40,7 +42,7 @@ export default function Calendar({
   errorMessage = "",
   onChange,
 }: CalendarProps): ReactNode {
-  const { t } = useLingui()
+  const { i18n, t } = useLingui()
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(defaultValue ? new Date(defaultValue) : undefined)
   const [browsingDate, setBrowsingDate] = useState<Date>(
     maxDate ? new Date(Math.min(maxDate.getTime(), new Date().getTime())) : new Date(),
@@ -291,11 +293,8 @@ export default function Calendar({
         onClick={handleOpenCalendar}
       >
         {selectedDate && selectedDate.getTime()
-          ? selectedDate.toLocaleDateString("en-US", {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-              timeZone: "UTC",
+          ? format(new Date(selectedDate.getTime() + selectedDate.getTimezoneOffset() * 60000), "PPP", {
+              locale: getDateFnsLocale(i18n.locale),
             })
           : (placeholder ?? t({ message: "Select a date" }))}
       </Button>

@@ -13,7 +13,7 @@ import AlertMessage from "@/components/ui/AlertMessage"
 import Button from "@/components/ui/Button"
 import Input from "@/components/ui/Input"
 import { INITIAL_FORM_STATE } from "@/constants/api"
-import { REDIRECT_URI } from "@/constants/routes"
+import { CALLBACK_URL } from "@/constants/routes"
 import { authClient } from "@/lib/auth-client"
 
 export function SignInWithMagicLinkForm(): ReactNode {
@@ -53,7 +53,7 @@ export function SignInWithMagicLinkForm(): ReactNode {
       await authClient.signIn.magicLink(
         {
           email: payload.email,
-          callbackURL: REDIRECT_URI,
+          callbackURL: CALLBACK_URL,
         },
         {
           onRequest: () => {

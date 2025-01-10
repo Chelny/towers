@@ -1,21 +1,15 @@
 import { ImgHTMLAttributes } from "react"
-import { fireEvent, render, screen } from "@testing-library/react"
+import { fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { Mock } from "vitest"
 import Table from "@/components/game/Table"
+import { ROUTE_TOWERS } from "@/constants/routes"
 import { authClient } from "@/lib/auth-client"
 import { useAppDispatch } from "@/lib/hooks"
+import { leaveTable } from "@/redux/features/socket-slice"
 import { mockRoom1 } from "@/test/data/rooms"
+import { mockSession } from "@/test/data/session"
 import { mockRoom1Table1 } from "@/test/data/tables"
-import { mockSession } from "@/test/data/users"
-
-const { useRouter } = vi.hoisted(() => {
-  const mockRouterPush: Mock = vi.fn()
-
-  return {
-    useRouter: () => ({ push: mockRouterPush }),
-    mockRouterPush,
-  }
-})
+import { mockUseRouter, mockUseSearchParams } from "@/vitest.setup"
 
 vi.mock("next/image", () => ({
   __esModule: true,
@@ -27,14 +21,17 @@ vi.mock("next/image", () => ({
   },
 }))
 
-vi.mock("next/navigation", async () => {
-  const actual = await vi.importActual("next/navigation")
-
-  return {
-    ...actual,
-    useRouter,
-  }
-})
+vi.mock("next/navigation", () => ({
+  useRouter: vi.fn(() => mockUseRouter),
+  useSearchParams: vi.fn(() => ({
+    ...mockUseSearchParams,
+    get: vi.fn((key: string) => {
+      if (key === "room") return mockRoom1.id
+      if (key === "table") return mockRoom1Table1.id
+      return null
+    }),
+  })),
+}))
 
 vi.mock("@/lib/auth-client", () => ({
   authClient: {
@@ -50,10 +47,6 @@ vi.mock("@/lib/hooks", () => ({
 describe("Table Component", () => {
   const mockAppDispatch: Mock = vi.fn()
 
-  beforeAll(() => {
-    HTMLElement.prototype.scrollIntoView = vi.fn()
-  })
-
   beforeEach(() => {
     vi.mocked(useAppDispatch).mockReturnValue(mockAppDispatch)
     vi.mocked(authClient.useSession).mockReturnValue(mockSession)
@@ -63,24 +56,32 @@ describe("Table Component", () => {
     vi.clearAllMocks()
   })
 
-  it("should render the chat input and allows message sending", () => {
-    render(<Table roomId={mockRoom1.id} tableId={mockRoom1Table1.id} />)
-
-    const messageInput: HTMLInputElement = screen.getByPlaceholderText("Write something...")
-    fireEvent.change(messageInput, { target: { value: "Hello!" } })
-    fireEvent.keyDown(messageInput, { key: "Enter" })
-
-    expect(mockAppDispatch).toHaveBeenCalled()
-  })
-
   it("should render the correct table type and rated status", () => {
-    render(<Table roomId={mockRoom1.id} tableId={mockRoom1Table1.id} />)
+    render(<Table />)
 
     expect(screen.getByText("Public")).toBeInTheDocument()
     expect(screen.getByLabelText("Rated Game")).toBeChecked()
   })
 
   it.todo("should handle seat click correctly", () => {
-    render(<Table roomId={mockRoom1.id} tableId={mockRoom1Table1.id} />)
+    render(<Table />)
+  })
+
+  it("should navigate to the room on successful room exit", () => {
+    render(<Table />)
+
+    const exitRoomButton: HTMLButtonElement = screen.getByText("Quit")
+    fireEvent.click(exitRoomButton)
+
+    expect(mockAppDispatch).toHaveBeenCalledWith(
+      leaveTable({
+        roomId: mockRoom1.id,
+        tableId: mockRoom1Table1.id,
+      }),
+    )
+
+    waitFor(() => {
+      expect(mockUseRouter).toHaveBeenCalledWith(`${ROUTE_TOWERS.PATH}?room=${mockRoom1.id}`)
+    })
   })
 })

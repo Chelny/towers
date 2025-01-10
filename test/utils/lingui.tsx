@@ -9,8 +9,7 @@ vi.mock("@lingui/core/macro", () => ({
 }))
 
 vi.mock("@lingui/react/macro", () => ({
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  Trans: ({ id, values, children }: { id?: string; values?: Record<string, any>; children?: React.ReactNode }) => {
+  Trans: ({ id, values, children }: { id?: string; values?: Record<string, unknown>; children?: React.ReactNode }) => {
     if (typeof children === "string") return <>{children}</>
     if (Array.isArray(children)) return <>{children}</>
     return children

@@ -1,7 +1,8 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { vi } from "vitest"
 import { SettingsForm } from "@/app/[locale]/(protected)/account/settings/settings.form"
-import { mockSession } from "@/test/data/users"
+import { APP_COOKIES } from "@/constants/app"
+import { mockSession } from "@/test/data/session"
 import { mockFetch, mockFetchResponse, mockUseRouter } from "@/vitest.setup"
 
 vi.mock("next/navigation", () => ({
@@ -70,7 +71,7 @@ describe("Settings Form", () => {
       message: "The settings have been updated!",
     }
 
-    global.localStorage.setItem("towers.formState", JSON.stringify(mockResponse))
+    global.localStorage.setItem(APP_COOKIES.SETTINGS_FORM_STATE, JSON.stringify(mockResponse))
 
     render(<SettingsForm session={mockSession.data} />)
 

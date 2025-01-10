@@ -5,9 +5,11 @@ import {
   TowersTable,
   TowersTableChatMessage,
   TowersUserProfile,
+  TowersUserRoom,
   User,
 } from "@prisma/client"
 import { parseArgs } from "node:util"
+import { DEFAULT_TOWERS_CONTROLS } from "@/constants/game"
 import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 
@@ -128,16 +130,17 @@ async function main(): Promise<void> {
       // * TowersUserProfile
       // **************************************************
 
-      const towersUserProfileData: Partial<TowersUserProfile>[] = users.map((user: User) => ({
-        userId: user.id,
-        rating: Math.floor(Math.random() * 4000) + 1000,
-        gamesCompleted: Math.floor(Math.random() * 100),
-        wins: Math.floor(Math.random() * 50),
-        loses: Math.floor(Math.random() * 50),
-        streak: Math.floor(Math.random() * 5),
-      }))
-
-      await prisma.towersUserProfile.createMany({ data: towersUserProfileData as TowersUserProfile[] })
+      await prisma.towersUserProfile.createMany({
+        data: users.map((user: User) => ({
+          userId: user.id,
+          rating: Math.floor(Math.random() * 4000) + 1000,
+          gamesCompleted: Math.floor(Math.random() * 100),
+          wins: Math.floor(Math.random() * 50),
+          loses: Math.floor(Math.random() * 50),
+          streak: Math.floor(Math.random() * 5),
+          controls: DEFAULT_TOWERS_CONTROLS,
+        })),
+      })
 
       const towersUserProfiles: TowersUserProfile[] = await prisma.towersUserProfile.findMany()
 
@@ -178,33 +181,59 @@ async function main(): Promise<void> {
       const tables: TowersTable[] = await prisma.towersTable.findMany()
 
       // **************************************************
-      // * TowersUserRoomTable
+      // * TowersUserRoom and TowersUserTable
       // **************************************************
 
       for (let i = 0; i < towersUserProfiles.length; i++) {
         if (i < 3) {
-          await prisma.towersUserRoomTable.create({
+          const userRoom: TowersUserRoom = await prisma.towersUserRoom.create({
+            data: {
+              userProfileId: towersUserProfiles[i].id,
+              roomId: tables[0].roomId,
+            },
+          })
+
+          await prisma.towersUserTable.create({
             data: {
               userProfileId: towersUserProfiles[i].id,
               roomId: tables[0].roomId,
               tableId: tables[0].id,
               seatNumber: i + 1,
+              userRoomId: userRoom.id,
             },
           })
         } else if (i === 3) {
-          await prisma.towersUserRoomTable.create({
+          const userRoom: TowersUserRoom = await prisma.towersUserRoom.create({
+            data: {
+              userProfileId: towersUserProfiles[i].id,
+              roomId: tables[1].roomId,
+            },
+          })
+
+          await prisma.towersUserTable.create({
             data: {
               userProfileId: towersUserProfiles[i].id,
               roomId: tables[1].roomId,
               tableId: tables[1].id,
+              seatNumber: null,
+              userRoomId: userRoom.id,
             },
           })
         } else if (i === 4) {
-          await prisma.towersUserRoomTable.create({
+          const userRoom: TowersUserRoom = await prisma.towersUserRoom.create({
+            data: {
+              userProfileId: towersUserProfiles[i].id,
+              roomId: tables[2].roomId,
+            },
+          })
+
+          await prisma.towersUserTable.create({
             data: {
               userProfileId: towersUserProfiles[i].id,
               roomId: tables[2].roomId,
               tableId: tables[2].id,
+              seatNumber: null,
+              userRoomId: userRoom.id,
             },
           })
         }

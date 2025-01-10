@@ -59,7 +59,11 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       include: {
         host: {
           include: {
-            user: true,
+            user: {
+              select: {
+                username: true,
+              },
+            },
           },
         },
       },

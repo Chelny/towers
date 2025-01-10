@@ -4,15 +4,17 @@ import Room from "@/components/game/Room"
 import { ROUTE_TOWERS } from "@/constants/routes"
 import { authClient } from "@/lib/auth-client"
 import { useAppDispatch } from "@/lib/hooks"
-import { leaveRoomSocketRoom } from "@/redux/features/socket-slice"
-import { leaveRoom } from "@/redux/thunks/room-thunks"
+import { leaveRoom } from "@/redux/features/socket-slice"
 import { mockRoom1 } from "@/test/data/rooms"
-import { mockSocketRoom1Id } from "@/test/data/socketState"
-import { mockSession } from "@/test/data/users"
-import { mockUseRouter } from "@/vitest.setup"
+import { mockSession } from "@/test/data/session"
+import { mockUseRouter, mockUseSearchParams } from "@/vitest.setup"
 
 vi.mock("next/navigation", () => ({
   useRouter: vi.fn(() => mockUseRouter),
+  useSearchParams: vi.fn(() => ({
+    ...mockUseSearchParams,
+    get: vi.fn((key: string) => (key === "room" ? mockRoom1.id : null)),
+  })),
 }))
 
 vi.mock("@/lib/auth-client", () => ({
@@ -26,20 +28,8 @@ vi.mock("@/lib/hooks", () => ({
   useAppSelector: vi.fn(),
 }))
 
-vi.mock("@/redux/features/socket-slice")
-
-vi.mock("@/redux/thunks/room-thunks")
-
 describe("Room Component", () => {
   const mockAppDispatch: Mock = vi.fn()
-  const mockSocketRoomThunkParams: { roomId: string; tablesToQuit: { id: string; isLastUser: boolean }[] } = {
-    roomId: mockSocketRoom1Id,
-    tablesToQuit: [],
-  }
-
-  beforeAll(() => {
-    HTMLElement.prototype.scrollIntoView = vi.fn()
-  })
 
   beforeEach(() => {
     vi.mocked(useAppDispatch).mockReturnValue(mockAppDispatch)
@@ -51,57 +41,41 @@ describe("Room Component", () => {
   })
 
   it("should render room correctly", () => {
-    render(<Room roomId={mockSocketRoom1Id} />)
-    expect(screen.getByPlaceholderText("Write something...")).toBeInTheDocument()
-  })
+    render(<Room />)
 
-  it("should send a message when Enter is pressed", () => {
-    render(<Room roomId={mockSocketRoom1Id} />)
-
-    const input: HTMLInputElement = screen.getByPlaceholderText("Write something...")
-    fireEvent.change(input, { target: { value: "Hello World!" } })
-    fireEvent.keyDown(input, { key: "Enter", code: "Enter" })
-
-    expect(mockAppDispatch).toHaveBeenCalled()
+    waitFor(() => {
+      expect(screen.getByPlaceholderText("Play Now")).toBeInTheDocument()
+      expect(screen.getByPlaceholderText("Create Table")).toBeInTheDocument()
+      expect(screen.getByPlaceholderText("Ratings")).toBeInTheDocument()
+      expect(screen.getByPlaceholderText("Options")).toBeInTheDocument()
+      expect(screen.getByPlaceholderText("Exit Room")).toBeInTheDocument()
+      expect(screen.getByPlaceholderText("Team 1-2")).toBeInTheDocument()
+      expect(screen.getByPlaceholderText("Team 3-4")).toBeInTheDocument()
+      expect(screen.getByPlaceholderText("Team 5-6")).toBeInTheDocument()
+      expect(screen.getByPlaceholderText("Team 7-8")).toBeInTheDocument()
+      expect(screen.getByPlaceholderText("Who is Watching")).toBeInTheDocument()
+    })
   })
 
   it("should not navigate to rooms list if room exit fails", () => {
-    const mockAppDispatchBeforeLeaveSocketRoom: Mock = vi.fn()
-
-    mockAppDispatch.mockReturnValue({
-      unwrap: () => Promise.resolve(),
-    })
-
-    mockAppDispatchBeforeLeaveSocketRoom.mockReturnValue({
-      unwrap: () => Promise.resolve(mockSocketRoomThunkParams),
-    })
-
-    render(<Room roomId={mockRoom1.id} />)
+    render(<Room />)
 
     const exitRoomButton: HTMLButtonElement = screen.getByText("Exit Room")
     fireEvent.click(exitRoomButton)
 
     waitFor(() => {
-      expect(mockAppDispatch).toHaveBeenCalledWith(leaveRoom(mockSocketRoomThunkParams))
-      expect(mockAppDispatchBeforeLeaveSocketRoom).not.toHaveBeenCalledWith(
-        leaveRoomSocketRoom(mockSocketRoomThunkParams),
-      )
+      expect(mockAppDispatch).toHaveBeenCalledWith(leaveRoom({ roomId: mockRoom1.id }))
       expect(mockUseRouter).not.toHaveBeenCalled()
     })
   })
 
   it("should navigate to the rooms list on successful room exit", () => {
-    mockAppDispatch.mockReturnValue({
-      unwrap: () => Promise.resolve(mockSocketRoomThunkParams),
-    })
-
-    render(<Room roomId={mockRoom1.id} />)
+    render(<Room />)
 
     const exitRoomButton: HTMLButtonElement = screen.getByText("Exit Room")
     fireEvent.click(exitRoomButton)
 
-    expect(mockAppDispatch).toHaveBeenCalledWith(leaveRoom(mockSocketRoomThunkParams))
-    expect(mockAppDispatch).toHaveBeenCalledWith(leaveRoomSocketRoom(mockSocketRoomThunkParams))
+    expect(mockAppDispatch).toHaveBeenCalledWith(leaveRoom({ roomId: mockRoom1.id }))
 
     waitFor(() => {
       expect(mockUseRouter).toHaveBeenCalledWith(ROUTE_TOWERS.PATH)

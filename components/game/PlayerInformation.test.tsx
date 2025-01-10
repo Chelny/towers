@@ -1,10 +1,10 @@
-import { ITowersUserRoomTable } from "@prisma/client"
+import { ITowersUserProfile } from "@prisma/client"
 import { fireEvent, render, screen } from "@testing-library/react"
 import { Mock } from "vitest"
 import PlayerInformation from "@/components/game/PlayerInformation"
 import { authClient } from "@/lib/auth-client"
+import { mockSession } from "@/test/data/session"
 import { mockTowersRoomState1Users } from "@/test/data/socketState"
-import { mockSession } from "@/test/data/users"
 
 vi.mock("@/lib/auth-client", () => ({
   authClient: {
@@ -13,8 +13,8 @@ vi.mock("@/lib/auth-client", () => ({
 }))
 
 describe("PlayerInformation Component", () => {
-  const player1: ITowersUserRoomTable = mockTowersRoomState1Users[0]
-  const player2: ITowersUserRoomTable = mockTowersRoomState1Users[1]
+  const player1: ITowersUserProfile = mockTowersRoomState1Users[0]
+  const player2: ITowersUserProfile = mockTowersRoomState1Users[1]
 
   beforeAll(() => {
     HTMLDialogElement.prototype.showModal = vi.fn()
@@ -39,12 +39,12 @@ describe("PlayerInformation Component", () => {
 
     render(<PlayerInformation isOpen={true} player={player2} isRatingsVisible onCancel={handleCancel} />)
 
-    expect(screen.getByText(`Player information of ${player2.userProfile?.user?.username}`)).toBeInTheDocument()
-    expect(screen.getByText(new RegExp(`Rating: ${player2.userProfile?.rating}`))).toBeInTheDocument()
-    expect(screen.getByText(new RegExp(`Games Completed: ${player2.userProfile?.gamesCompleted}`))).toBeInTheDocument()
-    expect(screen.getByText(new RegExp(`Wins: ${player2.userProfile?.wins}`))).toBeInTheDocument()
-    expect(screen.getByText(new RegExp(`Loses: ${player2.userProfile?.loses}`))).toBeInTheDocument()
-    expect(screen.getByText(new RegExp(`Streak: ${player2.userProfile?.streak}`))).toBeInTheDocument()
+    expect(screen.getByText(`Player information of ${player2.user?.username}`)).toBeInTheDocument()
+    expect(screen.getByText(new RegExp(`Rating: ${player2.rating}`))).toBeInTheDocument()
+    expect(screen.getByText(new RegExp(`Games Completed: ${player2.gamesCompleted}`))).toBeInTheDocument()
+    expect(screen.getByText(new RegExp(`Wins: ${player2.wins}`))).toBeInTheDocument()
+    expect(screen.getByText(new RegExp(`Loses: ${player2.loses}`))).toBeInTheDocument()
+    expect(screen.getByText(new RegExp(`Streak: ${player2.streak}`))).toBeInTheDocument()
   })
 
   it("should update the reason input when typed into", () => {

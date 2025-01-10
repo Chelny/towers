@@ -5,32 +5,19 @@ import { ROUTE_TOWERS } from "@/constants/routes"
 import { authClient } from "@/lib/auth-client"
 import { useAppDispatch, useAppSelector } from "@/lib/hooks"
 import { RootState } from "@/redux/store"
+import { mockSession } from "@/test/data/session"
 import {
-  mockSocketRoom1Id,
   mockSocketRoom1Table1Id,
   mockSocketState,
   mockStoreReducers,
+  mockTowersRoomState1Tables,
   mockTowersTableState11Info,
 } from "@/test/data/socketState"
-import { mockSession } from "@/test/data/users"
+import { mockUseRouter } from "@/vitest.setup"
 
-const { useRouter, mockRouterPush } = vi.hoisted(() => {
-  const mockRouterPush: Mock = vi.fn()
-
-  return {
-    useRouter: () => ({ push: mockRouterPush }),
-    mockRouterPush,
-  }
-})
-
-vi.mock("next/navigation", async () => {
-  const actual = await vi.importActual("next/navigation")
-
-  return {
-    ...actual,
-    useRouter,
-  }
-})
+vi.mock("next/navigation", () => ({
+  useRouter: vi.fn(() => mockUseRouter),
+}))
 
 vi.mock("@/lib/auth-client", () => ({
   authClient: {
@@ -68,19 +55,19 @@ describe("RoomTable Component", () => {
   })
 
   it("should render room tables correctly", () => {
-    render(<RoomTable roomId={mockSocketRoom1Id} tableId={mockSocketRoom1Table1Id} />)
+    render(<RoomTable table={mockTowersRoomState1Tables[mockSocketRoom1Table1Id]} isTablesLoading={false} />)
     expect(screen.getByText("#1")).toBeInTheDocument()
   })
 
   it("should navigate to the correct table on watch button click", async () => {
-    render(<RoomTable roomId={mockSocketRoom1Id} tableId={mockSocketRoom1Table1Id} />)
+    render(<RoomTable table={mockTowersRoomState1Tables[mockSocketRoom1Table1Id]} isTablesLoading={false} />)
 
     const watchButtons: HTMLButtonElement[] = screen.getAllByRole("button", { name: /Watch/i })
     expect(watchButtons[0]).toBeInTheDocument()
     fireEvent.click(watchButtons[0])
 
     await waitFor(() => {
-      expect(mockRouterPush).toHaveBeenCalledWith(
+      expect(mockUseRouter.push).toHaveBeenCalledWith(
         `${ROUTE_TOWERS.PATH}?room=${mockTowersTableState11Info?.roomId}&table=${mockTowersTableState11Info?.id}`,
       )
     })
