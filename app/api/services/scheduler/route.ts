@@ -1,18 +1,19 @@
 import { NextResponse } from "next/server"
 import { t } from "@lingui/core/macro"
 import cron from "node-cron"
+import { logger } from "@/lib/logger"
 import prisma from "@/lib/prisma"
 
 export async function POST(): Promise<NextResponse> {
   try {
     cron.schedule("*/20 * * * *", async () => {
-      console.log("")
-      console.log("######################################")
-      console.log("#                                    #")
-      console.log("# Running scheduler every 20 minutes #")
-      console.log("#                                    #")
-      console.log("######################################")
-      console.log("")
+      logger.info("")
+      logger.info("######################################")
+      logger.info("#                                    #")
+      logger.info("# Running scheduler every 20 minutes #")
+      logger.info("#                                    #")
+      logger.info("######################################")
+      logger.info("")
 
       // await prisma.user.deleteMany({
       //   where: { deletionScheduledAt: { lt: new Date() } },

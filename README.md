@@ -67,7 +67,6 @@ This project is inspired by Yahoo! Towers but is an independent work. It is not 
 [![TailwindCSS](https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 [![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Next JS](https://img.shields.io/badge/Next-black?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/)
-[![Redux](https://img.shields.io/badge/Redux-593D88?style=for-the-badge&logo=redux&logoColor=white)](https://redux.js.org/)
 [![Stylelint](https://img.shields.io/badge/stylelint-000?style=for-the-badge&logo=stylelint&logoColor=white)](https://stylelint.io/)
 [![ESLint](https://img.shields.io/badge/eslint-3A33D1?style=for-the-badge&logo=eslint&logoColor=white)](https://eslint.org/)
 [![Prettier](https://img.shields.io/badge/prettier-1A2C34?style=for-the-badge&logo=prettier&logoColor=F7BA3E)](https://prettier.io/docs/en/options.html)
@@ -149,41 +148,13 @@ _TODO_
 
 ## Roadmap
 
-- General
-  - [x] Add links to Terms of Service and Privacy Policy in `/sign-in` and `/sign-up` pages
-  - [x] Multi-language Support
-    - [x] French
-  - [x] Redirect new user that signs up with OAuth to `/new-user`
-  - [x] Fix delete user redirection from confirmation link
-  - [ ] Fix passkeys (sign-in and profile)
-  - [ ] Add OTP (email and phone)
-  - [x] Add analytics
-  - [ ] Add tooltip
-  - [ ] Add toast
-- User
-  - [ ] Add predefined avatars or allow users to upload their avatar
-  - [ ] Prevent user from accessing their account while in a game room (show prompt on click)
-- Room
-  - [ ] Prevent users from accessing a room directly by its URL (e.g., full rooms)
-  - [x] Lower recommended window size - Current: 1350px by 768px
-  - [ ] Invitation Request: Accept table invitation
-  - [ ] Invitation Request: Decline table invitation: Emit socket event + send decline reason to the other user
-  - [ ] Player Information: Send private message endpoint
-- Table
-  - [ ] Prevent users from accessing a table directly by its URL (e.g., private tables)
-  - [ ] Fix: In HTML, `<form>` cannot be a descendant of `<form>`
-  - [ ] Sidebar: Add boot user endpoint + socket event
-  - [ ] Sidebar: Add invite user socket event + only show users not in the table
-  - [ ] Game: Attacks should be sent to the opponents’ board
-  - [ ] Game: Seated users from teams 2–4 must play their game from team 1’s seat
-  - [ ] Game: Consider other team players’ boards when placing pieces
-  - [ ] Chat: Ratings update: `*** [username]’s old rating: 2050; new rating: 2040`
-  - [ ] Chat: Cipher key:
-    - [ ] Cipher key text: For each Tower made on the game board. Example: `*** V ==> M`
-    - [ ] Code after winning 25 games in 2 hours: `2FKK 2OF W1VAM2FO 91MO 8EWOF2 NF9 7HW3FE` (no asterisks at the beginning)
-    - [ ] Hero message: Click on chat input, click TAB, then type. Shouldn’t see it typed anywhere. Example: `*** [username] is a hero of Yahoo! Towers.`
-- Server
-  - [ ] Manage errors for specific users in specific rooms
+- [ ] Fix passkeys (sign-in and profile)
+- [ ] Add OTP (email and phone)
+- [ ] Add tooltip (?)
+- [ ] Add toast (?)
+- [ ] Add predefined avatars or allow users to upload their own avatar
+- [ ] Prevent user from accessing the profile page while in a game room (show prompt on click)
+- [ ] Add "Watch" button on Player Information modal - on click it should redirect to the player's most recent joined table
 
 See the [open issues](https://github.com/Chelny/towers/issues) for a full list of proposed features (and known issues).
 

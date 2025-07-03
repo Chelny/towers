@@ -1,7 +1,20 @@
 import { ImgHTMLAttributes } from "react"
-import { fireEvent, render, screen } from "@testing-library/react"
+import { fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { Mock } from "vitest"
 import PlayerBoard from "@/components/towers/PlayerBoard"
+import { SocketEvents } from "@/constants/socket-events"
+import { ModalProvider } from "@/context/ModalContext"
+import { TowersGameState } from "@/enums/towers-game-state"
+import { authClient } from "@/lib/auth-client"
+import { BoardPlainObject } from "@/server/towers/classes/Board"
+import { NextPiecesPlainObject } from "@/server/towers/classes/NextPieces"
+import { PowerBarPlainObject } from "@/server/towers/classes/PowerBar"
+import { TableInvitationManagerPlainObject } from "@/server/towers/classes/TableInvitationManager"
+import { UserMuteManagerPlainObject } from "@/server/towers/classes/UserMuteManager"
+import { mockSession } from "@/test/data/session"
+import { mockUser1 } from "@/test/data/user"
+import { mockUserStats1 } from "@/test/data/user-stats"
+import { mockSocket } from "@/vitest.setup"
 
 vi.mock("next/image", () => ({
   __esModule: true,
@@ -11,75 +24,270 @@ vi.mock("next/image", () => ({
   },
 }))
 
-const mockHandleStartGame: Mock = vi.fn()
+vi.mock("@/context/SocketContext", async () => {
+  const actual = await vi.importActual("@/context/SocketContext")
+  return {
+    ...actual,
+    useSocket: () => ({ socket: mockSocket }),
+  }
+})
 
-vi.mock("@/hooks/useTowers", () => ({
-  useTowers: () => ({
-    board: [],
-    startGame: mockHandleStartGame,
-    isPlaying: false,
-    isGameOver: false,
-    score: 100,
-    nextPieces: [[]],
-    powerBar: [],
-  }),
+vi.mock("@/lib/auth-client", () => ({
+  authClient: {
+    useSession: vi.fn(),
+  },
 }))
 
-// FIXME: Game logic
-describe.skip("PlayerBoard Component", () => {
-  const mockHandleChooseSeat: Mock = vi.fn()
+const defaultSeat = {
+  seatNumber: 1,
+  targetNumber: 1,
+  teamNumber: 1,
+  occupiedBy: {
+    user: mockUser1,
+    rooms: {
+      "mock-room-1": {
+        createdAt: Date.now(),
+      },
+    },
+    tables: {
+      "mock-table-1": {
+        roomId: "mock-room-1",
+        tableNumber: 1,
+        seatNumber: 1,
+        teamNumber: 1,
+        isReady: false,
+        isPlaying: false,
+        createdAt: Date.now(),
+      },
+    },
+    lastJoinedTable: {
+      roomId: "mock-room-1",
+      tableNumber: 1,
+      seatNumber: 1,
+      teamNumber: 1,
+      isReady: false,
+      isPlaying: false,
+      createdAt: Date.now(),
+    },
+    controlKeys: {
+      MOVE_LEFT: "ArrowLeft",
+      MOVE_RIGHT: "ArrowRight",
+      CYCLE: "ArrowUp",
+      DROP: "ArrowDown",
+      USE_ITEM: "Space",
+      USE_ITEM_ON_PLAYER_1: "1",
+      USE_ITEM_ON_PLAYER_2: "2",
+      USE_ITEM_ON_PLAYER_3: "3",
+      USE_ITEM_ON_PLAYER_4: "4",
+      USE_ITEM_ON_PLAYER_5: "5",
+      USE_ITEM_ON_PLAYER_6: "6",
+      USE_ITEM_ON_PLAYER_7: "7",
+      USE_ITEM_ON_PLAYER_8: "8",
+    },
+    stats: mockUserStats1,
+    tableInvitations: {} as TableInvitationManagerPlainObject,
+    mute: {} as UserMuteManagerPlainObject,
+  },
+  board: {} as BoardPlainObject,
+  nextPieces: { nextPiece: {} } as NextPiecesPlainObject,
+  powerBar: {} as PowerBarPlainObject,
+}
+
+const defaultProps = {
+  roomId: "mock-room-1",
+  tableId: "mock-table-1",
+  seat: defaultSeat,
+  isOpponentBoard: false,
+  gameState: TowersGameState.WAITING,
+  readyTeamsCount: 0,
+  isSitAccessGranted: false,
+  isUserSeatedAnywhere: false,
+  currentUser: defaultSeat.occupiedBy,
+  isRatingsVisible: true,
+  onSit: vi.fn(),
+  onStand: vi.fn(),
+  onStart: vi.fn(),
+  onNextPowerBarItem: vi.fn(),
+}
+
+describe("PlayerBoard", () => {
+  beforeEach(() => {
+    vi.mocked(authClient.useSession).mockReturnValue(mockSession)
+  })
 
   afterEach(() => {
     vi.clearAllMocks()
   })
 
-  // it("should render player information with score", () => {
-  //   render(<PlayerBoard seatNumber={1} onChooseSeat={mockHandleChooseSeat} />)
+  it("should display Join button when seat is available", () => {
+    const openSeat = {
+      ...defaultSeat,
+      occupiedBy: undefined,
+    }
 
-  //   expect(screen.getByText("the_player1 (100)")).toBeInTheDocument()
-  // })
+    render(
+      <ModalProvider>
+        <PlayerBoard {...defaultProps} isSitAccessGranted seat={openSeat} />
+      </ModalProvider>,
+    )
 
-  // it("should display the 'Join' button when not seated", () => {
-  //   render(<PlayerBoard seatNumber={1} isSeated={false} onChooseSeat={mockHandleChooseSeat} />)
+    expect(screen.getByText("Join")).toBeInTheDocument()
+  })
 
-  //   const joinButton: HTMLButtonElement = screen.getByText("Join")
-  //   expect(joinButton).toBeInTheDocument()
+  it("should call onSit when Join button is clicked", () => {
+    const onSit: Mock = vi.fn()
 
-  //   fireEvent.click(joinButton)
-  //   expect(mockHandleChooseSeat).toHaveBeenCalledWith(1)
-  // })
+    const openSeat = {
+      ...defaultSeat,
+      occupiedBy: undefined,
+    }
 
-  // it("should display the 'Stand' and 'Start' buttons when seated", () => {
-  //   render(<PlayerBoard seatNumber={1} isSeated={true} onChooseSeat={mockHandleChooseSeat} />)
+    render(
+      <ModalProvider>
+        <PlayerBoard {...defaultProps} seat={openSeat} isSitAccessGranted onSit={onSit} />
+      </ModalProvider>,
+    )
 
-  //   const standButton: HTMLButtonElement = screen.getByText("Stand")
-  //   const startButton: HTMLButtonElement = screen.getByText("Start")
+    fireEvent.click(screen.getByText("Join"))
+    expect(onSit).toHaveBeenCalled()
+  })
 
-  //   expect(standButton).toBeInTheDocument()
-  //   expect(startButton).toBeInTheDocument()
+  it("should render player avatar and username when seat is occupied", () => {
+    render(
+      <ModalProvider>
+        <PlayerBoard {...defaultProps} />
+      </ModalProvider>,
+    )
+    expect(screen.getByTestId("user-avatar_image")).toBeInTheDocument()
+    expect(screen.getByText("john.doe")).toBeInTheDocument()
+  })
 
-  //   fireEvent.click(standButton)
-  //   expect(mockHandleChooseSeat).toHaveBeenCalledWith(null)
+  it("should call onStand when Stand button is clicked", () => {
+    const onStand: Mock = vi.fn()
 
-  //   fireEvent.click(startButton)
-  //   expect(mockHandleStartGame).toHaveBeenCalled()
-  // })
+    render(
+      <ModalProvider>
+        <PlayerBoard {...defaultProps} seat={defaultSeat} isSitAccessGranted isUserSeatedAnywhere onStand={onStand} />
+      </ModalProvider>,
+    )
 
-  // it("should render the grid and power bar correctly for the player’s board", () => {
-  //   render(<PlayerBoard seatNumber={1} isOpponentBoard={false} onChooseSeat={mockHandleChooseSeat} />)
+    fireEvent.click(screen.getByText("Stand"))
+    expect(onStand).toHaveBeenCalled()
+  })
 
-  //   expect(screen.getByTestId("player-board-power-bar-container")).toBeInTheDocument()
-  //   expect(screen.getByTestId("player-board-grid-container")).toBeInTheDocument()
-  // })
+  it("should call onStart when Start button is clicked", () => {
+    const onStart: Mock = vi.fn()
 
-  // it("should render smaller avatar and text for opponent’s board", () => {
-  //   render(<PlayerBoard seatNumber={2} isOpponentBoard={true} onChooseSeat={mockHandleChooseSeat} />)
+    render(
+      <ModalProvider>
+        <PlayerBoard
+          {...defaultProps}
+          onStart={onStart}
+          gameState={TowersGameState.WAITING}
+          readyTeamsCount={2}
+          isSitAccessGranted
+          isUserSeatedAnywhere
+        />
+      </ModalProvider>,
+    )
 
-  //   const avatar: HTMLImageElement = screen.getByAltText("")
-  //   const playerName: HTMLDivElement = screen.getByText("the_player2 (100)")
+    fireEvent.click(screen.getByText("Start"))
+    expect(onStart).toHaveBeenCalled()
+  })
 
-  //   expect(avatar).toHaveAttribute("width", "16")
-  //   expect(avatar).toHaveAttribute("height", "16")
-  //   expect(playerName).toHaveClass("text-sm")
-  // })
+  it("should emit PIECE_CYCLE when up key is pressed", async () => {
+    render(
+      <ModalProvider>
+        <PlayerBoard {...defaultProps} isUserSeatedAnywhere />
+      </ModalProvider>,
+    )
+
+    const board: HTMLElement = screen.getByTestId("player-board_container_grid")
+    board.focus()
+
+    fireEvent.keyDown(document, { key: "ArrowUp", code: "ArrowUp" })
+
+    waitFor(() => {
+      expect(mockSocket.emit).toHaveBeenCalledWith(SocketEvents.PIECE_CYCLE, {
+        tableId: "mock-table-1",
+        seatNumber: 1,
+      })
+    })
+  })
+
+  it("should emit PIECE_MOVE when right key is pressed", async () => {
+    render(
+      <ModalProvider>
+        <PlayerBoard {...defaultProps} isUserSeatedAnywhere />
+      </ModalProvider>,
+    )
+
+    const board: HTMLElement = screen.getByTestId("player-board_container_grid")
+    board.focus()
+
+    fireEvent.keyDown(document, { key: "ArrowRight", code: "ArrowRight" })
+
+    waitFor(() => {
+      expect(mockSocket.emit).toHaveBeenCalledWith(SocketEvents.PIECE_MOVE, {
+        tableId: "mock-table-1",
+        seatNumber: 1,
+        direction: "right",
+      })
+    })
+  })
+
+  it("should emit PIECE_MOVE when left key is pressed", async () => {
+    render(
+      <ModalProvider>
+        <PlayerBoard {...defaultProps} isUserSeatedAnywhere />
+      </ModalProvider>,
+    )
+
+    const board: HTMLElement = screen.getByTestId("player-board_container_grid")
+    board.focus()
+
+    fireEvent.keyDown(document, { key: "ArrowLeft", code: "ArrowLeft" })
+
+    waitFor(() => {
+      expect(mockSocket.emit).toHaveBeenCalledWith(SocketEvents.PIECE_MOVE, {
+        tableId: "mock-table-1",
+        seatNumber: 1,
+        direction: "left",
+      })
+    })
+  })
+
+  it("should emit PIECE_DROP when spacebar is pressed", async () => {
+    render(
+      <ModalProvider>
+        <PlayerBoard {...defaultProps} isUserSeatedAnywhere />
+      </ModalProvider>,
+    )
+
+    const board: HTMLElement = screen.getByTestId("player-board_container_grid")
+    board.focus()
+
+    fireEvent.keyDown(document, { key: "Space", code: "Space" })
+
+    waitFor(() => {
+      expect(mockSocket.emit).toHaveBeenCalledWith(SocketEvents.POWER_USE, {
+        tableId: "mock-table-1",
+        seatNumber: 1,
+      })
+    })
+  })
+
+  it("should not emit control key event when not current user", () => {
+    render(
+      <ModalProvider>
+        <PlayerBoard {...defaultProps} />
+      </ModalProvider>,
+    )
+
+    const board: HTMLElement = screen.getByTestId("player-board_container_grid")
+    board.focus()
+
+    fireEvent.keyDown(document, { key: "ArrowLeft", code: "ArrowLeft" })
+    expect(mockSocket.emit).not.toHaveBeenCalled()
+  })
 })

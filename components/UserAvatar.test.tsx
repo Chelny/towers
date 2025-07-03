@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/react"
 import UserAvatar from "@/components/UserAvatar"
 import { authClient } from "@/lib/auth-client"
 import { mockErrorSession, mockPendingSession, mockSession } from "@/test/data/session"
-import { mockUser1 } from "@/test/data/users"
+import { mockUser1 } from "@/test/data/user"
 
 vi.mock("next/image", () => ({
   __esModule: true,
@@ -21,7 +21,7 @@ vi.mock("@/lib/auth-client", () => ({
   },
 }))
 
-describe("UserAvatar Component", () => {
+describe("UserAvatar", () => {
   it("should render placeholder avatar when session data is not available", () => {
     vi.mocked(authClient.useSession).mockReturnValue(mockErrorSession)
 

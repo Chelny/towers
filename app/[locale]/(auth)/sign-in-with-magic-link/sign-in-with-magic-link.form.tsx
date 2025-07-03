@@ -15,6 +15,7 @@ import Input from "@/components/ui/Input"
 import { INITIAL_FORM_STATE } from "@/constants/api"
 import { CALLBACK_URL } from "@/constants/routes"
 import { authClient } from "@/lib/auth-client"
+import { logger } from "@/lib/logger"
 
 export function SignInWithMagicLinkForm(): ReactNode {
   const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -38,7 +39,7 @@ export function SignInWithMagicLinkForm(): ReactNode {
           errorMessages.email = t({ message: "The email is invalid." })
           break
         default:
-          console.error(`Sign Up With Magic Link Validation: Unknown error at ${error.path}`)
+          logger.warn(`Sign Up With Magic Link Validation: Unknown error at ${error.path}`)
           break
       }
     }
@@ -89,7 +90,7 @@ export function SignInWithMagicLinkForm(): ReactNode {
         id="email"
         label={t({ message: "Email" })}
         required
-        dataTestId="sign-in-with-magic-link-email-input"
+        dataTestId="sign-in-with-magic-link_input-email_email"
         errorMessage={formState?.error?.email}
       />
       <Button type="submit" className="w-full" disabled={isLoading}>

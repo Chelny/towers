@@ -55,7 +55,7 @@ export default function RadioButtonGroup({
       <legend id={`${id}Label`} className="mb-1 font-medium">
         {label}{" "}
         {!required && (
-          <span className="text-neutral-500">
+          <span className={clsx("text-neutral-500", "dark:text-dark-text-muted")}>
             (<Trans>optional</Trans>)
           </span>
         )}
@@ -76,12 +76,12 @@ export default function RadioButtonGroup({
         ))}
       </div>
       {description && (
-        <p id={`${id}Description`} className="text-neutral-500">
+        <p id={`${id}Description`} className={clsx("text-neutral-500", "dark:text-dark-text-muted")}>
           {description}
         </p>
       )}
       {errorMessage && (
-        <span id={`${id}ErrorMessage`} className="text-red-600">
+        <span id={`${id}ErrorMessage`} className={clsx("text-red-600", "dark:text-red-400")}>
           {errorMessage}
         </span>
       )}
@@ -96,6 +96,6 @@ type RadioButtonOptionProps = {
   disabled?: boolean
 }
 
-const Option = ({ id, label, value, disabled = false }: RadioButtonOptionProps): ReactNode => null
+const Option = ({}: RadioButtonOptionProps): ReactNode => null
 
 RadioButtonGroup.Option = Option

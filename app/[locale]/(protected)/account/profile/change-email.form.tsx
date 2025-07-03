@@ -15,6 +15,7 @@ import Input from "@/components/ui/Input"
 import { INITIAL_FORM_STATE } from "@/constants/api"
 import { authClient } from "@/lib/auth-client"
 import { Session } from "@/lib/auth-client"
+import { logger } from "@/lib/logger"
 
 type ChangeEmailFormProps = {
   session: Session | null
@@ -42,7 +43,7 @@ export function ChangeEmailForm({ session }: ChangeEmailFormProps): ReactNode {
           errorMessages.email = t({ message: "The email is invalid." })
           break
         default:
-          console.error(`Change Email Validation: Unknown error at ${error.path}`)
+          logger.warn(`Change Email Validation: Unknown error at ${error.path}`)
           break
       }
     }
@@ -96,7 +97,7 @@ export function ChangeEmailForm({ session }: ChangeEmailFormProps): ReactNode {
             setIsLoading(true)
             setFormState(INITIAL_FORM_STATE)
           },
-          onSuccess: (ctx) => {
+          onSuccess: () => {
             setIsLoading(false)
             setFormState({
               success: true,
@@ -120,9 +121,9 @@ export function ChangeEmailForm({ session }: ChangeEmailFormProps): ReactNode {
 
   return (
     <>
-      <h3 className="text-lg font-semibold mb-4">
+      <h2 className="text-lg font-semibold mb-4">
         <Trans>Change Email</Trans>
-      </h3>
+      </h2>
       <form className="w-full" noValidate onSubmit={handleChangeEmail}>
         {formState?.message && (
           <AlertMessage type={formState.success ? "success" : "error"}>{formState.message}</AlertMessage>
@@ -134,7 +135,7 @@ export function ChangeEmailForm({ session }: ChangeEmailFormProps): ReactNode {
           placeholder={t({ message: "Enter your email" })}
           defaultValue={session?.user?.email}
           required
-          dataTestId="profile-email-input"
+          dataTestId="profile_input-email_email"
           onPaste={(event: ClipboardEvent<HTMLInputElement>) => event.preventDefault()}
           errorMessage={formState?.error?.email}
         />

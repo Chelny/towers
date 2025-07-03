@@ -6,13 +6,11 @@ import clsx from "clsx/lite"
 import { ChangeEmailForm } from "@/app/[locale]/(protected)/account/profile/change-email.form"
 import { ChangePasswordForm } from "@/app/[locale]/(protected)/account/profile/change-password.form"
 import { LinkedSocialAccountsForm } from "@/app/[locale]/(protected)/account/profile/linked-social-accounts.form"
-import { PasskeysForm } from "@/app/[locale]/(protected)/account/profile/passkeys.form"
 import { ProfileForm } from "@/app/[locale]/(protected)/account/profile/profile.form"
 import { initLingui } from "@/app/init-lingui"
 import ChangeEmailFormSkeleton from "@/components/skeleton/ChangeEmailFormSkeleton"
 import ChangePasswordFormSkeleton from "@/components/skeleton/ChangePasswordFormSkeleton"
 import LinkedSocialAccountsFormSkeleton from "@/components/skeleton/LinkedSocialAccountsFormSkeleton"
-import PasskeysFormSkeleton from "@/components/skeleton/PasskeysFormSkeleton"
 import ProfileFormSkeleton from "@/components/skeleton/ProfileFormSkeleton"
 import { ROUTE_PROFILE } from "@/constants/routes"
 import { auth } from "@/lib/auth"
@@ -52,6 +50,7 @@ export default async function Profile({ params }: ProfileProps): Promise<ReactNo
             "p-4 border border-gray-200 rounded-lg shadow-sm bg-gray-50",
             "md:col-span-3",
             "lg:col-span-4",
+            "dark:border-dark-card-border dark:bg-dark-card-background",
           )}
         >
           <Suspense fallback={<ProfileFormSkeleton />}>
@@ -65,6 +64,7 @@ export default async function Profile({ params }: ProfileProps): Promise<ReactNo
             "p-4 border border-gray-200 rounded-lg shadow-sm bg-gray-50",
             "md:col-span-3",
             "lg:col-span-2",
+            "dark:border-dark-card-border dark:bg-dark-card-background",
           )}
         >
           <Suspense fallback={<LinkedSocialAccountsFormSkeleton />}>
@@ -78,6 +78,7 @@ export default async function Profile({ params }: ProfileProps): Promise<ReactNo
             "p-4 border border-gray-200 rounded-lg shadow-sm bg-gray-50",
             "md:col-span-2",
             "lg:col-span-2",
+            "dark:border-dark-card-border dark:bg-dark-card-background",
           )}
         >
           <Suspense fallback={<ChangeEmailFormSkeleton />}>
@@ -91,6 +92,7 @@ export default async function Profile({ params }: ProfileProps): Promise<ReactNo
             "p-4 border border-gray-200 rounded-lg shadow-sm bg-gray-50",
             "md:col-span-2",
             "lg:col-span-2",
+            "dark:border-dark-card-border dark:bg-dark-card-background",
           )}
         >
           <Suspense fallback={<ChangePasswordFormSkeleton />}>
@@ -104,6 +106,7 @@ export default async function Profile({ params }: ProfileProps): Promise<ReactNo
             "p-4 border border-gray-200 rounded-lg shadow-sm bg-gray-50",
             "md:col-span-2",
             "lg:col-span-2",
+            "dark:border-dark-card-border dark:bg-dark-card-background",
           )}
         >
           <Suspense fallback={<PasskeysFormSkeleton />}>

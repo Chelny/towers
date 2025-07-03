@@ -18,6 +18,7 @@ import Input from "@/components/ui/Input"
 import { INITIAL_FORM_STATE } from "@/constants/api"
 import { authClient } from "@/lib/auth-client"
 import { Session } from "@/lib/auth-client"
+import { logger } from "@/lib/logger"
 
 type ChangePasswordFormProps = {
   session: Session | null
@@ -61,7 +62,7 @@ export function ChangePasswordForm({ session }: ChangePasswordFormProps): ReactN
           errorMessages.confirmPassword = t({ message: "The password confirmation is invalid." })
           break
         default:
-          console.error(`Set Password Validation: Unknown error at ${error.path}`)
+          logger.warn(`Set Password Validation: Unknown error at ${error.path}`)
           break
       }
     }
@@ -123,7 +124,7 @@ export function ChangePasswordForm({ session }: ChangePasswordFormProps): ReactN
           errorMessages.confirmNewPassword = t({ message: "The new password confirmation is invalid." })
           break
         default:
-          console.error(`Change Password Validation: Unknown error at ${error.path}`)
+          logger.warn(`Change Password Validation: Unknown error at ${error.path}`)
           break
       }
     }
@@ -196,9 +197,9 @@ export function ChangePasswordForm({ session }: ChangePasswordFormProps): ReactN
 
   return (
     <>
-      <h3 className="text-lg font-semibold mb-4">
+      <h2 className="text-lg font-semibold mb-4">
         <Trans>Change/Set Password</Trans>
-      </h3>
+      </h2>
       <form className="w-full" noValidate onSubmit={handleChangeSetPassword}>
         {formState?.message && (
           <AlertMessage type={formState.success ? "success" : "error"}>{formState.message}</AlertMessage>
@@ -212,7 +213,7 @@ export function ChangePasswordForm({ session }: ChangePasswordFormProps): ReactN
               label={t({ message: "Current Password" })}
               autoComplete="off"
               required
-              dataTestId="change-password-current-password-input"
+              dataTestId="change-password_input-password_current-password"
               errorMessage={formState?.error?.currentPassword}
             />
           )}
@@ -223,7 +224,9 @@ export function ChangePasswordForm({ session }: ChangePasswordFormProps): ReactN
             label={isUserPasswordSet ? t({ message: "New Password" }) : t({ message: "Password" })}
             autoComplete="off"
             required
-            dataTestId={isUserPasswordSet ? "change-password-new-password-input" : "set-password-password-input"}
+            dataTestId={
+              isUserPasswordSet ? "change-password_input-password_new-password" : "set-password_input-password_password"
+            }
             description={t({
               message:
                 "Password must be at least 8 characters long, must contain at least one digit, one uppercase letter, and at least one special character.",
@@ -238,7 +241,9 @@ export function ChangePasswordForm({ session }: ChangePasswordFormProps): ReactN
             autoComplete="off"
             required
             dataTestId={
-              isUserPasswordSet ? "change-password-confirm-new-password-input" : "set-password-confirm-password-input"
+              isUserPasswordSet
+                ? "change-password_input-password_confirm-new-password"
+                : "set-password_input-password_confirm-password"
             }
             onPaste={(event: ClipboardEvent<HTMLInputElement>) => event.preventDefault()}
             errorMessage={isUserPasswordSet ? formState?.error?.confirmNewPassword : formState?.error?.confirmPassword}
@@ -247,7 +252,7 @@ export function ChangePasswordForm({ session }: ChangePasswordFormProps): ReactN
             <Checkbox
               id="revokeOtherSessions"
               label={t({ message: "Revoke all other sessions" })}
-              dataTestId="change-password-revoke-other-sessions-checkbox"
+              dataTestId="change-password_checkbox_revoke-other-sessions"
               errorMessage={formState?.error?.revokeOtherSessions}
             />
           )}

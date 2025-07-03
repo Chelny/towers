@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react"
 import DefenseBlock from "@/components/towers/DefenseBlock"
 
-describe("DefenseBlock Component", () => {
+describe("DefenseBlock", () => {
   it("should render an empty block when no letter is provided", () => {
     render(<DefenseBlock />)
     expect(screen.queryByText("T")).not.toBeInTheDocument()

@@ -1,3 +1,4 @@
+import { WebsiteTheme } from "@prisma/client"
 import { fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { vi } from "vitest"
 import { SettingsForm } from "@/app/[locale]/(protected)/account/settings/settings.form"
@@ -11,7 +12,7 @@ vi.mock("next/navigation", () => ({
 }))
 
 describe("Settings Form", () => {
-  beforeAll(() => {
+  beforeEach(() => {
     HTMLElement.prototype.scrollIntoView = vi.fn()
   })
 
@@ -36,7 +37,7 @@ describe("Settings Form", () => {
 
     render(<SettingsForm session={mockSession.data} />)
 
-    fireEvent.click(screen.getByTestId("settings-language-select"))
+    fireEvent.click(screen.getByTestId("settings_select_language"))
     fireEvent.click(screen.getByRole("option", { name: /French/i }))
     fireEvent.click(screen.getByRole("button", { name: /Update Settings/i }))
 
@@ -44,7 +45,7 @@ describe("Settings Form", () => {
 
     expect(mockFetch).toHaveBeenCalledWith("/api/account/settings", {
       method: "POST",
-      body: JSON.stringify({ language: "fr" }),
+      body: JSON.stringify({ language: "fr", theme: WebsiteTheme.SYSTEM }),
     })
 
     expect(screen.getByText("The settings have been updated!")).toBeInTheDocument()
@@ -88,7 +89,7 @@ describe("Settings Form", () => {
 
     render(<SettingsForm session={mockSession.data} />)
 
-    fireEvent.click(screen.getByTestId("settings-language-select"))
+    fireEvent.click(screen.getByTestId("settings_select_language"))
     fireEvent.click(screen.getByRole("option", { name: /French/i }))
     fireEvent.click(screen.getByRole("button", { name: /Update Settings/i }))
 
@@ -96,7 +97,7 @@ describe("Settings Form", () => {
 
     expect(mockFetch).toHaveBeenCalledWith("/api/account/settings", {
       method: "POST",
-      body: JSON.stringify({ language: "fr" }),
+      body: JSON.stringify({ language: "fr", theme: WebsiteTheme.SYSTEM }),
     })
 
     await waitFor(() => {

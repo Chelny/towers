@@ -14,6 +14,7 @@ import Input from "@/components/ui/Input"
 import { INITIAL_FORM_STATE } from "@/constants/api"
 import { ROUTE_RESET_PASSWORD } from "@/constants/routes"
 import { authClient } from "@/lib/auth-client"
+import { logger } from "@/lib/logger"
 
 export function ForgotPasswordForm(): ReactNode {
   const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -37,7 +38,7 @@ export function ForgotPasswordForm(): ReactNode {
           errorMessages.email = t({ message: "The email is invalid." })
           break
         default:
-          console.error(`Forgot Password Validation: Unknown error at ${error.path}`)
+          logger.warn(`Forgot Password Validation: Unknown error at ${error.path}`)
           break
       }
     }
@@ -87,7 +88,7 @@ export function ForgotPasswordForm(): ReactNode {
         id="email"
         label={t({ message: "Email" })}
         required
-        dataTestId="forgot-password-email-input"
+        dataTestId="forgot-password_input-email_email"
         errorMessage={formState?.error?.email}
       />
       <Button type="submit" className="w-full" disabled={isLoading}>

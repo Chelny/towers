@@ -12,9 +12,9 @@ export default function GlobalError({ error, reset }: GlobalErrorProps): ReactNo
   return (
     <html>
       <body>
-        <h2>
+        <h1>
           <Trans>Something went wrong</Trans>
-        </h2>
+        </h1>
         <button onClick={() => reset()}>
           <Trans>Try again</Trans>
         </button>

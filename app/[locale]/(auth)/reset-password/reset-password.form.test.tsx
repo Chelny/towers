@@ -18,9 +18,9 @@ describe("Reset Password Form", () => {
   it("should render the form with all elements", () => {
     render(<ResetPasswordForm />)
 
-    expect(screen.getByTestId("reset-password-token-input")).toBeInTheDocument()
-    expect(screen.getByTestId("reset-password-password-input")).toBeInTheDocument()
-    expect(screen.getByTestId("reset-password-confirm-password-input")).toBeInTheDocument()
+    expect(screen.getByTestId("reset-password_input-hidden_token")).toBeInTheDocument()
+    expect(screen.getByTestId("reset-password_input-password_password")).toBeInTheDocument()
+    expect(screen.getByTestId("reset-password_input-password_confirm-password")).toBeInTheDocument()
   })
 
   it("should pass the token from URL params to the hidden input field", () => {
@@ -34,7 +34,7 @@ describe("Reset Password Form", () => {
 
     render(<ResetPasswordForm />)
 
-    expect(screen.getByTestId("reset-password-token-input")).toHaveValue(token)
+    expect(screen.getByTestId("reset-password_input-hidden_token")).toHaveValue(token)
   })
 
   it("should show an error for invalid password format", () => {
@@ -58,8 +58,12 @@ describe("Reset Password Form", () => {
 
     render(<ResetPasswordForm />)
 
-    fireEvent.input(screen.getByTestId("reset-password-password-input"), { target: { value: "Password1234!" } })
-    fireEvent.input(screen.getByTestId("reset-password-confirm-password-input"), { target: { value: "Password1234!" } })
+    fireEvent.input(screen.getByTestId("reset-password_input-password_password"), {
+      target: { value: "Password1234!" },
+    })
+    fireEvent.input(screen.getByTestId("reset-password_input-password_confirm-password"), {
+      target: { value: "Password1234!" },
+    })
 
     const submitButton: HTMLButtonElement = screen.getByRole("button", { name: /Reset Password/i })
     fireEvent.click(submitButton)

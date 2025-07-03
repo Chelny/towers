@@ -3,6 +3,7 @@
 import { FormEvent, ReactNode, useEffect, useState } from "react"
 import { usePathname, useRouter } from "next/navigation"
 import { Trans, useLingui } from "@lingui/react/macro"
+import { WebsiteTheme } from "@prisma/client"
 import { Value, ValueError } from "@sinclair/typebox/value"
 import clsx from "clsx/lite"
 import {
@@ -15,7 +16,9 @@ import Button from "@/components/ui/Button"
 import Select from "@/components/ui/Select"
 import { INITIAL_FORM_STATE } from "@/constants/api"
 import { APP_COOKIES } from "@/constants/app"
+import { useTheme } from "@/hooks/useTheme"
 import { Session } from "@/lib/auth-client"
+import { logger } from "@/lib/logger"
 import { defaultLocale, Language, languages, SupportedLocales } from "@/translations/languages"
 
 type SettingsFormProps = {
@@ -35,6 +38,7 @@ export function SettingsForm({ session }: SettingsFormProps): ReactNode {
     const formData: FormData = new FormData(event.currentTarget)
     const payload: SettingsPayload = {
       language: formData.get("language") as SupportedLocales,
+      theme: formData.get("theme") as WebsiteTheme,
     }
 
     const errors: ValueError[] = Array.from(Value.Errors(settingsSchema, payload))
@@ -45,8 +49,11 @@ export function SettingsForm({ session }: SettingsFormProps): ReactNode {
         case "language":
           errorMessages.language = t({ message: "The language is invalid." })
           break
+        case "theme":
+          errorMessages.theme = t({ message: "The theme is invalid." })
+          break
         default:
-          console.error(`Settings Validation: Unknown error at ${error.path}`)
+          logger.warn(`Settings Validation: Unknown error at ${error.path}`)
           break
       }
     }
@@ -64,6 +71,7 @@ export function SettingsForm({ session }: SettingsFormProps): ReactNode {
         method: "POST",
         body: JSON.stringify({
           language: payload.language,
+          theme: payload.theme,
         }),
       })
         .then(async (response) => {
@@ -88,6 +96,8 @@ export function SettingsForm({ session }: SettingsFormProps): ReactNode {
     }
   }
 
+  useTheme(session?.user.theme)
+
   useEffect(() => {
     const savedState: string | null = localStorage.getItem(APP_COOKIES.SETTINGS_FORM_STATE)
 
@@ -98,7 +108,13 @@ export function SettingsForm({ session }: SettingsFormProps): ReactNode {
   }, [])
 
   return (
-    <div className={clsx("max-w-full p-4 border border-gray-200 rounded-lg shadow-sm bg-gray-50", "md:max-w-96")}>
+    <div
+      className={clsx(
+        "max-w-full p-4 border border-gray-200 rounded-lg shadow-sm bg-gray-50",
+        "md:max-w-96",
+        "dark:border-dark-card-border dark:bg-dark-card-background",
+      )}
+    >
       <form className="w-full" noValidate onSubmit={handleUpdateUser}>
         {formState?.message && (
           <AlertMessage type={formState.success ? "success" : "error"}>{formState.message}</AlertMessage>
@@ -108,7 +124,7 @@ export function SettingsForm({ session }: SettingsFormProps): ReactNode {
           label={t({ message: "Language" })}
           defaultValue={session?.user.language ?? defaultLocale}
           required
-          dataTestId="settings-language-select"
+          dataTestId="settings_select_language"
         >
           {languages.map((language: Language) => (
             <Select.Option key={language.locale} value={language.locale}>
@@ -116,6 +132,23 @@ export function SettingsForm({ session }: SettingsFormProps): ReactNode {
                 <div>{language.flag}</div>
                 <div>{i18n._(language.msg)}</div>
               </div>
+            </Select.Option>
+          ))}
+        </Select>
+        <Select
+          id="theme"
+          label={t({ message: "Theme" })}
+          defaultValue={session?.user.theme ?? WebsiteTheme.SYSTEM}
+          required
+          dataTestId="settings_select_theme"
+        >
+          {Object.values(WebsiteTheme).map((theme: WebsiteTheme) => (
+            <Select.Option key={theme} value={theme}>
+              {theme === "LIGHT"
+                ? t({ message: "Light" })
+                : theme === "DARK"
+                  ? t({ message: "Dark" })
+                  : t({ message: "System" })}
             </Select.Option>
           ))}
         </Select>

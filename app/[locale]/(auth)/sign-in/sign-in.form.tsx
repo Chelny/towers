@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { Trans, useLingui } from "@lingui/react/macro"
 import { ValueError } from "@sinclair/typebox/errors"
 import { Value } from "@sinclair/typebox/value"
+import clsx from "clsx/lite"
 import { PiMagicWandFill } from "react-icons/pi"
 import { SignInFormValidationErrors, SignInPayload, signInSchema } from "@/app/[locale]/(auth)/sign-in/sign-in.schema"
 import AlertMessage from "@/components/ui/AlertMessage"
@@ -25,6 +26,7 @@ import {
   ROUTE_TERMS_OF_SERVICE,
 } from "@/constants/routes"
 import { authClient } from "@/lib/auth-client"
+import { logger } from "@/lib/logger"
 import { AuthProvider, AuthProviderDetails } from "@/lib/providers"
 
 export function SignInForm(): ReactNode {
@@ -37,22 +39,22 @@ export function SignInForm(): ReactNode {
     const isWebAuthnAvailable: boolean = typeof PublicKeyCredential !== "undefined"
 
     if (!isWebAuthnAvailable) {
-      console.warn("WebAuthn is not supported in this browser.")
+      logger.warn("WebAuthn is not supported in this browser.")
       return
     }
 
     const isAuthenticatorAvailable: boolean = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()
 
     if (!isAuthenticatorAvailable) {
-      console.warn("Passkeys are not supported on this device.")
+      logger.warn("Passkeys are not supported on this device.")
       return
     }
 
     try {
       await authClient.signIn.passkey({ autoFill: false })
-      console.info("Passkey sign-in initiated.")
+      logger.info("Passkey sign-in initiated.")
     } catch (error) {
-      console.error("Error initiating passkey sign-in:", error)
+      logger.error(`Error initiating passkey sign-in: ${error}`)
     }
   }
 
@@ -78,7 +80,7 @@ export function SignInForm(): ReactNode {
           errorMessages.password = t({ message: "The password is invalid." })
           break
         default:
-          console.error(`Sign In Validation: Unknown error at ${error.path}`)
+          logger.warn(`Sign In Validation: Unknown error at ${error.path}`)
           break
       }
     }
@@ -106,7 +108,7 @@ export function SignInForm(): ReactNode {
             setIsLoading(false)
             setFormState({
               success: true,
-              message: t({ message: "You’re successfully signed in. Welcome back!" }),
+              message: t({ message: "You’re signed in successfully. Welcome back!" }),
             })
           },
           onError: (ctx) => {
@@ -140,7 +142,7 @@ export function SignInForm(): ReactNode {
           setIsLoading(false)
           setFormState({
             success: true,
-            message: t({ message: "You’re successfully signed in. Welcome back!" }),
+            message: t({ message: "You’re signed in successfully. Welcome back!" }),
           })
         },
         onError: (ctx) => {
@@ -166,7 +168,7 @@ export function SignInForm(): ReactNode {
         label={t({ message: "Email" })}
         autoComplete="username webauthn"
         required
-        dataTestId="sign-in-email-input"
+        dataTestId="sign-in_input-email_email"
       />
       <Input
         type="password"
@@ -174,7 +176,7 @@ export function SignInForm(): ReactNode {
         label={t({ message: "Password" })}
         autoComplete="current-password webauthn"
         required
-        dataTestId="sign-in-password-input"
+        dataTestId="sign-in_input-password_password"
       />
       <div className="flex items-center">
         <div className="flex-1">
@@ -182,11 +184,11 @@ export function SignInForm(): ReactNode {
             id="rememberMe"
             label={t({ message: "Remember me" })}
             defaultChecked={true}
-            dataTestId="sign-in-remember-me-checkbox"
+            dataTestId="sign-in_checkbox_remember-me"
           />
         </div>
         <div className="flex-1 mb-3 text-end">
-          <Anchor href={ROUTE_FORGOT_PASSWORD.PATH} dataTestId="sign-in-forgot-password-link">
+          <Anchor href={ROUTE_FORGOT_PASSWORD.PATH} dataTestId="sign-in_link_forgot-password">
             <Trans>Forgot Password?</Trans>
           </Anchor>
         </div>
@@ -202,14 +204,14 @@ export function SignInForm(): ReactNode {
       <div className="flex justify-center gap-1 my-4 text-center">
         <Trans>
           <span>Don’t have an account?</span>{" "}
-          <Anchor href={ROUTE_SIGN_UP.PATH} dataTestId="sign-in-sign-up-link">
+          <Anchor href={ROUTE_SIGN_UP.PATH} dataTestId="sign-in_link_sign-up">
             Sign Up
           </Anchor>
         </Trans>
       </div>
       <div className="flex justify-between items-center mt-4 mb-6" role="separator">
         <hr className="flex-1 me-4 border border-t-neutral-200" />
-        <span className="mx-auto text-gray-600 text-sm uppercase">
+        <span className={clsx("mx-auto text-gray-600 text-sm uppercase", "dark:text-gray-400")}>
           <Trans>or sign in with</Trans>
         </span>
         <hr className="flex-1 h-0 ms-4 border border-t-neutral-200" />

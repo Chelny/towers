@@ -1,11 +1,12 @@
 "use client"
 
 import { ReactNode } from "react"
-import { ITowersRoom } from "@prisma/client"
+import clsx from "clsx/lite"
 import Banner from "@/components/Banner"
+import { RoomPlainObject } from "@/server/towers/classes/Room"
 
 type RoomHeaderProps = {
-  room: ITowersRoom | null
+  room?: RoomPlainObject
 }
 
 export default function RoomHeader({ room }: RoomHeaderProps): ReactNode {
@@ -13,12 +14,14 @@ export default function RoomHeader({ room }: RoomHeaderProps): ReactNode {
     <div className="[grid-area:banner]">
       <div className="flex justify-between items-center gap-6">
         <div>
-          <h2 className="p-4 text-4xl">{room?.name}</h2>
+          <h1 className="p-4 text-4xl">{room?.name}</h1>
         </div>
         <Banner />
       </div>
 
-      <div className="px-4 py-1 bg-amber-500 text-end">&nbsp;</div>
+      <div className={clsx("px-4 py-1 bg-amber-500 text-end", "dark:bg-dark-game-orange-top-bar-background")}>
+        &nbsp;
+      </div>
     </div>
   )
 }

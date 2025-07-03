@@ -3,6 +3,7 @@
 import { ClipboardEvent, FormEvent, ReactNode, useState } from "react"
 import { Trans, useLingui } from "@lingui/react/macro"
 import { Value, ValueError } from "@sinclair/typebox/value"
+import clsx from "clsx/lite"
 import {
   DeleteAccountFormValidationErrors,
   DeleteAccountPayload,
@@ -14,6 +15,7 @@ import Input from "@/components/ui/Input"
 import { INITIAL_FORM_STATE } from "@/constants/api"
 import { ROUTE_HOME } from "@/constants/routes"
 import { authClient } from "@/lib/auth-client"
+import { logger } from "@/lib/logger"
 
 export function DeleteAccountForm(): ReactNode {
   const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -37,7 +39,7 @@ export function DeleteAccountForm(): ReactNode {
           errorMessages.email = t({ message: "The email is invalid." })
           break
         default:
-          console.error(`Delete User Validation: Unknown error at ${error.path}`)
+          logger.warn(`Delete User Validation: Unknown error at ${error.path}`)
           break
       }
     }
@@ -81,11 +83,18 @@ export function DeleteAccountForm(): ReactNode {
   }
 
   return (
-    <form className="w-full p-4 border border-red-200 rounded-lg bg-red-50" noValidate onSubmit={handleDeleteUser}>
+    <form
+      className={clsx(
+        "w-full p-4 border border-red-200 rounded-lg bg-red-50",
+        "dark:border-dark-card-border dark:bg-dark-card-background",
+      )}
+      noValidate
+      onSubmit={handleDeleteUser}
+    >
       {formState?.message && (
         <AlertMessage type={formState.success ? "success" : "error"}>{formState.message}</AlertMessage>
       )}
-      <p className="text-red-600 font-medium">
+      <p className={clsx("text-red-600 font-medium", "dark:text-red-400")}>
         <Trans>
           Please note that deleting your account is a permanent action and cannot be undone. All your data, including
           your profile, settings, and any associated information, will be deleted immediately once you confirm your
@@ -100,7 +109,7 @@ export function DeleteAccountForm(): ReactNode {
         label={t({ message: "Enter your email to request an account deletion" })}
         autoComplete="off"
         required
-        dataTestId="delete-account-email-input"
+        dataTestId="delete-account_input-email_email"
         placeholder={t({ message: "Enter your email" })}
         errorMessage={formState?.error?.email}
         onPaste={(event: ClipboardEvent<HTMLInputElement>) => event.preventDefault()}

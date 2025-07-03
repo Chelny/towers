@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react"
 import { Mock } from "vitest"
 import Calendar from "@/components/ui/Calendar"
 
-describe("Calendar Component", () => {
+describe("Calendar", () => {
   it("should render Calendar component with placeholder", () => {
     render(<Calendar id="test-calendar" label="Select Date" placeholder="Select a date" />)
     expect(screen.getByText("Select a date")).toBeInTheDocument()

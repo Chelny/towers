@@ -1,0 +1,7 @@
+export enum TowersSeatState {
+  UNOCCUPIED = "UNOCCUPIED",
+  OCCUPIED = "OCCUPIED",
+  READY = "READY",
+  PLAYING = "PLAYING",
+  GAME_OVER = "GAME_OVER",
+}

@@ -4,11 +4,14 @@ import Negotiator from "negotiator"
 import { APP_COOKIES } from "@/constants/app"
 import { PROTECTED_ROUTES, PUBLIC_ROUTES, ROUTE_GAMES, ROUTE_SIGN_IN } from "@/constants/routes"
 import { Session } from "@/lib/auth-client"
+import { logger } from "@/lib/logger"
 import { defaultLocale, Language, languages } from "@/translations/languages"
 
 export default async function middleware(request: NextRequest) {
-  const { origin, pathname } = request.nextUrl
-  const requestHeaders: Headers = new Headers(request.headers)
+  const { pathname } = request.nextUrl
+  const host: string | null = request.headers.get("host")
+  const protocol: string = request.headers.get("x-forwarded-proto") || "http"
+  const origin: string = `${protocol}://${host}`
 
   // Fetch session
   const { data: session, error: sessionError } = await betterFetch<Session>("/api/auth/get-session", {
@@ -17,12 +20,22 @@ export default async function middleware(request: NextRequest) {
   })
 
   if (sessionError) {
-    console.error(`Failed to fetch session: ${sessionError.message}`)
+    logger.error(`Failed to fetch session: ${sessionError.message}`)
   }
 
   // Content Security Policy (CSP)
   const nonce: string = Buffer.from(crypto.randomUUID()).toString("base64")
-  const cspHeader: string = `
+  const devCspHeader: string = `
+    default-src * 'unsafe-inline' 'unsafe-eval' data: blob:;
+    script-src * 'unsafe-inline' 'unsafe-eval' data: blob:;
+    style-src * 'unsafe-inline' 'unsafe-eval' data: blob:;
+    connect-src *;
+    img-src * data: blob:;
+    font-src * data:;
+    object-src *;
+    frame-ancestors *;
+  `
+  const prodCspHeader: string = `
     default-src 'self';
     script-src 'self' 'nonce-${nonce}' 'strict-dynamic';
     style-src 'self' 'nonce-${nonce}';
@@ -33,11 +46,13 @@ export default async function middleware(request: NextRequest) {
     form-action 'self';
     frame-ancestors 'none';
     connect-src 'self' https://www.google-analytics.com;
-    ${process.env.NODE_ENV === "production" ? "upgrade-insecure-requests;" : ""}
+    upgrade-insecure-requests;
   `
+  const cspHeader: string = process.env.NODE_ENV === "production" ? prodCspHeader : devCspHeader
 
   const contentSecurityPolicyHeader: string = cspHeader.replace(/\s{2,}/g, " ").trim()
 
+  const requestHeaders: Headers = new Headers(request.headers)
   requestHeaders.set("x-nonce", nonce)
   requestHeaders.set("Content-Security-Policy", contentSecurityPolicyHeader)
 
@@ -48,6 +63,23 @@ export default async function middleware(request: NextRequest) {
   })
 
   response.headers.set("Content-Security-Policy", contentSecurityPolicyHeader)
+
+  // Request headers
+  response.headers.set("Access-Control-Allow-Credentials", "true")
+  response.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+  response.headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+
+  const trustedOrigins: string[] = (process.env.TRUSTED_ORIGINS || "").split(",").map((origin) => origin.trim())
+
+  if (origin && trustedOrigins.includes(origin)) {
+    response.headers.set("Access-Control-Allow-Origin", origin)
+  } else {
+    response.headers.set("Access-Control-Allow-Origin", trustedOrigins[0] || "*")
+  }
+
+  if (pathname.startsWith("/api/")) {
+    response.headers.set("Content-Type", "application/json")
+  }
 
   // Localization
   const userLocale: string | null | undefined = session?.user?.language
@@ -110,10 +142,11 @@ export const config = {
        * - _next/static (static files)
        * - _next/image (image optimization files)
        * - favicon.ico, sitemap.xml, robots.txt, manifest.webmanifest (metadata files)
-       * - images - .svg, .png, .jpg, .jpeg, .gif, .webp
+       * - images (.svg, .png, .jpg, .jpeg, .gif, .webp)
+       * - videos (.webm)
        */
       source:
-        "/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|manifest.webmanifest|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+        "/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|manifest.webmanifest|.*\\.(?:svg|png|jpg|jpeg|gif|webp|webm)$).*)",
       missing: [
         { type: "header", key: "next-router-prefetch" },
         { type: "header", key: "purpose", value: "prefetch" },

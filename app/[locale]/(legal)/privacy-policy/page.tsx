@@ -53,7 +53,7 @@ export default async function PrivacyPolicy({ params }: PrivacyPolicyProps): Pro
               <strong>Email:</strong> Your email address.
             </li>
             <li>
-              <strong>Birthdate:</strong> Your date of birth (optional).
+              <strong>Birthdate:</strong> Your date of birth.
             </li>
             <li>
               <strong>Usage Data:</strong> Data related to your usage of the services.

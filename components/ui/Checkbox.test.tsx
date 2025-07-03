@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react"
 import { Mock } from "vitest"
 import Checkbox from "@/components/ui/Checkbox"
 
-describe("Checkbox Component", () => {
+describe("Checkbox", () => {
   it("should render checkbox with label", () => {
     render(<Checkbox id="test-checkbox" label="Accept Terms" />)
 

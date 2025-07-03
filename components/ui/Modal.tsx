@@ -7,7 +7,6 @@ import Button from "@/components/ui/Button"
 
 type ModalProps = PropsWithChildren<{
   title: string
-  isOpen: boolean
   confirmText?: string
   cancelText?: string
   isConfirmButtonDisabled?: boolean
@@ -19,35 +18,37 @@ type ModalProps = PropsWithChildren<{
 export default function Modal({
   children,
   title,
-  isOpen,
   cancelText,
   confirmText,
   isConfirmButtonDisabled = false,
   dataTestId = undefined,
-  onCancel,
   onConfirm,
+  onCancel,
 }: ModalProps): ReactNode {
   const dialogRef: RefObject<HTMLDialogElement | null> = useRef<HTMLDialogElement | null>(null)
   const { t } = useLingui()
 
   useEffect(() => {
-    if (isOpen) {
-      dialogRef.current?.showModal()
-      dialogRef.current?.focus()
-    } else {
-      dialogRef.current?.close()
-    }
+    const dialog: HTMLDialogElement | null = dialogRef.current
+    if (!dialog) return
+
+    dialog.showModal()
+    dialog.focus()
 
     const handleKeyDown = (event: KeyboardEvent): void => {
-      if (event.key === "Escape") {
+      if (event.code === "Escape") {
         event.preventDefault()
         handleCancel()
       }
     }
 
-    dialogRef.current?.addEventListener("keydown", handleKeyDown)
-    return () => dialogRef.current?.removeEventListener("keydown", handleKeyDown)
-  }, [isOpen])
+    dialog.addEventListener("keydown", handleKeyDown)
+
+    return () => {
+      dialog.removeEventListener("keydown", handleKeyDown)
+      dialog.close()
+    }
+  }, [])
 
   const handleConfirm = (event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault()
@@ -59,21 +60,25 @@ export default function Modal({
     dialogRef.current?.close()
   }
 
-  if (!isOpen) return null
-
   return (
     <dialog
       ref={dialogRef}
       className={clsx(
         "fixed top-1/2 start-1/2 z-40 w-full max-w-md rounded shadow-lg -translate-x-1/2 -translate-y-1/2",
         "rtl:translate-x-1/2",
+        "dark:bg-dark-modal-background",
       )}
-      data-testid={dataTestId}
+      data-testid={`dialog_${dataTestId}`}
       onCancel={handleCancel}
     >
       <form noValidate onSubmit={handleConfirm}>
-        <div className="flex justify-between items-center px-4 py-3 border-b border-gray-300">
-          <h3 className="text-2xl">{title}</h3>
+        <div
+          className={clsx(
+            "flex justify-between items-center px-4 py-3 border-b border-gray-300",
+            "dark:border-dark-modal-border",
+          )}
+        >
+          <h3 className={clsx("text-2xl", "dark:text-dark-modal-heading-text")}>{title}</h3>
           <button
             className="self-start p-2 text-gray-400 hover:text-gray-500"
             aria-label={t({ message: "Close" })}
@@ -90,8 +95,15 @@ export default function Modal({
             </svg>
           </button>
         </div>
-        <div className="p-4">{children}</div>
-        <div className="flex justify-end gap-2 p-4 border-t border-gray-300">
+
+        <div className={clsx("p-4", "dark:text-dark-modal-body-text")}>{children}</div>
+
+        <div
+          className={clsx(
+            "flex justify-end gap-2 p-4 border-t border-gray-300",
+            "dark:border-t-dark-modal-border dark:border-dark-modal-border",
+          )}
+        >
           {onConfirm && (
             <Button type="submit" className="w-full" disabled={isConfirmButtonDisabled}>
               {confirmText ?? t({ message: "Confirm" })}

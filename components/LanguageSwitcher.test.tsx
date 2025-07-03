@@ -1,4 +1,3 @@
-import { act } from "react"
 import { fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { Mock, vi } from "vitest"
 import LanguageSwitcher from "@/components/LanguageSwitcher"
@@ -9,8 +8,8 @@ vi.mock("next/navigation", () => ({
   useRouter: vi.fn(() => mockUseRouter),
 }))
 
-describe("LanguageSwitcher Component", () => {
-  beforeAll(() => {
+describe("LanguageSwitcher", () => {
+  beforeEach(() => {
     HTMLElement.prototype.scrollIntoView = vi.fn()
   })
 
@@ -18,7 +17,7 @@ describe("LanguageSwitcher Component", () => {
     render(<LanguageSwitcher />)
 
     waitFor(() => {
-      expect(screen.getByTestId("language-switcher-select")).toBeInTheDocument()
+      expect(screen.getByTestId("language-switcher_select_locale")).toBeInTheDocument()
       expect(screen.getByText(/English/i)).toBeInTheDocument()
     })
   })
@@ -31,7 +30,7 @@ describe("LanguageSwitcher Component", () => {
 
     waitFor(() => {
       const selectElement: HTMLInputElement | null = screen
-        .getByTestId("language-switcher-select")
+        .getByTestId("language-switcher_select_locale")
         .querySelector("input")
       expect(selectElement).toBe("en")
     })
@@ -43,16 +42,13 @@ describe("LanguageSwitcher Component", () => {
 
     render(<LanguageSwitcher />)
 
-    fireEvent.click(screen.getByTestId("language-switcher-select"))
+    fireEvent.click(screen.getByTestId("language-switcher_select_locale"))
     fireEvent.click(screen.getByRole("option", { name: /French/i }))
 
     // Wait for the redirection to happen
     await waitFor(() => {
       expect(mockPush).toHaveBeenCalledWith("/fr/sign-in")
     })
-
-    // Debug output (if needed)
-    screen.debug()
   })
 
   it("should update the language state when the selection changes", async () => {
@@ -61,11 +57,11 @@ describe("LanguageSwitcher Component", () => {
 
     render(<LanguageSwitcher />)
 
-    fireEvent.click(screen.getByTestId("language-switcher-select"))
+    fireEvent.click(screen.getByTestId("language-switcher_select_locale"))
     fireEvent.click(screen.getByRole("option", { name: /French/i }))
 
     await waitFor(() => {
-      expect(screen.getByTestId("language-switcher-select")).toHaveTextContent("French")
+      expect(screen.getByTestId("language-switcher_select_locale")).toHaveTextContent("French")
     })
   })
 })

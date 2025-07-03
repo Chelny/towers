@@ -5,6 +5,7 @@ import { Trans, useLingui } from "@lingui/react/macro"
 import { ValueError } from "@sinclair/typebox/errors"
 import { Value } from "@sinclair/typebox/value"
 import { Passkey } from "better-auth/plugins/passkey"
+import clsx from "clsx/lite"
 import { LuPencilLine } from "react-icons/lu"
 import { LuTrash2 } from "react-icons/lu"
 import {
@@ -17,6 +18,7 @@ import Button from "@/components/ui/Button"
 import Input from "@/components/ui/Input"
 import { INITIAL_FORM_STATE } from "@/constants/api"
 import { authClient } from "@/lib/auth-client"
+import { logger } from "@/lib/logger"
 
 export function PasskeysForm(): ReactNode {
   const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -41,7 +43,7 @@ export function PasskeysForm(): ReactNode {
           errorMessages.name = t({ message: "The name is invalid." })
           break
         default:
-          console.error(`Add Passkey Validation: Unknown error at ${error.path}`)
+          logger.warn(`Add Passkey Validation: Unknown error at ${error.path}`)
           break
       }
     }
@@ -142,20 +144,19 @@ export function PasskeysForm(): ReactNode {
 
   return (
     <>
-      <h3 className="text-lg font-semibold mb-4">
+      <h2 className="text-lg font-semibold mb-4">
         <Trans>Passkeys</Trans>
-      </h3>
+      </h2>
       <form className="w-full" noValidate onSubmit={handleAddPasskey}>
         {formState?.message && (
           <AlertMessage type={formState.success ? "success" : "error"}>{formState.message}</AlertMessage>
         )}
         <Input
-          type="text"
           id="passkeyName"
           label={t({ message: "Name" })}
           placeholder={t({ message: "Enter a name for the passkey" })}
           required
-          dataTestId="passkeys-name-input"
+          dataTestId="passkeys_input-text_name"
           errorMessage={formState?.error?.name}
         />
         <Button type="submit" className="w-full" disabled={isLoading}>
@@ -167,7 +168,13 @@ export function PasskeysForm(): ReactNode {
         {passkeys?.map((passkey: Passkey) => {
           const passkeyName: string = passkey.name!
           return (
-            <li key={passkey.id} className="flex justify-between items-center p-2 border rounded bg-white">
+            <li
+              key={passkey.id}
+              className={clsx(
+                "flex justify-between items-center p-2 border rounded bg-white",
+                "dark:bg-dark-background",
+              )}
+            >
               <div className="flex-1">{passkey.name}</div>
               <div className="flex-1 flex gap-3 justify-end items-center">
                 <Button

@@ -1,4 +1,3 @@
-import { createId } from "@paralleldrive/cuid2"
 import { fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { Mock } from "vitest"
 import { LinkedSocialAccountsForm } from "@/app/[locale]/(protected)/account/profile/linked-social-accounts.form"
@@ -63,7 +62,7 @@ describe("Linked Social Accounts Form", () => {
     mockLinkSocial.mockImplementation(async (_, callbacks) => {
       callbacks.onRequest()
       await new Promise((resolve) => setTimeout(resolve, 100))
-      callbacks.onSuccess({ data: { id: createId(), provider: "google" } })
+      callbacks.onSuccess({ data: { id: "mock-google-1", provider: "google" } })
     })
 
     render(<LinkedSocialAccountsForm />)
@@ -87,14 +86,14 @@ describe("Linked Social Accounts Form", () => {
   it.skip("should handle unlinking a social account", async () => {
     const { authClient } = await import("@/lib/auth-client")
     const mockListAccounts: Mock = authClient.listAccounts as Mock
-    const mockUnlinkSocial: Mock = authClient.linkSocial as Mock // TODO: Change function name
+    const mockUnlinkSocialLogin: Mock = authClient.linkSocial as Mock
 
     mockListAccounts.mockImplementation(async (_, callbacks) => {
       callbacks.onRequest()
-      callbacks.onSuccess({ data: [{ id: createId(), provider: "google" }] })
+      callbacks.onSuccess({ data: [{ id: "mock-google-1", provider: "google" }] })
     })
 
-    mockUnlinkSocial.mockImplementation(async (_, callbacks) => {
+    mockUnlinkSocialLogin.mockImplementation(async (_, callbacks) => {
       callbacks.onRequest()
       await new Promise((resolve) => setTimeout(resolve, 100))
       callbacks.onSuccess()

@@ -20,6 +20,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       },
       data: {
         language: body.language,
+        theme: body.theme,
       },
     })
 

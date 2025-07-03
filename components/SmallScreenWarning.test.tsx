@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react"
 import SmallScreenWarning from "@/components/SmallScreenWarning"
 
-describe("SmallScreenWarning Component", () => {
+describe("SmallScreenWarning", () => {
   it("should render warning message", () => {
     render(<SmallScreenWarning />)
 

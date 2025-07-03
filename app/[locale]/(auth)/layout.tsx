@@ -10,7 +10,7 @@ type AuthLayoutProps = PropsWithChildren<{
 
 export default function AuthLayout({ children, breadcrumb }: AuthLayoutProps): ReactNode {
   return (
-    <div className={clsx("flex flex-col h-full bg-white", "md:flex-row md:gap-4")}>
+    <div className={clsx("flex flex-col h-full bg-white", "md:flex-row md:gap-4", "dark:bg-dark-background")}>
       <div
         className={clsx(
           "p-4 bg-towers-primary",

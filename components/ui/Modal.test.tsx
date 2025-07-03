@@ -2,15 +2,15 @@ import { fireEvent, render, screen } from "@testing-library/react"
 import { Mock } from "vitest"
 import Modal from "@/components/ui/Modal"
 
-describe("Modal Component", () => {
-  beforeAll(() => {
+describe("Modal", () => {
+  beforeEach(() => {
     HTMLDialogElement.prototype.showModal = vi.fn()
     HTMLDialogElement.prototype.close = vi.fn()
   })
 
   it("should render the modal with title and children", () => {
     render(
-      <Modal title="Test Modal" isOpen={true}>
+      <Modal title="Test Modal">
         <p>Modal content</p>
       </Modal>,
     )
@@ -19,20 +19,9 @@ describe("Modal Component", () => {
     expect(screen.getByText("Modal content")).toBeInTheDocument()
   })
 
-  it("should not render the modal when isOpen is false", () => {
+  it("should render the modal", () => {
     render(
-      <Modal title="Test Modal" isOpen={false}>
-        <p>Modal content</p>
-      </Modal>,
-    )
-
-    const modal: HTMLElement | null = screen.queryByText("Test Modal")
-    expect(modal).not.toBeInTheDocument()
-  })
-
-  it("should render the modal when isOpen is true", () => {
-    render(
-      <Modal title="Test Modal" isOpen={true}>
+      <Modal title="Test Modal">
         <p>Modal content</p>
       </Modal>,
     )
@@ -45,7 +34,7 @@ describe("Modal Component", () => {
     const handleCancel: Mock = vi.fn()
 
     render(
-      <Modal title="Test Modal" isOpen={true} onCancel={handleCancel}>
+      <Modal title="Test Modal" onCancel={handleCancel}>
         <p>Modal content</p>
       </Modal>,
     )
@@ -60,7 +49,7 @@ describe("Modal Component", () => {
     const handleConfirm: Mock = vi.fn()
 
     render(
-      <Modal title="Test Modal" isOpen={true} onConfirm={handleConfirm}>
+      <Modal title="Test Modal" onConfirm={handleConfirm}>
         <p>Modal content</p>
       </Modal>,
     )
@@ -73,7 +62,7 @@ describe("Modal Component", () => {
 
   it("should display custom close and confirm button text", () => {
     render(
-      <Modal title="Test Modal" isOpen={true} cancelText="Dismiss" confirmText="Proceed" onConfirm={vi.fn()}>
+      <Modal title="Test Modal" cancelText="Dismiss" confirmText="Proceed" onConfirm={vi.fn()}>
         <p>Modal content</p>
       </Modal>,
     )
@@ -86,7 +75,7 @@ describe("Modal Component", () => {
     const handleCancel: Mock = vi.fn()
 
     render(
-      <Modal title="Test Modal" isOpen={true} onCancel={handleCancel} onConfirm={handleCancel}>
+      <Modal title="Test Modal" onCancel={handleCancel} onConfirm={handleCancel}>
         <p>Modal content</p>
       </Modal>,
     )
@@ -101,7 +90,7 @@ describe("Modal Component", () => {
     const handleCancel: Mock = vi.fn()
 
     render(
-      <Modal title="Test Modal" isOpen={true} onCancel={handleCancel}>
+      <Modal title="Test Modal" onCancel={handleCancel}>
         <p>Modal content</p>
       </Modal>,
     )
@@ -116,12 +105,12 @@ describe("Modal Component", () => {
     const handleCancel: Mock = vi.fn()
 
     render(
-      <Modal title="Test Modal" isOpen={true} dataTestId="test-modal" onCancel={handleCancel}>
+      <Modal title="Test Modal" dataTestId="test-modal" onCancel={handleCancel}>
         <p>Modal content</p>
       </Modal>,
     )
 
-    const dialog: HTMLDialogElement = screen.getByTestId("test-modal")
+    const dialog: HTMLDialogElement = screen.getByTestId("dialog_test-modal")
     fireEvent.keyDown(dialog!, { key: "Escape", code: "Escape" })
     expect(handleCancel).toHaveBeenCalled()
   })

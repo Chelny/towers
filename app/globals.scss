@@ -19,7 +19,6 @@
     font-family: Verdana, Arial, Helvetica, sans-serif;
   }
 
-  // a,
   .towers-link {
     @apply text-blue-600 underline hover:text-blue-800 visited:text-purple-600;
   }
@@ -37,7 +36,7 @@ body {
 }
 
 body {
-  @apply overflow-x-hidden bg-gray-100 text-base tabular-nums;
+  @apply overflow-x-hidden bg-gray-100 dark:bg-dark-background dark:text-dark-text text-base tabular-nums;
 }
 
 ::-webkit-scrollbar {
@@ -47,15 +46,15 @@ body {
 ::-webkit-scrollbar-track {
   image-rendering: pixelated;
 
-  @apply bg-[url("/images/scrollbar-track.png")] bg-repeat;
+  @apply bg-[url("/images/scrollbar-track.png")] dark:bg-[url("/images/scrollbar-track-dark.png")] bg-repeat;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-zinc-300;
+  @apply bg-zinc-300 dark:bg-slate-600;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-zinc-400;
+  @apply bg-zinc-400 dark:bg-slate-500;
 }
 
 ::selection {
@@ -63,7 +62,7 @@ body {
 }
 
 dialog::backdrop {
-  @apply bg-black opacity-25;
+  @apply bg-black opacity-25 dark:opacity-50;
 }
 
 .small-screen-warning {

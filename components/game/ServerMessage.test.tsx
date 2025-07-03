@@ -2,10 +2,7 @@ import { act } from "react"
 import { render, screen, waitFor } from "@testing-library/react"
 import ServerMessage from "@/components/game/ServerMessage"
 import { authClient } from "@/lib/auth-client"
-import { useAppSelector } from "@/lib/hooks"
-import { RootState } from "@/redux/store"
 import { mockPendingSession, mockSession } from "@/test/data/session"
-import { mockSocketRoom1Id, mockSocketState, mockStoreReducers } from "@/test/data/socketState"
 
 vi.mock("@/lib/auth-client", () => ({
   authClient: {
@@ -13,11 +10,9 @@ vi.mock("@/lib/auth-client", () => ({
   },
 }))
 
-vi.mock("@/lib/hooks", () => ({
-  useAppSelector: vi.fn(),
-}))
+describe("ServerMessage", () => {
+  const mockRoomId: string = "mock-room-1"
 
-describe("ServerMessage Component", () => {
   beforeEach(() => {
     vi.useFakeTimers()
   })
@@ -27,20 +22,12 @@ describe("ServerMessage Component", () => {
     vi.useRealTimers()
   })
 
-  it("should render \"You are not logged in\" when unauthenticated and connected", () => {
+  it("should render \"You are not logged in\" when unauthenticated and connected", async () => {
     vi.mocked(authClient.useSession).mockReturnValue(mockPendingSession)
-    vi.mocked(useAppSelector).mockImplementation((selectorFn: (state: RootState) => unknown) => {
-      const mockState = {
-        ...mockStoreReducers,
-        socket: mockSocketState,
-      }
 
-      return selectorFn(mockState)
-    })
+    render(<ServerMessage roomId={mockRoomId} />)
 
-    render(<ServerMessage roomId={mockSocketRoom1Id} />)
-
-    act(() => {
+    await act(async () => {
       vi.advanceTimersByTime(1000)
     })
 
@@ -52,7 +39,7 @@ describe("ServerMessage Component", () => {
   it("should render user connected message when authenticated and connected", () => {
     vi.mocked(authClient.useSession).mockReturnValue(mockSession)
 
-    render(<ServerMessage roomId={mockSocketRoom1Id} />)
+    render(<ServerMessage roomId={mockRoomId} />)
 
     act(() => {
       vi.advanceTimersByTime(1000)
@@ -65,12 +52,8 @@ describe("ServerMessage Component", () => {
 
   it("should render \"Disconnected from server\" when not connected", () => {
     vi.mocked(authClient.useSession).mockReturnValue(mockPendingSession)
-    vi.mocked(useAppSelector).mockImplementation((selectorFn: (state: RootState) => unknown) => {
-      const mockState = mockStoreReducers
-      return selectorFn(mockState)
-    })
 
-    render(<ServerMessage roomId={mockSocketRoom1Id} />)
+    render(<ServerMessage roomId={mockRoomId} />)
 
     act(() => {
       vi.advanceTimersByTime(1000)
@@ -85,19 +68,8 @@ describe("ServerMessage Component", () => {
     const errorMessage: string = "Connection error occurred"
 
     vi.mocked(authClient.useSession).mockReturnValue(mockPendingSession)
-    vi.mocked(useAppSelector).mockImplementation((selectorFn: (state: RootState) => unknown) => {
-      const mockState = {
-        ...mockStoreReducers,
-        socket: {
-          ...mockSocketState,
-          errorMessage,
-        },
-      }
 
-      return selectorFn(mockState)
-    })
-
-    render(<ServerMessage roomId={mockSocketRoom1Id} />)
+    render(<ServerMessage roomId={mockRoomId} />)
 
     act(() => {
       vi.advanceTimersByTime(1000)

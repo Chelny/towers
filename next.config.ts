@@ -21,19 +21,17 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
     dirs: [
-      "__tests__",
       "app",
       "components",
       "constants",
       "context",
       "data",
       "enums",
-      "features",
       "hooks",
       "interfaces",
       "lib",
-      "middleware",
-      "redux",
+      "test",
+      "translations",
       "utils",
     ],
   },
@@ -47,18 +45,6 @@ const nextConfig: NextConfig = {
         },
       },
     },
-  },
-  headers: async () => {
-    return [
-      {
-        source: "/api/:path((?!auth/reference).*)",
-        headers: [
-          { key: "Access-Control-Allow-Credentials", value: "true" },
-          { key: "Access-Control-Allow-Origin", value: process.env.BASE_URL || "*" },
-          { key: "Content-Type", value: "application/json" },
-        ],
-      },
-    ]
   },
   images: {
     remotePatterns: [
@@ -111,6 +97,7 @@ const nextConfig: NextConfig = {
       },
     ]
   },
+  serverExternalPackages: ["pino", "pino-pretty"],
   webpack: (config) => {
     config.cache = false
     config.module.rules.push({

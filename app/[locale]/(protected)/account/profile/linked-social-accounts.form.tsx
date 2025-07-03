@@ -94,9 +94,9 @@ export function LinkedSocialAccountsForm(): ReactNode {
 
   return (
     <>
-      <h3 className="text-lg font-semibold mb-4">
+      <h2 className="text-lg font-semibold mb-4">
         <Trans>Linked Social Accounts</Trans>
-      </h3>
+      </h2>
       {formState?.message && (
         <AlertMessage type={formState.success ? "success" : "error"}>{formState.message}</AlertMessage>
       )}

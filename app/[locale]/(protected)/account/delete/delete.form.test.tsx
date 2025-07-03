@@ -17,14 +17,14 @@ describe("Delete Account Form", () => {
   it("should render the form with all elements", () => {
     render(<DeleteAccountForm />)
 
-    expect(screen.getByTestId("delete-account-email-input")).toBeInTheDocument()
+    expect(screen.getByTestId("delete-account_input-email_email")).toBeInTheDocument()
     expect(screen.getByRole("button", { name: /Confirm Deletion/i })).toBeInTheDocument()
   })
 
   it("should correctly mark form fields as required", () => {
     render(<DeleteAccountForm />)
 
-    expect(screen.getByTestId("delete-account-email-input")).toHaveAttribute("required")
+    expect(screen.getByTestId("delete-account_input-email_email")).toHaveAttribute("required")
   })
 
   it("should display error messages when the form is submitted with empty fields", () => {
@@ -48,7 +48,9 @@ describe("Delete Account Form", () => {
 
     render(<DeleteAccountForm />)
 
-    fireEvent.input(screen.getByTestId("delete-account-email-input"), { target: { value: "john.doe@example.com" } })
+    fireEvent.input(screen.getByTestId("delete-account_input-email_email"), {
+      target: { value: "john.doe@example.com" },
+    })
 
     const submitButton: HTMLButtonElement = screen.getByRole("button", { name: /Confirm Deletion/i })
     fireEvent.click(submitButton)

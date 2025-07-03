@@ -8,7 +8,6 @@ import { passkey } from "better-auth/plugins/passkey"
 import { APP_CONFIG, APP_COOKIES, COOKIE_PREFIX } from "@/constants/app"
 import { getAccountsByUserId } from "@/data/account"
 import { getUserById } from "@/data/user"
-import { getTowersUserProfileIdByUserId } from "@/data/user-profile"
 import {
   sendDeleteUserEmail,
   sendEmailChangeEmail,
@@ -16,12 +15,14 @@ import {
   sendMagicLinkEmail,
   sendPasswordResetEmail,
 } from "@/lib/email"
+import { logger } from "@/lib/logger"
 import prisma from "@/lib/prisma"
 import { generateRandomUsername } from "@/utils/user-utils"
 
 export const auth = betterAuth({
   appName: APP_CONFIG.NAME,
   baseURL: process.env.BASE_URL,
+  trustedOrigins: process.env.TRUSTED_ORIGINS?.split(",") || [],
   secret: process.env.BETTER_AUTH_SECRET,
   database: prismaAdapter(prisma, {
     provider: "postgresql",
@@ -140,7 +141,6 @@ export const auth = betterAuth({
     customSession(async (session) => {
       const user: User | null = await getUserById(session.user.id)
       const accounts: Account[] = await getAccountsByUserId(session.user.id)
-      const towersUserProfileId: string | undefined = await getTowersUserProfileIdByUserId(session.user.id)
 
       return {
         user: {
@@ -149,9 +149,6 @@ export const auth = betterAuth({
         },
         session: session.session,
         accounts,
-        userProfileIds: {
-          towers: towersUserProfileId,
-        },
       }
     }),
     username(),
@@ -176,8 +173,8 @@ export const auth = betterAuth({
     nextCookies(), // Make sure this is the last plugin in the array,
   ],
   onAPIError: {
-    onError: (error, ctx) => {
-      console.error("onAPIError", error)
+    onError: (error) => {
+      logger.warn(`Better-Auth API error: ${JSON.stringify(error)}`)
     },
   },
   logger: {

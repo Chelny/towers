@@ -54,9 +54,9 @@ function ErrorMessage(): ReactNode {
 
   return (
     <div className="flex flex-col">
-      <h2 className="mb-4 text-3xl">
+      <h1 className="mb-4 text-3xl">
         <Trans>Something went wrong</Trans>
-      </h2>
+      </h1>
       {errorMap[error] || (
         <div>
           <Trans>

@@ -14,7 +14,7 @@ vi.mock("next/navigation", () => ({
   usePathname: vi.fn(),
 }))
 
-describe("Breadcrumb Component", () => {
+describe("Breadcrumb", () => {
   it("should render breadcrumb structure correctly", () => {
     vi.mocked(usePathname).mockReturnValue("/home")
 

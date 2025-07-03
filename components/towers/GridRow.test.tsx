@@ -1,13 +1,14 @@
 import { render, screen } from "@testing-library/react"
 import GridRow from "@/components/towers/GridRow"
-import { BoardRow } from "@/interfaces/game"
-import { mockDefaultTowersBlockProps } from "@/test/data/board"
+import { BoardRow } from "@/interfaces/towers"
+import { mockDefaultBlockProps } from "@/test/data/board"
 
-describe("GridRow Component", () => {
+describe("GridRow", () => {
   const mockRow: BoardRow = [
-    { ...mockDefaultTowersBlockProps, letter: "T", powerType: "defense" },
-    { ...mockDefaultTowersBlockProps, letter: "O", powerType: null },
-    { ...mockDefaultTowersBlockProps, letter: "W", powerType: "attack" },
+    { ...mockDefaultBlockProps, letter: "T", powerType: "defense" },
+    { ...mockDefaultBlockProps, letter: "O", powerType: null },
+    { ...mockDefaultBlockProps, letter: "W", powerType: "attack" },
+    { ...mockDefaultBlockProps, letter: "E", powerType: null },
   ]
 
   it("should render a row with the correct number of cells", () => {
@@ -23,13 +24,15 @@ describe("GridRow Component", () => {
         <GridRow rowIndex={0} row={mockRow} />
         <GridRow rowIndex={1} row={mockRow} />
         <GridRow rowIndex={2} row={mockRow} />
+        <GridRow rowIndex={3} row={mockRow} />
       </>,
     )
 
     const rows: HTMLDivElement[] = screen.getAllByRole("row")
     expect(rows[0]).toHaveClass("hidden")
     expect(rows[1]).toHaveClass("hidden")
-    expect(rows[2]).not.toHaveClass("hidden")
+    expect(rows[2]).toHaveClass("hidden")
+    expect(rows[3]).not.toHaveClass("hidden")
   })
 
   it("should render cells correctly for opponent board", () => {

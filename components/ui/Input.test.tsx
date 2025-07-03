@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react"
 import { Mock } from "vitest"
 import Input from "@/components/ui/Input"
 
-describe("Input Component", () => {
+describe("Input", () => {
   it("should render input with label and placeholder", () => {
     render(<Input id="test-input" label="Username" placeholder="Enter username" required />)
 

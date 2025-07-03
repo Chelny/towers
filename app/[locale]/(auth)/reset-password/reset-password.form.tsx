@@ -16,6 +16,7 @@ import Input from "@/components/ui/Input"
 import { INITIAL_FORM_STATE } from "@/constants/api"
 import { ROUTE_SIGN_IN } from "@/constants/routes"
 import { authClient } from "@/lib/auth-client"
+import { logger } from "@/lib/logger"
 
 export function ResetPasswordForm(): ReactNode {
   const router = useRouter()
@@ -50,7 +51,7 @@ export function ResetPasswordForm(): ReactNode {
           errorMessages.confirmPassword = t({ message: "The password confirmation is invalid." })
           break
         default:
-          console.error(`Reset Password Validation: Unknown error at ${error.path}`)
+          logger.warn(`Reset Password Validation: Unknown error at ${error.path}`)
           break
       }
     }
@@ -115,7 +116,7 @@ export function ResetPasswordForm(): ReactNode {
         id="token"
         name="token"
         value={token ?? undefined}
-        data-testid="reset-password-token-input"
+        data-testid="reset-password_input-hidden_token"
         required
       />
       <Input
@@ -125,7 +126,7 @@ export function ResetPasswordForm(): ReactNode {
         autoComplete="off"
         required
         disabled={formState?.success}
-        dataTestId="reset-password-password-input"
+        dataTestId="reset-password_input-password_password"
         description={t({
           message:
             "Password must be at least 8 characters long, must contain at least one digit, one uppercase letter, and at least one special character.",
@@ -139,7 +140,7 @@ export function ResetPasswordForm(): ReactNode {
         autoComplete="off"
         required
         disabled={formState?.success}
-        dataTestId="reset-password-confirm-password-input"
+        dataTestId="reset-password_input-password_confirm-password"
         onPaste={(event: ClipboardEvent<HTMLInputElement>) => event.preventDefault()}
         errorMessage={formState?.error?.confirmPassword}
       />

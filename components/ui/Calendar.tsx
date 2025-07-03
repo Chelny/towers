@@ -193,10 +193,13 @@ export default function Calendar({
                     key={dayIndex}
                     type="button"
                     className={clsx(
-                      "flex-1 p-2 text-center border rounded-sm",
-                      !disabled && day !== null && !isDisabledDay && "cursor-pointer hover:bg-gray-200",
+                      "flex-1 p-2 text-center border rounded-sm dark:border-neutral-900",
+                      !disabled &&
+                        day !== null &&
+                        !isDisabledDay &&
+                        "cursor-pointer hover:bg-gray-200 dark:hover:bg-slate-600",
                       day === null && "opacity-50 cursor-default",
-                      isSelectedDay && "bg-blue-100",
+                      isSelectedDay && "bg-blue-100 dark:bg-slate-500",
                       isDisabledDay && "opacity-50 cursor-not-allowed",
                     )}
                     disabled={isDisabledDay}
@@ -247,7 +250,7 @@ export default function Calendar({
                 <Button
                   key={year}
                   type="button"
-                  className="text-center border rounded-sm hover:bg-gray-200"
+                  className="text-center border rounded-sm hover:bg-gray-200 dark:hover:bg-gray-600"
                   disabled={year > maxDate.getUTCFullYear() || year < minDate.getUTCFullYear()}
                   onClick={() => {
                     setBrowsingDate(new Date(year, browsingDate.getUTCMonth()))
@@ -276,7 +279,7 @@ export default function Calendar({
       <label id={`${id}Label`} htmlFor={id} className="block mb-2 font-medium">
         {label}{" "}
         {!required && (
-          <span className="text-neutral-500">
+          <span className={clsx("text-neutral-500", "dark:text-dark-text-muted")}>
             (<Trans>optional</Trans>)
           </span>
         )}
@@ -299,12 +302,12 @@ export default function Calendar({
           : (placeholder ?? t({ message: "Select a date" }))}
       </Button>
       {description && (
-        <p id={`${id}Description`} className="text-neutral-500">
+        <p id={`${id}Description`} className={clsx("text-neutral-500", "dark:text-dark-text-muted")}>
           {description}
         </p>
       )}
       {errorMessage && (
-        <span id={`${id}ErrorMessage`} className="text-red-600">
+        <span id={`${id}ErrorMessage`} className={clsx("text-red-600", "dark:text-red-400")}>
           {errorMessage}
         </span>
       )}
@@ -323,6 +326,7 @@ export default function Calendar({
           className={clsx(
             "absolute start-1/2 z-10 min-w-96 max-w-max p-4 border border-gray-300 rounded shadow-md bg-white -translate-x-1/2",
             "rtl:translate-x-1/2",
+            "dark:border-dark-card-border dark:bg-dark-card-background",
           )}
           role="dialog"
           aria-modal="true"

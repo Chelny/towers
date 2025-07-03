@@ -29,9 +29,9 @@ describe("Sign In Form", () => {
   it("should render the form with all elements", () => {
     render(<SignInForm />)
 
-    expect(screen.getByTestId("sign-in-email-input")).toBeInTheDocument()
-    expect(screen.getByTestId("sign-in-password-input")).toBeInTheDocument()
-    expect(screen.getByTestId("sign-in-remember-me-checkbox")).toBeInTheDocument()
+    expect(screen.getByTestId("sign-in_input-email_email")).toBeInTheDocument()
+    expect(screen.getByTestId("sign-in_input-password_password")).toBeInTheDocument()
+    expect(screen.getByTestId("sign-in_checkbox_remember-me")).toBeInTheDocument()
     expect(screen.getByText(/Forgot Password/i)).toBeInTheDocument()
     expect(screen.getByRole("button", { name: /Sign in with email and password/i })).toBeInTheDocument()
     expect(screen.getByText(/Sign Up/i)).toBeInTheDocument()
@@ -43,14 +43,14 @@ describe("Sign In Form", () => {
   it("should correctly mark form fields as required", () => {
     render(<SignInForm />)
 
-    expect(screen.getByTestId("sign-in-email-input")).toHaveAttribute("required")
-    expect(screen.getByTestId("sign-in-password-input")).toHaveAttribute("required")
+    expect(screen.getByTestId("sign-in_input-email_email")).toHaveAttribute("required")
+    expect(screen.getByTestId("sign-in_input-password_password")).toHaveAttribute("required")
   })
 
   it("should display the forgot password link", () => {
     render(<SignInForm />)
 
-    const forgotPasswordLink: HTMLElement = screen.getByTestId("sign-in-forgot-password-link")
+    const forgotPasswordLink: HTMLElement = screen.getByTestId("sign-in_link_forgot-password")
     expect(forgotPasswordLink).toBeInTheDocument()
     expect(forgotPasswordLink).toHaveAttribute("href", ROUTE_FORGOT_PASSWORD.PATH)
   })
@@ -58,7 +58,7 @@ describe("Sign In Form", () => {
   it("should display the sign up link", () => {
     render(<SignInForm />)
 
-    const signUpLink: HTMLElement = screen.getByTestId("sign-in-sign-up-link")
+    const signUpLink: HTMLElement = screen.getByTestId("sign-in_link_sign-up")
     expect(signUpLink).toBeInTheDocument()
     expect(signUpLink).toHaveAttribute("href", ROUTE_SIGN_UP.PATH)
   })
@@ -70,6 +70,7 @@ describe("Sign In Form", () => {
     render(<SignInForm />)
 
     fireEvent.click(screen.getByRole("button", { name: /Magic Link/i }))
+
     expect(mockPush).toHaveBeenCalledWith(ROUTE_SIGN_IN_WITH_MAGIC_LINK.PATH)
   })
 
@@ -95,8 +96,8 @@ describe("Sign In Form", () => {
 
     render(<SignInForm />)
 
-    fireEvent.input(screen.getByTestId("sign-in-email-input"), { target: { value: "john.doe@example.com" } })
-    fireEvent.input(screen.getByTestId("sign-in-password-input"), { target: { value: "Password!" } })
+    fireEvent.input(screen.getByTestId("sign-in_input-email_email"), { target: { value: "john.doe@example.com" } })
+    fireEvent.input(screen.getByTestId("sign-in_input-password_password"), { target: { value: "Password!" } })
     fireEvent.click(screen.getByRole("button", { name: /Sign in with email and password/i }))
 
     await waitFor(() => {
@@ -116,8 +117,8 @@ describe("Sign In Form", () => {
 
     render(<SignInForm />)
 
-    fireEvent.input(screen.getByTestId("sign-in-email-input"), { target: { value: "john.doe@example.com" } })
-    fireEvent.input(screen.getByTestId("sign-in-password-input"), { target: { value: "Password123!" } })
+    fireEvent.input(screen.getByTestId("sign-in_input-email_email"), { target: { value: "john.doe@example.com" } })
+    fireEvent.input(screen.getByTestId("sign-in_input-password_password"), { target: { value: "Password123!" } })
 
     const submitButton: HTMLButtonElement = screen.getByRole("button", { name: /Sign in with email and password/i })
     fireEvent.click(submitButton)

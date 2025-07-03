@@ -1,43 +1,51 @@
+import { EMPTY_CELL } from "@/constants/game"
 import {
   Block,
   BoardBlock,
-  EmptyCell,
-  MedusaBlock,
-  MidasBlock,
-  PowerBarBlock,
+  MedusaPieceBlock,
+  MidasPieceBlock,
+  PieceBlock,
+  PowerBarItem,
   PowerPieceBlock,
   SpecialDiamond,
-  TowersBlock,
-} from "@/interfaces/game"
-
-export const isTowersBlock = (block: Block): block is TowersBlock => {
-  return ["T", "O", "W", "E", "R", "S"].includes(block.letter)
-}
-
-export const isMedusaBlock = (block: Block): block is MedusaBlock => {
-  return block.letter === "ME"
-}
-
-export const isMidasBlock = (block: Block): block is MidasBlock => {
-  return block.letter === "MI"
-}
-
-export const isSpecialDiamond = (block: Block): block is SpecialDiamond => {
-  return block.letter === "SD"
-}
+  TowersPieceBlock,
+} from "@/interfaces/towers"
 
 export const isBoardBlock = (block: Block): block is BoardBlock => {
-  return isTowersBlock(block) || isMedusaBlock(block) || isMidasBlock(block)
+  return isTowersPieceBlock(block) || isPowerPieceBlock(block)
+}
+
+export const isPieceBlock = (block: Block): block is PieceBlock => {
+  return block === " " || "letter" in block
+}
+
+export const isTowersPieceBlock = (block: Block): block is TowersPieceBlock => {
+  return !isEmptyCell(block) && ["T", "O", "W", "E", "R", "S"].includes(block.letter)
+}
+
+export const isMedusaPieceBlock = (block: Block): block is MedusaPieceBlock => {
+  return !isEmptyCell(block) && block.letter === "ME"
+}
+
+export const isMidasPieceBlock = (block: Block): block is MidasPieceBlock => {
+  return !isEmptyCell(block) && block.letter === "MI"
 }
 
 export const isPowerPieceBlock = (block: Block): block is PowerPieceBlock => {
-  return isMedusaBlock(block) || isMidasBlock(block)
+  return isMedusaPieceBlock(block) || isMidasPieceBlock(block)
 }
 
-export const isPowerBarBlock = (block: Block): block is PowerBarBlock => {
-  return block.powerType !== null && (isTowersBlock(block) || isSpecialDiamond(block))
+export const isSpecialDiamond = (block: Block): block is SpecialDiamond => {
+  return !isEmptyCell(block) && block.letter === "SD"
 }
 
-export const isEmptyCell = (block: Block): block is EmptyCell => {
-  return block.letter === " "
+export const isPowerBarItem = (block: Block): block is PowerBarItem => {
+  return (
+    (isTowersPieceBlock(block) && typeof block.powerType !== "undefined" && typeof block.powerLevel !== "undefined") ||
+    isSpecialDiamond(block)
+  )
+}
+
+export const isEmptyCell = (block: Block): block is typeof EMPTY_CELL => {
+  return block === EMPTY_CELL
 }

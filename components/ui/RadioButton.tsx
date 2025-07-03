@@ -36,7 +36,8 @@ export default function RadioButton({
           id={id}
           className={clsx(
             "peer appearance-none col-start-1 row-start-1 shrink-0 w-5 h-5 border-2 border-t-gray-600 border-e-gray-400 border-b-gray-400 border-s-gray-600 rounded-full bg-white",
-            "disabled:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed",
+            "disabled:bg-gray-200/50 disabled:cursor-not-allowed",
+            "dark:disabled:bg-dark-input-disabled-background",
           )}
           name={name}
           value={value}

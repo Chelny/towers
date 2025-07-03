@@ -1,19 +1,25 @@
-import { ITowersRoomWithUsersCount, RoomLevel } from "@prisma/client"
 import { fireEvent, render, screen, waitFor } from "@testing-library/react"
-import { Mock } from "vitest"
+import { vi } from "vitest"
 import RoomsList from "@/components/game/RoomsList"
 import { ROUTE_TOWERS } from "@/constants/routes"
+import { SocketEvents } from "@/constants/socket-events"
 import { authClient } from "@/lib/auth-client"
-import { useAppDispatch, useAppSelector } from "@/lib/hooks"
-import { RootState } from "@/redux/store"
-import { mockRoom1, mockRoom2, mockRoom3 } from "@/test/data/rooms"
+import { RoomLevel, RoomPlainObject } from "@/server/towers/classes/Room"
+import { UserPlainObject } from "@/server/towers/classes/User"
 import { mockSession } from "@/test/data/session"
-import { mockSocketRoom3Id, mockSocketState, mockStoreReducers } from "@/test/data/socketState"
-import { mockUseRouter } from "@/vitest.setup"
+import { mockSocket, mockUseRouter } from "@/vitest.setup"
 
 vi.mock("next/navigation", () => ({
   useRouter: vi.fn(() => mockUseRouter),
 }))
+
+vi.mock("@/context/SocketContext", async () => {
+  const actual = await vi.importActual("@/context/SocketContext")
+  return {
+    ...actual,
+    useSocket: () => ({ socket: mockSocket }),
+  }
+})
 
 vi.mock("@/lib/auth-client", () => ({
   authClient: {
@@ -21,57 +27,44 @@ vi.mock("@/lib/auth-client", () => ({
   },
 }))
 
-vi.mock("@/lib/hooks", () => ({
-  useAppDispatch: vi.fn(),
-  useAppSelector: vi.fn(),
-}))
+describe("RoomsList", () => {
+  const mockRoom1: RoomPlainObject = {
+    id: "mock-room-1",
+    name: "Room One",
+    level: RoomLevel.SOCIAL,
+    isFull: false,
+    tables: [],
+    users: [{ user: mockSession.data.user } as UserPlainObject],
+    chat: { messages: [] },
+  }
 
-vi.mock("@/redux/features/socket-slice")
+  const mockRoom2: RoomPlainObject = {
+    id: "mock-room-2",
+    name: "Room Two",
+    level: RoomLevel.BEGINNER,
+    isFull: true,
+    tables: [],
+    users: [],
+    chat: { messages: [] },
+  }
 
-vi.mock("@/redux/thunks/room-thunks")
-
-describe("RoomsList Component", () => {
-  const mockAppDispatch: Mock = vi.fn()
-  const mockRooms: ITowersRoomWithUsersCount[] = [
-    {
-      ...mockRoom1,
-      usersCount: 123,
-      isUserInRoom: true,
-    },
-    {
-      ...mockRoom2,
-      usersCount: 300,
-      isUserInRoom: false,
-    },
-    {
-      ...mockRoom3,
-      usersCount: 234,
-      isUserInRoom: false,
-    },
-  ]
-
-  const getRoomDifficulty = (difficulty: string): string => {
-    return difficulty === RoomLevel.SOCIAL
-      ? "Social"
-      : difficulty === RoomLevel.BEGINNER
-        ? "Beginner"
-        : difficulty === RoomLevel.INTERMEDIATE
-          ? "Intermediate"
-          : difficulty === RoomLevel.ADVANCED
-            ? "Advanced"
-            : ""
+  const mockRoom3: RoomPlainObject = {
+    id: "mock-room-3",
+    name: "Room Three",
+    level: RoomLevel.ADVANCED,
+    isFull: false,
+    tables: [],
+    users: [],
+    chat: { messages: [] },
   }
 
   beforeEach(() => {
-    vi.mocked(useAppDispatch).mockReturnValue(mockAppDispatch)
     vi.mocked(authClient.useSession).mockReturnValue(mockSession)
-    vi.mocked(useAppSelector).mockImplementation((selectorFn: (state: RootState) => unknown) => {
-      const mockState = {
-        ...mockStoreReducers,
-        socket: mockSocketState,
-      }
 
-      return selectorFn(mockState)
+    mockSocket.on = vi.fn((event, callback) => {
+      if (event === SocketEvents.ROOMS_LIST) {
+        callback({ rooms: [mockRoom1, mockRoom2, mockRoom3] })
+      }
     })
   })
 
@@ -79,50 +72,48 @@ describe("RoomsList Component", () => {
     vi.clearAllMocks()
   })
 
-  it("should render room details correctly", () => {
-    render(<RoomsList rooms={mockRooms} />)
+  it("renders all room names", async () => {
+    render(<RoomsList />)
 
-    expect(screen.getByText(mockRoom1.name)).toBeInTheDocument()
-    expect(screen.getByText(getRoomDifficulty(mockRoom1.difficulty))).toBeInTheDocument()
-    expect(screen.getByText(`${mockRooms[0].usersCount} users`)).toBeInTheDocument()
-    expect(screen.getByText(mockRoom2.name)).toBeInTheDocument()
-    expect(screen.getByText(getRoomDifficulty(mockRoom2.difficulty))).toBeInTheDocument()
-    expect(screen.getByText(`${mockRooms[1].usersCount} users`)).toBeInTheDocument()
-    expect(screen.getByText(mockRoom3.name)).toBeInTheDocument()
-    expect(screen.getByText(getRoomDifficulty(mockRoom3.difficulty))).toBeInTheDocument()
-    expect(screen.getByText(`${mockRooms[2].usersCount} users`)).toBeInTheDocument()
-
-    const buttons: HTMLButtonElement[] = screen.getAllByRole("button", { name: /Join/i })
-    expect(buttons.length).toEqual(mockRooms.length)
-    buttons.forEach((button: HTMLButtonElement) => expect(button).toBeInTheDocument())
-  })
-
-  it("should disable the join button when the room is full", () => {
-    render(<RoomsList rooms={mockRooms} />)
-
-    const buttons: HTMLButtonElement[] = screen.getAllByRole("button", { name: /Join/i })
-    expect(buttons[1]).toBeDisabled()
-  })
-
-  it("should navigate to the correct room when join button is clicked", () => {
-    render(<RoomsList rooms={mockRooms} />)
-
-    const buttons: HTMLButtonElement[] = screen.getAllByRole("button", { name: /Join/i })
-    fireEvent.click(buttons[2])
-
-    waitFor(() => {
-      expect(mockUseRouter).toHaveBeenCalledWith(`${ROUTE_TOWERS.PATH}?room=${mockSocketRoom3Id}`)
+    await waitFor(() => {
+      expect(screen.getByText(mockRoom1.name)).toBeInTheDocument()
+      expect(screen.getByText(mockRoom2.name)).toBeInTheDocument()
+      expect(screen.getByText(mockRoom3.name)).toBeInTheDocument()
     })
   })
 
-  it("should not trigger navigation when join button is disabled", () => {
-    render(<RoomsList rooms={mockRooms} />)
+  it("disables join button when room is full", async () => {
+    render(<RoomsList />)
 
-    const buttons: HTMLButtonElement[] = screen.getAllByRole("button", { name: /Joined/i })
-    fireEvent.click(buttons[0])
+    await waitFor(() => {
+      const fullButton = screen.getByRole("button", { name: /Full/i })
+      expect(fullButton).toBeDisabled()
+    })
+  })
 
-    waitFor(() => {
-      expect(mockUseRouter).not.toHaveBeenCalled()
+  it("navigates to correct route on Join", async () => {
+    render(<RoomsList />)
+
+    const joinButtons: HTMLElement[] = await screen.findAllByRole("button", { name: /Join/i })
+    const joinRoom3Button: HTMLElement | undefined = joinButtons.at(1)
+
+    fireEvent.click(joinRoom3Button!)
+
+    await waitFor(() => {
+      expect(mockUseRouter.push).toHaveBeenCalledWith(`${ROUTE_TOWERS.PATH}?room=${mockRoom3.id}`)
+    })
+  })
+
+  it("does not navigate if user already joined", async () => {
+    render(<RoomsList />)
+
+    const joinButtons: HTMLElement[] = await screen.findAllByRole("button", { name: /Joined/i })
+    const joinRoom1Button: HTMLElement | undefined = joinButtons.at(0)
+
+    fireEvent.click(joinRoom1Button!)
+
+    await waitFor(() => {
+      expect(mockUseRouter.push).not.toHaveBeenCalled()
     })
   })
 })

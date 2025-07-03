@@ -3,18 +3,18 @@ import clsx from "clsx/lite"
 import DefenseBlock from "@/components/towers/DefenseBlock"
 import RegularBlock from "@/components/towers/RegularBlock"
 import SpecialDiamondBlock from "@/components/towers/SpecialDiamondBlock"
-import { PowerBarBlock } from "@/interfaces/game"
+import { PowerBarItemPlainObject, PowerBarPlainObject } from "@/server/towers/classes/PowerBar"
 import { getClassNameForBlock, getClassNameForBlockPowerType } from "@/utils/block-class-names-utils"
-import { isPowerBarBlock, isSpecialDiamond } from "@/utils/block-guards-utils"
+import { isSpecialDiamond } from "@/utils/block-guards-utils"
 
 type PowerBarProps = {
-  blocks: PowerBarBlock[]
+  powerBar?: PowerBarPlainObject
 }
 
-export default function PowerBar({ blocks }: PowerBarProps): ReactNode {
+export default function PowerBar({ powerBar }: PowerBarProps): ReactNode {
   return (
     <>
-      {blocks.map((block: PowerBarBlock, blockIndex: number) => (
+      {powerBar?.queue?.map((block: PowerBarItemPlainObject, blockIndex: number) => (
         <div
           key={blockIndex}
           className={clsx(
@@ -23,14 +23,13 @@ export default function PowerBar({ blocks }: PowerBarProps): ReactNode {
             getClassNameForBlockPowerType(block),
           )}
         >
-          {isPowerBarBlock(block) &&
-            (isSpecialDiamond(block) ? (
-              <SpecialDiamondBlock block={block} />
-            ) : block.powerType === "defense" ? (
-              <DefenseBlock letter={block.letter} />
-            ) : (
-              <RegularBlock letter={block.letter} />
-            ))}
+          {isSpecialDiamond(block) ? (
+            <SpecialDiamondBlock block={block} />
+          ) : block.powerType === "defense" ? (
+            <DefenseBlock letter={block.letter} />
+          ) : (
+            <RegularBlock letter={block.letter} />
+          )}
         </div>
       ))}
     </>

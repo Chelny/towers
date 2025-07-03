@@ -13,11 +13,12 @@ export default function SmallScreenWarning(): ReactNode {
       className={clsx(
         "small-screen-warning",
         "fixed z-50 flex flex-col justify-center w-[calc(100%-96px)] h-full -m-4 -mb-8 bg-white text-center",
+        "dark:bg-dark-background",
       )}
     >
-      <h2 className="text-2xl font-bold mb-2">
+      <h1 className="text-2xl font-bold mb-2">
         <Trans>Screen Too Small</Trans>
-      </h2>
+      </h1>
       <p className="text-lg">
         <Trans>
           Resize the window (recommended size: {width} by {height})

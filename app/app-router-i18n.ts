@@ -1,4 +1,5 @@
 import { AllMessages, I18n, Messages, setupI18n } from "@lingui/core"
+import { logger } from "@/lib/logger"
 import linguiConfig from "@/lingui.config"
 
 const { locales } = linguiConfig
@@ -16,7 +17,7 @@ async function loadCatalog(locale: SupportedLocales): Promise<Record<string, Mes
     // const { messages } = await import(`@lingui/loader!@/translations/locales/${locale}.po`)
     return { [locale]: messages }
   } catch (error) {
-    console.error(`Failed to load locale ${locale}: ${error}`)
+    logger.error(`Failed to load locale ${locale}: ${error}`)
     return { [locale]: {} }
   }
 }
@@ -42,7 +43,7 @@ export const allI18nInstances: AllI18nInstances = locales.reduce((acc, locale) =
 
 export const getI18nInstance = (locale: SupportedLocales): I18n => {
   if (!allI18nInstances[locale]) {
-    console.warn(`No i18n instance found for locale "${locale}"`)
+    logger.warn(`No i18n instance found for locale "${locale}"`)
   }
 
   return allI18nInstances[locale]! || allI18nInstances["en"]!

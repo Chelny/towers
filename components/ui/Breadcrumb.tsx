@@ -37,7 +37,7 @@ BreadcrumbLink.displayName = "BreadcrumbLink"
 const BreadcrumbPage = forwardRef<HTMLSpanElement, ComponentPropsWithoutRef<"span">>(({ className, ...props }, ref) => (
   <span
     ref={ref}
-    className={clsx("text-black font-medium", className)}
+    className={clsx("font-medium", className)}
     role="link"
     aria-current="page"
     aria-disabled="true"

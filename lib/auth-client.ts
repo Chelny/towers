@@ -8,9 +8,9 @@ import {
 } from "better-auth/client/plugins"
 import { createAuthClient } from "better-auth/react"
 import type { auth } from "@/lib/auth"
+import { logger } from "@/lib/logger"
 
 export const authClient = createAuthClient({
-  baseURL: process.env.BASE_URL,
   plugins: [
     inferAdditionalFields<typeof auth>(),
     customSessionClient<typeof auth>(),
@@ -24,7 +24,7 @@ export const authClient = createAuthClient({
       const { response } = context
       if (response.status === 429) {
         const retryAfter: string | null = response.headers.get("X-Retry-After")
-        console.log(`Rate limit exceeded. Retry after ${retryAfter} seconds.`)
+        logger.error(`Rate limit exceeded. Retry after ${retryAfter} seconds.`)
       }
     },
   },

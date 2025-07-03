@@ -1,7 +1,7 @@
 import { USERNAME_PATTERN } from "@/constants/regex"
 import { generateRandomUsername } from "@/utils/user-utils"
 
-describe("generateRandomUsername Utility", () => {
+describe("generateRandomUsername", () => {
   it("should generate a username with base and a random suffix", () => {
     const base: string = "john.doe"
     const username: string = generateRandomUsername(base)

@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react"
 import { Mock } from "vitest"
 import RadioButton from "@/components/ui/RadioButton"
 
-describe("RadioButton Component", () => {
+describe("RadioButton", () => {
   it("should render radio button with label", () => {
     render(<RadioButton id="test-radio" label="Option 1" name="group1" value="1" />)
 

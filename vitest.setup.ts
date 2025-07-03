@@ -1,4 +1,29 @@
 import "@testing-library/jest-dom"
+import { screen } from "@testing-library/react"
+import { getAllByNormalizedText, getByNormalizedText } from "@/test/utils/getByNormalizedText"
+
+vi.mock("pino", () => ({
+  default: () => ({
+    info: vi.fn(),
+    debug: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+  }),
+}))
+
+Object.defineProperty(window, "matchMedia", {
+  writable: true,
+  value: vi.fn().mockImplementation((query) => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    addListener: vi.fn(), // Legacy
+    removeListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  })),
+})
 
 export const mockUseRouter = {
   back: vi.fn(),
@@ -25,10 +50,27 @@ export const mockUseSearchParams = {
   [Symbol.iterator]: vi.fn(),
 }
 
+export const mockSocket = {
+  emit: vi.fn(),
+  on: vi.fn(),
+  off: vi.fn(),
+  id: "mock-socket-id",
+  connected: true,
+  disconnected: false,
+  connect: vi.fn(),
+  disconnect: vi.fn(),
+}
+
 export const mockFetch = (global.fetch = vi.fn())
 
 export const mockFetchResponse = (data: ApiResponse) => {
   return {
     json: () => new Promise((resolve: (value: unknown) => void) => resolve(data)),
   }
+}
+
+export const customScreen = {
+  ...screen,
+  getByNormalizedText,
+  getAllByNormalizedText,
 }

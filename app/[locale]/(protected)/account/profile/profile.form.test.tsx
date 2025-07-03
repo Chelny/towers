@@ -23,25 +23,25 @@ describe("Sign Up Form", () => {
     render(<ProfileForm session={mockSession.data} />)
 
     expect(screen.getByText(/Profile Information/i)).toBeInTheDocument()
-    expect(screen.getByTestId("profile-name-input")).toBeInTheDocument()
-    expect(screen.getByTestId("profile-birthdate-calendar")).toBeInTheDocument()
-    expect(screen.getByTestId("profile-username-input")).toBeInTheDocument()
+    expect(screen.getByTestId("profile_input-text_name")).toBeInTheDocument()
+    expect(screen.getByTestId("profile_input-date_birthdate")).toBeInTheDocument()
+    expect(screen.getByTestId("profile_input-text_username")).toBeInTheDocument()
     expect(screen.getByRole("button", { name: /Update Profile/i })).toBeInTheDocument()
   })
 
   it("should correctly mark form fields as required", () => {
     render(<ProfileForm session={mockSession.data} />)
 
-    expect(screen.getByTestId("profile-name-input")).toHaveAttribute("required")
-    expect(screen.getByTestId("profile-birthdate-calendar")).not.toHaveAttribute("required")
-    expect(screen.getByTestId("profile-username-input")).toHaveAttribute("required")
+    expect(screen.getByTestId("profile_input-text_name")).toHaveAttribute("required")
+    expect(screen.getByTestId("profile_input-date_birthdate")).not.toHaveAttribute("required")
+    expect(screen.getByTestId("profile_input-text_username")).toHaveAttribute("required")
   })
 
   it("should display error messages when the form is submitted with empty fields", () => {
     render(<ProfileForm session={mockSession.data} />)
 
-    fireEvent.input(screen.getByTestId("profile-name-input"), { target: { value: "" } })
-    fireEvent.input(screen.getByTestId("profile-username-input"), { target: { value: "" } })
+    fireEvent.input(screen.getByTestId("profile_input-text_name"), { target: { value: "" } })
+    fireEvent.input(screen.getByTestId("profile_input-text_username"), { target: { value: "" } })
     fireEvent.click(screen.getByRole("button", { name: /Update Profile/i }))
 
     expect(screen.getByText(/The name is invalid/i)).toBeInTheDocument()
@@ -60,8 +60,8 @@ describe("Sign Up Form", () => {
 
     render(<ProfileForm session={mockSession.data} />)
 
-    fireEvent.input(screen.getByTestId("profile-name-input"), { target: { value: "John Doe" } })
-    fireEvent.input(screen.getByTestId("profile-username-input"), { target: { value: "john.doe" } })
+    fireEvent.input(screen.getByTestId("profile_input-text_name"), { target: { value: "John Doe" } })
+    fireEvent.input(screen.getByTestId("profile_input-text_username"), { target: { value: "john.doe" } })
 
     const submitButton: HTMLButtonElement = screen.getByRole("button", { name: /Update Profile/i })
     fireEvent.click(submitButton)

@@ -1,19 +1,28 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react"
-import { Mock } from "vitest"
 import Room from "@/components/game/Room"
 import { ROUTE_TOWERS } from "@/constants/routes"
+import { GameProvider } from "@/context/GameContext"
+import { ModalProvider } from "@/context/ModalContext"
 import { authClient } from "@/lib/auth-client"
-import { useAppDispatch } from "@/lib/hooks"
-import { leaveRoom } from "@/redux/features/socket-slice"
-import { mockRoom1 } from "@/test/data/rooms"
+import { RoomLevel, RoomPlainObject } from "@/server/towers/classes/Room"
 import { mockSession } from "@/test/data/session"
 import { mockUseRouter, mockUseSearchParams } from "@/vitest.setup"
+
+const mockRoom: RoomPlainObject = {
+  id: "mock-room-1",
+  name: "Test Room",
+  level: RoomLevel.SOCIAL,
+  isFull: false,
+  tables: [],
+  users: [],
+  chat: { messages: [] },
+}
 
 vi.mock("next/navigation", () => ({
   useRouter: vi.fn(() => mockUseRouter),
   useSearchParams: vi.fn(() => ({
     ...mockUseSearchParams,
-    get: vi.fn((key: string) => (key === "room" ? mockRoom1.id : null)),
+    get: vi.fn((key: string) => (key === "room" ? mockRoom.id : null)),
   })),
 }))
 
@@ -23,27 +32,34 @@ vi.mock("@/lib/auth-client", () => ({
   },
 }))
 
-vi.mock("@/lib/hooks", () => ({
-  useAppDispatch: vi.fn(),
-  useAppSelector: vi.fn(),
-}))
+const renderRoom = () => {
+  render(
+    <GameProvider>
+      <ModalProvider>
+        <Room />
+      </ModalProvider>
+    </GameProvider>,
+  )
+}
 
-describe("Room Component", () => {
-  const mockAppDispatch: Mock = vi.fn()
-
+describe("Room", () => {
   beforeEach(() => {
-    vi.mocked(useAppDispatch).mockReturnValue(mockAppDispatch)
     vi.mocked(authClient.useSession).mockReturnValue(mockSession)
   })
 
-  afterEach(() => {
-    vi.clearAllMocks()
-  })
-
-  it("should render room correctly", () => {
-    render(<Room />)
+  it("should redirect if room join fails", () => {
+    renderRoom()
 
     waitFor(() => {
+      expect(mockUseRouter.push).toHaveBeenCalledWith(ROUTE_TOWERS.PATH)
+    })
+  })
+
+  it("should render room after successful join", () => {
+    renderRoom()
+
+    waitFor(() => {
+      expect(screen.getByText(mockRoom.name)).toBeInTheDocument()
       expect(screen.getByPlaceholderText("Play Now")).toBeInTheDocument()
       expect(screen.getByPlaceholderText("Create Table")).toBeInTheDocument()
       expect(screen.getByPlaceholderText("Ratings")).toBeInTheDocument()
@@ -58,27 +74,24 @@ describe("Room Component", () => {
   })
 
   it("should not navigate to rooms list if room exit fails", () => {
-    render(<Room />)
-
-    const exitRoomButton: HTMLButtonElement = screen.getByText("Exit Room")
-    fireEvent.click(exitRoomButton)
+    renderRoom()
 
     waitFor(() => {
-      expect(mockAppDispatch).toHaveBeenCalledWith(leaveRoom({ roomId: mockRoom1.id }))
+      const exitRoomButton: HTMLButtonElement = screen.getByText("Exit Room")
+      fireEvent.click(exitRoomButton)
+
       expect(mockUseRouter).not.toHaveBeenCalled()
     })
   })
 
   it("should navigate to the rooms list on successful room exit", () => {
-    render(<Room />)
-
-    const exitRoomButton: HTMLButtonElement = screen.getByText("Exit Room")
-    fireEvent.click(exitRoomButton)
-
-    expect(mockAppDispatch).toHaveBeenCalledWith(leaveRoom({ roomId: mockRoom1.id }))
+    renderRoom()
 
     waitFor(() => {
-      expect(mockUseRouter).toHaveBeenCalledWith(ROUTE_TOWERS.PATH)
+      const exitRoomButton: HTMLButtonElement = screen.getByText("Exit Room")
+      fireEvent.click(exitRoomButton)
+
+      expect(mockUseRouter.push).toHaveBeenCalledWith(ROUTE_TOWERS.PATH)
     })
   })
 })

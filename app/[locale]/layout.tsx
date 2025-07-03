@@ -1,5 +1,6 @@
 import { PropsWithChildren, ReactNode } from "react"
 import type { Metadata, Viewport } from "next"
+import { ReadonlyHeaders } from "next/dist/server/web/spec-extension/adapters/headers"
 import { Inter } from "next/font/google"
 import { headers } from "next/headers"
 import { I18n } from "@lingui/core"
@@ -7,11 +8,13 @@ import { GoogleAnalytics } from "@next/third-parties/google"
 import { ThemeProvider } from "next-themes"
 import { LinguiClientProvider } from "@/app/[locale]/lingui-client-provider"
 import { allMessages } from "@/app/app-router-i18n"
+import "@/app/globals.scss"
 import { initLingui } from "@/app/init-lingui"
-import { StoreProvider } from "@/app/store-provider"
 import { APP_CONFIG, APP_COOKIES } from "@/constants/app"
+import { GameProvider } from "@/context/GameContext"
+import { ModalProvider } from "@/context/ModalContext"
+import { SocketProvider } from "@/context/SocketContext"
 import { Language, languages } from "@/translations/languages"
-import "../globals.scss"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -50,7 +53,7 @@ export default async function RootLayout({ children, params }: Readonly<RootLayo
   const currentLanguage: Language | undefined = languages.find(
     (language: Language) => language.locale === routeParams.locale,
   )
-  const headersList = await headers()
+  const headersList: ReadonlyHeaders = await headers()
   const nonce: string = headersList.get("x-nonce") || ""
 
   initLingui(routeParams.locale)
@@ -68,7 +71,11 @@ export default async function RootLayout({ children, params }: Readonly<RootLayo
           disableTransitionOnChange
         >
           <LinguiClientProvider initialLocale={routeParams.locale} initialMessages={allMessages[routeParams.locale]}>
-            <StoreProvider>{children}</StoreProvider>
+            <SocketProvider>
+              <GameProvider>
+                <ModalProvider>{children}</ModalProvider>
+              </GameProvider>
+            </SocketProvider>
           </LinguiClientProvider>
         </ThemeProvider>
       </body>

@@ -14,28 +14,26 @@ describe("Sign In with Magic Link Form", () => {
   it("should render the form with all elements", () => {
     render(<SignInWithMagicLinkForm />)
 
-    expect(screen.getByTestId("sign-in-with-magic-link-email-input")).toBeInTheDocument()
+    expect(screen.getByTestId("sign-in-with-magic-link_input-email_email")).toBeInTheDocument()
     expect(screen.getByRole("button", { name: /Email Me A Sign In Link/i })).toBeInTheDocument()
   })
 
   it("should correctly mark form fields as required", () => {
     render(<SignInWithMagicLinkForm />)
 
-    expect(screen.getByTestId("sign-in-with-magic-link-email-input")).toHaveAttribute("required")
+    expect(screen.getByTestId("sign-in-with-magic-link_input-email_email")).toHaveAttribute("required")
   })
 
   it("should display error messages when the form is submitted with empty fields", () => {
     render(<SignInWithMagicLinkForm />)
-
     fireEvent.click(screen.getByRole("button", { name: /Email Me A Sign In Link/i }))
-
     expect(screen.getByText(/The email is invalid/i)).toBeInTheDocument()
   })
 
   it("should display error messages for invalid email format", () => {
     render(<SignInWithMagicLinkForm />)
 
-    fireEvent.input(screen.getByTestId("sign-in-with-magic-link-email-input"), { target: { value: "john.doe" } })
+    fireEvent.input(screen.getByTestId("sign-in-with-magic-link_input-email_email"), { target: { value: "john.doe" } })
     fireEvent.click(screen.getByRole("button", { name: /Email Me A Sign In Link/i }))
 
     expect(screen.getByText(/The email is invalid/i)).toBeInTheDocument()
@@ -53,7 +51,7 @@ describe("Sign In with Magic Link Form", () => {
 
     render(<SignInWithMagicLinkForm />)
 
-    fireEvent.input(screen.getByTestId("sign-in-with-magic-link-email-input"), {
+    fireEvent.input(screen.getByTestId("sign-in-with-magic-link_input-email_email"), {
       target: { value: "john.doe@example.com" },
     })
 

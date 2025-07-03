@@ -5,54 +5,166 @@ import { useRouter } from "next/navigation"
 import { Trans, useLingui } from "@lingui/react/macro"
 import clsx from "clsx/lite"
 import { useTheme } from "next-themes"
+import { GoSidebarExpand } from "react-icons/go"
 import { LuGamepad2 } from "react-icons/lu"
-import { LuMoon, LuSun } from "react-icons/lu"
 import { PiSignOut } from "react-icons/pi"
 import { RiUserLine } from "react-icons/ri"
-import { TbSquareChevronLeft, TbSquareChevronRight } from "react-icons/tb"
 import { TbTower } from "react-icons/tb"
-import { useDispatch } from "react-redux"
-import SidebarMenuItem, { AccordionLink } from "@/components/SidebarMenuItem"
+import AlertModal from "@/components/game/AlertModal"
+import InstantMessageModal from "@/components/game/InstantMessageModal"
+import TableInvitationModal from "@/components/game/TableInvitationModal"
+import SidebarMenuItem from "@/components/SidebarMenuItem"
 import UserAvatar from "@/components/UserAvatar"
 import { ROUTE_DELETE_ACCOUNT, ROUTE_HOME, ROUTE_PROFILE, ROUTE_SETTINGS, ROUTE_TOWERS } from "@/constants/routes"
+import {
+  GameInstantMessage,
+  GameNotification,
+  GameRoomSummary,
+  GameTableBootedMessage,
+  GameTableInvitation,
+  GameTableSummary,
+  useGame,
+} from "@/context/GameContext"
+import { useModal } from "@/context/ModalContext"
+import { SidebarMenuActionItem, SidebarMenuDropdownItem, SidebarMenuLinkItem } from "@/interfaces/sidebar-menu"
 import { authClient } from "@/lib/auth-client"
-import { useAppSelector } from "@/lib/hooks"
-import { destroySocket } from "@/redux/features/socket-slice"
-import { RootState } from "@/redux/store"
 
 export default function Sidebar(): ReactNode {
   const router = useRouter()
-  const [isExpanded, setIsExpanded] = useState<boolean>(false)
-  const [isLinkTextVisible, setIsLinkTextVisible] = useState<boolean>(false)
   const { data: session, isPending } = authClient.useSession()
-  const dispatch = useDispatch()
-  const gameAccordionLinks: AccordionLink[] = useAppSelector((state: RootState) => state.sidebar?.gameLinks)
+  const { joinedRooms, joinedTables, notifications } = useGame()
+  const { openModal, closeModal } = useModal()
   const { i18n, t } = useLingui()
   const { theme, setTheme } = useTheme()
+  const [isExpanded, setIsExpanded] = useState<boolean>(false)
+  const [isLinkTextVisible, setIsLinkTextVisible] = useState<boolean>(false)
   const [isSystemDarkMode, setIsSystemDarkMode] = useState<boolean>(false)
 
-  const getAccountAccordionLinks = (): AccordionLink[] => {
-    return [
-      { href: ROUTE_PROFILE.PATH, label: i18n._(ROUTE_PROFILE.TITLE) },
-      { href: ROUTE_SETTINGS.PATH, label: i18n._(ROUTE_SETTINGS.TITLE) },
-      { href: ROUTE_DELETE_ACCOUNT.PATH, label: i18n._(ROUTE_DELETE_ACCOUNT.TITLE) },
-    ]
-  }
+  const gameMenuItems: SidebarMenuLinkItem[] = joinedRooms.map((room: GameRoomSummary) => {
+    // Room Notifications
+    const roomNotifications: GameNotification[] = notifications[room.id] ?? []
+    const notificationItems: SidebarMenuDropdownItem[] = roomNotifications.map<SidebarMenuDropdownItem>(
+      (notification: GameNotification) => {
+        // Instant message notification
+        if (notification.type === "instantMessage") {
+          const instantMessage: GameInstantMessage = notification as Extract<
+            GameNotification,
+            { type: "instantMessage" }
+          >
+          return {
+            id: `instant-message-${instantMessage.id}`,
+            roomId: notification.roomId,
+            notification,
+            label: i18n._("Instant message #{id} from {sender}", {
+              id: instantMessage.id.slice(0, 4),
+              sender: instantMessage.sender.user?.username,
+            }),
+            onClick: () => openModal(InstantMessageModal, { instantMessage }),
+          }
+        } else if (notification.type === "tableBootedMessage") {
+          const tableBootedMessage: GameTableBootedMessage = notification as Extract<
+            GameNotification,
+            { type: "tableBootedMessage" }
+          >
+          return {
+            id: `table-booted-message-${tableBootedMessage.id}`,
+            roomId: notification.roomId,
+            label: t({ message: "You have been booted from a table." }),
+            notification,
+            onClick: () =>
+              openModal(AlertModal, {
+                title: t({ message: "Booted from table" }),
+                message: i18n._("You have been booted from table #{tableNumber} by {host}.", {
+                  tableNumber: tableBootedMessage.tableNumber,
+                  host: tableBootedMessage.hostUsername,
+                }),
+                testId: "booted-user",
+              }),
+          }
+        }
 
-  const handleSignOut = async (): Promise<void> => {
-    dispatch(destroySocket())
-    await authClient.signOut({
-      fetchOptions: {
-        onSuccess: () => {
-          router.push(ROUTE_HOME.PATH)
-        },
+        // Table invitation (accepted/declined)
+        const tableInvitation: GameTableInvitation = notification as Extract<
+          GameNotification,
+          { type: "tableInvitation" }
+        >
+        const base: SidebarMenuDropdownItem = {
+          id: `table-invitation-${tableInvitation.id}`,
+          roomId: notification.roomId,
+          notification,
+        } as SidebarMenuDropdownItem
+
+        // Declined invitation
+        if (!("tableNumber" in tableInvitation)) {
+          return {
+            ...base,
+            label: i18n._("Invitation declined from {username}", {
+              username: tableInvitation.inviteeUsername,
+            }),
+            onClick: () =>
+              openModal(AlertModal, {
+                title: t({ message: "Invitation Declined" }),
+                message: tableInvitation.declinedReason
+                  ? i18n._("{username} declined your invitation. Reason: {reason}", {
+                      username: tableInvitation.inviteeUsername,
+                      reason: tableInvitation.declinedReason,
+                    })
+                  : i18n._("{username} declined your invitation.", {
+                      username: tableInvitation.inviteeUsername,
+                    }),
+                testId: "invitation-declined",
+              }),
+          }
+        }
+
+        // Active invitation
+        return {
+          ...base,
+          label: i18n._("Invitation to table #{tableNumber}", {
+            tableNumber: tableInvitation.tableNumber,
+          }),
+          onClick: () =>
+            openModal(TableInvitationModal, {
+              tableInvitation: tableInvitation,
+              onAcceptInvitation: (roomId, tableId) => {
+                router.push(`${ROUTE_TOWERS.PATH}?room=${roomId}&table=${tableId}`)
+                closeModal()
+              },
+            }),
+        }
       },
-    })
-  }
+    )
 
-  const handleToggleTheme = (): void => {
-    setTheme(theme === "dark" ? "light" : "dark")
-  }
+    // Tables
+    const tables: SidebarMenuLinkItem[] = joinedTables
+      .filter((table: GameTableSummary) => table.roomId === room.id)
+      .map((table: GameTableSummary) => ({
+        id: `table-${table.id}`,
+        label: i18n._("Table #{tableNumber}", { tableNumber: table.tableNumber }),
+        href: `${room.basePath}?room=${room.id}&table=${table.id}`,
+      }))
+
+    return {
+      id: `room-${room.id}`,
+      label: room.name,
+      href: `${room.basePath}?room=${room.id}`,
+      children: [
+        ...(notifications
+          ? [
+              {
+                id: `notifications-${room.id}`,
+                label: t({ message: "Notifications" }),
+                children: notificationItems,
+                unreadCount: notificationItems.filter(
+                  (n: SidebarMenuDropdownItem) => n.notification.status === "unread",
+                ).length,
+              } satisfies SidebarMenuActionItem,
+            ]
+          : []),
+        ...tables,
+      ],
+    }
+  })
 
   useEffect(() => {
     if (isExpanded) {
@@ -72,7 +184,7 @@ export default function Sidebar(): ReactNode {
 
       setIsSystemDarkMode(mediaQuery.matches)
 
-      const listener = (event: MediaQueryListEvent) => {
+      const listener = (event: MediaQueryListEvent): void => {
         setIsSystemDarkMode(event.matches)
       }
 
@@ -82,10 +194,32 @@ export default function Sidebar(): ReactNode {
     }
   }, [theme])
 
+  const getAccountAccordionLinks = (): SidebarMenuLinkItem[] => {
+    return [
+      { id: ROUTE_PROFILE.ID, href: ROUTE_PROFILE.PATH, label: i18n._(ROUTE_PROFILE.TITLE) },
+      { id: ROUTE_SETTINGS.ID, href: ROUTE_SETTINGS.PATH, label: i18n._(ROUTE_SETTINGS.TITLE) },
+      { id: ROUTE_DELETE_ACCOUNT.ID, href: ROUTE_DELETE_ACCOUNT.PATH, label: i18n._(ROUTE_DELETE_ACCOUNT.TITLE) },
+    ]
+  }
+
+  const handleSignOut = async (): Promise<void> => {
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          router.push(ROUTE_HOME.PATH)
+        },
+      },
+    })
+  }
+
+  const handleToggleTheme = (): void => {
+    setTheme(theme === "dark" ? "light" : "dark")
+  }
+
   return (
     <aside
       className={clsx(
-        "flex-shrink-0 flex flex-col gap-4 min-w-24 h-full px-2 py-4 border-e border-e-gray-300 shadow-lg bg-gray-800 text-white/90 transition transition-[width] duration-500 ease-in-out",
+        "flex-shrink-0 flex flex-col gap-4 min-w-24 h-full px-2 py-4 border-e border-e-gray-700 shadow-xl bg-gray-800 text-white/90 transition transition-[width] duration-500 ease-in-out",
         isExpanded ? "w-72 items-start" : "w-24 items-center",
       )}
     >
@@ -97,7 +231,7 @@ export default function Sidebar(): ReactNode {
         </div>
         <div className={isExpanded ? "flex" : "hidden"}>
           <button type="button" aria-label={t({ message: "Collapse sidebar" })} onClick={() => setIsExpanded(false)}>
-            <TbSquareChevronLeft className={clsx("w-8 h-8 text-white/70", "rtl:rotate-180")} aria-hidden="true" />
+            <GoSidebarExpand className={clsx("w-8 h-8 text-white/70", "rtl:-scale-x-100")} aria-hidden="true" />
           </button>
         </div>
       </div>
@@ -105,7 +239,10 @@ export default function Sidebar(): ReactNode {
       {/* Expand icon */}
       <div className={isExpanded ? "hidden" : "flex justify-center items-center w-full h-8"}>
         <button type="button" aria-label={t({ message: "Expand sidebar" })} onClick={() => setIsExpanded(true)}>
-          <TbSquareChevronRight className={clsx("w-8 h-8 text-white/70", "rtl:rotate-180")} aria-hidden="true" />
+          <GoSidebarExpand
+            className={clsx("w-8 h-8 text-white/70 rotate-180", "rtl:-scale-x-100")}
+            aria-hidden="true"
+          />
         </button>
       </div>
 
@@ -113,17 +250,19 @@ export default function Sidebar(): ReactNode {
 
       <nav className="flex flex-col items-center w-full" aria-label={t({ message: "User" })}>
         <SidebarMenuItem
+          id="account"
           Icon={RiUserLine}
           ariaLabel={t({ message: "Account" })}
           isExpanded={isExpanded}
           isLinkTextVisible={isLinkTextVisible}
-          accordionLinks={getAccountAccordionLinks()}
+          menuItems={getAccountAccordionLinks()}
           disabled={isPending}
           onClick={() => setIsExpanded(true)}
         >
           <Trans>Account</Trans>
         </SidebarMenuItem>
         <SidebarMenuItem
+          id="rooms"
           Icon={LuGamepad2}
           ariaLabel={t({ message: "Rooms" })}
           isExpanded={isExpanded}
@@ -139,13 +278,14 @@ export default function Sidebar(): ReactNode {
 
       {/* Games */}
       <nav className="flex-1 flex flex-col items-center w-full" aria-label={t({ message: "Games" })}>
-        {gameAccordionLinks?.length > 0 && (
+        {gameMenuItems?.length > 0 && (
           <SidebarMenuItem
+            id="towers"
             Icon={TbTower}
-            ariaLabel={t({ message: "Games" })}
+            ariaLabel="Towers"
             isExpanded={isExpanded}
             isLinkTextVisible={isLinkTextVisible}
-            accordionLinks={gameAccordionLinks}
+            menuItems={gameMenuItems}
             disabled={isPending}
             onClick={() => setIsExpanded(true)}
           >
@@ -160,6 +300,7 @@ export default function Sidebar(): ReactNode {
       <nav className="self-end flex flex-col items-center w-full" aria-label={t({ message: "Settings" })}>
         {/* FIXME: Hydration issue */}
         {/* <SidebarMenuItem
+          id="theme"
           Icon={theme === "system"
             ? isSystemDarkMode ? LuSun : LuMoon
             : theme === "dark" ? LuSun : LuMoon
@@ -173,6 +314,7 @@ export default function Sidebar(): ReactNode {
           {theme === "dark" ? <Trans>Light Mode</Trans> : <Trans>Dark Mode</Trans>}
         </SidebarMenuItem> */}
         <SidebarMenuItem
+          id="sign-out"
           Icon={PiSignOut}
           ariaLabel={t({ message: "Sign out" })}
           isExpanded={isExpanded}

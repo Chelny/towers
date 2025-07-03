@@ -1,78 +1,54 @@
 import {
-  Account,
-  Prisma,
+  TowersGamePlayer,
+  TowersPlayerControlKeys,
+  TowersPlayerStats,
   TowersRoom,
   TowersRoomChatMessage,
   TowersTable,
   TowersTableChatMessage,
-  TowersUserProfile,
-  TowersUserRoom,
-  TowersUserTable,
   User,
 } from "@prisma/client"
 
 declare module "@prisma/client" {
-  interface ITowersTableWithRelations extends TowersTable {
-    room: TowersRoom
-    host: ITowersUserProfileWithRelations
-    userTables: ITowersUserTableWithRelations[]
-  }
-
-  interface ITowersUserProfileWithRelations extends TowersUserProfile {
-    user: User
-    userRooms?: ITowersUserRoomWithRelations[]
-    userTables?: ITowersUserTableWithRelations[]
-  }
-
-  interface ITowersUserRoomWithRelations extends TowersUserRoom {
-    userProfile: TowersUserProfile
-  }
-
-  interface ITowersUserTableWithRelations extends TowersUserTable {
-    userProfile: ITowersUserProfileWithRelations
-    table: TowersTable | null
-  }
-
-  // **************************************************
-  // * Room API
-  // **************************************************
-
-  interface IRoomListItem extends TowersRoom {
-    userRooms: { userProfileId: string }[]
-  }
-
-  interface ITowersRoomWithUsersCount extends TowersRoom {
-    usersCount: number
-    isUserInRoom: boolean
-  }
-
   // **************************************************
   // * Room
   // **************************************************
 
-  interface ITowersRoom extends TowersRoom {}
+  interface ITowersRoom extends TowersRoom {
+    tables: ITowersTable[]
+    chatMessages: TowersRoomChatMessage[]
+  }
+
+  interface ITowersRoomWithUsersCount extends TowersRoom {
+    usersCount: number
+  }
 
   interface ITowersRoomChatMessage extends TowersRoomChatMessage {
-    userProfile: ITowersUserProfileWithRelations
+    room: TowersRoom
+    gamePlayer: ITowersGamePlayer
   }
 
   // **************************************************
   // * Table
   // **************************************************
 
-  interface ITowersTable extends ITowersTableWithRelations {}
+  interface ITowersTable extends TowersTable {
+    room: TowersRoom
+    host: ITowersGamePlayer
+  }
 
   interface ITowersTableChatMessage extends TowersTableChatMessage {
-    userProfile: ITowersUserProfileWithRelations | null
+    table: TowersTable
+    gamePlayer: ITowersGamePlayer
   }
 
   // **************************************************
-  // * User
+  // * Game Player
   // **************************************************
 
-  interface ITowersUserProfile extends ITowersUserProfileWithRelations {}
-
-  interface ITowersUserRoom extends ITowersUserRoomWithRelations {}
-
-  interface ITowersUserTable extends ITowersUserTableWithRelations {}
+  interface ITowersGamePlayer extends TowersGamePlayer {
+    user: User
+    controlKeys: TowersPlayerControlKeys
+    stats: TowersPlayerStats
+  }
 }

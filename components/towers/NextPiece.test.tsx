@@ -1,14 +1,16 @@
 import { render, screen } from "@testing-library/react"
 import NextPiece from "@/components/towers/NextPiece"
-import { Piece } from "@/interfaces/game"
-import { mockDefaultTowersBlockProps } from "@/test/data/board"
+import { PiecePlainObject } from "@/server/towers/classes/Piece"
 
-describe("NextPiece Component", () => {
-  const mockNextPiece: Piece = [
-    { ...mockDefaultTowersBlockProps, letter: "T", powerType: "defense" },
-    { ...mockDefaultTowersBlockProps, letter: "O", powerType: null },
-    { ...mockDefaultTowersBlockProps, letter: "W", powerType: "attack" },
-  ]
+describe("NextPiece", () => {
+  const mockNextPiece: PiecePlainObject = {
+    blocks: [
+      { letter: "T", position: { row: 0, col: 0 }, powerType: "defense", powerLevel: "minor" },
+      { letter: "O", position: { row: 0, col: 0 }, powerType: null, powerLevel: null },
+      { letter: "W", position: { row: 0, col: 0 }, powerType: "attack", powerLevel: "normal" },
+    ],
+    position: { row: 0, col: 0 },
+  }
 
   it("should render all blocks in the next piece", () => {
     render(<NextPiece nextPiece={mockNextPiece} />)

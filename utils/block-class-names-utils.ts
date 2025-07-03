@@ -1,5 +1,11 @@
-import { Block } from "@/interfaces/game"
-import { isMedusaBlock, isMidasBlock, isTowersBlock } from "@/utils/block-guards-utils"
+import { Block } from "@/interfaces/towers"
+import {
+  isMedusaPieceBlock,
+  isMidasPieceBlock,
+  isPieceBlock,
+  isPowerBarItem,
+  isTowersPieceBlock,
+} from "@/utils/block-guards-utils"
 
 /**
  * Returns the CSS class name corresponding to a given block type for styling purposes.
@@ -8,7 +14,7 @@ import { isMedusaBlock, isMidasBlock, isTowersBlock } from "@/utils/block-guards
  * @returns CSS class name associated with the block type.
  */
 export const getClassNameForBlock = (block: Block): string => {
-  if (isTowersBlock(block)) {
+  if (isTowersPieceBlock(block)) {
     switch (block.letter) {
       case "T":
         return "block-t"
@@ -22,16 +28,14 @@ export const getClassNameForBlock = (block: Block): string => {
         return "block-r"
       case "S":
         return "block-s"
-      default:
-        return ""
     }
-  } else if (isMedusaBlock(block)) {
+  } else if (isMedusaPieceBlock(block)) {
     return "block-medusa"
-  } else if (isMidasBlock(block)) {
+  } else if (isMidasPieceBlock(block)) {
     return "block-midas"
-  } else {
-    return ""
   }
+
+  return ""
 }
 
 /**
@@ -41,12 +45,57 @@ export const getClassNameForBlock = (block: Block): string => {
  * @returns CSS class name associated with the block power type.
  */
 export const getClassNameForBlockPowerType = (block: Block): string => {
-  switch (block.powerType) {
-    case "attack":
-      return "attack-block"
-    case "defense":
-      return "defense-block"
-    default:
-      return ""
+  if (isPowerBarItem(block)) {
+    switch (block.powerType) {
+      case "attack":
+        return "attack-block"
+      case "defense":
+        return "defense-block"
+    }
   }
+
+  return ""
+}
+
+/**
+ * Returns the CSS class name corresponding to a block animation for styling purposes.
+ *
+ * @param block - Block type identifier.
+ * @returns CSS class name associated with the animation name.
+ */
+export const getBlockRemovalAnimationClass = (block: Block): string => {
+  if (isPieceBlock(block)) {
+    if (block.isToBeRemoved) {
+      if (block.removedByOrigin) {
+        const dx: number = block.position.col - block.removedByOrigin.col
+        const dy: number = block.position.row - block.removedByOrigin.row
+        const directions = ["up", "down", "left", "right", "up-left", "up-right", "down-left", "down-right"]
+
+        const dir: string =
+          dy === -1 && dx === 0
+            ? "up"
+            : dy === 1 && dx === 0
+              ? "down"
+              : dy === 0 && dx === -1
+                ? "left"
+                : dy === 0 && dx === 1
+                  ? "right"
+                  : dy === -1 && dx === -1
+                    ? "up-left"
+                    : dy === -1 && dx === 1
+                      ? "up-right"
+                      : dy === 1 && dx === -1
+                        ? "down-left"
+                        : dy === 1 && dx === 1
+                          ? "down-right"
+                          : directions[Math.floor(Math.random() * directions.length)]
+
+        return `block-explode-${dir}`
+      }
+
+      return "block-break"
+    }
+  }
+
+  return ""
 }

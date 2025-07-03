@@ -1,4 +1,3 @@
-import { createId } from "@paralleldrive/cuid2"
 import { fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { Passkey } from "better-auth/plugins/passkey"
 import { Mock } from "vitest"
@@ -33,7 +32,7 @@ describe("Passkeys Form", () => {
     render(<PasskeysForm />)
 
     expect(screen.getByText(/Passkeys/i)).toBeInTheDocument()
-    expect(screen.getByTestId("passkeys-name-input")).toBeInTheDocument()
+    expect(screen.getByTestId("passkeys_input-text_name")).toBeInTheDocument()
     expect(screen.getByRole("button", { name: /Add Passkey/i })).toBeInTheDocument()
   })
 
@@ -41,7 +40,7 @@ describe("Passkeys Form", () => {
     vi.mocked(authClient.useListPasskeys).mockReturnValue({
       data: [
         {
-          id: createId(),
+          id: "mock-passkey-1",
           name: "Passkey 1",
           publicKey: "",
           userId: mockSession.data.user.id,
@@ -53,7 +52,7 @@ describe("Passkeys Form", () => {
           createdAt: new Date(),
         },
         {
-          id: createId(),
+          id: "mock-passkey-2",
           name: "Passkey 2",
           publicKey: "",
           userId: mockSession.data.user.id,
@@ -92,7 +91,7 @@ describe("Passkeys Form", () => {
   it("should display error messages for invalid required fields", () => {
     render(<PasskeysForm />)
 
-    fireEvent.input(screen.getByTestId("passkeys-name-input"), { target: { value: "Test Passkey #1" } })
+    fireEvent.input(screen.getByTestId("passkeys_input-text_name"), { target: { value: "Test Passkey #1" } })
     fireEvent.click(screen.getByRole("button", { name: /Add Passkey/i }))
 
     expect(screen.getByText(/Validation errors occurred/i)).toBeInTheDocument()
@@ -117,7 +116,7 @@ describe("Passkeys Form", () => {
       callbacks.onRequest()
       await new Promise((resolve) => setTimeout(resolve, 100))
       const newPasskey: Passkey = {
-        id: createId(),
+        id: "mock-passkey-1",
         name: "Test Passkey 1",
         publicKey: "",
         userId: mockSession.data.user.id,
@@ -134,7 +133,7 @@ describe("Passkeys Form", () => {
 
     render(<PasskeysForm />)
 
-    fireEvent.input(screen.getByTestId("passkeys-name-input"), { target: { value: "Test Passkey 1" } })
+    fireEvent.input(screen.getByTestId("passkeys_input-text_name"), { target: { value: "Test Passkey 1" } })
 
     const submitButton: HTMLButtonElement = screen.getByRole("button", { name: /Add Passkey/i })
     fireEvent.click(submitButton)

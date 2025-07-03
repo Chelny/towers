@@ -23,20 +23,20 @@ describe("Change Email Form", () => {
     render(<ChangeEmailForm session={mockSession.data} />)
 
     expect(screen.getByText(/Change Email/i)).toBeInTheDocument()
-    expect(screen.getByTestId("profile-email-input")).toBeInTheDocument()
+    expect(screen.getByTestId("profile_input-email_email")).toBeInTheDocument()
     expect(screen.getByRole("button", { name: /Send Verification Email/i })).toBeInTheDocument()
   })
 
   it("should correctly mark form fields as required", () => {
     render(<ChangeEmailForm session={mockSession.data} />)
 
-    expect(screen.getByTestId("profile-email-input")).toHaveAttribute("required")
+    expect(screen.getByTestId("profile_input-email_email")).toHaveAttribute("required")
   })
 
   it("should display error messages when the form is submitted with empty fields", () => {
     render(<ChangeEmailForm session={mockSession.data} />)
 
-    fireEvent.input(screen.getByTestId("profile-email-input"), { target: { value: "" } })
+    fireEvent.input(screen.getByTestId("profile_input-email_email"), { target: { value: "" } })
     fireEvent.click(screen.getByRole("button", { name: /Send Verification Email/i }))
 
     expect(screen.getByText(/The email is invalid/i)).toBeInTheDocument()
@@ -53,7 +53,7 @@ describe("Change Email Form", () => {
     })
     render(<ChangeEmailForm session={mockSession.data} />)
 
-    fireEvent.input(screen.getByTestId("profile-email-input"), { target: { value: "john.doe@example.com" } })
+    fireEvent.input(screen.getByTestId("profile_input-email_email"), { target: { value: "john.doe@example.com" } })
 
     const submitButton: HTMLButtonElement = screen.getByRole("button", { name: /Send Verification Email/i })
     fireEvent.click(submitButton)

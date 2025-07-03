@@ -1,8 +1,8 @@
 import { ReactNode } from "react"
-import { BlockLetter } from "@/interfaces/game"
+import { PieceBlockLetter } from "@/server/towers/classes/PieceBlock"
 
 type RegularBlockProps = {
-  letter?: BlockLetter
+  letter?: PieceBlockLetter
 }
 
 export default function RegularBlock({ letter }: RegularBlockProps): ReactNode {

@@ -9,30 +9,27 @@ datasource db {
 }
 
 model User {
-  id                  String             @id @default(cuid(2))
-  name                String
-  birthdate           DateTime?
-  email               String             @unique
-  emailVerified       Boolean            @default(false)
-  username            String             @unique
-  image               String?
-  language            String?            @default("en")
-  role                String?
-  isOnline            Boolean?           @default(false)
-  lastActiveAt        DateTime?
-  banned              Boolean?
-  banReason           String?
-  banExpires          DateTime?
-  accounts            Account[]
-  passkeys            Passkey[]
-  sessions            Session[]
-  friendshipsUser1    Friendship[]       @relation("FriendshipUser1")
-  friendshipsUser2    Friendship[]       @relation("FriendshipUser2")
-  directMessagesUser2 DirectMessage[]    @relation("DirectMessageReceiver")
-  directMessagesUser1 DirectMessage[]    @relation("DirectMessageSender")
-  towersUserProfile   TowersUserProfile?
-  createdAt           DateTime           @default(now())
-  updatedAt           DateTime           @updatedAt
+  id               String            @id @default(cuid(2))
+  name             String
+  birthdate        DateTime?
+  email            String            @unique
+  emailVerified    Boolean           @default(false)
+  username         String            @unique
+  image            String?
+  language         String?           @default("en")
+  role             String?
+  isOnline         Boolean?          @default(false)
+  lastActiveAt     DateTime?
+  theme            WebsiteTheme      @default(SYSTEM)
+  banned           Boolean?
+  banReason        String?
+  banExpires       DateTime?
+  accounts         Account[]
+  passkeys         Passkey[]
+  sessions         Session[]
+  towersGamePlayer TowersGamePlayer?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
 }
 
 model Account {
@@ -98,62 +95,8 @@ model RateLimit {
   updatedAt   DateTime @updatedAt
 }
 
-model Friendship {
-  id        String           @id @default(cuid(2))
-  userId1   String
-  user1     User             @relation("FriendshipUser1", fields: [userId1], references: [id], onDelete: Cascade)
-  userId2   String
-  user2     User             @relation("FriendshipUser2", fields: [userId2], references: [id], onDelete: Cascade)
-  status    FriendshipStatus
-  createdAt DateTime         @default(now())
-  updatedAt DateTime         @updatedAt
-
-  @@unique([userId1, userId2])
-  @@index([userId1])
-  @@index([userId2])
-}
-
-model DirectMessage {
-  id         String   @id @default(cuid(2))
-  senderId   String
-  sender     User     @relation("DirectMessageSender", fields: [senderId], references: [id], onDelete: Cascade)
-  receiverId String
-  receiver   User     @relation("DirectMessageReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
-  message    String
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
-  @@index([senderId, receiverId])
-}
-
-enum FriendshipStatus {
-  NONE
-  PENDING
-  ACCEPTED
-  BLOCKED
-}
-
-enum RoomLevel {
-  SOCIAL
-  BEGINNER
-  INTERMEDIATE
-  ADVANCED
-}
-
-enum TableType {
-  PUBLIC
-  PRIVATE
-  PROTECTED
-}
-
-enum TableChatMessageType {
-  CHAT
-  USER_JOINED
-  USER_LEFT
-  TABLE_HOST
-  TABLE_TYPE
-  GAME_RATING
-  CIPHER_KEY
-  HERO_CODE
-  HERO_MESSAGE
+enum WebsiteTheme {
+  SYSTEM
+  LIGHT
+  DARK
 }

@@ -1,17 +1,21 @@
 "use client"
 
 import { ReactNode, useEffect } from "react"
-import { useSearchParams } from "next/navigation"
-import Room from "@/components/game/Room"
-import Table from "@/components/game/Table"
-import { authClient } from "@/lib/auth-client"
-import { useAppDispatch, useAppSelector } from "@/lib/hooks"
-import { destroySocket, initSocket } from "@/redux/features/socket-slice"
-import { AppDispatch, RootState } from "@/redux/store"
+import dynamic from "next/dynamic"
+import { useRouter, useSearchParams } from "next/navigation"
+import { ROUTE_TOWERS } from "@/constants/routes"
+import { SocketEvents } from "@/constants/socket-events"
+import { useGame } from "@/context/GameContext"
+import { useSocket } from "@/context/SocketContext"
+import { InstantMessagePlainObject } from "@/server/towers/classes/InstantMessage"
+import { DeclinedTableInvitationPlainObject, TableInvitationPlainObject } from "@/server/towers/classes/TableInvitation"
+
+const Room = dynamic(() => import("@/components/game/Room"))
+const Table = dynamic(() => import("@/components/game/Table"))
 
 export default function TowersPageContent(): ReactNode {
+  const router = useRouter()
   const searchParams = useSearchParams()
-  const dispatch: AppDispatch = useAppDispatch()
 
   const roomId: string | null = searchParams.get("room")
   const tableId: string | null = searchParams.get("table")
@@ -20,38 +24,71 @@ export default function TowersPageContent(): ReactNode {
     throw new Error("Room ID is required")
   }
 
-  const { data: session } = authClient.useSession()
-  const isConnected: boolean = useAppSelector((state: RootState) => state.socket.isConnected)
-
-  const connectToSocket = (): void => {
-    if (session && !isConnected) {
-      dispatch(initSocket({ session }))
-    }
-  }
+  const { socket } = useSocket()
+  const { removeJoinedTable, addNotification, setActiveRoomId, activeTableId, setActiveTableId } = useGame()
 
   useEffect(() => {
-    const handleOnline = (): void => {
-      console.info("You are online.")
-      connectToSocket()
+    setActiveRoomId(roomId)
+    setActiveTableId(tableId)
+  }, [roomId, tableId, setActiveRoomId, setActiveTableId])
+
+  useEffect(() => {
+    if (!socket) return
+
+    const handleInstantMessage = (instantMessage: InstantMessagePlainObject) => {
+      addNotification({ ...instantMessage, type: "instantMessage" })
     }
 
-    const handleOffline = (): void => {
-      console.info("You are offline.")
-      dispatch(destroySocket())
+    const handleInvitation = (tableInvitation: TableInvitationPlainObject): void => {
+      addNotification({ ...tableInvitation, type: "tableInvitation" })
     }
 
-    window.addEventListener("online", handleOnline)
-    window.addEventListener("offline", handleOffline)
+    const handleInvitationDeclined = (tableInvitation: DeclinedTableInvitationPlainObject): void => {
+      addNotification({ ...tableInvitation, type: "tableInvitation" })
+    }
+
+    const handleUserBooted = ({
+      id,
+      roomId,
+      tableId,
+      tableNumber,
+      hostUsername,
+    }: {
+      id: string
+      roomId: string
+      tableId: string
+      tableNumber: number
+      hostUsername: string
+    }): void => {
+      addNotification({
+        id,
+        roomId,
+        tableId,
+        tableNumber,
+        hostUsername,
+        type: "tableBootedMessage",
+      })
+
+      removeJoinedTable(tableId)
+
+      if (activeTableId === tableId) {
+        setActiveTableId(null)
+        router.push(`${ROUTE_TOWERS.PATH}?room=${roomId}`)
+      }
+    }
+
+    socket.on(SocketEvents.INSTANT_MESSAGE_RECEIVED, handleInstantMessage)
+    socket.on(SocketEvents.TABLE_INVITATION_NOTIFICATION, handleInvitation)
+    socket.on(SocketEvents.TABLE_INVITATION_DECLINED_NOTIFICATION, handleInvitationDeclined)
+    socket.on(SocketEvents.TABLE_BOOTED_USER_NOTIFICATION, handleUserBooted)
 
     return () => {
-      window.removeEventListener("online", handleOnline)
-      window.removeEventListener("offline", handleOffline)
+      socket.off(SocketEvents.INSTANT_MESSAGE_RECEIVED, handleInstantMessage)
+      socket.off(SocketEvents.TABLE_INVITATION_NOTIFICATION, handleInvitation)
+      socket.off(SocketEvents.TABLE_INVITATION_DECLINED_NOTIFICATION, handleInvitationDeclined)
+      socket.off(SocketEvents.TABLE_BOOTED_USER_NOTIFICATION, handleUserBooted)
     }
-  }, [session, isConnected])
+  }, [socket, activeTableId])
 
-  useEffect(() => {
-    connectToSocket()
-  }, [session, isConnected])
-
-  return <>{tableId ? <Table /> : <Room />}</>
+  return <>{tableId ? <Table key={tableId} /> : <Room key={roomId} />}</>
 }

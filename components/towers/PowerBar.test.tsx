@@ -1,25 +1,20 @@
 import { render, screen } from "@testing-library/react"
 import PowerBar from "@/components/towers/PowerBar"
-import { PowerBarBlock } from "@/interfaces/game"
-import { mockDefaultTowersBlockProps } from "@/test/data/board"
+import { PowerBarPlainObject } from "@/server/towers/classes/PowerBar"
 
-describe("PowerBar Component", () => {
-  const mockBlocks: PowerBarBlock[] = [
-    { ...mockDefaultTowersBlockProps, letter: "T", powerType: "defense", powerLevel: "minor" },
-    { ...mockDefaultTowersBlockProps, letter: "O", powerType: "attack", powerLevel: "minor" },
-    { letter: "SD", specialDiamondType: "speed drop" },
-  ]
+const mockBlocks: PowerBarPlainObject = {
+  queue: [
+    { letter: "T", position: { row: 0, col: 0 }, powerType: "defense", powerLevel: "minor", isToBeRemoved: false },
+    { letter: "O", position: { row: 0, col: 0 }, powerType: "attack", powerLevel: "minor", isToBeRemoved: false },
+    { letter: "SD", powerType: "speed drop" },
+  ],
+}
 
-  it("should render all blocks in the power bar", () => {
-    render(<PowerBar blocks={mockBlocks} />)
-
-    const defenseBlocks: HTMLDivElement[] = screen.getAllByText("T")
-    expect(defenseBlocks).toHaveLength(4)
-
-    const attackBlock: HTMLDivElement = screen.getByText("O")
-    expect(attackBlock).toBeInTheDocument()
-
-    const specialDiamondBlock: HTMLDivElement = screen.getByTestId("special-diamond-speed-drop")
-    expect(specialDiamondBlock).toBeInTheDocument()
+describe("PowerBar", () => {
+  it("should render all power bar blocks", () => {
+    render(<PowerBar powerBar={mockBlocks} />)
+    expect(screen.getAllByText("T")).toHaveLength(4) // Y-axis spinning cube
+    expect(screen.getByText("O")).toBeInTheDocument()
+    expect(screen.getByTestId("special-diamond_speed-drop")).toBeInTheDocument()
   })
 })

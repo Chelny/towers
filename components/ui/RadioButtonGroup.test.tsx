@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react"
 import { Mock } from "vitest"
 import RadioButtonGroup from "@/components/ui/RadioButtonGroup"
 
-describe("RadioButtonGroup Component", () => {
+describe("RadioButtonGroup", () => {
   it("should render a group of radio buttons", () => {
     render(
       <RadioButtonGroup id="test-group" label="Select an option">

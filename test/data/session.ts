@@ -1,12 +1,10 @@
-import { createId } from "@paralleldrive/cuid2"
-import { mockRoom1Table1TowersUserProfile1 } from "@/test/data/towersUserProfiles"
-import { mockUser1 } from "@/test/data/users"
+import { mockUser1 } from "@/test/data/user"
 
 export const mockSession = {
   data: {
     user: mockUser1,
     session: {
-      id: createId(),
+      id: "mock-user-1",
       userId: mockUser1.id,
       token: "mockToken",
       expiresAt: new Date(),
@@ -14,16 +12,13 @@ export const mockSession = {
       updatedAt: new Date(),
     },
     accounts: [],
-    userProfileIds: {
-      towers: mockRoom1Table1TowersUserProfile1.id,
-    },
   },
   isPending: false,
   error: null,
 }
 
 export const mockSessionCredentialAccount = {
-  id: createId(),
+  id: "account-credential-abc-123",
   userId: mockUser1.id,
   accountId: mockUser1.id,
   providerId: "credential",
@@ -40,7 +35,7 @@ export const mockSessionCredentialAccount = {
 }
 
 export const mockSessionGitHubAccount = {
-  id: createId(),
+  id: "account-github-abc-123",
   userId: mockUser1.id,
   accountId: "1234567",
   providerId: "github",

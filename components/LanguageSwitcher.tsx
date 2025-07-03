@@ -29,7 +29,7 @@ export default function LanguageSwitcher(): ReactNode {
       defaultValue={locale}
       // @ts-ignore
       value={locale}
-      dataTestId="language-switcher-select"
+      dataTestId="language-switcher_select_locale"
       onChange={handleChange}
     >
       {languages.map((language: Language) => (

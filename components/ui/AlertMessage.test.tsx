@@ -1,7 +1,7 @@
 import { render } from "@testing-library/react"
 import AlertMessage from "@/components/ui/AlertMessage"
 
-describe("AlertMessage Component", () => {
+describe("AlertMessage", () => {
   it("should render info alert with correct styles", () => {
     const { container } = render(<AlertMessage type="info">Info message</AlertMessage>)
     expect(container.firstChild).toHaveClass("border-sky-200 bg-sky-100 text-sky-600")

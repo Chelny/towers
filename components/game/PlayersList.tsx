@@ -1,12 +1,10 @@
 "use client"
 
-import { ReactNode, useMemo, useState } from "react"
+import { ReactNode, useEffect, useMemo, useState } from "react"
 import { Trans, useLingui } from "@lingui/react/macro"
-import { createId } from "@paralleldrive/cuid2"
-import { ITowersUserProfileWithRelations } from "@prisma/client"
 import clsx from "clsx/lite"
 import { BsSortAlphaDown, BsSortAlphaDownAlt, BsSortNumericDown, BsSortNumericDownAlt } from "react-icons/bs"
-import PlayerInformation from "@/components/game/PlayerInformation"
+import PlayerInformationModal from "@/components/game/PlayerInformationModal"
 import {
   PROVISIONAL_MAX_COMPLETED_GAMES,
   RATING_DIAMOND,
@@ -14,10 +12,12 @@ import {
   RATING_MASTER,
   RATING_PLATINUM,
 } from "@/constants/game"
+import { useModal } from "@/context/ModalContext"
 import { authClient } from "@/lib/auth-client"
+import { UserPlainObject } from "@/server/towers/classes/User"
 
 type PlayersListProps = {
-  users: ITowersUserProfileWithRelations[]
+  users: UserPlainObject[] | undefined
   isRatingsVisible?: boolean | null
   isTableNumberVisible?: boolean
   onSelectedPlayer?: (userId: string) => void
@@ -30,11 +30,63 @@ export default function PlayersList({
   onSelectedPlayer,
 }: PlayersListProps): ReactNode {
   const { data: session } = authClient.useSession()
+  const { t } = useLingui()
+  const { openModal } = useModal()
   const [sortKey, setSortKey] = useState<"name" | "rating" | "table">("name")
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null)
-  const [isPlayerInfoModalOpen, setIsPlayerInfoModalOpen] = useState<boolean>(false)
-  const { t } = useLingui()
+  const [currentUser, setCurrentUser] = useState<UserPlainObject>()
+  const isRTL: boolean = document?.documentElement?.dir === "rtl"
+  const dividerPosition: string = isRTL ? "calc(100% - 65.2%) 0" : "65.2% 0"
+  const dividerPosition1: string = isRTL ? "calc(100% - 40.8%) 0" : "40.8% 0"
+  const dividerPosition2: string = isRTL ? "calc(100% - 73.6%) 0" : "73.6% 0"
+  const isDarkMode = typeof window !== "undefined" ? document.documentElement.classList.contains("dark") : false
+  const lightLinearGradient: string = "linear-gradient(to bottom, #e5e7eb 0%, #e5e7eb 100%)"
+  const darkLinearGradient: string = "linear-gradient(to bottom, #365066 0%, #365066 100%)"
+  const lightRepeatingLinear: string =
+    "repeating-linear-gradient(0deg, #f9fafb, #f9fafb 50%, transparent 50%, transparent)"
+  const darkRepeatingLinear: string =
+    "repeating-linear-gradient(0deg, #243342, #243342 50%, transparent 50%, transparent)"
+
+  const bgImages: string = [
+    isRatingsVisible && !isTableNumberVisible && (isDarkMode ? darkLinearGradient : lightLinearGradient),
+    !isRatingsVisible && isTableNumberVisible && (isDarkMode ? darkLinearGradient : lightLinearGradient),
+    isRatingsVisible && isTableNumberVisible && (isDarkMode ? darkLinearGradient : lightLinearGradient),
+    isRatingsVisible && isTableNumberVisible && (isDarkMode ? darkLinearGradient : lightLinearGradient),
+    isDarkMode ? darkRepeatingLinear : lightRepeatingLinear,
+  ]
+    .filter(Boolean)
+    .join(", ")
+
+  const bgPositions: string = [
+    isRatingsVisible && !isTableNumberVisible && dividerPosition,
+    !isRatingsVisible && isTableNumberVisible && dividerPosition,
+    isRatingsVisible && isTableNumberVisible && dividerPosition1,
+    isRatingsVisible && isTableNumberVisible && dividerPosition2,
+    "0 0",
+  ]
+    .filter(Boolean)
+    .join(", ")
+
+  const bgRepeats: string = [
+    isRatingsVisible && !isTableNumberVisible && "no-repeat",
+    !isRatingsVisible && isTableNumberVisible && "no-repeat",
+    isRatingsVisible && isTableNumberVisible && "no-repeat",
+    isRatingsVisible && isTableNumberVisible && "no-repeat",
+    "repeat-y",
+  ]
+    .filter(Boolean)
+    .join(", ")
+
+  const bgSizes: string = [
+    isRatingsVisible && !isTableNumberVisible && "2px 100%",
+    !isRatingsVisible && isTableNumberVisible && "2px 100%",
+    isRatingsVisible && isTableNumberVisible && "2px 100%",
+    isRatingsVisible && isTableNumberVisible && "2px 100%",
+    "100% 78px",
+  ]
+    .filter(Boolean)
+    .join(", ")
 
   const handleSort = (key: "name" | "rating" | "table"): void => {
     if (sortKey === key) {
@@ -45,10 +97,25 @@ export default function PlayersList({
     }
   }
 
+  const handlePlayersRowClick = (playerId: string | undefined): void => {
+    if (playerId) {
+      setSelectedPlayerId(playerId)
+      onSelectedPlayer?.(playerId)
+    }
+  }
+
+  const handleOpenPlayerInfoModal = (): void => {
+    openModal(PlayerInformationModal, {
+      currentUser,
+      player: sortedPlayersList?.find((player: UserPlainObject) => player.user?.id === selectedPlayerId),
+      isRatingsVisible,
+    })
+  }
+
   const sortedPlayersList = useMemo(() => {
     if (!users) return []
 
-    return users.slice().sort((a: ITowersUserProfileWithRelations, b: ITowersUserProfileWithRelations) => {
+    return users.slice().sort((a: UserPlainObject, b: UserPlainObject) => {
       switch (sortKey) {
         case "name":
           const nameA: string = a.user?.username || ""
@@ -58,20 +125,20 @@ export default function PlayersList({
         case "rating":
           if (!isRatingsVisible) break
 
-          const isProvisionalA: boolean = a.gamesCompleted < PROVISIONAL_MAX_COMPLETED_GAMES
-          const isProvisionalB: boolean = b.gamesCompleted < PROVISIONAL_MAX_COMPLETED_GAMES
+          const isProvisionalA: boolean = a.stats.gamesCompleted < PROVISIONAL_MAX_COMPLETED_GAMES
+          const isProvisionalB: boolean = b.stats.gamesCompleted < PROVISIONAL_MAX_COMPLETED_GAMES
 
           // Add "provisional" first in ASC order
           if (isProvisionalA && !isProvisionalB) return sortOrder === "asc" ? -1 : 1
           if (!isProvisionalA && isProvisionalB) return sortOrder === "asc" ? 1 : -1
 
-          const ratingA: number = a.rating || 0
-          const ratingB: number = b.rating || 0
+          const ratingA: number = a.stats.rating || 0
+          const ratingB: number = b.stats.rating || 0
 
           return sortOrder === "asc" ? ratingA - ratingB : ratingB - ratingA
         case "table":
-          const tableNumberA: number = (a.userTables && a.userTables[a.userTables?.length - 1]?.table?.tableNumber) || 0
-          const tableNumberB: number = (b.userTables && b.userTables[b.userTables?.length - 1]?.table?.tableNumber) || 0
+          const tableNumberA: number = a.lastJoinedTable?.tableNumber || 0
+          const tableNumberB: number = b.lastJoinedTable?.tableNumber || 0
 
           return sortOrder === "asc" ? tableNumberA - tableNumberB : tableNumberB - tableNumberA
         default:
@@ -82,133 +149,133 @@ export default function PlayersList({
     })
   }, [users, sortKey, sortOrder])
 
-  const handlePlayersRowClick = (playerId: string): void => {
-    setSelectedPlayerId(playerId)
-    onSelectedPlayer?.(playerId)
-  }
-
-  const handleOpenPlayerInfoModal = (): void => setIsPlayerInfoModalOpen(true)
-  const handleClosePlayerInfoModal = (): void => setIsPlayerInfoModalOpen(false)
+  useEffect(() => {
+    setCurrentUser(users?.find((user: UserPlainObject) => user.user?.id === session?.user.id))
+  }, [users])
 
   return (
-    <>
-      <div className="grid grid-rows-[auto,1fr] h-full border bg-white">
-        {/* Players List Heading */}
+    <div
+      className={clsx(
+        "grid grid-rows-[auto,1fr] h-full border bg-white",
+        "dark:border-dark-game-players-border dark:bg-dark-game-players-row-odd",
+      )}
+    >
+      {/* Players List Heading */}
+      <div
+        className={clsx(
+          "grid gap-1 pe-3 border-b border-gray-200 divide-x-2 divide-gray-200 bg-gray-50",
+          "rtl:divide-x-reverse",
+          "dark:border-b-dark-game-players-border dark:border-dark-game-players-border dark:divide-dark-game-players-border dark:bg-dark-game-players-header",
+          isRatingsVisible && isTableNumberVisible ? "grid-cols-[5fr,4fr,3fr]" : "grid-cols-[8fr,4fr]",
+        )}
+      >
         <div
-          className={clsx(
-            "grid gap-1 pe-3 border-b border-gray-200 divide-x-2 divide-gray-200 bg-gray-50",
-            isRatingsVisible && isTableNumberVisible ? "grid-cols-[5fr,4fr,3fr]" : "grid-cols-[8fr,4fr]",
-          )}
+          className="flex items-center gap-2 p-2 cursor-pointer"
+          role="buton"
+          tabIndex={0}
+          onClick={() => handleSort("name")}
         >
+          <span>
+            <Trans>Name</Trans>
+          </span>
+          {sortKey === "name" &&
+            (sortOrder === "asc" ? (
+              <BsSortAlphaDown aria-label={t({ message: "Sort ascending" })} />
+            ) : (
+              <BsSortAlphaDownAlt aria-label={t({ message: "Sort descending" })} />
+            ))}
+        </div>
+        {isRatingsVisible && (
           <div
             className="flex items-center gap-2 p-2 cursor-pointer"
             role="buton"
             tabIndex={0}
-            onClick={() => handleSort("name")}
+            onClick={() => handleSort("rating")}
           >
             <span>
-              <Trans>Name</Trans>
+              <Trans>Rating</Trans>
             </span>
-            {sortKey === "name" &&
+            {sortKey === "rating" &&
               (sortOrder === "asc" ? (
-                <BsSortAlphaDown aria-label={t({ message: "Sort ascending" })} />
+                <BsSortNumericDown aria-label={t({ message: "Sort ascending" })} />
               ) : (
-                <BsSortAlphaDownAlt aria-label={t({ message: "Sort descending" })} />
+                <BsSortNumericDownAlt aria-label={t({ message: "Sort descending" })} />
               ))}
           </div>
-          {isRatingsVisible && (
-            <div
-              className="flex items-center gap-2 p-2 cursor-pointer"
-              role="buton"
-              tabIndex={0}
-              onClick={() => handleSort("rating")}
-            >
-              <span>
-                <Trans>Rating</Trans>
-              </span>
-              {sortKey === "rating" &&
-                (sortOrder === "asc" ? (
-                  <BsSortNumericDown aria-label={t({ message: "Sort ascending" })} />
-                ) : (
-                  <BsSortNumericDownAlt aria-label={t({ message: "Sort descending" })} />
-                ))}
-            </div>
-          )}
-          {isTableNumberVisible && (
-            <div
-              className="flex items-center gap-2 p-2 cursor-pointer"
-              role="buton"
-              tabIndex={0}
-              onClick={() => handleSort("table")}
-            >
-              <span>
-                <Trans>Table</Trans>
-              </span>
-              {sortKey === "table" &&
-                (sortOrder === "asc" ? (
-                  <BsSortNumericDown aria-label={t({ message: "Sort ascending" })} />
-                ) : (
-                  <BsSortNumericDownAlt aria-label={t({ message: "Sort descending" })} />
-                ))}
-            </div>
-          )}
-        </div>
-        {/* Players List */}
-        <div className="overflow-y-scroll">
-          {sortedPlayersList?.map((player: ITowersUserProfileWithRelations) => (
-            <div
-              key={player.id}
-              className={clsx(
-                "grid gap-1 divide-x-2 divide-gray-200 even:bg-gray-50",
-                isRatingsVisible && isTableNumberVisible ? "grid-cols-[5fr,4fr,3fr]" : "grid-cols-[8fr,4fr]",
-                selectedPlayerId === player.id && "!bg-blue-100",
-                player.userId === session?.user.id && "text-blue-700",
-              )}
-              role="button"
-              tabIndex={0}
-              onClick={() => handlePlayersRowClick(player.id)}
-              onDoubleClick={handleOpenPlayerInfoModal}
-            >
-              <div className="p-2 truncate">
-                <div className="flex items-center gap-1">
-                  {isRatingsVisible && (
-                    <div
-                      className={clsx(
-                        "flex-shrink-0 w-4 h-4",
-                        player.rating >= RATING_MASTER && "bg-red-400",
-                        player.rating >= RATING_DIAMOND && player.rating < RATING_MASTER && "bg-orange-400",
-                        player.rating >= RATING_PLATINUM && player.rating < RATING_DIAMOND && "bg-purple-400",
-                        player.rating >= RATING_GOLD && player.rating < RATING_PLATINUM && "bg-cyan-600",
-                        player.rating < RATING_GOLD && "bg-green-600",
-                        player.gamesCompleted < PROVISIONAL_MAX_COMPLETED_GAMES && "!bg-gray-400",
-                      )}
-                    />
-                  )}
-                  <div className="truncate">{player.user?.username}</div>
-                </div>
-              </div>
-              {isRatingsVisible && (
-                <div className="p-2 text-end truncate">
-                  {player.gamesCompleted >= PROVISIONAL_MAX_COMPLETED_GAMES ? player.rating : "provisional"}
-                </div>
-              )}
-              {isTableNumberVisible && (
-                <div className="p-2 text-end truncate">
-                  {player.userTables && player.userTables[player.userTables?.length - 1]?.table?.tableNumber}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
+        )}
+        {isTableNumberVisible && (
+          <div
+            className="flex items-center gap-2 p-2 cursor-pointer"
+            role="buton"
+            tabIndex={0}
+            onClick={() => handleSort("table")}
+          >
+            <span>
+              <Trans>Table</Trans>
+            </span>
+            {sortKey === "table" &&
+              (sortOrder === "asc" ? (
+                <BsSortNumericDown aria-label={t({ message: "Sort ascending" })} />
+              ) : (
+                <BsSortNumericDownAlt aria-label={t({ message: "Sort descending" })} />
+              ))}
+          </div>
+        )}
       </div>
-
-      <PlayerInformation
-        key={createId()}
-        isOpen={isPlayerInfoModalOpen}
-        player={sortedPlayersList?.find((player: ITowersUserProfileWithRelations) => player.id === selectedPlayerId)}
-        isRatingsVisible={isRatingsVisible}
-        onCancel={handleClosePlayerInfoModal}
-      />
-    </>
+      {/* Players List */}
+      <div
+        className="overflow-y-scroll"
+        style={{
+          backgroundImage: bgImages,
+          backgroundPosition: bgPositions,
+          backgroundRepeat: bgRepeats,
+          backgroundSize: bgSizes,
+          backgroundOrigin: "content-box",
+        }}
+      >
+        {sortedPlayersList?.map((player: UserPlainObject) => (
+          <div
+            key={player.user?.id}
+            className={clsx(
+              "grid gap-1 divide-x-2 divide-gray-200",
+              "rtl:divide-x-reverse",
+              "dark:divide-dark-game-players-border",
+              isRatingsVisible && isTableNumberVisible ? "grid-cols-[5fr,4fr,3fr]" : "grid-cols-[8fr,4fr]",
+              selectedPlayerId === player.user?.id && "!bg-blue-100 dark:!bg-slate-600",
+              player.user?.id === session?.user.id && "text-blue-700 dark:text-blue-400",
+            )}
+            role="button"
+            tabIndex={0}
+            onClick={() => handlePlayersRowClick(player.user?.id)}
+            onDoubleClick={handleOpenPlayerInfoModal}
+          >
+            <div className="p-2 truncate">
+              <div className="flex items-center gap-1">
+                {isRatingsVisible && (
+                  <div
+                    className={clsx(
+                      "flex-shrink-0 w-4 h-4",
+                      player.stats.rating >= RATING_MASTER && "bg-red-400",
+                      player.stats.rating >= RATING_DIAMOND && player.stats.rating < RATING_MASTER && "bg-orange-400",
+                      player.stats.rating >= RATING_PLATINUM && player.stats.rating < RATING_DIAMOND && "bg-purple-400",
+                      player.stats.rating >= RATING_GOLD && player.stats.rating < RATING_PLATINUM && "bg-cyan-600",
+                      player.stats.rating < RATING_GOLD && "bg-green-600",
+                      player.stats.gamesCompleted < PROVISIONAL_MAX_COMPLETED_GAMES && "!bg-gray-400",
+                    )}
+                  />
+                )}
+                <div className="truncate">{player.user?.username}</div>
+              </div>
+            </div>
+            {isRatingsVisible && (
+              <div className="p-2 truncate">
+                {player.stats.gamesCompleted >= PROVISIONAL_MAX_COMPLETED_GAMES ? player.stats.rating : "provisional"}
+              </div>
+            )}
+            {isTableNumberVisible && <div className="p-2 truncate">{player.lastJoinedTable?.tableNumber}</div>}
+          </div>
+        ))}
+      </div>
+    </div>
   )
 }

@@ -1,6 +1,6 @@
 "use client"
 
-import { ReactNode } from "react"
+import { ReactNode, useEffect, useState } from "react"
 import Image from "next/image"
 import { useLingui } from "@lingui/react/macro"
 import clsx from "clsx/lite"
@@ -15,18 +15,43 @@ type UserAvatarProps = {
 
 export default function UserAvatar({ user, isLoading, className, size = 40 }: UserAvatarProps): ReactNode {
   const { t } = useLingui()
+  const [isMounted, setIsMounted] = useState<boolean>(false)
+  const placeholderSrc: string = "https://placehold.co/40x40.png?text=?"
+  const placeholderAlt: string = t({ message: "Avatar placeholder" })
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
+  if (!isMounted) {
+    return (
+      <div className={clsx("flex w-10 h-10 rounded-md bg-zinc-400", className)}>
+        <Image
+          className="rounded-md"
+          src={placeholderSrc}
+          width={size}
+          height={size}
+          priority={true}
+          alt={placeholderAlt}
+        />
+      </div>
+    )
+  }
+
   const username: string | undefined = user?.username
+  const imageSrc: string = user?.image || placeholderSrc
+  const imageAlt: string = user?.image ? t({ message: `${username}’s avatar` }) : placeholderAlt
 
   if (isLoading || !user) {
     return (
       <div className={clsx("flex w-10 h-10 rounded-md bg-zinc-400", className)}>
         <Image
           className="rounded-md"
-          src="https://placehold.co/40x40.png?text=?"
+          src={placeholderSrc}
           width={size}
           height={size}
-          priority
-          alt={t({ message: "Avatar placeholder" })}
+          priority={true}
+          alt={placeholderAlt}
         />
       </div>
     )
@@ -36,11 +61,12 @@ export default function UserAvatar({ user, isLoading, className, size = 40 }: Us
     <div className={clsx("flex w-10 h-10 rounded-md bg-zinc-400", className)}>
       <Image
         className="rounded-md"
-        src={user?.image ?? "https://placehold.co/40x40.png?text=?"}
+        src={imageSrc}
         width={size}
         height={size}
-        priority
-        alt={user?.image ? t({ message: `${username}’s avatar` }) : t({ message: "Avatar placeholder" })}
+        priority={true}
+        alt={imageAlt}
+        data-testid="user-avatar_image"
       />
     </div>
   )

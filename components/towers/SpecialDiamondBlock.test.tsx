@@ -1,45 +1,32 @@
 import { render, screen } from "@testing-library/react"
 import SpecialDiamondBlock from "@/components/towers/SpecialDiamondBlock"
-import { SpecialDiamond } from "@/interfaces/game"
-import { mockDefaultTowersBlockProps } from "@/test/data/board"
+import { SpecialDiamond } from "@/interfaces/towers"
 
-describe("SpecialDiamondBlock Component", () => {
+describe("SpecialDiamondBlock", () => {
   it("should render the speed drop diamond", () => {
-    const mockSpecialDiamond: SpecialDiamond = {
-      ...mockDefaultTowersBlockProps,
-      letter: "SD",
-      specialDiamondType: "speed drop",
-    }
+    const mockSpecialDiamond: SpecialDiamond = { letter: "SD", powerType: "speed drop" }
 
     render(<SpecialDiamondBlock block={mockSpecialDiamond} />)
 
-    const diamond: HTMLDivElement = screen.getByTestId("special-diamond-speed-drop")
+    const diamond: HTMLDivElement = screen.getByTestId("special-diamond_speed-drop")
     expect(diamond).toBeInTheDocument()
   })
 
   it("should render the remove powers diamond", () => {
-    const mockSpecialDiamond: SpecialDiamond = {
-      ...mockDefaultTowersBlockProps,
-      letter: "SD",
-      specialDiamondType: "remove powers",
-    }
+    const mockSpecialDiamond: SpecialDiamond = { letter: "SD", powerType: "remove powers" }
 
     render(<SpecialDiamondBlock block={mockSpecialDiamond} />)
 
-    const diamond: HTMLDivElement = screen.getByTestId("special-diamond-remove-powers")
+    const diamond: HTMLDivElement = screen.getByTestId("special-diamond_remove-powers")
     expect(diamond).toBeInTheDocument()
   })
 
   it("should render the generic remove stones diamond", () => {
-    const mockSpecialDiamond: SpecialDiamond = {
-      ...mockDefaultTowersBlockProps,
-      letter: "SD",
-      specialDiamondType: "remove stones",
-    }
+    const mockSpecialDiamond: SpecialDiamond = { letter: "SD", powerType: "remove stones" }
 
     render(<SpecialDiamondBlock block={mockSpecialDiamond} />)
 
-    const diamond: HTMLDivElement = screen.getByTestId("special-diamond-remove-stones")
+    const diamond: HTMLDivElement = screen.getByTestId("special-diamond_remove-stones")
     expect(diamond).toBeInTheDocument()
   })
 })

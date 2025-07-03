@@ -2,22 +2,28 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { Mock } from "vitest"
 import RoomTable from "@/components/game/RoomTable"
 import { ROUTE_TOWERS } from "@/constants/routes"
+import { TableType } from "@/enums/table-type"
 import { authClient } from "@/lib/auth-client"
-import { useAppDispatch, useAppSelector } from "@/lib/hooks"
-import { RootState } from "@/redux/store"
+import { GamePlainObject } from "@/server/towers/classes/Game"
+import { TablePlainObject } from "@/server/towers/classes/Table"
+import { TableInvitationManagerPlainObject } from "@/server/towers/classes/TableInvitationManager"
+import { UserMuteManagerPlainObject } from "@/server/towers/classes/UserMuteManager"
 import { mockSession } from "@/test/data/session"
-import {
-  mockSocketRoom1Table1Id,
-  mockSocketState,
-  mockStoreReducers,
-  mockTowersRoomState1Tables,
-  mockTowersTableState11Info,
-} from "@/test/data/socketState"
-import { mockUseRouter } from "@/vitest.setup"
+import { mockUser1 } from "@/test/data/user"
+import { mockUserStats1 } from "@/test/data/user-stats"
+import { mockSocket, mockUseRouter } from "@/vitest.setup"
 
 vi.mock("next/navigation", () => ({
   useRouter: vi.fn(() => mockUseRouter),
 }))
+
+vi.mock("@/context/SocketContext", async () => {
+  const actual = await vi.importActual("@/context/SocketContext")
+  return {
+    ...actual,
+    useSocket: () => ({ socket: mockSocket, isConnected: true }),
+  }
+})
 
 vi.mock("@/lib/auth-client", () => ({
   authClient: {
@@ -25,29 +31,69 @@ vi.mock("@/lib/auth-client", () => ({
   },
 }))
 
-vi.mock("@/lib/hooks", () => ({
-  useAppDispatch: vi.fn(),
-  useAppSelector: vi.fn(),
-}))
-
-vi.mock("@/redux/features/socket-slice")
-
-vi.mock("@/redux/thunks/room-thunks")
-
-describe("RoomTable Component", () => {
-  const mockAppDispatch: Mock = vi.fn()
+describe("RoomTable", () => {
+  const mockRoomId: string = "mock-room-1"
+  const mockTable: TablePlainObject = {
+    id: "mock-table-1",
+    tableNumber: 5,
+    tableType: TableType.PUBLIC,
+    isRated: true,
+    host: {
+      user: mockUser1,
+      rooms: {
+        "mock-room-1": {
+          createdAt: Date.now(),
+        },
+      },
+      tables: {
+        "mock-table-1": {
+          roomId: "mock-room-1",
+          tableNumber: 1,
+          seatNumber: 1,
+          teamNumber: 1,
+          isReady: false,
+          isPlaying: false,
+          createdAt: Date.now(),
+        },
+      },
+      lastJoinedTable: {
+        roomId: "mock-room-1",
+        tableNumber: 1,
+        seatNumber: 1,
+        teamNumber: 1,
+        isReady: false,
+        isPlaying: false,
+        createdAt: Date.now(),
+      },
+      controlKeys: {
+        MOVE_LEFT: "ArrowLeft",
+        MOVE_RIGHT: "ArrowRight",
+        CYCLE: "ArrowUp",
+        DROP: "ArrowDown",
+        USE_ITEM: "Space",
+        USE_ITEM_ON_PLAYER_1: "1",
+        USE_ITEM_ON_PLAYER_2: "2",
+        USE_ITEM_ON_PLAYER_3: "3",
+        USE_ITEM_ON_PLAYER_4: "4",
+        USE_ITEM_ON_PLAYER_5: "5",
+        USE_ITEM_ON_PLAYER_6: "6",
+        USE_ITEM_ON_PLAYER_7: "7",
+        USE_ITEM_ON_PLAYER_8: "8",
+      },
+      stats: mockUserStats1,
+      tableInvitations: {} as TableInvitationManagerPlainObject,
+      mute: {} as UserMuteManagerPlainObject,
+    },
+    users: [],
+    usersToInvite: [],
+    usersToBoot: [],
+    seats: [],
+    chat: { messages: [] },
+    game: {} as GamePlainObject,
+  }
 
   beforeEach(() => {
-    vi.mocked(useAppDispatch).mockReturnValue(mockAppDispatch)
     vi.mocked(authClient.useSession).mockReturnValue(mockSession)
-    vi.mocked(useAppSelector).mockImplementation((selectorFn: (state: RootState) => unknown) => {
-      const mockState = {
-        ...mockStoreReducers,
-        socket: mockSocketState,
-      }
-
-      return selectorFn(mockState)
-    })
   })
 
   afterEach(() => {
@@ -55,21 +101,21 @@ describe("RoomTable Component", () => {
   })
 
   it("should render room tables correctly", () => {
-    render(<RoomTable table={mockTowersRoomState1Tables[mockSocketRoom1Table1Id]} isTablesLoading={false} />)
-    expect(screen.getByText("#1")).toBeInTheDocument()
+    render(<RoomTable roomId={mockRoomId} table={mockTable} />)
+    expect(screen.getByText("#5")).toBeInTheDocument()
   })
 
   it("should navigate to the correct table on watch button click", async () => {
-    render(<RoomTable table={mockTowersRoomState1Tables[mockSocketRoom1Table1Id]} isTablesLoading={false} />)
+    const mockPush: Mock = vi.fn()
+    mockUseRouter.push = mockPush
 
-    const watchButtons: HTMLButtonElement[] = screen.getAllByRole("button", { name: /Watch/i })
-    expect(watchButtons[0]).toBeInTheDocument()
-    fireEvent.click(watchButtons[0])
+    render(<RoomTable roomId={mockRoomId} table={mockTable} />)
 
     await waitFor(() => {
-      expect(mockUseRouter.push).toHaveBeenCalledWith(
-        `${ROUTE_TOWERS.PATH}?room=${mockTowersTableState11Info?.roomId}&table=${mockTowersTableState11Info?.id}`,
-      )
+      const watchButtons: HTMLButtonElement[] = screen.getAllByRole("button", { name: /Watch/i })
+      const watchButton: HTMLElement | undefined = watchButtons.at(0)
+      fireEvent.click(watchButton!)
+      expect(mockPush).toHaveBeenCalledWith(`${ROUTE_TOWERS.PATH}?room=${mockRoomId}&table=${mockTable.id}`)
     })
   })
 })

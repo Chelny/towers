@@ -17,6 +17,7 @@ import { INITIAL_FORM_STATE } from "@/constants/api"
 import { ROUTE_TOWERS } from "@/constants/routes"
 import { authClient } from "@/lib/auth-client"
 import { Session } from "@/lib/auth-client"
+import { logger } from "@/lib/logger"
 
 type ProfileFormProps = {
   session: Session | null
@@ -62,7 +63,7 @@ export function ProfileForm({ session, isNewUser }: ProfileFormProps): ReactNode
           }
           break
         default:
-          console.error(`Profile Validation: Unknown error at ${error.path}`)
+          logger.warn(`Profile Validation: Unknown error at ${error.path}`)
           break
       }
     }
@@ -117,9 +118,9 @@ export function ProfileForm({ session, isNewUser }: ProfileFormProps): ReactNode
 
   return (
     <>
-      <h3 className="text-lg font-semibold mb-4">
+      <h2 className="text-lg font-semibold mb-4">
         <Trans>Profile Information</Trans>
-      </h3>
+      </h2>
       <form className="w-full" noValidate onSubmit={handleUpdateUser}>
         {formState?.message && (
           <AlertMessage type={formState.success ? "success" : "error"}>{formState.message}</AlertMessage>
@@ -130,7 +131,7 @@ export function ProfileForm({ session, isNewUser }: ProfileFormProps): ReactNode
           label={t({ message: "Avatar" })}
           defaultValue={undefined}
           disabled
-          dataTestId="profile-image-input"
+          dataTestId="profile_input-file_image"
           errorMessage={formState?.error?.image}
         />
         <hr className="mt-6 mb-4" /> */}
@@ -140,7 +141,7 @@ export function ProfileForm({ session, isNewUser }: ProfileFormProps): ReactNode
           placeholder={t({ message: "Enter your name" })}
           defaultValue={session?.user?.name}
           required
-          dataTestId="profile-name-input"
+          dataTestId="profile_input-text_name"
           errorMessage={formState?.error?.name}
         />
         <Calendar
@@ -148,7 +149,7 @@ export function ProfileForm({ session, isNewUser }: ProfileFormProps): ReactNode
           label={t({ message: "Birthdate" })}
           maxDate={new Date(new Date().getFullYear() - 13, new Date().getMonth(), new Date().getDate())}
           defaultValue={session?.user?.birthdate ? String(new Date(session?.user?.birthdate)) : undefined}
-          dataTestId="profile-birthdate-calendar"
+          dataTestId="profile_input-date_birthdate"
           description={t({ message: "You must be at least 13 years old." })}
           errorMessage={formState?.error?.birthdate}
         />
@@ -159,7 +160,7 @@ export function ProfileForm({ session, isNewUser }: ProfileFormProps): ReactNode
           autoComplete="off"
           defaultValue={session?.user?.username}
           required
-          dataTestId="profile-username-input"
+          dataTestId="profile_input-text_username"
           description={t({
             message:
               "Username must be between 5 and 16 characters long and can contain digits, periods, and underscores.",

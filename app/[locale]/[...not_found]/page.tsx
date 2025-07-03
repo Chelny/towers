@@ -1,4 +1,4 @@
-import type { PropsWithChildren, ReactElement, ReactNode } from "react"
+import type { ReactElement, ReactNode } from "react"
 import { notFound } from "next/navigation"
 import { I18n, MessageDescriptor } from "@lingui/core"
 import { initLingui } from "@/app/init-lingui"

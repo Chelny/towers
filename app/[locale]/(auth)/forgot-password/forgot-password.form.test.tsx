@@ -12,14 +12,14 @@ describe("Forgot Password Form", () => {
   it("should render the form with all elements", () => {
     render(<ForgotPasswordForm />)
 
-    expect(screen.getByTestId("forgot-password-email-input")).toBeInTheDocument()
+    expect(screen.getByTestId("forgot-password_input-email_email")).toBeInTheDocument()
     expect(screen.getByRole("button", { name: /Send Email/i })).toBeInTheDocument()
   })
 
   it("should correctly mark form fields as required", () => {
     render(<ForgotPasswordForm />)
 
-    expect(screen.getByTestId("forgot-password-email-input")).toHaveAttribute("required")
+    expect(screen.getByTestId("forgot-password_input-email_email")).toHaveAttribute("required")
   })
 
   it("should display error messages when the form is submitted with empty fields", () => {
@@ -42,7 +42,9 @@ describe("Forgot Password Form", () => {
 
     render(<ForgotPasswordForm />)
 
-    fireEvent.input(screen.getByTestId("forgot-password-email-input"), { target: { value: "john.doe@example.com" } })
+    fireEvent.input(screen.getByTestId("forgot-password_input-email_email"), {
+      target: { value: "john.doe@example.com" },
+    })
 
     const submitButton: HTMLButtonElement = screen.getByRole("button", { name: /Send Email/i })
     fireEvent.click(submitButton)

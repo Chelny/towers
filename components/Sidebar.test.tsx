@@ -1,8 +1,8 @@
 import { ImgHTMLAttributes } from "react"
 import { fireEvent, render, screen } from "@testing-library/react"
-import { useDispatch } from "react-redux"
-import { Mock } from "vitest"
 import Sidebar from "@/components/Sidebar"
+import { GameProvider } from "@/context/GameContext"
+import { ModalProvider } from "@/context/ModalContext"
 import { authClient } from "@/lib/auth-client"
 import { mockSession } from "@/test/data/session"
 import { mockUseRouter } from "@/vitest.setup"
@@ -23,10 +23,6 @@ vi.mock("next/image", () => ({
   },
 }))
 
-vi.mock("react-redux", () => ({
-  useDispatch: vi.fn(),
-}))
-
 vi.mock("@/lib/auth-client", () => ({
   authClient: {
     signOut: vi.fn(),
@@ -34,15 +30,18 @@ vi.mock("@/lib/auth-client", () => ({
   },
 }))
 
-vi.mock("@/lib/hooks", () => ({
-  useAppSelector: vi.fn(),
-}))
+const renderSidebar = () => {
+  render(
+    <GameProvider>
+      <ModalProvider>
+        <Sidebar />
+      </ModalProvider>
+    </GameProvider>,
+  )
+}
 
-describe("Sidebar Component", () => {
-  const mockDispatch: Mock = vi.fn()
-
+describe("Sidebar", () => {
   beforeEach(() => {
-    vi.mocked(useDispatch).mockReturnValue(mockDispatch)
     vi.mocked(authClient.useSession).mockReturnValue(mockSession)
   })
 
@@ -51,14 +50,14 @@ describe("Sidebar Component", () => {
   })
 
   it("should render the sidebar in collapsed state initially", () => {
-    render(<Sidebar />)
+    renderSidebar()
 
     expect(screen.getByLabelText("Expand sidebar")).toBeInTheDocument()
     expect(screen.queryByText("John Doe")).not.toBeInTheDocument()
   })
 
   it("should expand the sidebar when expand button is clicked", () => {
-    render(<Sidebar />)
+    renderSidebar()
 
     const expandButton: HTMLButtonElement = screen.getByLabelText("Expand sidebar")
     fireEvent.click(expandButton)
@@ -66,8 +65,8 @@ describe("Sidebar Component", () => {
     expect(screen.getByText("John Doe")).toBeInTheDocument()
   })
 
-  it("should call mockDispatch and signOut on sign out button click", () => {
-    render(<Sidebar />)
+  it("should signOut which clicking the sign out button", () => {
+    renderSidebar()
 
     const expandButton: HTMLButtonElement = screen.getByLabelText("Expand sidebar")
     fireEvent.click(expandButton)
@@ -75,7 +74,6 @@ describe("Sidebar Component", () => {
     const signOutButton: HTMLButtonElement = screen.getByLabelText("Sign out")
     fireEvent.click(signOutButton)
 
-    expect(mockDispatch).toHaveBeenCalled()
     expect(authClient.signOut).toHaveBeenCalled()
   })
 })
