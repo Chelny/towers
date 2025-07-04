@@ -34,7 +34,7 @@ vi.mock("@lingui/react/macro", () => ({
         return key
       }),
     },
-    t: (key: Record<string, string>) => key.message,
+    t: (message: { message: string }) => message.message,
   }),
 }))
 

@@ -9,7 +9,7 @@ export default function NotFound(): ReactNode {
       <div className="towers-game-bg animate-move-background"></div>
       <div
         className={clsx(
-          "flex flex-col items-center justify-center max-w-full p-4 shadow-xl bg-white backdrop-blur-sm text-center md:max-w-md",
+          "flex flex-col items-center justify-center max-w-full p-4 shadow-xl bg-white backdrop-blur-xs text-center md:max-w-md",
           "dark:bg-dark-background",
         )}
       >

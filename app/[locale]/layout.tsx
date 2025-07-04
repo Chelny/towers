@@ -4,17 +4,19 @@ import { ReadonlyHeaders } from "next/dist/server/web/spec-extension/adapters/he
 import { Inter } from "next/font/google"
 import { headers } from "next/headers"
 import { I18n } from "@lingui/core"
+import { setI18n } from "@lingui/react/server"
 import { GoogleAnalytics } from "@next/third-parties/google"
 import { ThemeProvider } from "next-themes"
 import { LinguiClientProvider } from "@/app/[locale]/lingui-client-provider"
-import { allMessages } from "@/app/app-router-i18n"
-import "@/app/globals.scss"
+import { allMessages, getI18nInstance } from "@/app/app-router-i18n"
 import { initLingui } from "@/app/init-lingui"
 import { APP_CONFIG, APP_COOKIES } from "@/constants/app"
 import { GameProvider } from "@/context/GameContext"
 import { ModalProvider } from "@/context/ModalContext"
 import { SocketProvider } from "@/context/SocketContext"
+import { auth } from "@/lib/auth"
 import { Language, languages } from "@/translations/languages"
+import "../globals.css"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -30,7 +32,9 @@ type RootLayoutProps = PropsWithChildren<{
 
 export async function generateMetadata({ params }: RootLayoutProps): Promise<Metadata> {
   const routeParams: Params = await params
-  const i18n: I18n = initLingui(routeParams.locale)
+  const i18n: I18n = getI18nInstance(routeParams.locale)
+
+  setI18n(i18n)
 
   return {
     title: {
@@ -55,6 +59,7 @@ export default async function RootLayout({ children, params }: Readonly<RootLayo
   )
   const headersList: ReadonlyHeaders = await headers()
   const nonce: string = headersList.get("x-nonce") || ""
+  const session = await auth.api.getSession({ headers: headersList })
 
   initLingui(routeParams.locale)
 
@@ -65,8 +70,7 @@ export default async function RootLayout({ children, params }: Readonly<RootLayo
           attribute="class"
           storageKey={APP_COOKIES.THEME}
           enableSystem
-          defaultTheme="system"
-          forcedTheme="light"
+          defaultTheme={session?.user.theme?.toLowerCase()}
           nonce={nonce}
           disableTransitionOnChange
         >

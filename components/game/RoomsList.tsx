@@ -61,7 +61,7 @@ export default function RoomsList(): ReactNode {
           <li
             key={room.id}
             className={clsx(
-              "flex flex-col gap-2 p-4 border border-gray-300 rounded bg-white",
+              "flex flex-col gap-2 p-4 border border-gray-300 rounded-sm bg-white",
               room.isFull && "has-[button:disabled]:opacity-50",
               "dark:border-dark-card-border dark:bg-dark-card-background",
             )}

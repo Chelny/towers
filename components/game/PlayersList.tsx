@@ -36,11 +36,11 @@ export default function PlayersList({
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null)
   const [currentUser, setCurrentUser] = useState<UserPlainObject>()
-  const isRTL: boolean = document?.documentElement?.dir === "rtl"
-  const dividerPosition: string = isRTL ? "calc(100% - 65.2%) 0" : "65.2% 0"
-  const dividerPosition1: string = isRTL ? "calc(100% - 40.8%) 0" : "40.8% 0"
-  const dividerPosition2: string = isRTL ? "calc(100% - 73.6%) 0" : "73.6% 0"
-  const isDarkMode = typeof window !== "undefined" ? document.documentElement.classList.contains("dark") : false
+  const [isRTL, setIsRtl] = useState<boolean>(false)
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(false)
+  const dividerPosition: string = isRTL ? "calc(100% - 63.7%) 0" : "63.7% 0"
+  const dividerPosition1: string = isRTL ? "calc(100% - 39.3%) 0" : "39.3% 0"
+  const dividerPosition2: string = isRTL ? "calc(100% - 72.1%) 0" : "72.1% 0"
   const lightLinearGradient: string = "linear-gradient(to bottom, #e5e7eb 0%, #e5e7eb 100%)"
   const darkLinearGradient: string = "linear-gradient(to bottom, #365066 0%, #365066 100%)"
   const lightRepeatingLinear: string =
@@ -150,13 +150,18 @@ export default function PlayersList({
   }, [users, sortKey, sortOrder])
 
   useEffect(() => {
+    setIsRtl(document.documentElement.dir === "rtl")
+    setIsDarkMode(document.documentElement.classList.contains("dark"))
+  }, [])
+
+  useEffect(() => {
     setCurrentUser(users?.find((user: UserPlainObject) => user.user?.id === session?.user.id))
   }, [users])
 
   return (
     <div
       className={clsx(
-        "grid grid-rows-[auto,1fr] h-full border bg-white",
+        "grid grid-rows-[auto_1fr] h-full border border-gray-200 bg-white",
         "dark:border-dark-game-players-border dark:bg-dark-game-players-row-odd",
       )}
     >
@@ -166,7 +171,7 @@ export default function PlayersList({
           "grid gap-1 pe-3 border-b border-gray-200 divide-x-2 divide-gray-200 bg-gray-50",
           "rtl:divide-x-reverse",
           "dark:border-b-dark-game-players-border dark:border-dark-game-players-border dark:divide-dark-game-players-border dark:bg-dark-game-players-header",
-          isRatingsVisible && isTableNumberVisible ? "grid-cols-[5fr,4fr,3fr]" : "grid-cols-[8fr,4fr]",
+          isRatingsVisible && isTableNumberVisible ? "grid-cols-[5fr_4fr_3fr]" : "grid-cols-[8fr_4fr]",
         )}
       >
         <div
@@ -237,11 +242,11 @@ export default function PlayersList({
           <div
             key={player.user?.id}
             className={clsx(
-              "grid gap-1 divide-x-2 divide-gray-200",
+              "grid gap-1 divide-x-2 divide-gray-200 cursor-pointer",
               "rtl:divide-x-reverse",
               "dark:divide-dark-game-players-border",
-              isRatingsVisible && isTableNumberVisible ? "grid-cols-[5fr,4fr,3fr]" : "grid-cols-[8fr,4fr]",
-              selectedPlayerId === player.user?.id && "!bg-blue-100 dark:!bg-slate-600",
+              isRatingsVisible && isTableNumberVisible ? "grid-cols-[5fr_4fr_3fr]" : "grid-cols-[8fr_4fr]",
+              selectedPlayerId === player.user?.id && "!bg-blue-100 dark:!bg-blue-900",
               player.user?.id === session?.user.id && "text-blue-700 dark:text-blue-400",
             )}
             role="button"
@@ -254,7 +259,7 @@ export default function PlayersList({
                 {isRatingsVisible && (
                   <div
                     className={clsx(
-                      "flex-shrink-0 w-4 h-4",
+                      "shrink-0 w-4 h-4",
                       player.stats.rating >= RATING_MASTER && "bg-red-400",
                       player.stats.rating >= RATING_DIAMOND && player.stats.rating < RATING_MASTER && "bg-orange-400",
                       player.stats.rating >= RATING_PLATINUM && player.stats.rating < RATING_DIAMOND && "bg-purple-400",

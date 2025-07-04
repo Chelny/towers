@@ -17,13 +17,13 @@ export default function AuthLayout({ children, breadcrumb }: AuthLayoutProps): R
           "md:relative md:overflow-hidden md:flex-1 md:flex md:justify-center md:items-center md:h-full",
         )}
       >
-        <div className="md:towers-game-bg md:before:animate-move-background"></div>
+        <div className="towers-game-bg before:animate-move-background"></div>
         <div className="flex gap-2 md:absolute md:z-10">
           <Image className="md:hidden" src="/favicon.svg" width={36} height={24} alt={APP_CONFIG.NAME} />
           <h1
             className={clsx(
               "font-semibold text-white text-4xl",
-              "md:px-[3vw] md:py-[2vw] md:border md:border-neutral-300 md:rounded md:shadow-xl md:backdrop-blur-sm md:text-[3vw]",
+              "md:px-[3vw] md:py-[2vw] md:border md:border-neutral-300 md:rounded-sm md:shadow-xl md:backdrop-blur-xs md:text-[3vw]",
             )}
           >
             {APP_CONFIG.NAME}

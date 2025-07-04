@@ -4,7 +4,6 @@ import { ReactNode, useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Trans, useLingui } from "@lingui/react/macro"
 import clsx from "clsx/lite"
-import { useTheme } from "next-themes"
 import { GoSidebarExpand } from "react-icons/go"
 import { LuGamepad2 } from "react-icons/lu"
 import { PiSignOut } from "react-icons/pi"
@@ -35,10 +34,8 @@ export default function Sidebar(): ReactNode {
   const { joinedRooms, joinedTables, notifications } = useGame()
   const { openModal, closeModal } = useModal()
   const { i18n, t } = useLingui()
-  const { theme, setTheme } = useTheme()
   const [isExpanded, setIsExpanded] = useState<boolean>(false)
   const [isLinkTextVisible, setIsLinkTextVisible] = useState<boolean>(false)
-  const [isSystemDarkMode, setIsSystemDarkMode] = useState<boolean>(false)
 
   const gameMenuItems: SidebarMenuLinkItem[] = joinedRooms.map((room: GameRoomSummary) => {
     // Room Notifications
@@ -178,22 +175,6 @@ export default function Sidebar(): ReactNode {
     }
   }, [isExpanded])
 
-  useEffect(() => {
-    if (theme === "system") {
-      const mediaQuery: MediaQueryList = window.matchMedia("(prefers-color-scheme: dark)")
-
-      setIsSystemDarkMode(mediaQuery.matches)
-
-      const listener = (event: MediaQueryListEvent): void => {
-        setIsSystemDarkMode(event.matches)
-      }
-
-      mediaQuery.addEventListener("change", listener)
-
-      return () => mediaQuery.removeEventListener("change", listener)
-    }
-  }, [theme])
-
   const getAccountAccordionLinks = (): SidebarMenuLinkItem[] => {
     return [
       { id: ROUTE_PROFILE.ID, href: ROUTE_PROFILE.PATH, label: i18n._(ROUTE_PROFILE.TITLE) },
@@ -212,14 +193,10 @@ export default function Sidebar(): ReactNode {
     })
   }
 
-  const handleToggleTheme = (): void => {
-    setTheme(theme === "dark" ? "light" : "dark")
-  }
-
   return (
     <aside
       className={clsx(
-        "flex-shrink-0 flex flex-col gap-4 min-w-24 h-full px-2 py-4 border-e border-e-gray-700 shadow-xl bg-gray-800 text-white/90 transition transition-[width] duration-500 ease-in-out",
+        "shrink-0 flex flex-col gap-4 min-w-24 h-full px-2 py-4 border-e border-e-gray-700 shadow-xl bg-gray-800 text-white/90 transition transition-[width] duration-500 ease-in-out",
         isExpanded ? "w-72 items-start" : "w-24 items-center",
       )}
     >
@@ -297,22 +274,10 @@ export default function Sidebar(): ReactNode {
       <hr className="w-full border-t border-t-slate-600" />
 
       {/* Settings and sign out button */}
-      <nav className="self-end flex flex-col items-center w-full" aria-label={t({ message: "Settings" })}>
-        {/* FIXME: Hydration issue */}
-        {/* <SidebarMenuItem
-          id="theme"
-          Icon={theme === "system"
-            ? isSystemDarkMode ? LuSun : LuMoon
-            : theme === "dark" ? LuSun : LuMoon
-          }
-          ariaLabel={theme === "dark" ? t({ message: "Toggle to Light Mode" }) : t({ message: "Toggle to Dark Mode" })}
-          isExpanded={isExpanded}
-          isLinkTextVisible={isLinkTextVisible}
-          disabled
-          onClick={handleToggleTheme}
-        >
-          {theme === "dark" ? <Trans>Light Mode</Trans> : <Trans>Dark Mode</Trans>}
-        </SidebarMenuItem> */}
+      <nav
+        className="self-end flex flex-col items-center w-full cursor-pointer"
+        aria-label={t({ message: "Settings" })}
+      >
         <SidebarMenuItem
           id="sign-out"
           Icon={PiSignOut}

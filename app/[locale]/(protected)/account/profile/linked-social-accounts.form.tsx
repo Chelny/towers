@@ -100,7 +100,7 @@ export function LinkedSocialAccountsForm(): ReactNode {
       {formState?.message && (
         <AlertMessage type={formState.success ? "success" : "error"}>{formState.message}</AlertMessage>
       )}
-      <ul className="space-y-4">
+      <ul className="flex flex-col gap-4">
         {AUTH_PROVIDERS.map(({ name, label, icon }: AuthProviderDetails) => (
           <li key={name} className="flex items-center justify-between gap-2">
             <div className="flex-1 flex items-center gap-2">

@@ -1,0 +1,336 @@
+/* stylelint-disable scss/at-rule-no-unknown */
+@import "tailwindcss";
+@import "./styles/towers";
+
+/* stylelint-disable-next-line scss/operator-no-unspaced */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  /* Board */
+  --grid-cell-size: 30;
+  --grid-cell-size-opponent: 15;
+  --grid-rows: 13;
+  --grid-cols: 6;
+
+  /* Misc */
+  --border-radius: 0.25rem;
+
+  /* Grid Template Rows */
+  --grid-rows-game: max-content 1fr max-content;
+  --grid-rows-game-content: auto minmax(25%, 35%);
+  --grid-rows-grid-container: repeat(var(--grid-rows), calc(var(--grid-cell-size) * 1px));
+  --grid-rows-grid-container-opponent: repeat(var(--grid-rows), calc(var(--grid-cell-size-opponent) * 1px));
+
+  /* Grid Template Columns */
+  --grid-cols-game: 208px 1fr max-content;
+  --grid-cols-table-team: 224px 1fr 224px; /* player-board-opponent * 2 */
+  --grid-cols-grid-row: repeat(var(--grid-cols), calc(var(--grid-cell-size) * 1px));
+  --grid-cols-grid-row-opponent: repeat(var(--grid-cols), calc(var(--grid-cell-size-opponent) * 1px));
+
+  /* Spacing */
+  --spacing-fill: -webkit-fill-available;
+  --spacing-player-board-opponent-width: calc((var(--grid-cell-size-opponent) * var(--grid-cols) * 1px) + 8px + 2px);
+  --spacing-grid-container-width: calc(var(--grid-cols) * var(--grid-cell-size) * 1px);
+  --spacing-grid-container-opponent-width: calc(var(--grid-cols) * var(--grid-cell-size-opponent) * 1px);
+  --spacing-grid-cell-width: calc(var(--grid-cell-size) * 1px);
+  --spacing-grid-cell-height: calc(var(--grid-cell-size) * 1px);
+  --spacing-grid-cell-opponent-width: calc(var(--grid-cell-size-opponent) * 1px);
+  --spacing-grid-cell-opponent-height: calc(var(--grid-cell-size-opponent) * 1px);
+  --spacing-preview-piece-width: calc(var(--grid-cell-size) * 1px + 16px);
+  --spacing-preview-piece-height: calc(var(--grid-cell-size) * 3px + 16px);
+  --spacing-power-bar-width: calc(var(--grid-cell-size) * 1px + 16px);
+  --spacing-power-bar-height: calc(var(--grid-cell-size) * 8px + 16px);
+  --spacing-demo-block: 28px;
+
+  /* Text */
+  --text-board-button: clamp(10px, 4vw, 16px);
+  --text-board-button-opponent: clamp(6px, 4vw, 10px);
+
+  /* Colors */
+  --color-towers-primary: theme('colors.teal.800');
+  --color-dark-background: #1E2A35;
+  --color-dark-text: #E1E8ED;
+  --color-dark-text-muted: #AAB8C2;
+  --color-dark-card-background: #2B3A48;
+  --color-dark-card-border: #3A4A58;
+  --color-dark-input-background: #243342;
+  --color-dark-input-text: #F0F4F8;
+  --color-dark-input-readonly-background: #2B3A48;
+  --color-dark-input-readonly-text: #AEBECC;
+  --color-dark-input-disabled-background: #202E3A;
+  --color-dark-input-disabled-text: #7D8C9A;
+  --color-dark-input-border-top: #1A2630;
+  --color-dark-input-border-end: #365066;
+  --color-dark-input-border-bottom: #365066;
+  --color-dark-input-border-start: #1A2630;
+  --color-dark-button-background: #3D5A73;
+  --color-dark-button-text: #F0F4F8;
+  --color-dark-button-border-top: #5E7689;
+  --color-dark-button-border-end: #1C2A34;
+  --color-dark-button-border-bottom: #1C2A34;
+  --color-dark-button-border-start: #5E7689;
+  --color-dark-button-ring: #5AA1C2;
+  --color-dark-modal-background: #2B3A48;
+  --color-dark-modal-border: #3A4A58;
+  --color-dark-modal-heading-text: #F0F4F8;
+  --color-dark-modal-body-text: #E1E8ED;
+  --color-dark-modal-border-top: #5E7689;
+  --color-dark-modal-border-end: #1C2A34;
+  --color-dark-modal-border-bottom: #1C2A34;
+  --color-dark-modal-border-start: #5E7689;
+  --color-dark-modal-ring: #5AA1C2;
+  --color-dark-info-background: #2E4356;
+  --color-dark-info-text: #9BC4E2;
+  --color-dark-info-border: #3A4A58;
+  --color-dark-warning-background: #4C3A1A;
+  --color-dark-warning-text: #E3D48C;
+  --color-dark-warning-border: #70502C;
+  --color-dark-success-background: #274037;
+  --color-dark-success-text: #A7D9BA;
+  --color-dark-success-border: #355A47;
+  --color-dark-error-background: #5A2A33;
+  --color-dark-error-text: #E7BFC2;
+  --color-dark-error-border: #803843;
+  --color-dark-alert-message-background: #2B3A48;
+  --color-dark-alert-message-text: #F0F4F8;
+  --color-dark-alert-message-border: #3A4A58;
+  --color-dark-game-background: #22303E;
+  --color-dark-game-border: #365066;
+  --color-dark-game-sidebar-background: #202D3A;
+  --color-dark-game-sidebar-border: #E1E8ED;
+  --color-dark-game-content-background: #243342;
+  --color-dark-game-content-text: #3A4A58;
+  --color-dark-game-content-border: #415A6B;
+  --color-dark-game-orange-top-bar-background: #FF9F40;
+  --color-dark-game-yellow-sub-bar-background: #E6C744;
+  --color-dark-game-chat-background: #263544;
+  --color-dark-game-players-header: #2B3A48;
+  --color-dark-game-players-row-odd: #263544;
+  --color-dark-game-players-row-even: #243342;
+  --color-dark-game-players-border: #365066;
+  --color-dark-game-change-keys-background: #202D3B;
+
+  /* Line Height */
+  --leading-default: 1;
+
+  /* Animations */
+  --animate-move-background: move-background 180s linear infinite;
+  --animate-move-up: move-up 1.5s ease-in-out forwards;
+  --animate-move-down: move-down 1.5s ease-in-out forwards;
+  --animate-demo-slide-power-block: demo-slide-power-block 0.8s ease-in-out forwards;
+  --animate-demo-slide-power-block-rtl: demo-slide-power-block-rtl 0.4s ease-out forwards;
+
+  @keyframes move-background {
+    0% {
+      background-position: bottom;
+    }
+
+    100% {
+      background-position: top;
+    }
+  }
+
+  @keyframes move-up {
+    0% {
+      transform: translateY(100%);
+      opacity: 0%;
+    }
+
+    100% {
+      transform: translateY(0);
+      opacity: 100%;
+    }
+  }
+
+  @keyframes move-down {
+    0% {
+      transform: translateY(0);
+      opacity: 100%;
+    }
+
+    100% {
+      transform: translateY(100%);
+      opacity: 0%;
+    }
+  }
+
+  @keyframes demo-slide-power-block {
+    0% {
+      width: 1rem;
+      transform: scale(0.6) translate(0, 0);
+      opacity: 0%;
+    }
+
+    100% {
+      width: 1.5rem;
+      transform: scale(1) translate(calc(100% * 3), -100%);
+      opacity: 100%;
+    }
+  }
+
+  @keyframes demo-slide-power-block-rtl {
+    0% {
+      width: 1rem;
+      transform: scale(0.6) translate(0, 0);
+      opacity: 0%;
+    }
+
+    100% {
+      width: 1.5rem;
+      transform: scale(1) translate(calc(-100% * 3), -100%);
+      opacity: 100%;
+    }
+  }
+}
+
+@layer base {
+  html {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+  }
+
+  .towers-link {
+    color: theme("color.blue.600")
+  }
+
+  .towers-link:hover {
+    color: theme("color.blue.800")
+  }
+
+  .towers-link:visited {
+    color: theme("color.purple.600")
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  overflow-x: hidden;
+  background-color: theme("color.gray.100");
+  font-size: 1rem;
+  font-variant-numeric: tabular-nums;
+
+  @variant dark {
+    background-color: var(--color-dark-background);
+    color: var(--color-dark-text);
+  }
+}
+
+@supports (scrollbar-color: auto) {
+  body {
+    scrollbar-width: thin;
+    scrollbar-color: #d4d4d8 #f1f5f9; /* Thumb, track */
+  }
+
+  .dark body {
+    scrollbar-color: #475569 #1e293b;
+  }
+}
+
+@supports selector(::-webkit-scrollbar) {
+  @layer base {
+    ::-webkit-scrollbar {
+      width: 0.75rem;
+    }
+
+    ::-webkit-scrollbar-track {
+      background-image: url("/images/scrollbar-track.png");
+      background-repeat: repeat;
+      image-rendering: pixelated;
+
+      /* @variant dark {
+        background-image: url("/images/scrollbar-track-dark.png");
+      } */
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background-color: theme("color.zinc.300");
+      font-size: var(--text-xl);
+
+      /* @variant dark {
+        background-color: theme("color.slate.600");
+      } */
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background-color: theme("color.zinc.400");
+
+      /* @variant dark {
+        background-color: theme("color.slate.500");
+      } */
+    }
+
+    .dark {
+      ::-webkit-scrollbar-track {
+        @apply bg-[url("/images/scrollbar-track-dark.png")]
+      }
+
+      ::-webkit-scrollbar-thumb {
+        @apply bg-slate-600;
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        @apply bg-zinc-500;
+      }
+    }
+  }
+}
+
+::selection {
+  background-color: theme("color.slate.400");
+  color: white;
+}
+
+dialog::backdrop {
+  opacity: 25%;
+  background-color: black;
+
+  @variant dark {
+    opacity: 50%;
+  }
+}
+
+.small-screen-warning {
+  display: flex;
+}
+
+@media (min-width: 1275px) and (min-height: 768px) {
+  .small-screen-warning {
+    display: none;
+  }
+}
+
+.towers-game-bg {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .towers-game-bg {
+    display: block;
+  }
+}
+
+.towers-game-bg::before {
+  content: " ";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  padding: 1rem;
+  transform: rotate(-12deg);
+  opacity: 50%;
+  background-clip: content-box;
+  background-image: url("/images/logo.png");
+  background-repeat: round;
+  background-size: auto;
+  background-origin: content-box;
+}

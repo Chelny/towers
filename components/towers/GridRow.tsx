@@ -26,7 +26,7 @@ export default function GridRow({
       className={clsx(
         "grid",
         rowIndex < HIDDEN_ROWS_COUNT && "hidden",
-        isOpponentBoard ? "grid-cols-grid-row-opponent" : "grid-cols-grid-row",
+        isOpponentBoard ? "grid-cols-(--grid-cols-grid-row-opponent)" : "grid-cols-(--grid-cols-grid-row)",
       )}
       role="row"
     >

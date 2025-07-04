@@ -11,47 +11,60 @@ export default function PlayersListSkeleton({
   isTableNumberVisible = true,
 }: PlayersListSkeletonProps): ReactNode {
   return (
-    <div className="grid grid-rows-[auto,1fr] h-fill border bg-white">
+    <div
+      className={clsx(
+        "grid grid-rows-[auto_1fr] h-full border border-gray-200 bg-white animate-pulse",
+        "dark:border-dark-game-players-border dark:bg-dark-game-players-row-odd",
+      )}
+    >
       <div
         className={clsx(
-          "grid gap-1 border-b border-gray-200 bg-gray-50 animate-pulse",
-          isRatingsVisible ? "grid-cols-[6fr,3fr,3fr]" : "grid-cols-[9fr,3fr]",
+          "grid gap-1 pe-3 border-b border-gray-200 divide-x-2 divide-gray-200 bg-gray-50",
+          "rtl:divide-x-reverse",
+          "dark:border-b-dark-game-players-border dark:border-dark-game-players-border dark:divide-dark-game-players-border dark:bg-dark-game-players-header",
+          isRatingsVisible && isTableNumberVisible ? "grid-cols-[5fr_4fr_3fr]" : "grid-cols-[8fr_4fr]",
         )}
       >
-        <div className="flex items-center gap-2 p-2 bg-gray-100">
-          <span className="w-1/3 h-4 rounded bg-gray-200"></span>
-          <div className="w-4 h-4 rounded bg-gray-200"></div>
+        <div className="flex items-center gap-2 p-2">
+          <span className="w-1/3 h-4 rounded-sm"></span>
+          <div className="w-4 h-4 rounded-sm"></div>
         </div>
         {isRatingsVisible && (
-          <div className="flex items-center gap-2 p-2 bg-gray-100">
-            <span className="w-1/3 h-4 rounded bg-gray-200"></span>
-            <div className="w-4 h-4 rounded bg-gray-200"></div>
+          <div className="flex items-center gap-2 p-2">
+            <span className="w-1/3 h-4 rounded-sm"></span>
+            <div className="w-4 h-4 rounded-sm"></div>
           </div>
         )}
         {isTableNumberVisible && (
-          <div className="flex items-center gap-2 p-2 me-4 bg-gray-100">
-            <span className="w-1/3 h-4 rounded bg-gray-200"></span>
-            <div className="w-4 h-4 rounded bg-gray-200"></div>
+          <div className="flex items-center gap-2 p-2 me-4">
+            <span className="w-1/3 h-4 rounded-sm"></span>
+            <div className="w-4 h-4 rounded-sm"></div>
           </div>
         )}
       </div>
-      <div className="overflow-y-scroll">
-        {Array.from({ length: 10 }).map((_, index: number) => (
+      <div className="overflow-y-scroll pointer-events-none">
+        {Array.from({ length: 20 }).map((_, index: number) => (
           <div
             key={index}
             className={clsx(
-              "grid gap-1 divide-gray-200 animate-pulse",
-              isRatingsVisible && isTableNumberVisible ? "grid-cols-[6fr,3fr,3fr]" : "grid-cols-[9fr,3fr]",
+              "grid gap-1 divide-x-2 divide-gray-200 animate-pulse",
+              "rtl:divide-x-reverse",
+              "dark:divide-dark-game-players-border dark:even:bg-dark-game-players-row-even dark:odd:bg-dark-game-players-row-odd",
+              isRatingsVisible && isTableNumberVisible ? "grid-cols-[5fr_4fr_3fr]" : "grid-cols-[8fr_4fr]",
             )}
           >
-            <div className="p-2">
+            <div className="p-2 truncate">
               <div className="flex items-center gap-1">
-                {isRatingsVisible && <div className="flex-shrink-0 w-4 h-4 rounded bg-gray-200"></div>}
-                <div className="w-36 h-4 rounded bg-gray-200"></div>
+                {isRatingsVisible && <div className="shrink-0 w-4 h-4 rounded-sm"></div>}
+                <div className="w-36 h-4 rounded-sm"></div>
               </div>
             </div>
-            <div className="self-center h-4 mx-2 rounded bg-gray-200"></div>
-            {isTableNumberVisible && <div className="self-center h-4 mx-2 rounded bg-gray-200"></div>}
+            {isRatingsVisible && (
+              <div className="p-2 truncate">
+                <div className="self-center h-4 mx-2"></div>
+              </div>
+            )}
+            {isTableNumberVisible && <div className="self-center h-4 mx-2"></div>}
           </div>
         ))}
       </div>

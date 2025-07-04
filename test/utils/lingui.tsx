@@ -8,6 +8,13 @@ vi.mock("@lingui/core/macro", () => ({
   t: (key: Record<string, string>) => key.message,
 }))
 
+vi.mock("@lingui/react", () => ({
+  useLingui: vi.fn().mockReturnValue({
+    i18n: { _: (str: string) => str },
+    t: (key: Record<string, string>) => key.message,
+  }),
+}))
+
 vi.mock("@lingui/react/macro", () => ({
   Trans: ({ children }: { id?: string; values?: Record<string, unknown>; children?: React.ReactNode }) => {
     if (typeof children === "string") return <>{children}</>

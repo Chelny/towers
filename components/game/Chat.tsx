@@ -152,7 +152,7 @@ export default function Chat({ chat, messageInputRef, isMessageInputDisabled, on
         ref={messageInputRef}
         id="chat"
         type="text"
-        className="w-full p-2 -mb-4 border"
+        className="w-full p-2 -mb-4 border border-gray-200"
         placeholder={t({ message: "Write something..." })}
         maxLength={CHAT_MESSSAGE_MAX_LENGTH}
         disabled={isMessageInputDisabled}

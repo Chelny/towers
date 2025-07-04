@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { ReactNode, useState } from "react"
 import { I18n, type Messages, setupI18n } from "@lingui/core"
 import { I18nProvider } from "@lingui/react"
 
@@ -9,7 +9,7 @@ export function LinguiClientProvider({
   initialLocale,
   initialMessages,
 }: {
-  children: React.ReactNode
+  children: ReactNode
   initialLocale: string
   initialMessages: Messages
 }) {

@@ -137,7 +137,7 @@ export function SidebarMenuSubItem({ item, isActiveHref, isLast, level }: Sideba
         {isDropdownVisible && (
           <ul
             id={`action-item-${item.id}-menu`}
-            className="overflow-y-auto absolute top-0 start-full z-40 w-72 max-h-96 p-2 divide-y divide-white/10 border border-slate-700 rounded shadow-lg bg-slate-800"
+            className="overflow-y-auto absolute top-0 start-full z-40 w-72 max-h-96 p-2 divide-y divide-white/10 border border-slate-700 rounded-sm shadow-lg bg-slate-800"
             role="menu"
             onMouseEnter={() => setIsDropdownVisible(true)}
             onMouseLeave={() => setIsDropdownVisible(false)}

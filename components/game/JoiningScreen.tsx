@@ -42,8 +42,8 @@ export default function JoiningScreen({ title, subtitle, isDone, onCancel }: Joi
     >
       <div
         className={clsx(
-          "relative flex flex-col p-4 border rounded-md shadow-2xl bg-white",
-          "dark:border-dark-card-border dark:bg-dark-card-background",
+          "relative flex flex-col p-4 border-t-4 border-t-gray-200 border-r-4 border-e-gray-400 border-b-4 border-b-gray-400 border-l-4 border-s-gray-200 rounded-xs ring-1 ring-black shadow-lg bg-white",
+          "dark:border-t-dark-modal-border-top dark:border-e-dark-modal-border-end dark:border-b-dark-modal-border-bottom dark:border-s-dark-modal-border-start dark:bg-dark-modal-background",
         )}
       >
         <h1 className="mb-8 text-2xl text-center font-semibold">{title}</h1>
@@ -71,8 +71,8 @@ export default function JoiningScreen({ title, subtitle, isDone, onCancel }: Joi
                   className={clsx(
                     "flex-1",
                     index < blocksToShow ? "bg-towers-primary" : "bg-transparent",
-                    isFirstFilled && "rounded-s-sm",
-                    isLastFilled && "rounded-e-sm",
+                    isFirstFilled && "rounded-s-xs",
+                    isLastFilled && "rounded-e-xs",
                   )}
                   data-testid={
                     index < blocksToShow

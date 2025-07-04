@@ -1,11 +1,12 @@
 "use client"
 
-import { FormEvent, ReactNode, useEffect, useState } from "react"
+import { FormEvent, ReactNode, useState } from "react"
 import { usePathname, useRouter } from "next/navigation"
 import { Trans, useLingui } from "@lingui/react/macro"
 import { WebsiteTheme } from "@prisma/client"
 import { Value, ValueError } from "@sinclair/typebox/value"
 import clsx from "clsx/lite"
+import { useTheme } from "next-themes"
 import {
   SettingsFormValidationErrors,
   SettingsPayload,
@@ -15,8 +16,6 @@ import AlertMessage from "@/components/ui/AlertMessage"
 import Button from "@/components/ui/Button"
 import Select from "@/components/ui/Select"
 import { INITIAL_FORM_STATE } from "@/constants/api"
-import { APP_COOKIES } from "@/constants/app"
-import { useTheme } from "@/hooks/useTheme"
 import { Session } from "@/lib/auth-client"
 import { logger } from "@/lib/logger"
 import { defaultLocale, Language, languages, SupportedLocales } from "@/translations/languages"
@@ -31,6 +30,7 @@ export function SettingsForm({ session }: SettingsFormProps): ReactNode {
   const { i18n, t } = useLingui()
   const router = useRouter()
   const pathname: string = usePathname()
+  const { setTheme } = useTheme()
 
   const handleUpdateUser = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault()
@@ -79,14 +79,16 @@ export function SettingsForm({ session }: SettingsFormProps): ReactNode {
           setIsLoading(false)
           setFormState(data)
 
-          if (data.success) {
-            localStorage.setItem(APP_COOKIES.SETTINGS_FORM_STATE, JSON.stringify(data))
-          }
+          // Set theme dynamically
+          setTheme(payload.theme.toLowerCase())
 
           // Dynamically change language
           const pathNameWithoutLocale: string[] = pathname?.split("/")?.slice(2) ?? []
           const newPath: string = `/${payload.language}/${pathNameWithoutLocale.join("/")}`
-          router.push(newPath)
+
+          setTimeout(() => {
+            router.push(newPath)
+          }, 2000)
         })
         .catch(async (error) => {
           const data: ApiResponse = await error.json()
@@ -96,21 +98,10 @@ export function SettingsForm({ session }: SettingsFormProps): ReactNode {
     }
   }
 
-  useTheme(session?.user.theme)
-
-  useEffect(() => {
-    const savedState: string | null = localStorage.getItem(APP_COOKIES.SETTINGS_FORM_STATE)
-
-    if (savedState) {
-      setFormState(JSON.parse(savedState))
-      localStorage.removeItem(APP_COOKIES.SETTINGS_FORM_STATE)
-    }
-  }, [])
-
   return (
     <div
       className={clsx(
-        "max-w-full p-4 border border-gray-200 rounded-lg shadow-sm bg-gray-50",
+        "max-w-full p-4 border border-gray-200 rounded-lg shadow-xs bg-gray-50",
         "md:max-w-96",
         "dark:border-dark-card-border dark:bg-dark-card-background",
       )}

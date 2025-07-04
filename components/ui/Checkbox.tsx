@@ -13,6 +13,7 @@ type CheckboxProps = {
   disabled?: boolean
   dataTestId?: string
   errorMessage?: string
+  isNoBottomSpace?: boolean
   onChange?: (_: ChangeEvent<HTMLInputElement>) => void
 }
 
@@ -24,6 +25,7 @@ export default function Checkbox({
   disabled = false,
   dataTestId = undefined,
   errorMessage = "",
+  isNoBottomSpace = false,
   onChange,
 }: CheckboxProps): ReactNode {
   const [checked, setChecked] = useState<boolean>(defaultChecked)
@@ -38,13 +40,13 @@ export default function Checkbox({
   }
 
   return (
-    <div className="w-full mb-4">
+    <div className={clsx("w-full", isNoBottomSpace ? "mb-0" : "mb-4")}>
       <div className="relative flex jusitfy-center items-center gap-2">
         <input
           type="checkbox"
           id={id}
           className={clsx(
-            "peer shrink-0 appearance-none w-5 h-5 border-2 border-t-gray-600 border-e-gray-400 border-b-gray-400 border-s-gray-600 rounded-sm mt-1 bg-white cursor-pointer",
+            "peer shrink-0 appearance-none w-5 h-5 border-2 border-t-gray-600 border-e-gray-400 border-b-gray-400 border-s-gray-600 rounded-xs mt-1 bg-white cursor-pointer",
             "disabled:bg-gray-200/50 disabled:cursor-not-allowed",
             "dark:border-t-dark-input-border-top dark:border-e-dark-input-border-end dark:border-b-dark-input-border-bottom dark:border-s-dark-input-border-start dark:bg-dark-input-background",
             "dark:disabled:bg-dark-input-disabled-background",

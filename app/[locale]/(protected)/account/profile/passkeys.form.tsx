@@ -164,14 +164,14 @@ export function PasskeysForm(): ReactNode {
         </Button>
       </form>
       {passkeys && passkeys?.length > 0 && <hr className="mt-6 mb-4" />}
-      <ul className="space-y-2">
+      <ul className="flex flex-col gap-2">
         {passkeys?.map((passkey: Passkey) => {
           const passkeyName: string = passkey.name!
           return (
             <li
               key={passkey.id}
               className={clsx(
-                "flex justify-between items-center p-2 border rounded bg-white",
+                "flex justify-between items-center p-2 border border-gray-200 rounded-sm bg-white",
                 "dark:bg-dark-background",
               )}
             >

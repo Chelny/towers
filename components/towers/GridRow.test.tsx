@@ -6,9 +6,9 @@ import { mockDefaultBlockProps } from "@/test/data/board"
 describe("GridRow", () => {
   const mockRow: BoardRow = [
     { ...mockDefaultBlockProps, letter: "T", powerType: "defense" },
-    { ...mockDefaultBlockProps, letter: "O", powerType: null },
+    { ...mockDefaultBlockProps, letter: "O", powerType: undefined },
     { ...mockDefaultBlockProps, letter: "W", powerType: "attack" },
-    { ...mockDefaultBlockProps, letter: "E", powerType: null },
+    { ...mockDefaultBlockProps, letter: "E", powerType: undefined },
   ]
 
   it("should render a row with the correct number of cells", () => {
@@ -40,7 +40,7 @@ describe("GridRow", () => {
 
     const cells: HTMLDivElement[] = screen.getAllByRole("gridcell")
     cells.forEach((cell: HTMLDivElement) => {
-      expect(cell).toHaveClass("w-grid-cell-opponent")
+      expect(cell).toHaveClass("w-grid-cell-opponent-width")
     })
   })
 })

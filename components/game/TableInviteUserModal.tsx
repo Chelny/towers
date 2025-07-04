@@ -10,6 +10,10 @@ import { useSocket } from "@/context/SocketContext"
 import { authClient } from "@/lib/auth-client"
 import { UserPlainObject } from "@/server/towers/classes/User"
 
+const PlayersList = dynamic(() => import("@/components/game/PlayersList"), {
+  loading: () => <PlayersListSkeleton isTableNumberVisible />,
+})
+
 type TableInviteUserModalProps = {
   roomId: string
   tableId: string
@@ -60,7 +64,3 @@ export default function TableInviteUserModal({
     </Modal>
   )
 }
-
-const PlayersList = dynamic(() => import("@/components/game/PlayersList"), {
-  loading: () => <PlayersListSkeleton isTableNumberVisible />,
-})

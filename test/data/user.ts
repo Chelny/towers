@@ -1,10 +1,11 @@
-import { User } from "@prisma/client"
+import { User, WebsiteTheme } from "@prisma/client"
 
 const commonUserProperties = {
   language: "en",
   role: "user",
   isOnline: true,
   lastActiveAt: new Date(),
+  theme: WebsiteTheme.SYSTEM,
   banned: false,
   banReason: null,
   banExpires: null,

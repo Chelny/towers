@@ -3,6 +3,18 @@ green='\033[0;32m'
 yellow='\033[0;33m'
 no_color='\033[0m'
 
+# build: Changes that affect the build system or external dependencies (example: webpack, vite config)
+# chore: Routine tasks that don’t change src code or tests (example: upgrade dependencies, rename files, update .gitignore)
+# ci: Changes to CI/CD config files and scripts (example: GitHub Actions, CircleCI, Jenkins)
+# docs: Documentation only changes (example: README.md, Storybook docs)
+# feat: A new feature for the user (example: add new button component)
+# fix: A bug fix (example: fix crashing bug in login)
+# merge: Merges a branch (optional, many teams auto-generate merge commits)
+# perf: A code change that improves performance (example: faster algorithm, lighter bundle)
+# refactor: Code changes that neither fix a bug nor add a feature (example: restructure files, rename vars)
+# revert: Reverts a previous commit (example: undo broken deploy)
+# style: Changes that do not affect code meaning (example: code formatting, whitespace, semicolons)
+# test: Adding or updating tests only (example: add unit test for SignupForm)
 commit_types="(build|chore|ci|docs|feat|fix|merge|perf|refactor|revert|style|test)"
 conventional_commit_regex="^${commit_types}(\([a-z \-]+\))?!?: .+$"
 

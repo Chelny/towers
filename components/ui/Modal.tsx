@@ -33,7 +33,6 @@ export default function Modal({
     if (!dialog) return
 
     dialog.showModal()
-    dialog.focus()
 
     const handleKeyDown = (event: KeyboardEvent): void => {
       if (event.code === "Escape") {
@@ -64,23 +63,20 @@ export default function Modal({
     <dialog
       ref={dialogRef}
       className={clsx(
-        "fixed top-1/2 start-1/2 z-40 w-full max-w-md rounded shadow-lg -translate-x-1/2 -translate-y-1/2",
+        "fixed top-1/2 start-1/2 z-40 w-full max-w-md border-t-4 border-t-gray-200 border-r-4 border-e-gray-400 border-b-4 border-b-gray-400 border-l-4 border-s-gray-200 rounded-xs ring-1 ring-black shadow-lg -translate-x-1/2 -translate-y-1/2",
         "rtl:translate-x-1/2",
-        "dark:bg-dark-modal-background",
+        "dark:border-t-dark-modal-border-top dark:border-e-dark-modal-border-end dark:border-b-dark-modal-border-bottom dark:border-s-dark-modal-border-start dark:bg-dark-modal-background",
       )}
       data-testid={`dialog_${dataTestId}`}
       onCancel={handleCancel}
     >
       <form noValidate onSubmit={handleConfirm}>
-        <div
-          className={clsx(
-            "flex justify-between items-center px-4 py-3 border-b border-gray-300",
-            "dark:border-dark-modal-border",
-          )}
-        >
-          <h3 className={clsx("text-2xl", "dark:text-dark-modal-heading-text")}>{title}</h3>
+        <div className={clsx("flex justify-between items-center gap-2 p-2 bg-gray-200", "dark:bg-slate-700")}>
+          <h3 className={clsx("flex-1 text-base font-medium truncate", "dark:text-dark-modal-heading-text")}>
+            {title}
+          </h3>
           <button
-            className="self-start p-2 text-gray-400 hover:text-gray-500"
+            className="self-start text-gray-400 hover:text-gray-500"
             aria-label={t({ message: "Close" })}
             onClick={handleCancel}
           >

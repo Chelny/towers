@@ -19,7 +19,7 @@ const generateErrorMessage = (errorCode: string, message: ReactNode) => (
     </p>
     <div>
       <Trans>
-        Error code: <code className="rounded p-1 bg-gray-200 text-sm">{errorCode}</code>
+        Error code: <code className="rounded-sm p-1 bg-gray-200 text-sm">{errorCode}</code>
       </Trans>
     </div>
   </div>

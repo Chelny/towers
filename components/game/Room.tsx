@@ -25,6 +25,22 @@ import { RoomPlainObject } from "@/server/towers/classes/Room"
 import { TablePlainObject } from "@/server/towers/classes/Table"
 import { UserPlainObject } from "@/server/towers/classes/User"
 
+const RoomHeader = dynamic(() => import("@/components/game/RoomHeader"), {
+  loading: () => <RoomHeaderSkeleton />,
+})
+
+const RoomTable = dynamic(() => import("@/components/game/RoomTable"), {
+  loading: () => <RoomTableSkeleton />,
+})
+
+const Chat = dynamic(() => import("@/components/game/Chat"), {
+  loading: () => <ChatSkeleton />,
+})
+
+const PlayersList = dynamic(() => import("@/components/game/PlayersList"), {
+  loading: () => <PlayersListSkeleton isTableNumberVisible />,
+})
+
 export default function Room(): ReactNode {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -150,7 +166,7 @@ export default function Room(): ReactNode {
     <>
       <div
         className={clsx(
-          "grid [grid-template-areas:'banner_banner_banner''sidebar_content_content''sidebar_content_content'] grid-rows-game grid-cols-game h-screen -m-4 -mb-8 bg-gray-100",
+          "grid [grid-template-areas:'banner_banner_banner''sidebar_content_content''sidebar_content_content'] grid-rows-(--grid-rows-game) grid-cols-(--grid-cols-game) h-screen -m-4 -mb-8 bg-gray-100",
           "dark:bg-dark-game-background",
         )}
       >
@@ -175,7 +191,7 @@ export default function Room(): ReactNode {
             {room && room?.level !== RoomLevel.SOCIAL && (
               <>
                 <div>
-                  <span className="p-1 rounded-tl rounded-tr bg-sky-700 text-white text-sm">
+                  <span className="p-1 rounded-tl-sm rounded-tr-sm bg-sky-700 text-white text-sm">
                     <Trans>Ratings</Trans>
                   </span>
                 </div>
@@ -232,11 +248,11 @@ export default function Room(): ReactNode {
         </div>
 
         {/* Content */}
-        <div className="[grid-area:content] grid [grid-template-areas:'tables''chat'] grid-rows-game-content gap-2 px-2 pb-2">
+        <div className="[grid-area:content] grid [grid-template-areas:'tables''chat'] grid-rows-(--grid-rows-game-content) gap-2 px-2 pb-2">
           {/* Tables */}
           <div
             className={clsx(
-              "[grid-area:tables] overflow-hidden flex flex-col border bg-white",
+              "[grid-area:tables] overflow-hidden flex flex-col border border-gray-200 bg-white",
               "dark:border-dark-game-content-border dark:bg-dark-game-content-background",
             )}
           >
@@ -282,7 +298,7 @@ export default function Room(): ReactNode {
           <div className="[grid-area:chat] flex gap-2">
             <div
               className={clsx(
-                "overflow-hidden flex-1 flex flex-col gap-1 border bg-white",
+                "overflow-hidden flex-1 flex flex-col gap-1 border border-gray-200 bg-white",
                 "dark:border-dark-game-content-border dark:bg-dark-game-chat-background",
               )}
             >
@@ -312,19 +328,3 @@ export default function Room(): ReactNode {
     </>
   )
 }
-
-const RoomHeader = dynamic(() => import("@/components/game/RoomHeader"), {
-  loading: () => <RoomHeaderSkeleton />,
-})
-
-const RoomTable = dynamic(() => import("@/components/game/RoomTable"), {
-  loading: () => <RoomTableSkeleton />,
-})
-
-const Chat = dynamic(() => import("@/components/game/Chat"), {
-  loading: () => <ChatSkeleton />,
-})
-
-const PlayersList = dynamic(() => import("@/components/game/PlayersList"), {
-  loading: () => <PlayersListSkeleton isTableNumberVisible />,
-})

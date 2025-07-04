@@ -54,6 +54,30 @@ import { ServerTowersSeat, ServerTowersTeam, TablePlainObject } from "@/server/t
 import { TableInvitationPlainObject } from "@/server/towers/classes/TableInvitation"
 import { UserPlainObject } from "@/server/towers/classes/User"
 
+const TableHeader = dynamic(() => import("@/components/game/TableHeader"), {
+  loading: () => <TableHeaderSkeleton />,
+})
+
+const Chat = dynamic(() => import("@/components/game/Chat"), {
+  loading: () => <ChatSkeleton />,
+})
+
+const PlayersList = dynamic(() => import("@/components/game/PlayersList"), {
+  loading: () => <PlayersListSkeleton />,
+})
+
+const changeTableOptionsSchema = Type.Object({
+  tableType: Type.Union([
+    Type.Literal(TableType.PUBLIC),
+    Type.Literal(TableType.PROTECTED),
+    Type.Literal(TableType.PRIVATE),
+  ]),
+  isRated: Type.Boolean(),
+})
+
+type ChangeTableOptionsPayload = FormPayload<typeof changeTableOptionsSchema>
+type ChangeTableOptionsFormValidationErrors = FormValidationErrors<keyof ChangeTableOptionsPayload>
+
 export default function Table(): ReactNode {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -295,9 +319,10 @@ export default function Table(): ReactNode {
     if (winners && winners?.length > 0) {
       const user1: string | undefined = winners[0]?.user?.username
       const user2: string | undefined = winners[1]?.user?.username
+      const value: number = winners.length
 
       setWinningMessage(
-        plural(winners.length, {
+        plural(value, {
           one: `Congratulations\n${user1}`,
           other: `Congratulations\n${user1} and ${user2}`,
         }),
@@ -612,9 +637,11 @@ export default function Table(): ReactNode {
           </Trans>
         )
       } else if (letter === "W") {
+        const value: number | undefined =
+          powerLevel === "minor" ? 1 : powerLevel === "normal" ? 2 : powerLevel === "mega" ? 3 : undefined
         return (
           <Plural
-            value={powerLevel === "minor" ? 1 : powerLevel === "normal" ? 2 : powerLevel === "mega" ? 3 : undefined}
+            value={value}
             one={`${sourceUsername} dropped 1 stone for ${targetUsername}`}
             two={`${sourceUsername} dropped 2 stones for ${targetUsername}`}
             _3={`${sourceUsername} dropped 3 stones for ${targetUsername}`}
@@ -680,7 +707,7 @@ export default function Table(): ReactNode {
       <form ref={formRef} noValidate onSubmit={handleFormValidation}>
         <div
           className={clsx(
-            "grid [grid-template-areas:'banner_banner_banner''sidebar_content_content''sidebar_content_content'] grid-rows-game grid-cols-game h-screen -m-4 -mb-8",
+            "grid [grid-template-areas:'banner_banner_banner''sidebar_content_content''sidebar_content_content'] grid-rows-(--grid-rows-game) grid-cols-(--grid-cols-game) h-screen -m-4 -mb-8",
             "dark:bg-dark-game-background",
           )}
         >
@@ -693,7 +720,7 @@ export default function Table(): ReactNode {
               "dark:bg-dark-game-sidebar-background",
             )}
           >
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <Button
                 className="w-full"
                 disabled={
@@ -703,7 +730,7 @@ export default function Table(): ReactNode {
               >
                 <Trans>Start</Trans>
               </Button>
-              <hr className="border-1 border-gray-400" />
+              <hr className={clsx("border-1 border-gray-400", "dark:border-slate-500")} />
               <Button
                 className="w-full"
                 disabled={!isConnected || view === TablePanelView.CHANGE_KEYS || gameState === TowersGameState.PLAYING}
@@ -718,7 +745,7 @@ export default function Table(): ReactNode {
               >
                 <Trans>Demo</Trans>
               </Button>
-              <hr className="border-1 border-gray-400" />
+              <hr className={clsx("border-1 border-gray-400", "dark:border-slate-500")} />
               <Button
                 className="w-full"
                 disabled={!isConnected || typeof seatNumber === "undefined"}
@@ -727,7 +754,7 @@ export default function Table(): ReactNode {
                 <Trans>Stand</Trans>
               </Button>
               <div>
-                <span className="p-1 rounded-tl rounded-tr bg-sky-700 text-white text-sm">
+                <span className="p-1 rounded-tl-sm rounded-tr-sm bg-sky-700 text-white text-sm">
                   <Trans>Table Type</Trans>
                 </span>
               </div>
@@ -735,6 +762,7 @@ export default function Table(): ReactNode {
                 id="tableType"
                 defaultValue={table?.tableType}
                 disabled={!isConnected || session?.user.id !== table?.host?.user?.id}
+                isNoBottomSpace
                 onChange={() => {
                   handleOptionChange()
                 }}
@@ -764,7 +792,7 @@ export default function Table(): ReactNode {
                 <Trans>Boot</Trans>
               </Button>
               <div>
-                <span className="p-1 rounded-tl rounded-tr bg-sky-700 text-white text-sm">
+                <span className="p-1 rounded-tl-sm rounded-tr-sm bg-sky-700 text-white text-sm">
                   <Trans>Options</Trans>
                 </span>
               </div>
@@ -778,14 +806,14 @@ export default function Table(): ReactNode {
                   gameState === TowersGameState.COUNTDOWN ||
                   gameState === TowersGameState.PLAYING
                 }
-                onChange={() => {
-                  handleOptionChange()
-                }}
+                isNoBottomSpace
+                onChange={handleOptionChange}
               />
               <Checkbox
                 id="sound"
                 label={t({ message: "Sound" })}
                 disabled
+                isNoBottomSpace
                 onChange={(event: ChangeEvent<HTMLInputElement>) => console.log(event.target.checked)}
               />
             </div>
@@ -800,15 +828,25 @@ export default function Table(): ReactNode {
           </div>
 
           {/* Content */}
-          <div className="[grid-area:content] grid [grid-template-areas:'seats''chat'] grid-rows-game-content gap-2 px-2 pb-2">
+          <div className="[grid-area:content] grid [grid-template-areas:'seats''chat'] grid-rows-(--grid-rows-game-content) gap-2 px-2 pb-2">
             {view === TablePanelView.CHANGE_KEYS ? (
               <TableChangeKeysPanel controlKeys={controlKeys} onChangeView={() => setView(TablePanelView.GAME)} />
             ) : view === TablePanelView.DEMO ? (
               <TableGameDemoPanel nextGameCountdown={countdown} onChangeView={() => setView(TablePanelView.GAME)} />
             ) : (
-              <div className={clsx("[grid-area:seats] flex flex-col border", "dark:border-dark-game-content-border")}>
-                <div className={clsx("flex items-center w-full h-full border", "dark:border-dark-game-content-border")}>
-                  <div className="relative grid [grid-template-areas:'timer_team1_team3''timer_team1_team3''team2_team1_team4''team2_hint_team4'] grid-cols-table-team w-fit p-2 mx-auto">
+              <div
+                className={clsx(
+                  "[grid-area:seats] flex flex-col border border-gray-200",
+                  "dark:border-dark-game-content-border",
+                )}
+              >
+                <div
+                  className={clsx(
+                    "flex items-center w-full h-full border border-gray-200",
+                    "dark:border-dark-game-content-border",
+                  )}
+                >
+                  <div className="relative grid [grid-template-areas:'timer_team1_team3''timer_team1_team3''team2_team1_team4''team2_hint_team4'] grid-cols-(--grid-cols-table-team) w-fit p-2 mx-auto">
                     {/* Game countdown */}
                     {gameState === TowersGameState.COUNTDOWN && countdown !== null && (
                       <div
@@ -980,7 +1018,7 @@ export default function Table(): ReactNode {
             <div className="[grid-area:chat] flex gap-2">
               <div
                 className={clsx(
-                  "overflow-hidden flex-1 flex flex-col gap-1 border bg-white",
+                  "overflow-hidden flex-1 flex flex-col gap-1 border border-gray-200 bg-white",
                   "dark:border-dark-game-content-border dark:bg-dark-game-chat-background",
                 )}
               >
@@ -1007,27 +1045,3 @@ export default function Table(): ReactNode {
     </>
   )
 }
-
-const TableHeader = dynamic(() => import("@/components/game/TableHeader"), {
-  loading: () => <TableHeaderSkeleton />,
-})
-
-const Chat = dynamic(() => import("@/components/game/Chat"), {
-  loading: () => <ChatSkeleton />,
-})
-
-const PlayersList = dynamic(() => import("@/components/game/PlayersList"), {
-  loading: () => <PlayersListSkeleton />,
-})
-
-const changeTableOptionsSchema = Type.Object({
-  tableType: Type.Union([
-    Type.Literal(TableType.PUBLIC),
-    Type.Literal(TableType.PROTECTED),
-    Type.Literal(TableType.PRIVATE),
-  ]),
-  isRated: Type.Boolean(),
-})
-
-type ChangeTableOptionsPayload = FormPayload<typeof changeTableOptionsSchema>
-type ChangeTableOptionsFormValidationErrors = FormValidationErrors<keyof ChangeTableOptionsPayload>

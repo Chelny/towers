@@ -104,7 +104,7 @@ export default function TableChangeKeysPanel({
       </div>
 
       <div className="flex items-evenly gap-6 w-full max-w-5xl pt-2">
-        <div className="flex-1 space-y-1">
+        <div className="flex-1 flex flex-col gap-1">
           {renderRow("Move Piece Left", "MOVE_LEFT", true)}
           {renderRow("Move Piece Right", "MOVE_RIGHT", true)}
           {renderRow("Cycle Piece Colors", "CYCLE", true)}
@@ -117,7 +117,7 @@ export default function TableChangeKeysPanel({
           })}
         </div>
 
-        <div className="flex-1 space-y-1">
+        <div className="flex-1 flex flex-col gap-1">
           {Array.from({ length: 12 }).map((_, index: number) => {
             const fKey: keyof typeof fKeyMessages = `F${index + 1}` as keyof typeof fKeyMessages
             return (

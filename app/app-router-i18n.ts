@@ -6,7 +6,7 @@ const { locales } = linguiConfig
 // Optionally use a stricter union type
 type SupportedLocales = string
 
-async function loadCatalog(locale: SupportedLocales): Promise<Record<string, Messages>> {
+const loadCatalog = async (locale: SupportedLocales): Promise<Record<string, Messages>> => {
   try {
     // TypeError [ERR_UNKNOWN_FILE_EXTENSION]: Unknown file extension ".po" for /.../towers/translations/locales/*.po"
     if (process.env.BYPASS_LINGUI_ERRORS) {

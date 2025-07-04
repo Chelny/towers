@@ -20,7 +20,9 @@ export default function GridCell({ block, isOpponentBoard = false }: GridCellPro
     <div
       className={clsx(
         "flex items-center justify-center box-border",
-        isOpponentBoard ? "opponent-cell w-grid-cell-opponent h-grid-cell-opponent" : "w-grid-cell h-grid-cell",
+        isOpponentBoard
+          ? "opponent-cell w-grid-cell-opponent-width h-grid-cell-opponent-height"
+          : "w-grid-cell h-grid-cell",
         getClassNameForBlock(block),
         getClassNameForBlockPowerType(block),
         getBlockRemovalAnimationClass(block),

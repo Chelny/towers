@@ -9,6 +9,10 @@ import { SocketEvents } from "@/constants/socket-events"
 import { useSocket } from "@/context/SocketContext"
 import { UserPlainObject } from "@/server/towers/classes/User"
 
+const PlayersList = dynamic(() => import("@/components/game/PlayersList"), {
+  loading: () => <PlayersListSkeleton />,
+})
+
 type TableBootUserModalProps = {
   roomId: string
   tableId: string
@@ -50,7 +54,3 @@ export default function TableBootUserModal({
     </Modal>
   )
 }
-
-const PlayersList = dynamic(() => import("@/components/game/PlayersList"), {
-  loading: () => <PlayersListSkeleton />,
-})

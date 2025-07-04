@@ -40,14 +40,14 @@ export default async function Profile({ params }: ProfileProps): Promise<ReactNo
       <div
         className={clsx(
           "flex flex-col gap-6",
-          "md:grid md:grid-cols-6 md:grid-rows-[auto,auto,auto] md:gap-4",
-          "lg:grid-cols-6 lg:grid-rows-[auto,auto,auto] lg:gap-8",
+          "md:grid md:grid-cols-6 md:grid-rows-[auto_auto_auto] md:gap-4",
+          "lg:grid-cols-6 lg:grid-rows-[auto_auto_auto] lg:gap-8",
         )}
       >
         {/* Profile */}
         <section
           className={clsx(
-            "p-4 border border-gray-200 rounded-lg shadow-sm bg-gray-50",
+            "p-4 border border-gray-200 rounded-lg shadow-xs bg-gray-50",
             "md:col-span-3",
             "lg:col-span-4",
             "dark:border-dark-card-border dark:bg-dark-card-background",
@@ -61,7 +61,7 @@ export default async function Profile({ params }: ProfileProps): Promise<ReactNo
         {/* Linked Socials */}
         <section
           className={clsx(
-            "p-4 border border-gray-200 rounded-lg shadow-sm bg-gray-50",
+            "p-4 border border-gray-200 rounded-lg shadow-xs bg-gray-50",
             "md:col-span-3",
             "lg:col-span-2",
             "dark:border-dark-card-border dark:bg-dark-card-background",
@@ -75,7 +75,7 @@ export default async function Profile({ params }: ProfileProps): Promise<ReactNo
         {/* Change Email */}
         <section
           className={clsx(
-            "p-4 border border-gray-200 rounded-lg shadow-sm bg-gray-50",
+            "p-4 border border-gray-200 rounded-lg shadow-xs bg-gray-50",
             "md:col-span-2",
             "lg:col-span-2",
             "dark:border-dark-card-border dark:bg-dark-card-background",
@@ -89,7 +89,7 @@ export default async function Profile({ params }: ProfileProps): Promise<ReactNo
         {/* Change Password */}
         <section
           className={clsx(
-            "p-4 border border-gray-200 rounded-lg shadow-sm bg-gray-50",
+            "p-4 border border-gray-200 rounded-lg shadow-xs bg-gray-50",
             "md:col-span-2",
             "lg:col-span-2",
             "dark:border-dark-card-border dark:bg-dark-card-background",
@@ -103,7 +103,7 @@ export default async function Profile({ params }: ProfileProps): Promise<ReactNo
         {/* Passkeys */}
         {/* <section
           className={clsx(
-            "p-4 border border-gray-200 rounded-lg shadow-sm bg-gray-50",
+            "p-4 border border-gray-200 rounded-lg shadow-xs bg-gray-50",
             "md:col-span-2",
             "lg:col-span-2",
             "dark:border-dark-card-border dark:bg-dark-card-background",

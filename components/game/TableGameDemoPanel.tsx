@@ -219,12 +219,12 @@ export default function TableGameDemoPanel({ nextGameCountdown, onChangeView }: 
   }
 
   const keyboardKeyClasses = (key: string): string =>
-    `overflow-hidden flex items-end justify-start w-10 h-10 pl-0.5 border-t-4 border-t-[#D6D7BD] border-r-4 border-r-[#D6D7BD] border-b-4 border-b-[#5E4511] border-l-4 border-l-[#5E4511] rounded-sm ring-1 ring-black shadow bg-[#ECE3D7] text-black font-medium line-clamp-1 transition-transform duration-100 ${
+    `overflow-hidden flex w-10 h-10 pl-0.5 border-t-4 border-t-[#D6D7BD] border-r-4 border-r-[#D6D7BD] border-b-4 border-b-[#5E4511] border-l-4 border-l-[#5E4511] rounded-xs ring-1 ring-black shadow-sm bg-[#ECE3D7] text-black font-medium line-clamp-1 transition-transform duration-100 ${
       arrowPressed === key || (key === "Space" && isSpaceBarPressed) ? "scale-90 bg-[#A1978A]" : ""
     }`
 
   const powerBarClasses: string =
-    "flex flex-col-reverse w-5 h-full p-0.5 border mb-2 bg-neutral-600 dark:border-slate-500"
+    "flex flex-col-reverse w-5 h-full p-0.5 border border-gray-200 mb-2 bg-neutral-600 dark:border-slate-500 dark:bg-slate-600"
 
   const renderRegularBlock = ({ letter }: { letter: TowersBlockLetter }): ReactNode => (
     <div
@@ -476,7 +476,12 @@ export default function TableGameDemoPanel({ nextGameCountdown, onChangeView }: 
   }, [activePowerBlockIndex, visibleBlockPowerType, isSpaceBarPressed])
 
   return (
-    <div className={clsx("flex justify-center items-center border", "dark:border-dark-game-content-border")}>
+    <div
+      className={clsx(
+        "flex justify-center items-center border border-gray-200",
+        "dark:border-dark-game-content-border",
+      )}
+    >
       <div className="grid grid-rows-[1fr_auto] grid-cols-12 gap-4 max-w-5xl">
         {/* Demo */}
         <div className="col-span-3 flex flex-col gap-2 items-center justify-end mb-2">
@@ -492,7 +497,7 @@ export default function TableGameDemoPanel({ nextGameCountdown, onChangeView }: 
 
         <div
           className={clsx(
-            "col-span-9 flex flex-col gap-2 p-2 border bg-gray-50",
+            "col-span-9 flex flex-col gap-2 p-2 border border-gray-200 bg-gray-50",
             "dark:border-dark-game-content-border dark:bg-slate-700",
           )}
         >
@@ -506,12 +511,18 @@ export default function TableGameDemoPanel({ nextGameCountdown, onChangeView }: 
               {/* Arrow Keys */}
               <div className="grid grid-rows-5 grid-cols-5 w-full h-full">
                 <div className="col-span-5 flex justify-center">
-                  <div className={keyboardKeyClasses("ArrowUp")} aria-label={t({ message: "Move Up" })}>
+                  <div
+                    className={clsx(keyboardKeyClasses("ArrowUp"), "justify-start items-end")}
+                    aria-label={t({ message: "Move Up" })}
+                  >
                     ↑
                   </div>
                 </div>
                 <div className="row-span-3 flex items-center justify-start">
-                  <div className={keyboardKeyClasses("ArrowLeft")} aria-label={t({ message: "Move Left" })}>
+                  <div
+                    className={clsx(keyboardKeyClasses("ArrowLeft"), "justify-start items-end")}
+                    aria-label={t({ message: "Move Left" })}
+                  >
                     ←
                   </div>
                 </div>
@@ -533,18 +544,24 @@ export default function TableGameDemoPanel({ nextGameCountdown, onChangeView }: 
                   </div>
                 </div>
                 <div className="row-span-3 flex items-center justify-end">
-                  <div className={keyboardKeyClasses("ArrowRight")} aria-label={t({ message: "Move Right" })}>
+                  <div
+                    className={clsx(keyboardKeyClasses("ArrowRight"), "justify-start items-end")}
+                    aria-label={t({ message: "Move Right" })}
+                  >
                     →
                   </div>
                 </div>
                 <div className="col-span-5 flex items-end justify-center">
-                  <div className={keyboardKeyClasses("ArrowDown")} aria-label={t({ message: "Move Down" })}>
+                  <div
+                    className={clsx(keyboardKeyClasses("ArrowDown"), "justify-start items-end")}
+                    aria-label={t({ message: "Move Down" })}
+                  >
                     ↓
                   </div>
                 </div>
               </div>
 
-              <hr className={clsx("w-11/12 my-1 border", "dark:border-slate-500")} />
+              <hr className={clsx("w-11/12 my-1 border border-gray-200", "dark:border-slate-500")} />
 
               {/* Team */}
               <div className="flex items-end text-center">
@@ -568,7 +585,7 @@ export default function TableGameDemoPanel({ nextGameCountdown, onChangeView }: 
                 </div>
                 <div className="flex flex-wrap justify-center gap-4 mt-4">
                   {powerColumns.map((column: PowerBlockDemo[], index: number) => (
-                    <ul key={index} className="flex-1 flex flex-col space-y-2">
+                    <ul key={index} className="flex-1 flex flex-col gap-2">
                       {column.map(({ letter, attackLabel, defenseLabel }: PowerBlockDemo) =>
                         renderAttackBlock({ letter, attackLabel, defenseLabel }),
                       )}
@@ -591,10 +608,10 @@ export default function TableGameDemoPanel({ nextGameCountdown, onChangeView }: 
                     <div className="flex gap-1">
                       <div
                         className={clsx(
-                          "relative grid grid-cols-6 w-24 aspect-[6/13] border bg-neutral-600",
+                          "relative grid grid-cols-6 w-24 aspect-[6/13] border border-gray-200 bg-neutral-600",
                           "before:content-[attr(data-player)] before:absolute before:top-1 before:start-1/2 before:-translate-x-1/2 before:text-white before:text-sm before:font-medium before:text-center",
                           "rtl:before:translate-x-1/2",
-                          "dark:border-slate-500",
+                          "dark:border-slate-500 dark:bg-slate-600",
                         )}
                         data-player={t({ message: "You" })}
                       >
@@ -646,9 +663,9 @@ export default function TableGameDemoPanel({ nextGameCountdown, onChangeView }: 
                               )}
                             </div>
                           ))}
-                          <div className="aspect-square bg-neutral-600" />
-                          <div className="aspect-square bg-neutral-600" />
-                          <div className="aspect-square bg-neutral-600" />
+                          <div className="aspect-square bg-neutral-600 dark:bg-slate-600" />
+                          <div className="aspect-square bg-neutral-600 dark:bg-slate-600" />
+                          <div className="aspect-square bg-neutral-600 dark:bg-slate-600" />
                         </div>
 
                         {/* Use power button */}
@@ -657,7 +674,6 @@ export default function TableGameDemoPanel({ nextGameCountdown, onChangeView }: 
                             keyboardKeyClasses("Space"),
                             "justify-center items-center w-32 h-10 ms-4 text-sm uppercase",
                           )}
-                          aria-label={t({ message: "Space bar" })}
                         >
                           {t({ message: "Space bar" })}
                         </div>
@@ -670,10 +686,10 @@ export default function TableGameDemoPanel({ nextGameCountdown, onChangeView }: 
                     <div className="flex gap-1">
                       <div
                         className={clsx(
-                          "relative grid grid-cols-6 w-24 aspect-[6/13] border bg-neutral-600",
+                          "relative grid grid-cols-6 w-24 aspect-[6/13] border border-gray-200 bg-neutral-600",
                           "before:content-[attr(data-player)] before:absolute before:top-1 before:start-1/2 before:-translate-x-1/2 before:text-white before:text-sm before:font-medium before:text-center",
                           "rtl:before:translate-x-1/2",
-                          "dark:border-slate-500",
+                          "dark:border-slate-500 dark:bg-slate-600",
                         )}
                         data-player={t({ message: "Opponent" })}
                       >
@@ -698,11 +714,11 @@ export default function TableGameDemoPanel({ nextGameCountdown, onChangeView }: 
                           <div className="aspect-square block-e defense-block" />
                           <div className="aspect-square block-o defense-block" />
                           <div className="aspect-square block-r attack-block" />
-                          <div className="aspect-square bg-neutral-600" />
-                          <div className="aspect-square bg-neutral-600" />
-                          <div className="aspect-square bg-neutral-600" />
-                          <div className="aspect-square bg-neutral-600" />
-                          <div className="aspect-square bg-neutral-600" />
+                          <div className="aspect-square bg-neutral-600 dark:bg-slate-600" />
+                          <div className="aspect-square bg-neutral-600 dark:bg-slate-600" />
+                          <div className="aspect-square bg-neutral-600 dark:bg-slate-600" />
+                          <div className="aspect-square bg-neutral-600 dark:bg-slate-600" />
+                          <div className="aspect-square bg-neutral-600 dark:bg-slate-600" />
                         </div>
                       </div>
                     </div>

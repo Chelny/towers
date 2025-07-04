@@ -116,7 +116,7 @@ export default forwardRef<HTMLInputElement, InputProps>(function Input(
             id={id}
             name={id}
             className={clsx(
-              "overflow-hidden w-full p-1 border-2 border-t-gray-600 border-e-gray-400 border-b-gray-400 border-s-gray-600 rounded-sm bg-white text-black line-clamp-1",
+              "overflow-hidden w-full p-1 border-2 border-t-gray-600 border-e-gray-400 border-b-gray-400 border-s-gray-600 rounded-xs bg-white text-black line-clamp-1",
               type === "password" && "pe-7",
               "read-only:bg-gray-200",
               "disabled:border-t-gray-600/50 disabled:border-e-gray-400/50 disabled:border-b-gray-400/50 disabled:border-s-gray-600/50 disabled:bg-gray-200/50 disabled:text-black/50 disabled:cursor-not-allowed",

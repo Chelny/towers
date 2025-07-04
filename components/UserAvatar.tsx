@@ -10,10 +10,17 @@ type UserAvatarProps = {
   user: Session["user"] | undefined | null
   isLoading?: boolean
   className?: string
+  dimensions?: string
   size?: number
 }
 
-export default function UserAvatar({ user, isLoading, className, size = 40 }: UserAvatarProps): ReactNode {
+export default function UserAvatar({
+  user,
+  isLoading,
+  className,
+  dimensions = "w-10 h-10",
+  size = 40,
+}: UserAvatarProps): ReactNode {
   const { t } = useLingui()
   const [isMounted, setIsMounted] = useState<boolean>(false)
   const placeholderSrc: string = "https://placehold.co/40x40.png?text=?"
@@ -25,7 +32,7 @@ export default function UserAvatar({ user, isLoading, className, size = 40 }: Us
 
   if (!isMounted) {
     return (
-      <div className={clsx("flex w-10 h-10 rounded-md bg-zinc-400", className)}>
+      <div className={clsx("flex rounded-md bg-zinc-400", dimensions, className)}>
         <Image
           className="rounded-md"
           src={placeholderSrc}
@@ -44,7 +51,7 @@ export default function UserAvatar({ user, isLoading, className, size = 40 }: Us
 
   if (isLoading || !user) {
     return (
-      <div className={clsx("flex w-10 h-10 rounded-md bg-zinc-400", className)}>
+      <div className={clsx("flex rounded-md bg-zinc-400", dimensions, className)}>
         <Image
           className="rounded-md"
           src={placeholderSrc}
@@ -58,7 +65,7 @@ export default function UserAvatar({ user, isLoading, className, size = 40 }: Us
   }
 
   return (
-    <div className={clsx("flex w-10 h-10 rounded-md bg-zinc-400", className)}>
+    <div className={clsx("flex rounded-md bg-zinc-400", dimensions, className)}>
       <Image
         className="rounded-md"
         src={imageSrc}

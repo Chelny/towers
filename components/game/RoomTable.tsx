@@ -95,7 +95,7 @@ export default function RoomTable({ roomId, table, user }: RoomTableProps): Reac
                       <div
                         key={colIndex}
                         className={clsx(
-                          "flex items-center justify-center w-28 p-1 border border-gray-300 rounded",
+                          "flex items-center justify-center w-28 p-1 border border-gray-300 rounded-sm",
                           "dark:border-dark-game-border",
                         )}
                       >

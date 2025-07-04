@@ -210,13 +210,13 @@ export function SignInForm(): ReactNode {
         </Trans>
       </div>
       <div className="flex justify-between items-center mt-4 mb-6" role="separator">
-        <hr className="flex-1 me-4 border border-t-neutral-200" />
+        <hr className={clsx("flex-1 me-4 border border-neutral-200", "dark:border-slate-600")} />
         <span className={clsx("mx-auto text-gray-600 text-sm uppercase", "dark:text-gray-400")}>
           <Trans>or sign in with</Trans>
         </span>
-        <hr className="flex-1 h-0 ms-4 border border-t-neutral-200" />
+        <hr className={clsx("flex-1 h-0 ms-4 border border-neutral-200", "dark:border-slate-600")} />
       </div>
-      <div className="space-y-4">
+      <div className="flex flex-col gap-4">
         <Button
           className="flex justify-center items-center w-full gap-x-2"
           disabled={isLoading}

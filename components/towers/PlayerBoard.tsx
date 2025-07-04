@@ -294,35 +294,36 @@ export default function PlayerBoard({
   }, [isCurrentUserSeat, nextPieces])
 
   return (
-    <div className={clsx("flex flex-col", isOpponentBoard && "w-player-board-opponent")}>
+    <div className={clsx("flex flex-col", isOpponentBoard && "w-player-board-opponent-width")}>
       <div
         className={clsx(
-          "flex justify-start items-center gap-2 px-1",
-          !isOpponentBoard ? "w-[180px] h-6 pb-1" : "h-4",
-          !isOpponentBoard && isReversed && "me-14",
-          !isOpponentBoard && !isReversed && "ms-14",
+          "flex justify-start items-center gap-2 px-1 mx-1 cursor-pointer",
+          !isOpponentBoard ? "w-[175px] h-6" : "h-4",
+          !isOpponentBoard && isReversed && "ms-2 me-13",
+          !isOpponentBoard && !isReversed && "ms-16",
         )}
         role="button"
+        tabIndex={0}
         onDoubleClick={() => (seat.occupiedBy ? handleOpenPlayerInfoModal(seat.occupiedBy) : undefined)}
       >
         {seat.occupiedBy?.user?.id && (
           <>
-            <div className={isOpponentBoard ? "w-4 h-4" : "w-6 h-6"}>
+            <div className={clsx(isOpponentBoard ? "w-4 h-4" : "w-6 h-6")}>
               <UserAvatar
                 user={seat.occupiedBy?.user}
-                className={isOpponentBoard ? "w-4 h-4" : "w-6 h-6"}
+                dimensions={isOpponentBoard ? "w-4 h-4" : "w-6 h-6"}
                 size={isOpponentBoard ? 16 : 24}
               />
             </div>
-            <p
+            <div
               className={clsx(
-                "line-clamp-1",
+                "truncate",
                 isOpponentBoard ? "text-sm" : "text-base",
                 board?.isHooDetected && "text-red-500 dark:text-red-400",
               )}
             >
               {seat.occupiedBy?.user.username}
-            </p>
+            </div>
           </>
         )}
       </div>
@@ -354,13 +355,13 @@ export default function PlayerBoard({
             "[grid-area:board-grid-container] relative grid w-full text-neutral-200",
             board?.isGameOver ? "bg-neutral-700 dark:bg-neutral-900" : "bg-neutral-100 dark:bg-slate-800",
             isOpponentBoard
-              ? "grid-rows-grid-container-opponent w-grid-container-opponent"
-              : "grid-rows-grid-container w-grid-container",
+              ? "grid-rows-(--grid-rows-grid-container-opponent) w-grid-container-opponent-width"
+              : "grid-rows-(--grid-rows-grid-container) w-grid-container-width",
             "before:content-[attr(data-seat-number)] before:absolute before:top-1/4 before:start-1/2 before:-translate-x-1/2 before:text-[7rem] before:font-bold before:text-center",
             "dark:before:text-slate-700",
           )}
           // className={clsx(
-          //   "[grid-area:board-grid-container] relative grid grid-rows-grid-container w-grid-container border text-neutral-200",
+          //   "[grid-area:board-grid-container] relative grid grid-rows-(--grid-rows-grid-container) w-grid-container-width border border-gray-200 text-neutral-200",
           //   board?.isGameOver ? "bg-neutral-700" : "bg-gray-50",
           //   "before:content-[attr(data-demo)] before:absolute before:top-1/4 before:start-1/2 before:-translate-x-1/2 before:text-4xl before:font-bold before:text-center before:text-neutral-300",
           // )}
@@ -381,7 +382,7 @@ export default function PlayerBoard({
                 isUserReady ||
                 isUserWaitingForMorePlayers ||
                 isUserWaitingForNextGame) &&
-                "shadow-md bg-neutral-800 dark:bg-slate-700",
+                "shadow-md bg-neutral-800 dark:border dark:border-slate-600 dark:bg-slate-700",
             )}
           >
             {gameState === TowersGameState.WAITING && isSitAccessGranted && (
@@ -444,25 +445,25 @@ export default function PlayerBoard({
           <>
             <div
               className={clsx(
-                "[grid-area:preview-piece] flex flex-col items-center justify-center h-preview-piece px-2 py-2 bg-neutral-100",
-                isOpponentBoard ? "" : "w-preview-piece",
+                "[grid-area:preview-piece] flex flex-col items-center justify-center h-preview-piece-height px-2 py-2 bg-neutral-100",
+                isOpponentBoard ? "" : "w-preview-piece-width",
                 "dark:bg-slate-800",
               )}
               // className={clsx(
-              //   "[grid-area:preview-piece] flex flex-col items-center justify-center h-preview-piece px-2 py-2 border bg-gray-50",
-              //   "w-preview-piece",
+              //   "[grid-area:preview-piece] flex flex-col items-center justify-center h-preview-piece-height px-2 py-2 border border-gray-200 bg-gray-50",
+              //   "w-preview-piece-width",
               // )}
             >
               {isCurrentUserSeat && <NextPiece nextPiece={nextPieces?.nextPiece} />}
             </div>
             <div
               className={clsx(
-                "[grid-area:power-bar] flex flex-col items-center justify-end h-power-bar px-2 py-2 bg-neutral-100",
-                isOpponentBoard ? "" : "w-power-bar",
+                "[grid-area:power-bar] flex flex-col items-center justify-end h-power-bar-height px-2 py-2 bg-neutral-100",
+                isOpponentBoard ? "" : "w-power-bar-width",
                 "dark:bg-slate-800",
               )}
               // className={clsx(
-              //   "[grid-area:power-bar] flex flex-col items-center justify-end w-power-bar h-power-bar px-2 py-2 border bg-gray-50",
+              //   "[grid-area:power-bar] flex flex-col items-center justify-end w-power-bar-width h-power-bar-height px-2 py-2 border border-gray-200 bg-gray-50",
               // )}
               data-testid="player-board_container_power-bar"
             >

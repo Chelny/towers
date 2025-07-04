@@ -45,7 +45,6 @@ describe("LanguageSwitcher", () => {
     fireEvent.click(screen.getByTestId("language-switcher_select_locale"))
     fireEvent.click(screen.getByRole("option", { name: /French/i }))
 
-    // Wait for the redirection to happen
     await waitFor(() => {
       expect(mockPush).toHaveBeenCalledWith("/fr/sign-in")
     })

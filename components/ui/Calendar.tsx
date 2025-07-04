@@ -193,13 +193,13 @@ export default function Calendar({
                     key={dayIndex}
                     type="button"
                     className={clsx(
-                      "flex-1 p-2 text-center border rounded-sm dark:border-neutral-900",
+                      "flex-1 p-2 text-center border border-gray-200 rounded-xs dark:border-neutral-900",
                       !disabled &&
                         day !== null &&
                         !isDisabledDay &&
                         "cursor-pointer hover:bg-gray-200 dark:hover:bg-slate-600",
                       day === null && "opacity-50 cursor-default",
-                      isSelectedDay && "bg-blue-100 dark:bg-slate-500",
+                      isSelectedDay && "bg-blue-100 dark:bg-blue-900",
                       isDisabledDay && "opacity-50 cursor-not-allowed",
                     )}
                     disabled={isDisabledDay}
@@ -250,7 +250,7 @@ export default function Calendar({
                 <Button
                   key={year}
                   type="button"
-                  className="text-center border rounded-sm hover:bg-gray-200 dark:hover:bg-gray-600"
+                  className="text-center border border-gray-200 rounded-xs hover:bg-gray-200 dark:hover:bg-gray-600"
                   disabled={year > maxDate.getUTCFullYear() || year < minDate.getUTCFullYear()}
                   onClick={() => {
                     setBrowsingDate(new Date(year, browsingDate.getUTCMonth()))
@@ -324,7 +324,7 @@ export default function Calendar({
         <div
           ref={calendarRef}
           className={clsx(
-            "absolute start-1/2 z-10 min-w-96 max-w-max p-4 border border-gray-300 rounded shadow-md bg-white -translate-x-1/2",
+            "absolute start-1/2 z-10 min-w-96 max-w-max p-4 border border-gray-300 rounded-sm shadow-md bg-white -translate-x-1/2",
             "rtl:translate-x-1/2",
             "dark:border-dark-card-border dark:bg-dark-card-background",
           )}

@@ -26,6 +26,7 @@ type SelectProps = PropsWithChildren<{
   dataTestId?: string
   description?: string
   errorMessage?: string
+  isNoBottomSpace?: boolean
   onChange?: (value: string) => void
 }>
 
@@ -41,6 +42,7 @@ export default function Select({
   dataTestId = undefined,
   description = "",
   errorMessage = "",
+  isNoBottomSpace = false,
   onChange,
 }: SelectProps): ReactNode {
   const [selectedValue, setSelectedValue] = useState<string>(defaultValue)
@@ -88,7 +90,7 @@ export default function Select({
   }
 
   return (
-    <div className="relative w-full mb-4">
+    <div className={clsx("relative w-full", isNoBottomSpace ? "mb-0" : "mb-4")}>
       {label && (
         <label id={`${id}Label`} className="mb-1 font-medium">
           {label}{" "}
@@ -102,7 +104,7 @@ export default function Select({
       <div
         id={id}
         className={clsx(
-          "flex justify-between items-center w-full h-8 px-1 py-4 overflow-hidden border-2 border-t-gray-200 border-e-gray-400 border-b-gray-400 border-s-gray-200 rounded-sm ring-1 ring-black bg-gray-300 text-black line-clamp-1 cursor-pointer",
+          "flex justify-between items-center w-full h-8 px-1 py-4 overflow-hidden border-2 border-t-gray-200 border-e-gray-400 border-b-gray-400 border-s-gray-200 rounded-xs ring-1 ring-black bg-gray-300 text-black line-clamp-1 cursor-pointer",
           disabled && "bg-gray-200 opacity-50 cursor-not-allowed",
           "dark:border-t-dark-button-border-top dark:border-e-dark-button-border-end dark:border-b-dark-button-border-bottom dark:border-s-dark-button-border-start dark:bg-dark-button-background dark:text-dark-button-text",
           className,
@@ -138,7 +140,7 @@ export default function Select({
           ref={dropdownRef}
           id={`${id}Dropdown`}
           className={clsx(
-            "absolute z-20 mt-1 py-1 overflow-y-auto w-full max-h-60 border border-gray-300 shadow-lg rounded bg-white",
+            "absolute z-20 mt-1 py-1 overflow-y-auto w-full max-h-60 border border-gray-300 shadow-lg rounded-sm bg-white",
             "dark:border-dark-card-border dark:bg-dark-card-background",
           )}
           role="listbox"
@@ -151,7 +153,7 @@ export default function Select({
               className={clsx(
                 "block w-full px-2 py-2 text-start cursor-pointer",
                 "hover:bg-gray-200 dark:hover:bg-slate-600",
-                option.props.value === selectedValue && "bg-blue-100 dark:bg-slate-500",
+                option.props.value === selectedValue && "bg-blue-100 dark:bg-blue-900",
               )}
               role="option"
               tabIndex={0}
