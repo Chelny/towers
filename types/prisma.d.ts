@@ -7,7 +7,7 @@ import {
   TowersTable,
   TowersTableChatMessage,
   User,
-} from "@prisma/client"
+} from "db"
 
 declare module "@prisma/client" {
   // **************************************************

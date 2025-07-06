@@ -1,4 +1,4 @@
-import { RoomLevel } from "@prisma/client"
+import { RoomLevel } from "db"
 import { parseArgs } from "node:util"
 import { logger } from "@/lib/logger"
 import prisma from "@/lib/prisma"

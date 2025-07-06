@@ -1,4 +1,4 @@
-import { Account } from "@prisma/client"
+import { Account } from "db"
 import prisma from "@/lib/prisma"
 
 /**

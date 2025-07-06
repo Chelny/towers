@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { t } from "@lingui/core/macro"
-import { Prisma } from "@prisma/client"
+import { Prisma } from "db"
 
 export const getPrismaError = (error: unknown): NextResponse => {
   let message: string = t({ message: "An unexpected error occurred. Please try again later." })

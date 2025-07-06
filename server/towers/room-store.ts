@@ -3,18 +3,18 @@ import { Room, RoomLevel } from "@/server/towers/classes/Room"
 export const rooms: Map<string, Room> = new Map<string, Room>()
 
 const roomsList = [
-  { name: "Leaning Tower of Pisa", level: RoomLevel.SOCIAL },
-  { name: "Tower of Babble", level: RoomLevel.SOCIAL },
-  { name: "Eiffel Tower", level: RoomLevel.SOCIAL },
-  { name: "Sunshine 60 Tower", level: RoomLevel.SOCIAL },
-  { name: "Two Union Square", level: RoomLevel.SOCIAL },
-  { name: "Empire State Building", level: RoomLevel.BEGINNER },
-  { name: "Sears Tower", level: RoomLevel.BEGINNER },
-  { name: "Chang Tower", level: RoomLevel.BEGINNER },
-  { name: "One Astor Place", level: RoomLevel.BEGINNER },
-  { name: "Olympia Centre", level: RoomLevel.BEGINNER },
-  { name: "World Trade Center", level: RoomLevel.INTERMEDIATE },
-  { name: "CN Tower", level: RoomLevel.ADVANCED },
+  { name: "Leaning Montreal Tower", level: RoomLevel.SOCIAL },
+  { name: "Central Park Tower", level: RoomLevel.SOCIAL },
+  { name: "Milad Tower", level: RoomLevel.SOCIAL },
+  { name: "Merdeka 118", level: RoomLevel.SOCIAL },
+  { name: "Ostankino Tower", level: RoomLevel.SOCIAL },
+  { name: "Tashkent Tower", level: RoomLevel.BEGINNER },
+  { name: "Shanghai Tower", level: RoomLevel.BEGINNER },
+  { name: "Kuala Lumpur Tower", level: RoomLevel.BEGINNER },
+  { name: "Lotte World Tower", level: RoomLevel.BEGINNER },
+  { name: "Tokyo Skytree", level: RoomLevel.BEGINNER },
+  { name: "One World Trade Center", level: RoomLevel.INTERMEDIATE },
+  { name: "Burj Khalifa", level: RoomLevel.ADVANCED },
 ]
 
 roomsList.forEach((roomItem) => {

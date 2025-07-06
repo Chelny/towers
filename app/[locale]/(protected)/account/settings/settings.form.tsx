@@ -3,9 +3,9 @@
 import { FormEvent, ReactNode, useState } from "react"
 import { usePathname, useRouter } from "next/navigation"
 import { Trans, useLingui } from "@lingui/react/macro"
-import { WebsiteTheme } from "@prisma/client"
 import { Value, ValueError } from "@sinclair/typebox/value"
 import clsx from "clsx/lite"
+import { WebsiteTheme } from "db"
 import { useTheme } from "next-themes"
 import {
   SettingsFormValidationErrors,

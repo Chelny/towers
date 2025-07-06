@@ -1,5 +1,5 @@
-import { WebsiteTheme } from "@prisma/client"
 import { Type } from "@sinclair/typebox"
+import { WebsiteTheme } from "db"
 import { Language, languages } from "@/translations/languages"
 
 export const settingsSchema = Type.Object({

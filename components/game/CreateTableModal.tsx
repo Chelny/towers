@@ -2,9 +2,9 @@
 
 import { FormEvent, ReactNode, useState } from "react"
 import { useLingui } from "@lingui/react/macro"
-import { TableType } from "@prisma/client"
 import { Type } from "@sinclair/typebox"
 import { Value, ValueError } from "@sinclair/typebox/value"
+import { TableType } from "db"
 import Checkbox from "@/components/ui/Checkbox"
 import Modal from "@/components/ui/Modal"
 import Select from "@/components/ui/Select"

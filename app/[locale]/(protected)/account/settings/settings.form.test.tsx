@@ -1,5 +1,5 @@
-import { WebsiteTheme } from "@prisma/client"
 import { fireEvent, render, screen, waitFor } from "@testing-library/react"
+import { WebsiteTheme } from "db"
 import { vi } from "vitest"
 import { SettingsForm } from "@/app/[locale]/(protected)/account/settings/settings.form"
 import { mockSession } from "@/test/data/session"

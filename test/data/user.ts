@@ -1,4 +1,4 @@
-import { User, WebsiteTheme } from "@prisma/client"
+import { User, WebsiteTheme } from "db"
 
 const commonUserProperties = {
   language: "en",
