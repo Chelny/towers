@@ -69,7 +69,7 @@ export default [
               position: "before",
             },
             {
-              pattern: "**/*.scss",
+              pattern: "**/*.css",
               group: "internal",
               position: "after",
             }

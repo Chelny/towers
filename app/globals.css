@@ -1,8 +1,10 @@
-/* stylelint-disable scss/at-rule-no-unknown */
+/* stylelint-disable import-notation */
+/* stylelint-disable at-rule-no-deprecated */
+/* stylelint-disable at-rule-no-unknown */
+/* stylelint-disable declaration-property-value-no-unknown */
 @import "tailwindcss";
 @import "./styles/towers";
 
-/* stylelint-disable-next-line scss/operator-no-unspaced */
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
@@ -47,68 +49,68 @@
   --text-board-button-opponent: clamp(6px, 4vw, 10px);
 
   /* Colors */
-  --color-towers-primary: theme('colors.teal.800');
-  --color-dark-background: #1E2A35;
-  --color-dark-text: #E1E8ED;
-  --color-dark-text-muted: #AAB8C2;
-  --color-dark-card-background: #2B3A48;
-  --color-dark-card-border: #3A4A58;
+  --color-towers-primary: theme("colors.teal.800");
+  --color-dark-background: #1e2a35;
+  --color-dark-text: #e1e8ed;
+  --color-dark-text-muted: #aab8c2;
+  --color-dark-card-background: #2b3a48;
+  --color-dark-card-border: #3a4a58;
   --color-dark-input-background: #243342;
-  --color-dark-input-text: #F0F4F8;
-  --color-dark-input-readonly-background: #2B3A48;
-  --color-dark-input-readonly-text: #AEBECC;
-  --color-dark-input-disabled-background: #202E3A;
-  --color-dark-input-disabled-text: #7D8C9A;
-  --color-dark-input-border-top: #1A2630;
+  --color-dark-input-text: #f0f4f8;
+  --color-dark-input-readonly-background: #2b3a48;
+  --color-dark-input-readonly-text: #aebecc;
+  --color-dark-input-disabled-background: #202e3a;
+  --color-dark-input-disabled-text: #7d8c9a;
+  --color-dark-input-border-top: #1a2630;
   --color-dark-input-border-end: #365066;
   --color-dark-input-border-bottom: #365066;
-  --color-dark-input-border-start: #1A2630;
-  --color-dark-button-background: #3D5A73;
-  --color-dark-button-text: #F0F4F8;
-  --color-dark-button-border-top: #5E7689;
-  --color-dark-button-border-end: #1C2A34;
-  --color-dark-button-border-bottom: #1C2A34;
-  --color-dark-button-border-start: #5E7689;
-  --color-dark-button-ring: #5AA1C2;
-  --color-dark-modal-background: #2B3A48;
-  --color-dark-modal-border: #3A4A58;
-  --color-dark-modal-heading-text: #F0F4F8;
-  --color-dark-modal-body-text: #E1E8ED;
-  --color-dark-modal-border-top: #5E7689;
-  --color-dark-modal-border-end: #1C2A34;
-  --color-dark-modal-border-bottom: #1C2A34;
-  --color-dark-modal-border-start: #5E7689;
-  --color-dark-modal-ring: #5AA1C2;
-  --color-dark-info-background: #2E4356;
-  --color-dark-info-text: #9BC4E2;
-  --color-dark-info-border: #3A4A58;
-  --color-dark-warning-background: #4C3A1A;
-  --color-dark-warning-text: #E3D48C;
-  --color-dark-warning-border: #70502C;
+  --color-dark-input-border-start: #1a2630;
+  --color-dark-button-background: #3d5a73;
+  --color-dark-button-text: #f0f4f8;
+  --color-dark-button-border-top: #5e7689;
+  --color-dark-button-border-end: #1c2a34;
+  --color-dark-button-border-bottom: #1c2a34;
+  --color-dark-button-border-start: #5e7689;
+  --color-dark-button-ring: #5aa1c2;
+  --color-dark-modal-background: #2b3a48;
+  --color-dark-modal-border: #3a4a58;
+  --color-dark-modal-heading-text: #f0f4f8;
+  --color-dark-modal-body-text: #e1e8ed;
+  --color-dark-modal-border-top: #5e7689;
+  --color-dark-modal-border-end: #1c2a34;
+  --color-dark-modal-border-bottom: #1c2a34;
+  --color-dark-modal-border-start: #5e7689;
+  --color-dark-modal-ring: #5aa1c2;
+  --color-dark-info-background: #2e4356;
+  --color-dark-info-text: #9bc4e2;
+  --color-dark-info-border: #3a4a58;
+  --color-dark-warning-background: #4c3a1a;
+  --color-dark-warning-text: #e3d48c;
+  --color-dark-warning-border: #70502c;
   --color-dark-success-background: #274037;
-  --color-dark-success-text: #A7D9BA;
-  --color-dark-success-border: #355A47;
-  --color-dark-error-background: #5A2A33;
-  --color-dark-error-text: #E7BFC2;
+  --color-dark-success-text: #a7d9ba;
+  --color-dark-success-border: #355a47;
+  --color-dark-error-background: #5a2a33;
+  --color-dark-error-text: #e7bfc2;
   --color-dark-error-border: #803843;
-  --color-dark-alert-message-background: #2B3A48;
-  --color-dark-alert-message-text: #F0F4F8;
-  --color-dark-alert-message-border: #3A4A58;
-  --color-dark-game-background: #22303E;
+  --color-dark-alert-message-background: #2b3a48;
+  --color-dark-alert-message-text: #f0f4f8;
+  --color-dark-alert-message-border: #3a4a58;
+  --color-dark-game-background: #22303e;
   --color-dark-game-border: #365066;
-  --color-dark-game-sidebar-background: #202D3A;
-  --color-dark-game-sidebar-border: #E1E8ED;
+  --color-dark-game-sidebar-background: #202d3a;
+  --color-dark-game-sidebar-border: #e1e8ed;
   --color-dark-game-content-background: #243342;
-  --color-dark-game-content-text: #3A4A58;
-  --color-dark-game-content-border: #415A6B;
-  --color-dark-game-orange-top-bar-background: #FF9F40;
-  --color-dark-game-yellow-sub-bar-background: #E6C744;
+  --color-dark-game-content-text: #3a4a58;
+  --color-dark-game-content-border: #415a6b;
+  --color-dark-game-orange-top-bar-background: #ff9f40;
+  --color-dark-game-yellow-sub-bar-background: #e6c744;
   --color-dark-game-chat-background: #263544;
-  --color-dark-game-players-header: #2B3A48;
+  --color-dark-game-players-header: #2b3a48;
   --color-dark-game-players-row-odd: #263544;
   --color-dark-game-players-row-even: #243342;
   --color-dark-game-players-border: #365066;
-  --color-dark-game-change-keys-background: #202D3B;
+  --color-dark-game-change-keys-background: #202d3b;
 
   /* Line Height */
   --leading-default: 1;
@@ -189,15 +191,15 @@
   }
 
   .towers-link {
-    color: theme("color.blue.600")
+    color: theme("color.blue.600");
   }
 
   .towers-link:hover {
-    color: theme("color.blue.800")
+    color: theme("color.blue.800");
   }
 
   .towers-link:visited {
-    color: theme("color.purple.600")
+    color: theme("color.purple.600");
   }
 }
 
@@ -270,7 +272,7 @@ body {
 
     .dark {
       ::-webkit-scrollbar-track {
-        @apply bg-[url("/images/scrollbar-track-dark.png")]
+        @apply bg-[url("/images/scrollbar-track-dark.png")];
       }
 
       ::-webkit-scrollbar-thumb {

@@ -1,11 +1,12 @@
 {
-  "*.scss": [
+  "*.css": [
     "prettier --write",
-    "pnpm lint:scss --fix"
+    "pnpm lint:css --fix"
   ],
   "*.{ts,tsx}": [
     "prettier --write",
     "pnpm lint:ts --fix",
     "pnpm exec vitest related --run"
-  ]
+  ],
+  "*.po": "echo 'Error: .po files changed! Run `pnpm translations:extract` manually, review & commit.' && exit 1"
 }

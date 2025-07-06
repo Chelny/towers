@@ -525,7 +525,7 @@ msgstr "<0>Effective Date: {date}</0><1><2>1. Introduction</2><3>Welcome to {nam
 msgid "<0>Email not verified.</0> Please verify your email to continue. <1>Resend verification</1>"
 msgstr "<0>Email not verified.</0> Please verify your email to continue. <1>Resend verification</1>"
 
-#: components/game/Table.tsx:848
+#: components/game/Table.tsx:858
 msgid "<0>The next game is starting in</0><1>{countdown}</1><2>{countdown, plural, one {second} other {seconds}}</2>"
 msgstr "<0>The next game is starting in</0><1>{countdown}</1><2>{countdown, plural, one {second} other {seconds}}</2>"
 
@@ -620,7 +620,6 @@ msgstr "Beginner"
 msgid "Birthdate"
 msgstr "Birthdate"
 
-#: components/game/TableBootUserModal.tsx:45
 #: components/game/Table.tsx:792
 msgid "Boot"
 msgstr "Boot"
@@ -715,6 +714,7 @@ msgid "Create"
 msgstr "Create"
 
 #: components/game/Room.tsx:187
+#: components/game/CreateTableModal.tsx:79
 msgid "Create Table"
 msgstr "Create Table"
 
@@ -722,7 +722,7 @@ msgstr "Create Table"
 msgid "Current Password"
 msgstr "Current Password"
 
-#: components/game/Table.tsx:918
+#: components/game/Table.tsx:928
 msgid "Cycle Color:"
 msgstr "Cycle Color:"
 
@@ -790,7 +790,7 @@ msgstr "Down Arrow"
 msgid "Drop Stones"
 msgstr "Drop Stones"
 
-#: components/game/Table.tsx:910
+#: components/game/Table.tsx:920
 msgid "Drop:"
 msgstr "Drop:"
 
@@ -886,7 +886,7 @@ msgstr "Full"
 msgid "Game option: {ratedOption}"
 msgstr "Game option: {ratedOption}"
 
-#: components/game/Table.tsx:869
+#: components/game/Table.tsx:879
 msgid "Game Over"
 msgstr "Game Over"
 
@@ -967,7 +967,6 @@ msgstr "Intermediate"
 msgid "Invitation Declined"
 msgstr "Invitation Declined"
 
-#: components/game/TableInviteUserModal.tsx:50
 #: components/game/Table.tsx:785
 msgid "Invite"
 msgstr "Invite"
@@ -1022,7 +1021,7 @@ msgstr "Language"
 msgid "Left Arrow"
 msgstr "Left Arrow"
 
-#: components/game/Table.tsx:894
+#: components/game/Table.tsx:904
 msgid "Left:"
 msgstr "Left:"
 
@@ -1349,6 +1348,7 @@ msgid "Rated"
 msgstr "Rated"
 
 #: components/game/Table.tsx:801
+#: components/game/CreateTableModal.tsx:100
 msgid "Rated Game"
 msgstr "Rated Game"
 
@@ -1417,7 +1417,7 @@ msgstr "Revoke all other sessions"
 msgid "Right Arrow"
 msgstr "Right Arrow"
 
-#: components/game/Table.tsx:902
+#: components/game/Table.tsx:912
 msgid "Right:"
 msgstr "Right:"
 
@@ -1540,12 +1540,10 @@ msgstr "Space"
 msgid "Space bar"
 msgstr "Space bar"
 
-#: components/towers/PlayerBoard.tsx:405
 #: components/game/Table.tsx:754
 msgid "Stand"
 msgstr "Stand"
 
-#: components/towers/PlayerBoard.tsx:415
 #: components/game/Table.tsx:731
 msgid "Start"
 msgstr "Start"
@@ -1563,11 +1561,11 @@ msgid "System"
 msgstr "System"
 
 #: components/game/Room.tsx:266
-#: components/game/PlayersList.tsx:219
 msgid "Table"
 msgstr "Table"
 
 #: components/game/Table.tsx:758
+#: components/game/CreateTableModal.tsx:88
 msgid "Table Type"
 msgstr "Table Type"
 
@@ -1758,7 +1756,7 @@ msgstr "Update Profile"
 msgid "Update Settings"
 msgstr "Update Settings"
 
-#: components/game/Table.tsx:926
+#: components/game/Table.tsx:936
 msgid "Use Item:"
 msgstr "Use Item:"
 
@@ -1781,7 +1779,6 @@ msgid "Validation error: {errorMessage}"
 msgstr "Validation error: {errorMessage}"
 
 #: app/[locale]/(protected)/account/settings/settings.form.tsx:64
-#: app/[locale]/(protected)/account/profile/passkeys.form.tsx:54
 msgid "Validation errors occurred."
 msgstr "Validation errors occurred."
 
@@ -1881,7 +1878,7 @@ msgstr "You can't touch me."
 msgid "You have been booted from a table."
 msgstr "You have been booted from a table."
 
-#: components/game/Table.tsx:874
+#: components/game/Table.tsx:884
 msgid "You lose!"
 msgstr "You lose!"
 
@@ -1895,14 +1892,16 @@ msgid "You must be at least 13 years old."
 msgstr "You must be at least 13 years old."
 
 #: components/game/Table.tsx:400
+#: components/game/CreateTableModal.tsx:47
 msgid "You must rate this game."
 msgstr "You must rate this game."
 
 #: components/game/Table.tsx:394
+#: components/game/CreateTableModal.tsx:41
 msgid "You must select a table type."
 msgstr "You must select a table type."
 
-#: components/game/Table.tsx:881
+#: components/game/Table.tsx:891
 msgid "You win!"
 msgstr "You win!"
 

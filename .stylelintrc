@@ -1,10 +1,18 @@
 {
   "extends": [
-    "stylelint-config-standard-scss",
-    "stylelint-config-property-sort-order-smacss"
+    "stylelint-config-standard"
+  ],
+  "plugins": [
+    "stylelint-order"
   ],
   "rules": {
     "alpha-value-notation": "percentage",
+    "at-rule-no-unknown": [
+      true,
+      {
+        "ignoreAtRules": ["tailwind"]
+      }
+    ],
     "color-function-notation": "modern",
     "declaration-empty-line-before": "never",
     "function-no-unknown": null,
@@ -23,7 +31,6 @@
     "no-invalid-position-at-import-rule": null,
     "order/order": [
       [
-        "dollar-variables",
         "custom-properties",
         "declarations",
         {
@@ -41,13 +48,6 @@
         "at-rules"
       ]
     ],
-    "scss/at-rule-no-unknown": [
-      true,
-      {
-        "ignoreAtRules": ["tailwind"]
-      }
-    ],
-    "scss/no-global-function-names": null,
     "selector-class-pattern": "^.[A-Za-z0-9-]+(?:__[A-Za-z0-9-]+)?(?:--[A-Za-z0-9-]+)?(?=\\W|$)",
     "selector-max-id": [1],
     "selector-max-type": [3],

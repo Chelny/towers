@@ -8,13 +8,6 @@ loadEnvConfig(process.cwd())
 
 export default defineConfig({
   assetsInclude: ["**/*.po"],
-  css: {
-    preprocessorOptions: {
-      scss: {
-        api: "modern",
-      },
-    },
-  },
   plugins: [react()],
   resolve: {
     alias: {

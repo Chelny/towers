@@ -1,7 +1,17 @@
-# Extract messages from files that are staged for commit
+red='\033[0;31m'
+green='\033[0;32m'
+yellow='\033[0;33m'
+no_color='\033[0m'
 
-lingui extract $(git diff --name-only --staged)
-
-# Run linting
+echo "${yellow}Running pre-commit checks...${no_color}"
 
 pnpm exec lint-staged
+
+lint_staged_exit_code=$?
+
+if [ $lint_staged_exit_code -eq 0 ]; then
+  echo "${green}All lint-staged checks passed.${no_color}"
+else
+  echo "${red}lint-staged found issues. Please fix them before committing.${no_color}"
+  exit 1
+fi
