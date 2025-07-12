@@ -2,25 +2,7 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { Mock } from "vitest"
 import CreateTable from "@/components/game/CreateTableModal"
 import { TableType } from "@/enums/table-type"
-import { authClient } from "@/lib/auth-client"
-import { mockSession } from "@/test/data/session"
-
-const socketEmitMock: Mock = vi.fn()
-const mockSocket: { emit: Mock } = { emit: socketEmitMock }
-
-vi.mock("@/context/SocketContext", async () => {
-  const actual = await vi.importActual("@/context/SocketContext")
-  return {
-    ...actual,
-    useSocket: () => ({ socket: mockSocket }),
-  }
-})
-
-vi.mock("@/lib/auth-client", () => ({
-  authClient: {
-    useSession: vi.fn(),
-  },
-}))
+import { mockSocket } from "@/test/data/socket"
 
 const mockRoomId: string = "mock-room-1"
 
@@ -29,7 +11,6 @@ describe("CreateTableModal", () => {
     HTMLDialogElement.prototype.showModal = vi.fn()
     HTMLDialogElement.prototype.close = vi.fn()
     HTMLElement.prototype.scrollIntoView = vi.fn()
-    vi.mocked(authClient.useSession).mockReturnValue(mockSession)
   })
 
   it("renders modal with default values", () => {
@@ -60,7 +41,7 @@ describe("CreateTableModal", () => {
     const handleCancel: Mock = vi.fn()
     const tableId: string = "mock-table-1"
 
-    socketEmitMock.mockImplementationOnce((event, payload, callback) => {
+    mockSocket.current.emit.mockImplementationOnce((event, payload, callback) => {
       callback({ success: true, message: "ok", data: { tableId } })
     })
 

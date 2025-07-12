@@ -3,32 +3,16 @@ import { Mock } from "vitest"
 import RoomTable from "@/components/game/RoomTable"
 import { ROUTE_TOWERS } from "@/constants/routes"
 import { TableType } from "@/enums/table-type"
-import { authClient } from "@/lib/auth-client"
 import { GamePlainObject } from "@/server/towers/classes/Game"
 import { TablePlainObject } from "@/server/towers/classes/Table"
 import { TableInvitationManagerPlainObject } from "@/server/towers/classes/TableInvitationManager"
 import { UserMuteManagerPlainObject } from "@/server/towers/classes/UserMuteManager"
-import { mockSession } from "@/test/data/session"
 import { mockUser1 } from "@/test/data/user"
 import { mockUserStats1 } from "@/test/data/user-stats"
-import { mockSocket, mockUseRouter } from "@/vitest.setup"
+import { mockUseRouter } from "@/vitest.setup"
 
 vi.mock("next/navigation", () => ({
   useRouter: vi.fn(() => mockUseRouter),
-}))
-
-vi.mock("@/context/SocketContext", async () => {
-  const actual = await vi.importActual("@/context/SocketContext")
-  return {
-    ...actual,
-    useSocket: () => ({ socket: mockSocket, isConnected: true }),
-  }
-})
-
-vi.mock("@/lib/auth-client", () => ({
-  authClient: {
-    useSession: vi.fn(),
-  },
 }))
 
 describe("RoomTable", () => {
@@ -91,14 +75,6 @@ describe("RoomTable", () => {
     chat: { messages: [] },
     game: {} as GamePlainObject,
   }
-
-  beforeEach(() => {
-    vi.mocked(authClient.useSession).mockReturnValue(mockSession)
-  })
-
-  afterEach(() => {
-    vi.clearAllMocks()
-  })
 
   it("should render room tables correctly", () => {
     render(<RoomTable roomId={mockRoomId} table={mockTable} />)

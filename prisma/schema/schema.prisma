@@ -1,10 +1,6 @@
 generator client {
-  provider               = "prisma-client-js"
-  output                 = "../app/prisma/generated"
-  runtime                = "nodejs"
-  moduleFormat           = "esm"
-  generatedFileExtension = "ts"
-  importFileExtension    = "ts"
+  provider = "prisma-client-js"
+  output   = "../app/generated/prisma/client"
 }
 
 datasource db {
@@ -19,10 +15,11 @@ model User {
   email            String            @unique
   emailVerified    Boolean           @default(false)
   username         String            @unique
+  displayUsername  String?
   image            String?
-  language         String?           @default("en")
+  language         String            @default("en")
   role             String?
-  isOnline         Boolean?          @default(false)
+  isOnline         Boolean           @default(false)
   lastActiveAt     DateTime?
   theme            WebsiteTheme      @default(SYSTEM)
   banned           Boolean?
@@ -66,6 +63,7 @@ model Passkey {
   transports   String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+  aaguid       String?
 }
 
 model Session {

@@ -1,6 +1,6 @@
 "use client"
 
-import { ReactNode, RefObject, useEffect, useRef, useState } from "react"
+import { ReactNode, useEffect, useRef, useState } from "react"
 import { Trans } from "@lingui/react/macro"
 import clsx from "clsx/lite"
 import PlayerInformationModal from "@/components/game/PlayerInformationModal"
@@ -15,7 +15,6 @@ import { useModal } from "@/context/ModalContext"
 import { useSocket } from "@/context/SocketContext"
 import { TowersControlKeys } from "@/enums/towers-control-keys"
 import { TowersGameState } from "@/enums/towers-game-state"
-import { authClient } from "@/lib/auth-client"
 import { BlockToRemove, BoardPlainObject } from "@/server/towers/classes/Board"
 import { NextPiecesPlainObject } from "@/server/towers/classes/NextPieces"
 import { PiecePlainObject } from "@/server/towers/classes/Piece"
@@ -59,8 +58,7 @@ export default function PlayerBoard({
   onStart,
   onNextPowerBarItem,
 }: PlayerBoardProps): ReactNode {
-  const { socket } = useSocket()
-  const { data: session } = authClient.useSession()
+  const { socketRef, session } = useSocket()
   const { openModal } = useModal()
   const [isReversed, setIsReversed] = useState<boolean>(seat.seatNumber % 2 === 0)
   const [nextPieces, setNextPieces] = useState<NextPiecesPlainObject>()
@@ -68,12 +66,12 @@ export default function PlayerBoard({
   const [board, setBoard] = useState<BoardPlainObject>()
   const [currentPiece, setCurrentPiece] = useState<PiecePlainObject>()
   const boardRefs = useRef<Record<string, HTMLDivElement | null>>({})
-  const isCurrentUserSeat: boolean = seat.occupiedBy?.user?.id === session?.user.id
+  const isCurrentUserSeat: boolean = seat.occupiedBy?.user?.id === session?.user?.id
   const [controlKeys, setControlKeys] = useState<TowersControlKeys | undefined>(seat.occupiedBy?.controlKeys)
   const [isReady, setIsReady] = useState<boolean>(false)
   const [isPlaying, setIsPlaying] = useState<boolean>(false)
-  const typedRef: RefObject<string> = useRef<string>("")
-  const typingTimerRef: RefObject<NodeJS.Timeout | null> = useRef<NodeJS.Timeout | null>(null)
+  const typedRef = useRef<string>("")
+  const typingTimerRef = useRef<NodeJS.Timeout>(null)
   const isSeatAvailable: boolean =
     (gameState === TowersGameState.WAITING && !seat.occupiedBy && !isUserSeatedAnywhere) ||
     (gameState === TowersGameState.PLAYING && !seat.occupiedBy && !isUserSeatedAnywhere)
@@ -90,27 +88,27 @@ export default function PlayerBoard({
   }
 
   const handleMovePiece = (direction: "left" | "right"): void => {
-    socket?.emit(SocketEvents.PIECE_MOVE, { tableId, seatNumber: seat.seatNumber, direction })
+    socketRef.current?.emit(SocketEvents.PIECE_MOVE, { tableId, seatNumber: seat.seatNumber, direction })
   }
 
   const handleCyclePiece = (): void => {
-    socket?.emit(SocketEvents.PIECE_CYCLE, { tableId, seatNumber: seat.seatNumber })
+    socketRef.current?.emit(SocketEvents.PIECE_CYCLE, { tableId, seatNumber: seat.seatNumber })
   }
 
   const handleDropPiece = (): void => {
-    socket?.emit(SocketEvents.PIECE_DROP, { tableId, seatNumber: seat.seatNumber })
+    socketRef.current?.emit(SocketEvents.PIECE_DROP, { tableId, seatNumber: seat.seatNumber })
   }
 
   const handleStopDropPiece = (): void => {
-    socket?.emit(SocketEvents.PIECE_DROP_STOP, { tableId, seatNumber: seat.seatNumber })
+    socketRef.current?.emit(SocketEvents.PIECE_DROP_STOP, { tableId, seatNumber: seat.seatNumber })
   }
 
   const handleUsePowerItem = (targetSeatNumber?: number): void => {
-    socket?.emit(SocketEvents.POWER_USE, { tableId, seatNumber: seat.seatNumber, targetSeatNumber })
+    socketRef.current?.emit(SocketEvents.POWER_USE, { tableId, seatNumber: seat.seatNumber, targetSeatNumber })
   }
 
   useEffect(() => {
-    if (!socket || !tableId) return
+    if (!tableId) return
 
     const handleGameUpdate = ({
       seatNumber: incomingSeatNumber,
@@ -154,7 +152,7 @@ export default function PlayerBoard({
         isCurrentUserSeat &&
         teamNumber !== seat.teamNumber
       ) {
-        socket.emit(SocketEvents.GAME_HOO_ADD_BLOCKS, { tableId, teamNumber, blocks })
+        socketRef.current?.emit(SocketEvents.GAME_HOO_ADD_BLOCKS, { tableId, teamNumber, blocks })
       }
     }
 
@@ -171,19 +169,19 @@ export default function PlayerBoard({
       await new Promise<void>((resolve) => setTimeout(resolve, 190))
       setBlocksToRemove([])
 
-      socket.emit(SocketEvents.GAME_CLIENT_BLOCKS_ANIMATION_DONE)
+      socketRef.current?.emit(SocketEvents.GAME_CLIENT_BLOCKS_ANIMATION_DONE)
     }
 
-    socket.on(SocketEvents.GAME_UPDATE, handleGameUpdate)
-    socket.on(SocketEvents.GAME_HOO_SEND_BLOCKS, handleHooSendBlocks)
-    socket.on(SocketEvents.GAME_BLOCKS_MARKED_FOR_REMOVAL, handleBlocksMarkedForRemoval)
+    socketRef.current?.on(SocketEvents.GAME_UPDATE, handleGameUpdate)
+    socketRef.current?.on(SocketEvents.GAME_HOO_SEND_BLOCKS, handleHooSendBlocks)
+    socketRef.current?.on(SocketEvents.GAME_BLOCKS_MARKED_FOR_REMOVAL, handleBlocksMarkedForRemoval)
 
     return () => {
-      socket.off(SocketEvents.GAME_UPDATE, handleGameUpdate)
-      socket.off(SocketEvents.GAME_HOO_SEND_BLOCKS, handleHooSendBlocks)
-      socket.off(SocketEvents.GAME_BLOCKS_MARKED_FOR_REMOVAL, handleBlocksMarkedForRemoval)
+      socketRef.current?.off(SocketEvents.GAME_UPDATE, handleGameUpdate)
+      socketRef.current?.off(SocketEvents.GAME_HOO_SEND_BLOCKS, handleHooSendBlocks)
+      socketRef.current?.off(SocketEvents.GAME_BLOCKS_MARKED_FOR_REMOVAL, handleBlocksMarkedForRemoval)
     }
-  }, [socket, tableId, seat])
+  }, [tableId, seat])
 
   useEffect(() => {
     setIsReversed(seat.seatNumber % 2 === 0)
@@ -246,14 +244,14 @@ export default function PlayerBoard({
   }, [controlKeys])
 
   useEffect(() => {
-    if (!socket || !isCurrentUserSeated) {
+    if (!isCurrentUserSeated) {
       typedRef.current = ""
       clearTimeout(typingTimerRef.current!)
       return
     }
 
     const handleKeyDown = (event: KeyboardEvent): void => {
-      const key: string = event.key.toUpperCase()
+      const key: string = event.key?.toUpperCase()
 
       if (!/^[A-Z0-9 ]$/.test(key)) return
 
@@ -276,7 +274,7 @@ export default function PlayerBoard({
         typedRef.current = ""
       }, TYPING_TIMEOUT_MS)
 
-      socket.emit(SocketEvents.TABLE_TYPED_HERO_CODE, { roomId, tableId, code: typedRef.current })
+      socketRef.current?.emit(SocketEvents.TABLE_TYPED_HERO_CODE, { roomId, tableId, code: typedRef.current })
     }
 
     window.addEventListener("keydown", handleKeyDown)
@@ -285,7 +283,7 @@ export default function PlayerBoard({
       window.removeEventListener("keydown", handleKeyDown)
       typedRef.current = ""
     }
-  }, [socket, isCurrentUserSeated])
+  }, [socketRef.current, isCurrentUserSeated])
 
   useEffect(() => {
     if (isCurrentUserSeat) {
@@ -357,7 +355,7 @@ export default function PlayerBoard({
             isOpponentBoard
               ? "grid-rows-(--grid-rows-grid-container-opponent) w-grid-container-opponent-width"
               : "grid-rows-(--grid-rows-grid-container) w-grid-container-width",
-            "before:content-[attr(data-seat-number)] before:absolute before:top-1/4 before:start-1/2 before:-translate-x-1/2 before:text-[7rem] before:font-bold before:text-center",
+            "before:content-[attr(data-seat-number)] before:absolute before:start-1/2 before:-translate-x-1/2 before:text-[7rem] before:font-bold before:text-center",
             "dark:before:text-slate-700",
           )}
           // className={clsx(

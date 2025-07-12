@@ -1,10 +1,11 @@
 import { MessageDescriptor } from "@lingui/core"
+import { i18n } from "@lingui/core"
 import { msg } from "@lingui/core/macro"
 import { enUS, frCA, Locale } from "date-fns/locale"
 
 export interface Language {
   locale: string
-  msg: MessageDescriptor
+  label: MessageDescriptor
   flag: string
   territory?: string
   rtl: boolean
@@ -17,7 +18,7 @@ export const defaultLocale: SupportedLocales = "en"
 export const languages: Language[] = [
   {
     locale: "en",
-    msg: msg`English`,
+    label: msg`English`,
     territory: "US",
     flag: "🇺🇸",
     rtl: false,
@@ -25,7 +26,7 @@ export const languages: Language[] = [
   },
   {
     locale: "fr",
-    msg: msg`French`,
+    label: msg`French`,
     territory: "CA",
     flag: "🇨🇦",
     rtl: false,
@@ -37,10 +38,16 @@ if (process.env.NODE_ENV !== "production") {
   // Pseudo locale for testing
   languages.push({
     locale: "pseudo-LOCALE",
-    msg: msg`Pseudo`,
+    label: msg`Pseudo`,
     flag: "🔤",
     rtl: true,
   })
+}
+
+export const dynamicActivate = async (locale: string): Promise<void> => {
+  const { messages } = await import(`@/translations/locales/${locale}/messages`)
+  i18n.load(locale, messages)
+  i18n.activate(locale)
 }
 
 export const getDateFnsLocale = (locale: string): Locale => {

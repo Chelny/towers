@@ -1,6 +1,7 @@
 import { User, WebsiteTheme } from "db"
 
 const commonUserProperties = {
+  displayUsername: null,
   language: "en",
   role: "user",
   isOnline: true,

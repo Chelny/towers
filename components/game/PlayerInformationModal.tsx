@@ -1,6 +1,6 @@
 "use client"
 
-import { ChangeEvent, ReactNode, useEffect, useState } from "react"
+import { InputEvent, ReactNode, useEffect, useState } from "react"
 import { ReadonlyURLSearchParams, useSearchParams } from "next/navigation"
 import { Trans, useLingui } from "@lingui/react/macro"
 import { formatDistanceToNow } from "date-fns"
@@ -9,7 +9,6 @@ import Input from "@/components/ui/Input"
 import Modal from "@/components/ui/Modal"
 import { SocketEvents } from "@/constants/socket-events"
 import { useSocket } from "@/context/SocketContext"
-import { authClient } from "@/lib/auth-client"
 import { UserPlainObject } from "@/server/towers/classes/User"
 import { getDateFnsLocale } from "@/translations/languages"
 
@@ -27,13 +26,12 @@ export default function PlayerInformationModal({
   onCancel,
 }: PlayerInformationModalProps): ReactNode {
   const searchParams: ReadonlyURLSearchParams = useSearchParams()
-  const { socket } = useSocket()
-  const { data: session } = authClient.useSession()
+  const { socketRef, session } = useSocket()
   const { i18n, t } = useLingui()
   const [isCurrentUser, setIsCurrentUser] = useState<boolean>(false)
   const [message, setMessage] = useState<string | undefined>(undefined)
   const [idleTime, setIdleTime] = useState<string | undefined>(undefined)
-  const username: string | undefined = player?.user?.username
+  const username: string | null | undefined = player?.user?.username
   const rating: number | undefined = player?.stats.rating
   const gamesCompleted: number | undefined = player?.stats.gamesCompleted
   const wins: number | undefined = player?.stats.wins
@@ -41,9 +39,9 @@ export default function PlayerInformationModal({
   const streak: number | undefined = player?.stats.streak
 
   const handleSendMessage = (): void => {
-    socket?.emit(
+    socketRef.current?.emit(
       SocketEvents.INSTANT_MESSAGE_SENT,
-      { roomId: searchParams.get("room"), recipientUserId: player?.user?.id, message },
+      { roomId: searchParams?.get("room"), recipientUserId: player?.user?.id, message },
       (response: { success: boolean; message: string }) => {
         if (response.success) {
           onCancel?.()
@@ -53,11 +51,11 @@ export default function PlayerInformationModal({
   }
 
   const handleMuteUser = (): void => {
-    socket?.emit(SocketEvents.USER_MUTE, { userId: player?.user?.id })
+    socketRef.current?.emit(SocketEvents.USER_MUTE, { userId: player?.user?.id })
   }
 
   useEffect(() => {
-    setIsCurrentUser(player?.user?.id === session?.user.id)
+    setIsCurrentUser(player?.user?.id === session?.user?.id)
   }, [player, session])
 
   useEffect(() => {
@@ -94,7 +92,7 @@ export default function PlayerInformationModal({
             label={t({ message: "Send instant message" })}
             defaultValue={message}
             inlineButtonText={t({ message: "Send" })}
-            onInput={(event: ChangeEvent<HTMLInputElement>) => setMessage(event.target.value)}
+            onInput={(event: InputEvent<HTMLInputElement>) => setMessage((event.target as HTMLInputElement).value)}
             onInlineButtonClick={handleSendMessage}
           />
         )}

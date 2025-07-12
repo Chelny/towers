@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from "next/server"
-import { betterFetch } from "@better-fetch/fetch"
+import { getCookieCache } from "better-auth/cookies"
 import Negotiator from "negotiator"
-import { APP_COOKIES } from "@/constants/app"
+import { APP_COOKIES, COOKIE_PREFIX } from "@/constants/app"
 import { PROTECTED_ROUTES, PUBLIC_ROUTES, ROUTE_GAMES, ROUTE_SIGN_IN } from "@/constants/routes"
-import { Session } from "@/lib/auth-client"
-import { logger } from "@/lib/logger"
+import { Session } from "@/lib/auth"
 import { defaultLocale, Language, languages } from "@/translations/languages"
 
 export default async function middleware(request: NextRequest) {
@@ -14,13 +13,35 @@ export default async function middleware(request: NextRequest) {
   const origin: string = `${protocol}://${host}`
 
   // Fetch session
-  const { data: session, error: sessionError } = await betterFetch<Session>("/api/auth/get-session", {
-    baseURL: origin,
-    headers: { cookie: request.headers.get("cookie") || "" },
-  })
+  const session: Session | null = await getCookieCache(request, { cookiePrefix: COOKIE_PREFIX })
 
-  if (sessionError) {
-    logger.error(`Failed to fetch session: ${sessionError.message}`)
+  // Localization
+  const userLocale: string | null | undefined = session?.user?.language
+  const cookieLocale: string | undefined = request.cookies.get(APP_COOKIES.LOCALE)?.value
+  const acceptLocale: string = getAcceptLanguage(request.headers)
+  let locale: string = userLocale || cookieLocale || acceptLocale || defaultLocale
+
+  const pathnameLocale: string = pathname.split("/")[1]
+  const locales: string[] = languages.map((language: Language) => language.locale)
+  const isValidLocale: boolean = locales.includes(pathnameLocale)
+
+  if (!isValidLocale) {
+    // Redirect if there is no locale
+    request.nextUrl.pathname = `/${locale}${pathname}`
+    // e.g. incoming request is /sign-in
+    // The new URL is now /en/sign-in
+    return NextResponse.redirect(request.nextUrl)
+  }
+
+  // Access control
+  if (session) {
+    if (PUBLIC_ROUTES.includes(pathname)) {
+      return NextResponse.redirect(new URL(ROUTE_GAMES.PATH, origin))
+    }
+  } else {
+    if (PROTECTED_ROUTES.includes(pathname)) {
+      return NextResponse.redirect(new URL(ROUTE_SIGN_IN.PATH, origin))
+    }
   }
 
   // Content Security Policy (CSP)
@@ -49,12 +70,11 @@ export default async function middleware(request: NextRequest) {
     upgrade-insecure-requests;
   `
   const cspHeader: string = process.env.NODE_ENV === "production" ? prodCspHeader : devCspHeader
-
   const contentSecurityPolicyHeader: string = cspHeader.replace(/\s{2,}/g, " ").trim()
 
   const requestHeaders: Headers = new Headers(request.headers)
-  requestHeaders.set("x-nonce", nonce)
   requestHeaders.set("Content-Security-Policy", contentSecurityPolicyHeader)
+  requestHeaders.set("x-nonce", nonce)
 
   const response: NextResponse = NextResponse.next({
     request: {
@@ -64,7 +84,7 @@ export default async function middleware(request: NextRequest) {
 
   response.headers.set("Content-Security-Policy", contentSecurityPolicyHeader)
 
-  // Request headers
+  // CORS
   response.headers.set("Access-Control-Allow-Credentials", "true")
   response.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization")
   response.headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
@@ -81,43 +101,15 @@ export default async function middleware(request: NextRequest) {
     response.headers.set("Content-Type", "application/json")
   }
 
-  // Localization
-  const userLocale: string | null | undefined = session?.user?.language
-  const cookieLocale: string | undefined = request.cookies.get(APP_COOKIES.LOCALE)?.value
-  const acceptLocale: string = getAcceptLanguage(request.headers)
-  let locale: string = userLocale || cookieLocale || acceptLocale || defaultLocale
-
-  const pathnameLocale: string = pathname.split("/")[1]
-  const locales: string[] = languages.map((language: Language) => language.locale)
-  const isValidLocale: boolean = locales.includes(pathnameLocale)
-
-  if (!isValidLocale) {
-    // Redirect if there is no locale
-    request.nextUrl.pathname = `/${locale}${pathname}`
-    // e.g. incoming request is /sign-in
-    // The new URL is now /en/sign-in
-    return NextResponse.redirect(request.nextUrl)
-  }
-
+  // Sync locale cookie
   if (pathnameLocale !== cookieLocale) {
     // If the locale in the cookie doesn't match the pathname locale, update the cookie
     response.cookies.set(APP_COOKIES.LOCALE, pathnameLocale, {
       httpOnly: true,
       path: "/",
-      maxAge: 60 * 60 * 24 * 30, // Cache for 30 days,
+      maxAge: 60 * 60 * 24 * 30, // Cache for 30 days
       secure: process.env.NODE_ENV === "production",
     })
-  }
-
-  // Page access
-  if (session) {
-    if (PUBLIC_ROUTES.includes(pathname)) {
-      return NextResponse.redirect(new URL(ROUTE_GAMES.PATH, origin))
-    }
-  } else {
-    if (PROTECTED_ROUTES.includes(pathname)) {
-      return NextResponse.redirect(new URL(ROUTE_SIGN_IN.PATH, origin))
-    }
   }
 
   return response

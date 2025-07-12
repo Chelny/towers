@@ -20,7 +20,7 @@ type CreateTableModalProps = {
 
 export default function CreateTableModal({ roomId, onCreateTableSuccess, onCancel }: CreateTableModalProps): ReactNode {
   const { t } = useLingui()
-  const { socket } = useSocket()
+  const { socketRef } = useSocket()
   const [errorMessages, setErrorMessages] = useState<CreateTableFormValidationErrors>({})
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
 
@@ -61,7 +61,7 @@ export default function CreateTableModal({ roomId, onCreateTableSuccess, onCance
   const handleCreateTable = async (body: CreateTablePayload): Promise<void> => {
     setIsSubmitting(true)
 
-    socket?.emit(
+    socketRef.current?.emit(
       SocketEvents.TABLE_CREATE,
       { roomId, tableType: body.tableType, isRated: body.isRated },
       (response: { success: boolean; message: string; data: { tableId: string } }) => {

@@ -4,11 +4,9 @@ import { Mock } from "vitest"
 import Chat from "@/components/game/Chat"
 import { TableChatMessageType } from "@/enums/table-chat-message-type"
 import { TableType } from "@/enums/table-type"
-import { authClient } from "@/lib/auth-client"
 import { ChatMessagePlainObject } from "@/server/towers/classes/Chat"
 import { TableChatMessagePlainObject } from "@/server/towers/classes/TableChat"
 import { UserPlainObject } from "@/server/towers/classes/User"
-import { mockSession } from "@/test/data/session"
 import { mockUser1 } from "@/test/data/user"
 import { customScreen as screen } from "@/vitest.setup"
 
@@ -36,12 +34,6 @@ vi.mock("@lingui/react/macro", () => ({
     },
     t: (message: { message: string }) => message.message,
   }),
-}))
-
-vi.mock("@/lib/auth-client", () => ({
-  authClient: {
-    useSession: vi.fn(),
-  },
 }))
 
 const mockHandleSendMessage: Mock = vi.fn()
@@ -118,7 +110,6 @@ const mockChat: { messages: TableChatMessagePlainObject[] } = {
 describe("Chat", () => {
   beforeEach(() => {
     HTMLElement.prototype.scrollIntoView = vi.fn()
-    vi.mocked(authClient.useSession).mockReturnValue(mockSession)
   })
 
   it("should render room chat messages correctly", () => {

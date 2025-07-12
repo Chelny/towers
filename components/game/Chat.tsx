@@ -1,29 +1,29 @@
 "use client"
 
-import { KeyboardEvent, ReactNode, Ref, RefObject, useEffect, useMemo, useRef } from "react"
+import { KeyboardEvent, ReactNode, Ref, useEffect, useMemo, useRef } from "react"
 import { useLingui } from "@lingui/react/macro"
 import clsx from "clsx/lite"
-import Input from "@/components/ui/Input"
+import Input, { InputImperativeHandle } from "@/components/ui/Input"
 import { APP_CONFIG } from "@/constants/app"
 import { FKey, fKeyMessages } from "@/constants/f-key-messages"
 import { CHAT_MESSSAGE_MAX_LENGTH } from "@/constants/game"
+import { useSocket } from "@/context/SocketContext"
 import { TableChatMessageType } from "@/enums/table-chat-message-type"
 import { TableType } from "@/enums/table-type"
-import { authClient } from "@/lib/auth-client"
 import { ChatMessagePlainObject, ChatPlainObject } from "@/server/towers/classes/Chat"
 import { TableChatMessagePlainObject, TableChatMessageVariables } from "@/server/towers/classes/TableChat"
 
 type ChatProps = {
   chat?: ChatPlainObject
-  messageInputRef?: Ref<HTMLInputElement>
+  messageInputRef?: Ref<InputImperativeHandle>
   isMessageInputDisabled: boolean
   onSendMessage: (event: KeyboardEvent<HTMLInputElement>) => void
 }
 
 export default function Chat({ chat, messageInputRef, isMessageInputDisabled, onSendMessage }: ChatProps): ReactNode {
-  const { data: session } = authClient.useSession()
+  const { session } = useSocket()
   const { i18n, t } = useLingui()
-  const chatEndRef: RefObject<HTMLDivElement | null> = useRef<HTMLDivElement | null>(null)
+  const chatEndRef = useRef<HTMLDivElement>(null)
 
   const scrollToBottom = (): void => {
     chatEndRef.current?.scrollIntoView({ behavior: "instant", block: "end" })
@@ -41,7 +41,7 @@ export default function Chat({ chat, messageInputRef, isMessageInputDisabled, on
     const heroCode: string | undefined = messageVariables?.heroCode
     const tableHostUsername: string | undefined = messageVariables?.tableHostUsername
     const tableType: TableType | undefined = messageVariables?.tableType
-    const username: string | undefined = messageVariables?.username
+    const username: string | null | undefined = messageVariables?.username
     const appName: string = APP_CONFIG.NAME
     let message: string = ""
 
@@ -156,7 +156,6 @@ export default function Chat({ chat, messageInputRef, isMessageInputDisabled, on
         placeholder={t({ message: "Write something..." })}
         maxLength={CHAT_MESSSAGE_MAX_LENGTH}
         disabled={isMessageInputDisabled}
-        shouldClearValueAfterEnter
         onKeyDown={onSendMessage}
       />
       <div className="overflow-y-auto flex-1 my-1">

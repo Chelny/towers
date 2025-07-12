@@ -1,5 +1,7 @@
 import "@testing-library/jest-dom"
 import { screen } from "@testing-library/react"
+import { mockSession } from "@/test/data/session"
+import { mockSocket } from "@/test/data/socket"
 import { getAllByNormalizedText, getByNormalizedText } from "@/test/utils/getByNormalizedText"
 
 vi.mock("pino", () => ({
@@ -10,6 +12,14 @@ vi.mock("pino", () => ({
     error: vi.fn(),
   }),
 }))
+
+vi.mock("@/context/SocketContext", async () => {
+  const actual = await vi.importActual("@/context/SocketContext")
+  return {
+    ...actual,
+    useSocket: () => ({ socketRef: mockSocket, isConnected: true, session: mockSession }),
+  }
+})
 
 Object.defineProperty(window, "matchMedia", {
   writable: true,
@@ -48,17 +58,6 @@ export const mockUseSearchParams = {
   set: vi.fn(),
   sort: vi.fn(),
   [Symbol.iterator]: vi.fn(),
-}
-
-export const mockSocket = {
-  emit: vi.fn(),
-  on: vi.fn(),
-  off: vi.fn(),
-  id: "mock-socket-id",
-  connected: true,
-  disconnected: false,
-  connect: vi.fn(),
-  disconnect: vi.fn(),
 }
 
 export const mockFetch = (global.fetch = vi.fn())

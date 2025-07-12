@@ -24,7 +24,7 @@ export default function TowersPageContent(): ReactNode {
     throw new Error("Room ID is required")
   }
 
-  const { socket } = useSocket()
+  const { socketRef } = useSocket()
   const { removeJoinedTable, addNotification, setActiveRoomId, activeTableId, setActiveTableId } = useGame()
 
   useEffect(() => {
@@ -33,8 +33,6 @@ export default function TowersPageContent(): ReactNode {
   }, [roomId, tableId, setActiveRoomId, setActiveTableId])
 
   useEffect(() => {
-    if (!socket) return
-
     const handleInstantMessage = (instantMessage: InstantMessagePlainObject) => {
       addNotification({ ...instantMessage, type: "instantMessage" })
     }
@@ -77,18 +75,18 @@ export default function TowersPageContent(): ReactNode {
       }
     }
 
-    socket.on(SocketEvents.INSTANT_MESSAGE_RECEIVED, handleInstantMessage)
-    socket.on(SocketEvents.TABLE_INVITATION_NOTIFICATION, handleInvitation)
-    socket.on(SocketEvents.TABLE_INVITATION_DECLINED_NOTIFICATION, handleInvitationDeclined)
-    socket.on(SocketEvents.TABLE_BOOTED_USER_NOTIFICATION, handleUserBooted)
+    socketRef.current?.on(SocketEvents.INSTANT_MESSAGE_RECEIVED, handleInstantMessage)
+    socketRef.current?.on(SocketEvents.TABLE_INVITATION_NOTIFICATION, handleInvitation)
+    socketRef.current?.on(SocketEvents.TABLE_INVITATION_DECLINED_NOTIFICATION, handleInvitationDeclined)
+    socketRef.current?.on(SocketEvents.TABLE_BOOTED_USER_NOTIFICATION, handleUserBooted)
 
     return () => {
-      socket.off(SocketEvents.INSTANT_MESSAGE_RECEIVED, handleInstantMessage)
-      socket.off(SocketEvents.TABLE_INVITATION_NOTIFICATION, handleInvitation)
-      socket.off(SocketEvents.TABLE_INVITATION_DECLINED_NOTIFICATION, handleInvitationDeclined)
-      socket.off(SocketEvents.TABLE_BOOTED_USER_NOTIFICATION, handleUserBooted)
+      socketRef.current?.off(SocketEvents.INSTANT_MESSAGE_RECEIVED, handleInstantMessage)
+      socketRef.current?.off(SocketEvents.TABLE_INVITATION_NOTIFICATION, handleInvitation)
+      socketRef.current?.off(SocketEvents.TABLE_INVITATION_DECLINED_NOTIFICATION, handleInvitationDeclined)
+      socketRef.current?.off(SocketEvents.TABLE_BOOTED_USER_NOTIFICATION, handleUserBooted)
     }
-  }, [socket, activeTableId])
+  }, [activeTableId])
 
   return <>{tableId ? <Table key={tableId} /> : <Room key={roomId} />}</>
 }

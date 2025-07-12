@@ -1,15 +1,6 @@
 "use client"
 
-import {
-  KeyboardEvent,
-  PropsWithChildren,
-  ReactElement,
-  ReactNode,
-  RefObject,
-  useEffect,
-  useRef,
-  useState,
-} from "react"
+import { KeyboardEvent, PropsWithChildren, ReactElement, ReactNode, useEffect, useRef, useState } from "react"
 import React from "react"
 import { Trans } from "@lingui/react/macro"
 import clsx from "clsx/lite"
@@ -47,7 +38,7 @@ export default function Select({
 }: SelectProps): ReactNode {
   const [selectedValue, setSelectedValue] = useState<string>(defaultValue)
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false)
-  const dropdownRef: RefObject<HTMLDivElement | null> = useRef<HTMLDivElement | null>(null)
+  const dropdownRef = useRef<HTMLDivElement>(null)
   const options = React.Children.toArray(children) as ReactElement<SelectOptionProps>[]
 
   useEffect(() => {

@@ -1,0 +1,1982 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2024-12-23 16:32-0500\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: @lingui/cli\n"
+"Language: fr\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Plural-Forms: \n"
+
+#: components/ui/Calendar.tsx:76
+msgid "Saturday"
+msgstr "Samedi"
+
+#: app/api/account/password/route.ts:34
+msgid "The password has been set!"
+msgstr "Le mot de passe a été défini!"
+
+#: app/[locale]/(protected)/account/profile/profile.form.tsx:165
+#: app/[locale]/(auth)/sign-up/sign-up.form.tsx:176
+msgid "Username must be between 5 and 16 characters long and can contain digits, periods, and underscores."
+msgstr "Le nom d'utilisateur doit contenir entre 5 et 16 caractères et peut inclure des chiffres, des points et des traits de soulignement."
+
+#: app/[locale]/(auth)/reset-password/reset-password.form.tsx:93
+msgid "The password has been reset! You will be redirected to the sign in page in 3 seconds..."
+msgstr "Le mot de passe a été réinitialisé! Vous serez redirigé vers la page de connexion dans 3 secondes..."
+
+#: app/[locale]/(protected)/account/profile/change-email.form.tsx:44
+#: app/[locale]/(protected)/account/delete/delete.form.tsx:40
+#: app/[locale]/(auth)/sign-up/sign-up.form.tsx:59
+#: app/[locale]/(auth)/sign-in-with-magic-link/sign-in-with-magic-link.form.tsx:40
+#: app/[locale]/(auth)/sign-in/sign-in.form.tsx:55
+#: app/[locale]/(auth)/forgot-password/forgot-password.form.tsx:39
+msgid "The email is invalid."
+msgstr "Le courriel est invalide."
+
+#: app/[locale]/(auth)/new-user/page.tsx:37
+msgid "Skip this step"
+msgstr "Passer cette étape"
+
+#: app/[locale]/(protected)/account/profile/change-password.form.tsx:168
+msgid "The password has been updated!"
+msgstr "Le mot de passe a été mis à jour!"
+
+#: app/[locale]/(auth)/error/page.tsx:38
+msgid "We were unable to create your account at this time."
+msgstr "Nous n'avons pas pu créer votre compte pour le moment."
+
+#: components/game/TableInvitationModal.tsx:68
+msgid "Game option: {ratedOption}"
+msgstr "Option de jeu : {ratedOption}"
+
+#: components/game/Room.tsx:279
+msgid "Team 7-8"
+msgstr "Équipe 7-8"
+
+#: components/game/PlayerInformationModal.tsx:86
+msgid "Streak: {streak}"
+msgstr "Série : {streak}"
+
+#: components/game/PlayerInformationModal.tsx:92
+msgid "Send instant message"
+msgstr "Envoyer un message instantané"
+
+#: components/game/Table.tsx:256
+msgid "{powerLevel, select, minor {You can minorly dither} mega {You can mega dither} other {You can dither}}"
+msgstr "{powerLevel, select, minor {Vous pouvez brouiller légèrement} mega {Vous pouvez brouiller fortement} other {Vous pouvez brouiller}}"
+
+#: app/[locale]/(protected)/account/profile/linked-social-accounts.form.tsx:116
+msgid "Unlink {label}"
+msgstr "Dissocier {label}"
+
+#: components/game/Table.tsx:324
+msgid "You can send a color plague"
+msgstr "Vous pouvez envoyer une peste de couleur"
+
+#: app/[locale]/(protected)/account/profile/linked-social-accounts.form.tsx:99
+msgid "Linked Social Accounts"
+msgstr "Comptes liés"
+
+#: components/towers/PlayerBoard.tsx:397
+#: components/game/RoomsList.tsx:85
+#: components/game/RoomTable.tsx:111
+msgid "Join"
+msgstr "Joindre"
+
+#: components/game/Table.tsx:791
+#: components/game/Room.tsx:242
+msgid "Options"
+msgstr "Options"
+
+#: components/game/TableInvitationModal.tsx:83
+msgid "Decline All Invitations"
+msgstr "Refuser toutes les invitations"
+
+#: components/game/TableGameDemoPanel.tsx:584
+msgid "Attack Power Blocks"
+msgstr "Blocs de pouvoir d’attaque"
+
+#: components/Banner.tsx:17
+msgid "advertisement"
+msgstr "publicité"
+
+#: components/game/TableGameDemoPanel.tsx:490
+msgid "Your browser does not support the video tag."
+msgstr "Votre navigateur ne prend pas en charge la balise vidéo."
+
+#: app/[locale]/(protected)/account/settings/settings.form.tsx:151
+msgid "Light"
+msgstr "Clair"
+
+#: components/game/TableHeader.tsx:22
+msgid "Table: {tableNumber} - Host: {tableHostUsername}"
+msgstr "Table : {tableNumber} - Hôte : {tableHostUsername}"
+
+#: lib/api.ts:60
+msgid "You are not authorized to perform this action. Please sign in and try again."
+msgstr "Vous n'êtes pas autorisé à effectuer cette action. Veuillez vous connecter et réessayer."
+
+#: components/game/Table.tsx:919
+msgid "Drop:"
+msgstr "Chuter :"
+
+#: app/[locale]/(protected)/account/profile/change-password.form.tsx:135
+msgid "The new password and new password confirmation do not match."
+msgstr "Le nouveau mot de passe et la confirmation du mot de passe ne correspondent pas."
+
+#: components/ui/Breadcrumb.tsx:75
+msgid "More"
+msgstr "Plus"
+
+#: components/game/TableGameDemoPanel.tsx:743
+msgid "Next game starting..."
+msgstr "Prochaine partie en cours de démarrage..."
+
+#: app/[locale]/(protected)/account/profile/profile.form.tsx:160
+#: app/[locale]/(auth)/sign-up/sign-up.form.tsx:172
+msgid "Enter your username"
+msgstr "Entrez votre nom d'utilisateur"
+
+#: app/[locale]/(protected)/account/profile/change-password.form.tsx:251
+msgid "Set Password"
+msgstr "Définir le mot de passe"
+
+#: components/game/RoomsList.tsx:82
+msgid "Joined"
+msgstr "Rejoint"
+
+#: app/[locale]/(protected)/account/profile/change-password.form.tsx:126
+msgid "The new password confirmation is invalid."
+msgstr "La confirmation du nouveau mot de passe est invalide."
+
+#: app/[locale]/(protected)/account/profile/passkeys.form.tsx:181
+msgid "Add Passkey"
+msgstr "Ajouter une clé d'accès"
+
+#: app/[locale]/(protected)/account/profile/linked-social-accounts.form.tsx:76
+msgid "The account has been linked!"
+msgstr "Le compte a été lié!"
+
+#: components/ui/Breadcrumb.tsx:14
+msgid "breadcrumb"
+msgstr "fil d'Ariane"
+
+#: components/game/Table.tsx:423
+msgid "{sourceUsername} color blasted {targetUsername}"
+msgstr "{sourceUsername} a déclenché une explosion de couleur sur {targetUsername}"
+
+#: app/[locale]/(protected)/account/settings/settings.form.tsx:159
+msgid "Update Settings"
+msgstr "Mettre à jour les paramètres"
+
+#: components/ui/Calendar.tsx:75
+msgid "Friday"
+msgstr "Vendredi"
+
+#: components/game/Table.tsx:753
+#: components/game/CreateTableModal.tsx:88
+msgid "Table Type"
+msgstr "Type de table"
+
+#: components/game/Room.tsx:195
+msgid "Ratings"
+msgstr "Évaluations"
+
+#: app/[locale]/(protected)/account/profile/passkeys.form.tsx:223
+msgid "Edit \"{passkeyName}\" passkey"
+msgstr "Modifier la clé d'accès « {passkeyName} »"
+
+#: components/ui/Calendar.tsx:60
+msgid "May"
+msgstr "Mai"
+
+#: components/game/TableGameDemoPanel.tsx:494
+msgid "Resume Demo"
+msgstr "Reprendre la démo"
+
+#: components/game/TableGameDemoPanel.tsx:602
+msgid "Attacks damage opponents' boards."
+msgstr "Les attaques endommagent les plateaux des adversaires."
+
+#: lib/api.ts:12
+msgid "Prisma error: {errorMessage}"
+msgstr "Erreur Prisma : {errorMessage}"
+
+#: lib/api.ts:20
+msgid "A severe internal error occurred with Prisma."
+msgstr "Une erreur interne grave est survenue avec Prisma."
+
+#: components/game/Room.tsx:266
+#: components/game/PlayersList.tsx:219
+msgid "Table"
+msgstr "Table"
+
+#: components/ui/Calendar.tsx:57
+msgid "February"
+msgstr "Février"
+
+#: components/Sidebar.tsx:74
+msgid "Booted from table"
+msgstr "Expulsé(e) de la table"
+
+#: lib/api.ts:17
+msgid "Validation error: {errorMessage}"
+msgstr "Erreur de validation : {errorMessage}"
+
+#: components/towers/PlayerBoard.tsx:431
+msgid "Waiting for the next game"
+msgstr "En attente de la prochaine partie"
+
+#: app/[locale]/(protected)/account/settings/settings.form.tsx:54
+msgid "The theme is invalid."
+msgstr "Le thème est invalide."
+
+#: app/[locale]/(protected)/account/profile/change-password.form.tsx:123
+msgid "The new password is invalid."
+msgstr "Le nouveau mot de passe est invalide."
+
+#: components/game/Table.tsx:769
+msgid "Protected"
+msgstr "Protégé"
+
+#: app/[locale]/(protected)/account/profile/profile.form.tsx:141
+#: app/[locale]/(protected)/account/profile/passkeys.form.tsx:173
+#: app/[locale]/(auth)/sign-up/sign-up.form.tsx:144
+#: components/game/PlayersList.tsx:184
+msgid "Name"
+msgstr "Nom"
+
+#: app/[locale]/(protected)/account/profile/linked-social-accounts.form.tsx:119
+msgid "Unlink"
+msgstr "Dissocier"
+
+#: lib/keyboard/keyboard-key-labels.ts:7
+msgid "Left Arrow"
+msgstr "Flèche gauche"
+
+#: constants/f-key-messages.ts:10
+msgid "That must have hurt."
+msgstr "Ça a dû faire mal."
+
+#: components/ui/Input.tsx:158
+msgid "Show password"
+msgstr "Afficher le mot de passe"
+
+#: app/[locale]/(auth)/error/page.tsx:12
+msgid "{message} Please try again or <0>contact our support team</0> if the issue persists."
+msgstr "{message} Veuillez réessayer ou <0>contactez notre équipe de soutien</0> si le problème persiste."
+
+#: components/Sidebar.tsx:229
+msgid "User"
+msgstr "Utilisateur"
+
+#: components/game/Table.tsx:286
+msgid "{powerLevel, select, minor {You can minorly remove powers} mega {You can mega remove powers} other {You can remove powers}}"
+msgstr "{powerLevel, select, minor {Vous pouvez supprimer légèrement les pouvoirs} mega {Vous pouvez supprimer fortement les pouvoirs} other {Vous pouvez supprimer les pouvoirs}}"
+
+#: components/ui/Modal.tsx:105
+msgid "Confirm"
+msgstr "Confirmer"
+
+#: components/game/Table.tsx:265
+msgid "{powerLevel, select, minor {You can add a stone} normal {You can add 2 stones} mega {You can add 3 stones} other {You can add stones}}"
+msgstr "{powerLevel, select, minor {Vous pouvez ajouter une pierre} normal {Vous pouvez ajouter 2 pierres} mega {Vous pouvez ajouter 3 pierres} other {Vous pouvez ajouter des pierres}}"
+
+#: components/game/Table.tsx:766
+msgid "Public"
+msgstr "Public"
+
+#: components/game/Table.tsx:692
+msgid "Joining table"
+msgstr "Connexion à la table"
+
+#: app/[locale]/(protected)/account/profile/profile.form.tsx:159
+#: app/[locale]/(auth)/sign-up/sign-up.form.tsx:171
+msgid "Username"
+msgstr "Nom d'utilisateur"
+
+#: app/[locale]/(protected)/account/profile/change-password.form.tsx:214
+msgid "New Password"
+msgstr "Nouveau mot de passe"
+
+#: lib/keyboard/keyboard-key-labels.ts:61
+msgid "Numpad 1"
+msgstr "Pavé numérique 1"
+
+#: app/[locale]/(protected)/account/profile/passkeys.form.tsx:238
+msgid "Delete \"{passkeyName}\" passkey"
+msgstr "Supprimer la clé d'accès « {passkeyName} »"
+
+#: app/[locale]/(protected)/account/profile/change-password.form.tsx:214
+#: app/[locale]/(auth)/sign-up/sign-up.form.tsx:185
+#: app/[locale]/(auth)/sign-in/sign-in.form.tsx:179
+#: app/[locale]/(auth)/reset-password/reset-password.form.tsx:127
+msgid "Password"
+msgstr "Mot de passe"
+
+#: components/game/InstantMessageModal.tsx:41
+msgid "Instant message from {username} ({rating})"
+msgstr "Message instantané de {username} ({rating})"
+
+#: lib/api.ts:50
+msgid "Please provide a table ID to proceed."
+msgstr "Veuillez fournir un ID de table pour continuer."
+
+#: app/[locale]/(protected)/account/profile/change-email.form.tsx:149
+msgid "<0>Email not verified.</0> Please verify your email to continue. <1>Resend verification</1>"
+msgstr "<0>Courriel non vérifié.</0> Veuillez vérifier votre courriel pour continuer. <1>Renvoyer la vérification</1>"
+
+#: components/game/Table.tsx:358
+msgid "{powerLevel, select, minor {{sourceUsername} minorly dithered {targetUsername}} mega {{sourceUsername} mega dithered {targetUsername}} other {{sourceUsername} dithered {targetUsername}}}"
+msgstr "{powerLevel, select, minor {{sourceUsername} a légèrement brouillé {targetUsername}} mega {{sourceUsername} a puissamment brouillé {targetUsername}} other {{sourceUsername} a brouillé {targetUsername}}}"
+
+#: lib/keyboard/keyboard-key-labels.ts:72
+msgid "Numpad *"
+msgstr "Pavé numérique *"
+
+#: app/[locale]/(protected)/account/profile/change-password.form.tsx:191
+msgid "Change/Set Password"
+msgstr "Modifier/Définir le mot de passe"
+
+#: components/game/Table.tsx:320
+msgid "You can color blast"
+msgstr "Vous pouvez déclencher une explosion de couleur"
+
+#: components/ui/Select.tsx:98
+#: components/ui/RadioButtonGroup.tsx:59
+#: components/ui/Input.tsx:114
+#: components/ui/Calendar.tsx:283
+msgid "optional"
+msgstr "facultatif"
+
+#. js-lingui-explicit-id
+#: lib/email.ts:125
+msgid "Account deletion request received"
+msgstr "Demande de suppression de compte reçue"
+
+#: components/Sidebar.tsx:233
+#: components/Sidebar.tsx:239
+#: constants/routes.ts:14
+msgid "Account"
+msgstr "Compte"
+
+#: components/game/RoomTable.tsx:83
+msgid "Watch"
+msgstr "Regarder"
+
+#. js-lingui-explicit-id
+#: components/game/Chat.tsx:91
+msgid "Anyone may play or watch your table now."
+msgstr "Tout le monde peut jouer ou regarder votre table maintenant."
+
+#. js-lingui-explicit-id
+#: app/[locale]/layout.tsx:45
+msgid "Arcade game based on Yahoo! Towers"
+msgstr "Jeu d'arcade basé sur Yahoo! Towers"
+
+#: components/ui/Calendar.tsx:367
+msgid "Next Month"
+msgstr "Mois suivant"
+
+#: constants/f-key-messages.ts:5
+msgid "Thanks, partner."
+msgstr "Merci, partenaire."
+
+#: components/game/Table.tsx:283
+msgid "You can send a Medusa piece"
+msgstr "Vous pouvez envoyer une pièce de Méduse"
+
+#: components/game/TableGameDemoPanel.tsx:736
+msgid "OK, I'm ready to play"
+msgstr "OK, je suis prêt à jouer"
+
+#: components/game/TableGameDemoPanel.tsx:516
+msgid "Move Up"
+msgstr "Déplacer vers le haut"
+
+#: app/[locale]/(auth)/reset-password/reset-password.form.tsx:46
+msgid "The token is missing or invalid."
+msgstr "Le jeton est manquant ou invalide."
+
+#: app/[locale]/(protected)/account/profile/profile.form.tsx:63
+msgid "The image is invalid."
+msgstr "L'image est invalide."
+
+#: app/[locale]/(protected)/account/profile/change-email.form.tsx:138
+#: app/[locale]/(protected)/account/delete/delete.form.tsx:115
+#: app/[locale]/(auth)/sign-up/sign-up.form.tsx:162
+msgid "Enter your email"
+msgstr "Entrez votre adresse courriel"
+
+#: app/[locale]/(protected)/account/profile/change-password.form.tsx:120
+msgid "The current password is invalid."
+msgstr "Le mot de passe actuel est invalide."
+
+#: components/game/Room.tsx:270
+msgid "Team 1-2"
+msgstr "Équipe 1-2"
+
+#: lib/keyboard/keyboard-key-labels.ts:70
+msgid "Numpad ="
+msgstr "Pavé numérique ="
+
+#: components/game/Room.tsx:273
+msgid "Team 3-4"
+msgstr "Équipe 3-4"
+
+#. js-lingui-explicit-id
+#: components/game/Chat.tsx:50
+msgid "Cipher key: {encryptedChar} => {decryptedChar}"
+msgstr "Clé de chiffrement : {encryptedChar} => {decryptedChar}"
+
+#. js-lingui-explicit-id
+#: components/SidebarMenuSubItem.tsx:68
+msgid "Collapse {label}"
+msgstr "Réduire {label}"
+
+#: app/[locale]/(protected)/account/settings/settings.form.tsx:154
+msgid "System"
+msgstr "Système"
+
+#: app/[locale]/(protected)/account/profile/change-password.form.tsx:64
+#: app/[locale]/(auth)/sign-up/sign-up.form.tsx:68
+#: app/[locale]/(auth)/reset-password/reset-password.form.tsx:52
+msgid "The password confirmation is invalid."
+msgstr "La confirmation du mot de passe est invalide."
+
+#: components/ui/Calendar.tsx:70
+msgid "Sunday"
+msgstr "Dimanche"
+
+#: components/ui/Calendar.tsx:63
+msgid "August"
+msgstr "Août"
+
+#: app/[locale]/(protected)/account/profile/change-password.form.tsx:203
+msgid "Current Password"
+msgstr "Mot de passe actuel"
+
+#. js-lingui-explicit-id
+#: lib/email.ts:128
+msgid "Delete Account"
+msgstr "Supprimer le compte"
+
+#: components/game/TableInvitationModal.tsx:54
+msgid "Invited"
+msgstr "Invité(e)"
+
+#: components/game/Table.tsx:435
+msgid "{sourceUsername} sent a color plague to {targetUsername}"
+msgstr "{sourceUsername} a envoyé une peste colorée à {targetUsername}"
+
+#: app/[locale]/(protected)/account/profile/profile.form.tsx:123
+msgid "Profile Information"
+msgstr "Informations du profil"
+
+#: lib/api.ts:40
+msgid "Please provide a room ID to proceed."
+msgstr "Veuillez fournir un ID de salle pour continuer."
+
+#: lib/keyboard/keyboard-key-labels.ts:71
+msgid "Numpad /"
+msgstr "Pavé numérique /"
+
+#. js-lingui-explicit-id
+#: lib/email.ts:99
+msgid "Email change request"
+msgstr "Demande de changement d'email"
+
+#. js-lingui-explicit-id
+#: components/SidebarMenuSubItem.tsx:69
+msgid "Expand {label}"
+msgstr "Développer {label}"
+
+#: app/[locale]/(protected)/account/settings/settings.form.tsx:143
+msgid "Theme"
+msgstr "Thème"
+
+#: app/[locale]/(auth)/sign-in/sign-in.form.tsx:259
+msgid "Passkey"
+msgstr "Clé d'accès"
+
+#: app/[locale]/(protected)/account/delete/delete.form.tsx:100
+msgid "Please note that deleting your account is a permanent action and cannot be undone. All your data, including your profile, settings, and any associated information, will be deleted immediately once you confirm your request through the link sent to your email. If you did not request account deletion, please contact our support team right away for assistance."
+msgstr "Veuillez noter que la suppression de votre compte est une action permanente et ne peut pas être annulée. Toutes vos données, y compris votre profil, vos paramètres et toute information associée, seront immédiatement supprimées une fois votre demande confirmée via le lien envoyé à votre courriel. Si vous n'avez pas demandé la suppression de votre compte, veuillez contacter notre équipe de soutien immédiatement pour obtenir de l'aide."
+
+#: components/Sidebar.tsx:244
+#: components/Sidebar.tsx:250
+msgid "Rooms"
+msgstr "Salles"
+
+#: app/[locale]/(auth)/sign-up/sign-up.form.tsx:132
+msgid "Already have an account? <0>Sign In</0>"
+msgstr "Vous avez déjà un compte ? <0>Connectez-vous</0>"
+
+#: app/[locale]/(protected)/account/profile/profile.form.tsx:172
+msgid "Complete Registration"
+msgstr "Terminer l'inscription"
+
+#: components/ui/Calendar.tsx:72
+msgid "Tuesday"
+msgstr "Mardi"
+
+#: app/[locale]/(protected)/account/profile/profile.form.tsx:150
+#: app/[locale]/(auth)/sign-up/sign-up.form.tsx:152
+msgid "Birthdate"
+msgstr "Date de naissance"
+
+#: components/game/PlayerInformationModal.tsx:85
+msgid "Loses: {loses}"
+msgstr "Défaites: {loses}"
+
+#. js-lingui-explicit-id
+#: lib/email.ts:23
+#: lib/email.ts:72
+#: lib/email.ts:101
+#: lib/email.ts:127
+msgid "Hi {name},"
+msgstr "Bonjour {name},"
+
+#. js-lingui-explicit-id
+#: lib/email.ts:131
+msgid ""
+"Hi {name},\n"
+"\n"
+"This is to confirm that we have received your request to delete your account associated with the email {email}. Confirm your account deletion by copying and pasting the following link in a browser: {url}\n"
+"\n"
+"Once your account is deleted, all your data will be permanently removed from our system, and this action cannot be undone. Ensure to remove our application from your third-party account settings to fully disconnect your account.\n"
+"\n"
+"If you have any questions or need assistance, do not hesitate to reach out.\n"
+"\n"
+""
+msgstr ""
+"Bonjour {name},\n"
+"\n"
+"Ceci est pour confirmer que nous avons reçu votre demande de suppression de votre compte associé à l'email {email}. Confirmez la suppression de votre compte en copiant et en collant le lien suivant dans un navigateur : {url}\n"
+"\n"
+"Une fois votre compte supprimé, toutes vos données seront définitivement supprimées de notre système, et cette action ne peut pas être annulée. Assurez-vous de supprimer notre application de vos paramètres de compte tiers pour déconnecter complètement votre compte.\n"
+"\n"
+"Si vous avez des questions ou avez besoin d'assistance, n'hésitez pas à nous contacter.\n"
+""
+
+#. js-lingui-explicit-id
+#: lib/email.ts:29
+msgid ""
+"Hi {name},\n"
+"\n"
+"We received a request to verify your email address. To proceed, copy and paste the following link in a browser: {url}\n"
+"\n"
+"The verification token will expire 1 hour after receiving this message.\n"
+"\n"
+"If you did not make this request or if you believe your account has been compromised, contact our support team immediately.\n"
+"\n"
+""
+msgstr ""
+"Bonjour {name},\n"
+"\n"
+"Nous avons reçu une demande de vérification de votre adresse e-mail. Pour continuer, copiez et collez le lien suivant dans un navigateur : {url}\n"
+"\n"
+"Le jeton de vérification expirera 1 heure après la réception de ce message.\n"
+"\n"
+"Si vous n'êtes pas à l'origine de cette demande ou si vous pensez que votre compte a été compromis, contactez immédiatement notre équipe de support.\n"
+"\n"
+""
+
+#. js-lingui-explicit-id
+#: lib/email.ts:76
+msgid ""
+"Hi {name},\n"
+"\n"
+"We’ve received a request to reset your password. Reset your password by copying and pasting the following link in a browser: {url}\n"
+"\n"
+"The link will expire 1 hour after receiving this message.\n"
+"\n"
+"If you did not request a new password or if you believe your account has been compromised, contact our support team immediately.\n"
+"\n"
+""
+msgstr ""
+"Bonjour {name},\n"
+"\n"
+"Nous avons reçu une demande de réinitialisation de votre mot de passe. Réinitialisez votre mot de passe en copiant et collant le lien suivant dans un navigateur : {url}\n"
+"\n"
+"Le lien expirera 1 heure après la réception de ce message.\n"
+"\n"
+"Si vous n’avez pas demandé un nouveau mot de passe ou si vous pensez que votre compte a été compromis, contactez immédiatement notre équipe d’assistance.\n"
+"\n"
+""
+
+#. js-lingui-explicit-id
+#: lib/email.ts:105
+msgid ""
+"Hi {name},\n"
+"\n"
+"We’ve received an email change request for your account. You’ve entered {newEmail} as the email address for your account. Verify this email address by copying and pasting the following link in a browser: {url}\n"
+"\n"
+"The verification token will expire 15 minutes after receiving this message.\n"
+"\n"
+"If you did not make this change, your account might have been compromised, contact our support team immediately.\n"
+"\n"
+""
+msgstr ""
+"Bonjour {name},\n"
+"\n"
+"Nous avons reçu une demande de changement d'email pour votre compte. Vous avez saisi {newEmail} comme adresse e-mail pour votre compte. Vérifiez cette adresse e-mail en copiant et en collant le lien suivant dans un navigateur : {url}\n"
+"\n"
+"Le jeton de vérification expirera 15 minutes après la réception de ce message.\n"
+"\n"
+"Si vous n'êtes pas à l'origine de ce changement, votre compte pourrait avoir été compromis. Contactez immédiatement notre équipe de support.\n"
+"\n"
+""
+
+#. js-lingui-explicit-id
+#: lib/email.ts:50
+msgid ""
+"Hi,\n"
+"\n"
+"Sign in to {appName}\n"
+"{url}\n"
+"\n"
+"This magic link will expire in 10 minutes.\n"
+"\n"
+"If you did not request this email you can safely ignore it.\n"
+"\n"
+""
+msgstr ""
+"Bonjour,\n"
+"\n"
+"Connectez-vous à {appName}\n"
+"{url}\n"
+"\n"
+"Ce lien magique expirera dans 10 minutes.\n"
+"\n"
+"Si vous n'avez pas demandé cet e-mail, vous pouvez l'ignorer en toute sécurité.\n"
+"\n"
+""
+
+#: components/game/TableInvitationModal.tsx:63
+msgid "{username} ({userRating}) has invited you to table #{tableNumber}."
+msgstr "{username} ({userRating}) vous a invité à la table n°{tableNumber}."
+
+#: app/[locale]/(protected)/account/settings/settings.form.tsx:65
+#: app/[locale]/(protected)/account/profile/profile.form.tsx:75
+#: app/[locale]/(protected)/account/profile/passkeys.form.tsx:59
+#: app/[locale]/(protected)/account/profile/change-password.form.tsx:79
+#: app/[locale]/(protected)/account/profile/change-password.form.tsx:141
+#: app/[locale]/(protected)/account/profile/change-email.form.tsx:55
+#: app/[locale]/(protected)/account/delete/delete.form.tsx:51
+#: app/[locale]/(auth)/sign-up/sign-up.form.tsx:86
+#: app/[locale]/(auth)/sign-in-with-magic-link/sign-in-with-magic-link.form.tsx:51
+#: app/[locale]/(auth)/reset-password/reset-password.form.tsx:67
+#: app/[locale]/(auth)/forgot-password/forgot-password.form.tsx:50
+msgid "Validation errors occurred."
+msgstr "Des erreurs de validation se sont produites."
+
+#: app/[locale]/(protected)/account/profile/linked-social-accounts.form.tsx:116
+msgid "Link {label}"
+msgstr "Lier {label}"
+
+#: components/game/Table.tsx:693
+msgid "Please wait while we connect you to the table..."
+msgstr "Veuillez patienter pendant que nous vous connectons à la table…"
+
+#. js-lingui-explicit-id
+#: lib/email.ts:24
+#: lib/email.ts:73
+#: lib/email.ts:102
+#: lib/email.ts:128
+msgid "If that doesn't work, copy and paste the following link in a browser:"
+msgstr "Si cela ne fonctionne pas, copiez et collez le lien suivant dans un navigateur :"
+
+#. js-lingui-explicit-id
+#: lib/email.ts:103
+msgid "If you did not make this change, your account might have been compromised, contact our support team immediately."
+msgstr "Si vous n'êtes pas à l'origine de ce changement, votre compte pourrait avoir été compromis. Contactez immédiatement notre équipe de support."
+
+#. js-lingui-explicit-id
+#: lib/email.ts:27
+msgid "If you did not make this request or if you believe your account has been compromised, contact our support team immediately."
+msgstr "Si vous n'avez pas fait cette demande ou si vous pensez que votre compte a été compromis, contactez immédiatement notre équipe d'assistance."
+
+#. js-lingui-explicit-id
+#: lib/email.ts:74
+msgid "If you did not request a new password or if you believe your account has been compromised, contact our support team immediately."
+msgstr "Si vous n'avez pas demandé un nouveau mot de passe ou si vous pensez que votre compte a été compromis, contactez immédiatement notre équipe d'assistance."
+
+#. js-lingui-explicit-id
+#: lib/email.ts:47
+msgid "If you did not request this email you can safely ignore it."
+msgstr "Si vous n'avez pas demandé cet e-mail, vous pouvez l'ignorer en toute sécurité."
+
+#. js-lingui-explicit-id
+#: lib/email.ts:129
+msgid "If you have any questions or need assistance, do not hesitate to reach out."
+msgstr "Si vous avez des questions ou avez besoin d'assistance, n'hésitez pas à nous contacter."
+
+#: components/game/InstantMessageModal.tsx:54
+msgid "Reply"
+msgstr "Répondre"
+
+#. js-lingui-explicit-id
+#: components/Sidebar.tsx:56
+msgid "Instant message #{id} from {sender}"
+msgstr "Message instantané n°{id} de {sender}"
+
+#. js-lingui-explicit-id
+#: components/Sidebar.tsx:99
+msgid "Invitation declined from {username}"
+msgstr "Invitation refusée de la part de {username}"
+
+#. js-lingui-explicit-id
+#: components/Sidebar.tsx:121
+msgid "Invitation to table #{tableNumber}"
+msgstr "Invitation à la table n°{tableNumber}"
+
+#: app/[locale]/(auth)/sign-in/sign-in.form.tsx:232
+msgid "Magic Link"
+msgstr "Lien magique"
+
+#: lib/keyboard/keyboard-key-labels.ts:60
+msgid "Numpad 0"
+msgstr "Pavé numérique 0"
+
+#: components/game/Room.tsx:245
+msgid "Exit Room"
+msgstr "Quitter la salle"
+
+#: app/[locale]/(auth)/sign-in-with-magic-link/sign-in-with-magic-link.form.tsx:78
+msgid "We’ve sent a magic sign-in link to {email}"
+msgstr "Nous avons envoyé un lien magique de connexion à {email}"
+
+#: components/game/PlayerInformationModal.tsx:94
+msgid "Send"
+msgstr "Envoyer"
+
+#: components/SmallScreenWarning.tsx:23
+msgid "Resize the window (recommended size: {width} by {height})<0/>or use a computer for a better experience."
+msgstr "Redimensionnez la fenêtre (taille recommandée : {width} par {height})<0/>ou utilisez un ordinateur pour une meilleure expérience."
+
+#: lib/keyboard/keyboard-key-labels.ts:8
+msgid "Right Arrow"
+msgstr "Flèche droite"
+
+#: lib/api.ts:24
+msgid "An unknown Prisma error occurred."
+msgstr "Une erreur Prisma inconnue est survenue."
+
+#: app/[locale]/global-error.tsx:19
+#: app/[locale]/error.tsx:32
+msgid "Try again"
+msgstr "Réessayez"
+
+#: components/game/TableGameDemoPanel.tsx:583
+msgid "Defense Power Blocks"
+msgstr "Blocs de pouvoir défensifs"
+
+#: components/game/TableGameDemoPanel.tsx:572
+msgid "Team"
+msgstr "Équipe"
+
+#: constants/f-key-messages.ts:15
+msgid "Work as a team, partner."
+msgstr "Travaille en équipe, partenaire."
+
+#: app/[locale]/(auth)/reset-password/reset-password.form.tsx:150
+#: constants/routes.ts:7
+msgid "Reset Password"
+msgstr "Réinitialiser le mot de passe"
+
+#: constants/f-key-messages.ts:14
+msgid "I can't talk until the game is over."
+msgstr "Je ne peux pas parler avant la fin de la partie."
+
+#: constants/f-key-messages.ts:11
+msgid "I brush off your attacks like dandruff."
+msgstr "Je balaie tes attaques comme des pellicules."
+
+#: constants/routes.ts:29
+msgid "Privacy Policy"
+msgstr "Politique de confidentialité"
+
+#: translations/languages.ts:41
+msgid "Pseudo"
+msgstr "Pseudo"
+
+#: components/game/TableInviteUserModal.tsx:48
+#: components/game/Table.tsx:780
+msgid "Invite"
+msgstr "Inviter"
+
+#: app/[locale]/(protected)/account/profile/change-password.form.tsx:220
+#: app/[locale]/(auth)/sign-up/sign-up.form.tsx:189
+#: app/[locale]/(auth)/reset-password/reset-password.form.tsx:132
+msgid "Password must be at least 8 characters long, must contain at least one digit, one uppercase letter, and at least one special character."
+msgstr "Le mot de passe doit comporter au moins 8 caractères, inclure au moins un chiffre, une lettre majuscule et un caractère spécial."
+
+#: app/[locale]/(auth)/sign-in/sign-in.form.tsx:243
+msgid "Sign in with {provider}"
+msgstr "Connexion avec {provider}"
+
+#: components/game/PlayerInformationModal.tsx:100
+msgid "Idle Time: {idleTime}"
+msgstr "Temps d'inactivité : {idleTime}"
+
+#: app/[locale]/(auth)/sign-in/sign-in.form.tsx:209
+msgid "<0>Don’t have an account?</0> <1>Sign Up</1>"
+msgstr "<0>Vous n'avez pas de compte ?</0> <1>Inscrivez-vous</1>"
+
+#: components/game/Room.tsx:282
+msgid "Who is Watching"
+msgstr "Qui regarde"
+
+#: components/game/PlayersList.tsx:188
+#: components/game/PlayersList.tsx:205
+#: components/game/PlayersList.tsx:223
+msgid "Sort ascending"
+msgstr "Trier par ordre croissant"
+
+#: constants/f-key-messages.ts:12
+msgid "You can't touch me."
+msgstr "Tu ne peux pas m'atteindre."
+
+#: app/[locale]/(protected)/account/profile/change-email.form.tsx:137
+#: app/[locale]/(auth)/sign-up/sign-up.form.tsx:161
+#: app/[locale]/(auth)/sign-in-with-magic-link/sign-in-with-magic-link.form.tsx:93
+#: app/[locale]/(auth)/sign-in/sign-in.form.tsx:171
+#: app/[locale]/(auth)/forgot-password/forgot-password.form.tsx:91
+msgid "Email"
+msgstr "Courriel"
+
+#: components/ui/Calendar.tsx:375
+msgid "Next Year"
+msgstr "Prochain année"
+
+#: components/game/Table.tsx:891
+msgid ""
+"{winnersCount, plural, one {Congratulations\n"
+"{firstWinner}} other {Congratulations\n"
+"{firstWinner} and {secondWinner}}}"
+msgstr "{winnersCount, plural, one {Félicitations\n"
+"{firstWinner}} =2 {Félicitations\n"
+"{firstWinner} et {secondWinner}}}"
+
+#: components/ui/Calendar.tsx:302
+msgid "Select a date"
+msgstr "Sélectionner une date"
+
+#: app/[locale]/(auth)/sign-up/sign-up.form.tsx:119
+msgid "A confirmation email has been sent to {email}. If you don’t see it in your inbox, please check your spam or junk folder."
+msgstr "Un courriel de confirmation a été envoyé à {email}. Si vous ne le voyez pas dans votre boîte de réception, veuillez vérifier votre dossier de pourriels ou courriers indésirables."
+
+#. js-lingui-explicit-id
+#: lib/email.ts:128
+msgid "Once your account is deleted, all your data will be permanently removed from our system, and this action cannot be undone. Ensure to remove our application from your third-party account settings to fully disconnect your account."
+msgstr "Une fois votre compte supprimé, toutes vos données seront définitivement supprimées de notre système, et cette action ne peut pas être annulée. Assurez-vous de supprimer notre application de vos paramètres de compte tiers pour déconnecter complètement votre compte."
+
+#. js-lingui-explicit-id
+#: components/game/Chat.tsx:85
+msgid "Only people you have invited may play now."
+msgstr "Seules les personnes que vous avez invitées peuvent jouer maintenant."
+
+#. js-lingui-explicit-id
+#: components/game/Chat.tsx:88
+msgid "Only people you have invited may play or watch your table now."
+msgstr "Seules les personnes que vous avez invitées peuvent jouer ou regarder votre table maintenant."
+
+#: constants/f-key-messages.ts:6
+msgid "Yeah baby!"
+msgstr "Ouais bébé !"
+
+#: components/SidebarMenuSubItem.tsx:151
+msgid "No notifications"
+msgstr "Aucune notification"
+
+#: components/Sidebar.tsx:104
+msgid "Invitation Declined"
+msgstr "Invitation refusée"
+
+#: components/towers/PlayerBoard.tsx:430
+msgid "Waiting for more players"
+msgstr "En attendant plus de joueurs"
+
+#: components/game/Table.tsx:879
+msgid "You lose!"
+msgstr "Vous avez perdu !"
+
+#: app/[locale]/(protected)/account/profile/profile.form.tsx:172
+msgid "Update Profile"
+msgstr "Mettre à jour le profil"
+
+#. js-lingui-explicit-id
+#: lib/email.ts:70
+msgid "Password reset request"
+msgstr "Demande de réinitialisation du mot de passe"
+
+#: constants/f-key-messages.ts:8
+msgid "Prepare to lose."
+msgstr "Prépare-toi à perdre."
+
+#: app/[locale]/(protected)/account/profile/profile.form.tsx:55
+#: app/[locale]/(auth)/sign-up/sign-up.form.tsx:55
+msgid "The birthdate is invalid."
+msgstr "La date de naissance est invalide."
+
+#: components/ui/Input.tsx:158
+msgid "Hide password"
+msgstr "Masquer le mot de passe"
+
+#: app/[locale]/(auth)/error/page.tsx:32
+msgid "The user already exists but the account isn’t linked to the provider."
+msgstr "L'utilisateur existe déjà, mais le compte n'est pas lié au fournisseur."
+
+#: components/game/TableGameDemoPanel.tsx:146
+msgid "Color Blast"
+msgstr "Explosion de couleurs"
+
+#: app/[locale]/(protected)/account/profile/linked-social-accounts.form.tsx:24
+msgid "The email you provided does not match the one associated with your account."
+msgstr "Le courriel que vous avez fourni ne correspond pas à celui associé à votre compte."
+
+#: components/ui/Calendar.tsx:362
+msgid "Select Year"
+msgstr "Sélectionner l'année"
+
+#. js-lingui-explicit-id
+#: lib/email.ts:73
+msgid "Reset password"
+msgstr "Réinitialiser le mot de passe"
+
+#: lib/keyboard/keyboard-key-labels.ts:73
+msgid "Numpad -"
+msgstr "Pavé numérique -"
+
+#: components/game/PlayerInformationModal.tsx:84
+msgid "Wins: {wins}"
+msgstr "Victoires : {wins}"
+
+#: components/game/TableInvitationModal.tsx:71
+msgid "Would you like to join?"
+msgstr "Voudriez-vous rejoindre ?"
+
+#: lib/keyboard/keyboard-key-labels.ts:13
+msgid "Insert"
+msgstr "Insérer"
+
+#: components/game/TableInviteUserModal.tsx:47
+msgid "Invite User"
+msgstr "Inviter un utilisateur"
+
+#: components/game/Table.tsx:413
+msgid "{value, plural, one {{sourceUsername} dropped 1 stone for {targetUsername}} two {{sourceUsername} dropped 2 stones for {targetUsername}} =3 {{sourceUsername} dropped 3 stones for {targetUsername}} other {{sourceUsername} dropped stones for {targetUsername}}}"
+msgstr "{value, plural, one {{sourceUsername} a lâché 1 pierre pour {targetUsername}} two {{sourceUsername} a lâché 2 pierres pour {targetUsername}} =3 {{sourceUsername} a lâché 3 pierres pour {targetUsername}} other {{sourceUsername} a lâché des pierres pour {targetUsername}}}"
+
+#: components/game/TableGameDemoPanel.tsx:148
+msgid "Remove Powers"
+msgstr "Supprimer les pouvoirs"
+
+#. js-lingui-explicit-id
+#: lib/email.ts:44
+#: lib/email.ts:46
+msgid "Sign in to {appName}"
+msgstr "Connectez-vous à {appName}"
+
+#: constants/routes.ts:30
+msgid "Error"
+msgstr "Erreur"
+
+#: app/[locale]/not-found.tsx:20
+msgid "It looks like the page you’re looking for doesn’t exist or has been moved."
+msgstr "Il semble que la page que vous recherchez n'existe pas ou a été déplacée."
+
+#: components/game/Chat.tsx:156
+msgid "Write something..."
+msgstr "Écrivez quelque chose..."
+
+#. js-lingui-explicit-id
+#: components/Sidebar.tsx:141
+msgid "Table #{tableNumber}"
+msgstr "Table n°{tableNumber}"
+
+#: components/game/ServerMessage.tsx:29
+msgid "Connected to the game as {username}"
+msgstr "Connecté(e) au jeu en tant que {username}"
+
+#: app/[locale]/(auth)/error/page.tsx:21
+msgid "Error code: <0>{errorCode}</0>"
+msgstr "Code d'erreur : <0>{errorCode}</0>"
+
+#. js-lingui-explicit-id
+#: lib/email.ts:73
+msgid "The link will expire 1 hour after receiving this message."
+msgstr "Le lien expirera 1 heure après la réception de ce message."
+
+#. js-lingui-explicit-id
+#: app/api/account/settings/route.ts:32
+msgid "The settings have been updated!"
+msgstr "Les paramètres ont été mise à jour avec succès !"
+
+#. js-lingui-explicit-id
+#: lib/email.ts:24
+msgid "The verification token will expire 1 hour after receiving this message."
+msgstr "Le jeton de vérification expirera une heure après la réception de ce message."
+
+#. js-lingui-explicit-id
+#: lib/email.ts:102
+msgid "The verification token will expire 15 minutes after receiving this message."
+msgstr "Le jeton de vérification expirera 15 minutes après la réception de ce message."
+
+#. js-lingui-explicit-id
+#: components/EmailTemplate.tsx:52
+msgid "The {appName} Team"
+msgstr "L'équipe {appName}"
+
+#. js-lingui-explicit-id
+#: lib/email.ts:128
+msgid "This is to confirm that we have received your request to delete your account associated with the email <strong>{email}</strong>. Confirm your account deletion by clicking the following link:"
+msgstr "Ceci est pour confirmer que nous avons reçu votre demande de suppression de votre compte associé à l'email <strong>{email}</strong>. Confirmez la suppression de votre compte en cliquant sur le lien suivant :"
+
+#. js-lingui-explicit-id
+#: lib/email.ts:46
+msgid "This magic link will expire in 10 minutes."
+msgstr "Ce lien magique expirera dans 10 minutes."
+
+#: components/game/Table.tsx:734
+msgid "Change Keys"
+msgstr "Changer les touches"
+
+#: components/game/InstantMessageModal.tsx:52
+msgid "Reply to {username}"
+msgstr "Répondre à {username}"
+
+#: components/Sidebar.tsx:278
+#: constants/routes.ts:16
+msgid "Settings"
+msgstr "Paramètres"
+
+#: components/game/Room.tsx:276
+msgid "Team 5-6"
+msgstr "Équipe 5-6"
+
+#: components/game/RoomsList.tsx:64
+msgid "Beginner"
+msgstr "Débutant"
+
+#: app/[locale]/(protected)/account/profile/passkeys.form.tsx:164
+msgid "Passkeys"
+msgstr "Clés d'accès"
+
+#: components/game/ServerMessage.tsx:36
+msgid "Disconnected from server"
+msgstr "Déconnecté(e) du server"
+
+#. js-lingui-explicit-id
+#: lib/email.ts:102
+msgid "Update Email"
+msgstr "Mettre à jour l'email"
+
+#. js-lingui-explicit-id
+#: components/game/TableChangeKeysPanel.tsx:116
+msgid "Use Item on Player {number}"
+msgstr "Utiliser un objet sur le joueur {number}"
+
+#: components/ui/Calendar.tsx:242
+msgid "Next Decade"
+msgstr "Prochaine décennie"
+
+#: components/NotificationDropdownItem.tsx:42
+msgid "Delete notification"
+msgstr "Supprimer la notification"
+
+#: app/[locale]/(protected)/account/profile/change-email.form.tsx:128
+msgid "Change Email"
+msgstr "Modifier le courriel"
+
+#: components/ui/Calendar.tsx:73
+msgid "Wednesday"
+msgstr "Mercredi"
+
+#: components/UserAvatar.tsx:27
+msgid "Avatar placeholder"
+msgstr "Espace réservé pour l'avatar"
+
+#: components/game/TableInvitationModal.tsx:76
+msgid "Reason"
+msgstr "Raison"
+
+#. js-lingui-explicit-id
+#: lib/email.ts:24
+msgid "Verify email"
+msgstr "Vérifier l'e-mail"
+
+#. js-lingui-explicit-id
+#: lib/email.ts:21
+msgid "Verify your email address"
+msgstr "Vérifiez votre adresse e-mail"
+
+#: app/[locale]/(protected)/account/profile/change-password.form.tsx:251
+msgid "Change Password"
+msgstr "Modifier le mot de passe"
+
+#: components/Sidebar.tsx:257
+#: constants/routes.ts:22
+msgid "Games"
+msgstr "Jeux"
+
+#: components/game/TableGameDemoPanel.tsx:494
+msgid "Pause Demo"
+msgstr "Mettre la démo en pause"
+
+#. js-lingui-explicit-id
+#: lib/email.ts:24
+msgid "We received a request to verify your email address. To proceed, click the following link:"
+msgstr "Nous avons reçu une demande de vérification de votre adresse e-mail. Pour continuer, cliquez sur le lien suivant :"
+
+#. js-lingui-explicit-id
+#: lib/email.ts:73
+msgid "We’ve received a request to reset your password. Reset your password by clicking the following link:"
+msgstr "Nous avons reçu une demande pour réinitialiser votre mot de passe. Réinitialisez votre mot de passe en cliquant sur le lien suivant :"
+
+#. js-lingui-explicit-id
+#: lib/email.ts:102
+msgid "We’ve received an email change request for your account. You’ve entered {newEmail} as the email address for your account. Verify this email address by clicking the following link:"
+msgstr "Nous avons reçu une demande de changement d'email pour votre compte. Vous avez saisi {newEmail} comme adresse e-mail pour votre compte. Vérifiez cette adresse e-mail en cliquant sur le lien suivant :"
+
+#: app/[locale]/(legal)/privacy-policy/page.tsx:34
+msgid "<0>Effective Date: {date}</0><1><2>1. Introduction</2><3>This Privacy Policy explains how {name} collects, uses, and protects your personal data when you use our services.</3></1><4><5>2. Information We Collect</5><6>When you sign up and use {name}, we collect the following personal information:</6><7><8><9>Name:</9> Your full name.</8><10><11>Email:</11> Your email address.</10><12><13>Birthdate:</13> Your date of birth.</12><14><15>Usage Data:</15> Data related to your usage of the services.</14></7></4><16><17>3. How We Use Your Information</17><18>We use your information to provide and improve the services, communicate with you, and for security purposes.</18></16><19><20>4. Sharing Your Information</20><21>We do not sell or share your personal information with third parties except as required by law or with your consent.</21></19><22><23>5. Security</23><24>We implement reasonable security measures to protect your data, but no method of transmission over the Internet is 100% secure.</24></22><25><26>6. Your Rights</26><27>You have the right to access, correct, or delete your personal data. To delete your account, please sign in and visit the <28>account deletion page</28>.</27></25><29><30>7. Changes to this Policy</30><31>We may update this Privacy Policy from time to time. Any changes will be posted here with an updated “Effective Date.”</31></29><32><33>8. Contact Us</33><34>If you have any questions, please contact us at <35>{supportEmail}</35>.</34></32>"
+msgstr "<0>Date d’entrée en vigueur : {date}</0><1><2>1. Introduction</2><3>Cette politique de confidentialité explique comment {name} collecte, utilise et protège vos données personnelles lorsque vous utilisez nos services.</3></1><4><5>2. Informations que nous collectons</5><6>Lorsque vous vous inscrivez et utilisez {name}, nous collectons les informations personnelles suivantes :</6><7><8><9>Nom :</9> Votre nom complet.</8><10><11>Email :</11> Votre adresse e-mail.</10><12><13>Date de naissance :</13> Votre date de naissance.</12><14><15>Données d’utilisation :</15> Données relatives à votre utilisation des services.</14></7></4><16><17>3. Comment nous utilisons vos informations</17><18>Nous utilisons vos informations pour fournir et améliorer les services, communiquer avec vous et à des fins de sécurité.</18></16><19><20>4. Partage de vos informations</20><21>Nous ne vendons ni ne partageons vos informations personnelles avec des tiers sauf si la loi l’exige ou avec votre consentement.</21></19><22><23>5. Sécurité</23><24>Nous mettons en place des mesures de sécurité raisonnables pour protéger vos données, mais aucun mode de transmission sur Internet n’est 100 % sécurisé.</24></22><25><26>6. Vos droits</26><27>Vous avez le droit d’accéder, de corriger ou de supprimer vos données personnelles. Pour supprimer votre compte, veuillez vous connecter et visiter la <28>page de suppression de compte</28>.</27></25><29><30>7. Modifications de cette politique</30><31>Nous pouvons mettre à jour cette politique de confidentialité de temps en temps. Toute modification sera publiée ici avec une « Date d’entrée en vigueur » mise à jour.</31></29><32><33>8. Nous contacter</33><34>Si vous avez des questions, veuillez nous contacter à <35>{supportEmail}</35>.</34></32>"
+
+#: components/game/PlayerInformationModal.tsx:82
+msgid "Rating: {rating}"
+msgstr "Évaluation : {rating}"
+
+#: components/GoToHomepageLink.tsx:9
+msgid "Go to homepage"
+msgstr "Aller à la page d'accueil"
+
+#: lib/keyboard/keyboard-key-labels.ts:16
+msgid "Page Up"
+msgstr "Page précédente"
+
+#: components/game/Table.tsx:399
+msgid "{sourceUsername} removed a row from {targetUsername}"
+msgstr "{sourceUsername} a supprimé une rangée de {targetUsername}"
+
+#: app/[locale]/(protected)/account/profile/change-email.form.tsx:159
+msgid "Send Verification Email"
+msgstr "Envoyer un courriel de vérification"
+
+#: components/game/Table.tsx:405
+msgid "{sourceUsername} clumped {targetUsername}"
+msgstr "{sourceUsername} a regroupé les blocs de {targetUsername}"
+
+#: components/game/TableGameDemoPanel.tsx:678
+msgid "Space bar"
+msgstr "Barre d’espace"
+
+#: app/[locale]/(protected)/account/delete/delete.form.tsx:111
+msgid "Enter your email to request an account deletion"
+msgstr "Entrez votre adresse courriel pour demander la suppression du compte"
+
+#: components/ui/Calendar.tsx:349
+msgid "Previous Month"
+msgstr "Mois précédent"
+
+#: components/game/TableGameDemoPanel.tsx:148
+msgid "Remove Color"
+msgstr "Supprimer une couleur"
+
+#. js-lingui-explicit-id
+#: components/game/Chat.tsx:77
+msgid "You are the host of the table. This gives you the power to invite to [or boot people from] your table. You may also limit other player’s access to your table by selecting its \"Table Type\"."
+msgstr "Vous êtes l'hôte de la table. Cela vous donne le pouvoir d'inviter [ou d'expulser des personnes] de votre table. Vous pouvez également limiter l'accès des autres joueurs à votre table en sélectionnant son \"Type de Table\"."
+
+#. js-lingui-explicit-id
+#: components/game/Chat.tsx:104
+msgid "You granted {username} access to play."
+msgstr "Vous avez accordé à {username} l'autorisation de jouer."
+
+#. js-lingui-explicit-id
+#: components/Sidebar.tsx:75
+msgid "You have been booted from table #{tableNumber} by {host}."
+msgstr "Vous avez été expulsé(e) de la table n°{tableNumber} par {host}."
+
+#. js-lingui-explicit-id
+#: components/game/Chat.tsx:100
+msgid "You have been granted access to play by the host."
+msgstr "Vous avez reçu l'autorisation de jouer de la part de l'hôte."
+
+#: lib/keyboard/keyboard-key-labels.ts:9
+msgid "Up Arrow"
+msgstr "Flèche haut"
+
+#: components/game/Table.tsx:322
+msgid "You can send a Midas piece"
+msgstr "Vous pouvez envoyer une pièce de Midas"
+
+#: lib/api.ts:6
+msgid "An unexpected error occurred. Please try again later."
+msgstr "Une erreur inattendue est survenue. Veuillez réessayer plus tard."
+
+#: app/[locale]/(protected)/account/profile/passkeys.form.tsx:153
+msgid "The passkey \"{name}\" has been deleted!"
+msgstr "La clé d'accès « {name} » a été supprimée!"
+
+#: components/game/TableBootUserModal.tsx:45
+#: components/game/Table.tsx:787
+msgid "Boot"
+msgstr "Expulser"
+
+#: constants/routes.ts:11
+msgid "Sign In with Magic Link"
+msgstr "Se connecter avec un lien magique"
+
+#: components/game/TableGameDemoPanel.tsx:147
+msgid "Medusa Piece"
+msgstr "Pièce de Méduse"
+
+#: components/ui/Calendar.tsx:338
+msgid "Previous Year"
+msgstr "Année précédente"
+
+#: app/[locale]/(protected)/account/profile/profile.form.tsx:154
+#: app/[locale]/(auth)/sign-up/sign-up.form.tsx:155
+msgid "You must be at least 13 years old."
+msgstr "Vous devez avoir au moins 13 ans."
+
+#: app/[locale]/(auth)/sign-in/sign-in.form.tsx:264
+msgid "By signing in, you agree to our <0>Terms of Service</0> and <1>Privacy Policy</1>."
+msgstr "En vous connectant, vous acceptez nos <0>Conditions d'utilisation</0> et notre <1>Politique de confidentialité</1>."
+
+#: components/game/TableGameDemoPanel.tsx:145
+msgid "Add Stones"
+msgstr "Ajouter des pierres"
+
+#: components/game/TableGameDemoPanel.tsx:557
+msgid "Move Down"
+msgstr "Déplacer vers le bas"
+
+#: components/game/Table.tsx:302
+msgid "{powerLevel, select, minor {You can minorly clump} mega {You can mega clump} other {You can clump}}"
+msgstr "{powerLevel, select, minor {Vous pouvez regrouper légèrement} mega {Vous pouvez regrouper fortement} other {Vous pouvez regrouper}}"
+
+#: app/[locale]/not-found.tsx:17
+msgid "Page Not Found"
+msgstr "Page non trouvée"
+
+#: components/game/Table.tsx:817
+msgid "Help"
+msgstr "Aide"
+
+#: components/game/PlayerInformationModal.tsx:83
+msgid "Games Completed: {gamesCompleted}"
+msgstr "Jeux terminés : {gamesCompleted}"
+
+#: app/[locale]/(protected)/account/profile/passkeys.form.tsx:85
+msgid "The passkey \"{name}\" has been added!"
+msgstr "La clé d'accès « {name} » a été ajoutée!"
+
+#: components/game/Table.tsx:373
+msgid "{powerLevel, select, minor {{sourceUsername} minorly defused {targetUsername}} mega {{sourceUsername} mega defused {targetUsername}} other {{sourceUsername} defused {targetUsername}}}"
+msgstr "{powerLevel, select, minor {{sourceUsername} a légèrement désamorcé {targetUsername}} mega {{sourceUsername} a puissamment désamorcé {targetUsername}} other {{sourceUsername} a désamorcé {targetUsername}}}"
+
+#: components/towers/PlayerBoard.tsx:429
+msgid "Ready"
+msgstr "Prêt"
+
+#: lib/keyboard/keyboard-key-labels.ts:12
+msgid "Delete"
+msgstr "Supprimer"
+
+#: components/game/PlayersList.tsx:190
+#: components/game/PlayersList.tsx:207
+#: components/game/PlayersList.tsx:225
+msgid "Sort descending"
+msgstr "Trier par ordre décroissant"
+
+#: components/ui/Modal.tsx:109
+#: components/game/TableChangeKeysPanel.tsx:145
+#: components/game/JoiningScreen.tsx:87
+msgid "Cancel"
+msgstr "Annuler"
+
+#: components/game/TableGameDemoPanel.tsx:143
+msgid "Remove Row"
+msgstr "Supprimer une rangée"
+
+#: lib/keyboard/keyboard-key-labels.ts:64
+msgid "Numpad 4"
+msgstr "Pavé numérique 4"
+
+#: app/[locale]/(auth)/sign-in/sign-in.form.tsx:195
+#: constants/routes.ts:6
+msgid "Forgot Password"
+msgstr "Mot de passe oublié"
+
+#: components/ui/Calendar.tsx:234
+msgid "Previous Decade"
+msgstr "Décennie précédente"
+
+#: constants/routes.ts:5
+msgid "Complete Your Profile"
+msgstr "Complétez votre profil"
+
+#: components/ui/Calendar.tsx:65
+msgid "October"
+msgstr "Octobre"
+
+#: app/[locale]/(protected)/account/profile/profile.form.tsx:59
+#: app/[locale]/(auth)/sign-up/sign-up.form.tsx:62
+msgid "The username is invalid."
+msgstr "Le nom d'utilisateur est invalide."
+
+#: app/[locale]/(protected)/account/profile/change-password.form.tsx:244
+msgid "Revoke all other sessions"
+msgstr "Révoquer toutes les autres sessions"
+
+#: components/game/RoomTable.tsx:133
+msgid "Host: {hostUsername}"
+msgstr "Hôte : {hostUsername}"
+
+#: components/game/Table.tsx:911
+msgid "Right:"
+msgstr "Droite :"
+
+#: lib/keyboard/keyboard-key-labels.ts:75
+msgid "Numpad ."
+msgstr "Pavé numérique ."
+
+#: components/game/Table.tsx:170
+#: components/game/CreateTableModal.tsx:47
+msgid "You must rate this game."
+msgstr "Vous devez évaluer ce jeu."
+
+#: components/game/Table.tsx:253
+msgid "You can add a row"
+msgstr "Vous pouvez ajouter une rangée"
+
+#: components/Sidebar.tsx:283
+#: components/Sidebar.tsx:288
+msgid "Sign out"
+msgstr "Se déconnecter"
+
+#: app/[locale]/(auth)/error/page.tsx:62
+msgid "An unexpected error occurred. Please try again later or <0>contact our support team</0> if this issue continues."
+msgstr "Une erreur inattendue est survenue. Veuillez réessayer plus tard ou <0>contactez notre équipe de soutien</0> si ce problème persiste."
+
+#: components/game/Table.tsx:809
+msgid "Sound"
+msgstr "Son"
+
+#: components/game/RoomsList.tsx:84
+msgid "Full"
+msgstr "Complet"
+
+#: components/game/TableInvitationModal.tsx:55
+msgid "Accept"
+msgstr "Accepter"
+
+#: components/game/Table.tsx:874
+msgid "Game Over"
+msgstr "Partie terminée"
+
+#: app/[locale]/(auth)/sign-in/sign-in.form.tsx:219
+msgid "or sign in with"
+msgstr "ou connectez-vous avec"
+
+#: components/game/PlayerInformationModal.tsx:105
+msgid "Ignore"
+msgstr "Ignorer"
+
+#: components/game/Room.tsx:158
+msgid "Please wait while we connect you to the room..."
+msgstr "Veuillez patienter pendant que nous vous connectons à la salle…"
+
+#: components/game/TableGameDemoPanel.tsx:144
+msgid "Dither"
+msgstr "Tramer"
+
+#: components/towers/PlayerBoard.tsx:403
+#: components/game/Table.tsx:749
+msgid "Stand"
+msgstr "Se lever"
+
+#: app/[locale]/(protected)/account/profile/change-password.form.tsx:61
+#: app/[locale]/(auth)/sign-up/sign-up.form.tsx:65
+#: app/[locale]/(auth)/sign-in/sign-in.form.tsx:58
+#: app/[locale]/(auth)/reset-password/reset-password.form.tsx:49
+msgid "The password is invalid."
+msgstr "Le mot de passe est invalide."
+
+#: components/game/CreateTableModal.tsx:80
+msgid "Create"
+msgstr "Créer"
+
+#: components/ui/Calendar.tsx:58
+msgid "March"
+msgstr "Mars"
+
+#: components/ui/Calendar.tsx:64
+msgid "September"
+msgstr "Septembre"
+
+#: components/ui/Calendar.tsx:71
+msgid "Monday"
+msgstr "Lundi"
+
+#: app/[locale]/(auth)/sign-up/sign-up.form.tsx:71
+msgid "You must accept the terms and conditions."
+msgstr "Vous devez accepter les termes et conditions."
+
+#: app/[locale]/(auth)/forgot-password/forgot-password.form.tsx:97
+msgid "Send Email"
+msgstr "Envoyer le courriel"
+
+#: constants/routes.ts:3
+#: lib/keyboard/keyboard-key-labels.ts:14
+msgid "Home"
+msgstr "Accueil"
+
+#: components/game/TableInvitationModal.tsx:30
+msgid "Not Rated"
+msgstr "Non évalué"
+
+#: app/[locale]/(protected)/account/profile/profile.form.tsx:106
+msgid "Your profile has been updated!"
+msgstr "Votre profil a été mis à jour !"
+
+#: components/game/Table.tsx:340
+msgid "{sourceUsername} used a special cell on {targetUsername}"
+msgstr "{sourceUsername} a utilisé une cellule spéciale sur {targetUsername}"
+
+#: components/Sidebar.tsx:154
+msgid "Notifications"
+msgstr "Notifications"
+
+#: components/game/TableGameDemoPanel.tsx:524
+msgid "Move Left"
+msgstr "Déplacer vers la gauche"
+
+#: components/game/Table.tsx:429
+msgid "{sourceUsername} sent a Midas piece to {targetUsername}"
+msgstr "{sourceUsername} a envoyé une pièce Midas à {targetUsername}"
+
+#: app/[locale]/(auth)/forgot-password/forgot-password.form.tsx:76
+msgid "A reset password link has been sent in your inbox!"
+msgstr "Un lien pour réinitialiser votre mot de passe a été envoyé dans votre boîte de réception!"
+
+#: components/game/TableGameDemoPanel.tsx:146
+msgid "Defuse"
+msgstr "Désamorcer"
+
+#: lib/keyboard/keyboard-key-labels.ts:65
+msgid "Numpad 5"
+msgstr "Pavé numérique 5"
+
+#: components/game/Room.tsx:235
+msgid "provisional"
+msgstr "provisoire"
+
+#: components/SmallScreenWarning.tsx:20
+msgid "Screen Too Small"
+msgstr "Écran trop petit"
+
+#: constants/f-key-messages.ts:4
+msgid "Help!"
+msgstr "À l'aide !"
+
+#: components/game/Table.tsx:796
+#: components/game/CreateTableModal.tsx:100
+msgid "Rated Game"
+msgstr "Jeu évalué"
+
+#: app/api/services/scheduler/route.ts:29
+msgid "Unknown error occurred"
+msgstr "Une erreur inconnue s'est produite."
+
+#: components/game/TableInvitationModal.tsx:56
+msgid "Decline"
+msgstr "Refuser"
+
+#: app/[locale]/(protected)/account/profile/passkeys.form.tsx:174
+msgid "Enter a name for the passkey"
+msgstr "Entrez un nom pour la clé d'accès"
+
+#: lib/keyboard/keyboard-key-labels.ts:63
+msgid "Numpad 3"
+msgstr "Pavé numérique 3"
+
+#: lib/api.ts:22
+msgid "Prisma failed to initialize. Please check your configuration."
+msgstr "Prisma n'a pas réussi à s'initialiser. Veuillez vérifier votre configuration."
+
+#: components/game/RoomsList.tsx:62
+msgid "Social"
+msgstr "Social"
+
+#: components/game/TableGameDemoPanel.tsx:616
+msgid "You"
+msgstr "Vous"
+
+#: components/game/Table.tsx:741
+msgid "Demo"
+msgstr "Démo"
+
+#: app/[locale]/(auth)/sign-in/sign-in.form.tsx:203
+msgid "Sign in with email and password"
+msgstr "Se connecter avec courriel et mot de passe"
+
+#: lib/keyboard/keyboard-key-labels.ts:66
+msgid "Numpad 6"
+msgstr "Pavé numérique 6"
+
+#: constants/routes.ts:23
+msgid "Towers Rooms"
+msgstr "Salles Towers"
+
+#: components/ui/Calendar.tsx:74
+msgid "Thursday"
+msgstr "Jeudi"
+
+#: components/game/Table.tsx:275
+msgid "{powerLevel, select, minor {You can minorly defuse} mega {You can mega defuse} other {You can defuse}}"
+msgstr "{powerLevel, select, minor {Vous pouvez désamorcer légèrement} mega {Vous pouvez désamorcer fortement} other {Vous pouvez désamorcer}}"
+
+#: app/[locale]/(auth)/sign-up/sign-up.form.tsx:209
+msgid "I agree to the <0>Terms of Service</0> and <1>Privacy Policy</1>."
+msgstr "J'accepte les <0>Conditions d'utilisation</0> et la <1>Politique de confidentialité</1>."
+
+#: components/game/TableGameDemoPanel.tsx:601
+msgid "Defenses repair your team's boards."
+msgstr "Les défenses réparent les planches de votre équipe."
+
+#: app/[locale]/(protected)/account/profile/passkeys.form.tsx:214
+msgid "Save passkey"
+msgstr "Enregistrer la clé d'accès"
+
+#: translations/languages.ts:21
+msgid "English"
+msgstr "Anglais"
+
+#: components/game/Table.tsx:927
+msgid "Cycle Color:"
+msgstr "Changer la couleur :"
+
+#: app/[locale]/(auth)/sign-up/sign-up.form.tsx:227
+#: constants/routes.ts:4
+msgid "Sign Up"
+msgstr "Inscription"
+
+#: components/game/TableGameDemoPanel.tsx:147
+msgid "Midas Piece"
+msgstr "Pièce de Midas"
+
+#: components/Sidebar.tsx:211
+msgid "Collapse sidebar"
+msgstr "Réduire la barre latérale"
+
+#: app/[locale]/(auth)/sign-in/sign-in.form.tsx:206
+#: constants/routes.ts:8
+msgid "Sign In"
+msgstr "Connexion"
+
+#: constants/f-key-messages.ts:13
+msgid "Need help partner?"
+msgstr "Besoin d'aide, partenaire ?"
+
+#: components/game/Table.tsx:853
+msgid "<0>The next game is starting in</0><1>{countdown}</1><2>{countdown, plural, one {second} other {seconds}}</2>"
+msgstr "<0>La prochaine partie commence dans</0><1>{countdown}</1><2>{countdown, plural, one {seconde} other {secondes}}</2>"
+
+#: app/[locale]/(protected)/account/profile/profile.form.tsx:142
+#: app/[locale]/(auth)/sign-up/sign-up.form.tsx:145
+msgid "Enter your name"
+msgstr "Entrez votre nom"
+
+#: translations/languages.ts:29
+msgid "French"
+msgstr "Français"
+
+#: components/game/TableGameDemoPanel.tsx:549
+msgid "Move Right"
+msgstr "Déplacer vers la droite"
+
+#: components/ui/Calendar.tsx:59
+msgid "April"
+msgstr "Avril"
+
+#: lib/keyboard/keyboard-key-labels.ts:74
+msgid "Numpad +"
+msgstr "Pavé numérique +"
+
+#: components/game/TableChangeKeysPanel.tsx:95
+msgid "Duplicate keys detected. Each key must be unique."
+msgstr "Des touches en double ont été détectées. Chaque touche doit être unique."
+
+#: components/game/RoomsList.tsx:66
+msgid "Intermediate"
+msgstr "Intermédiaire"
+
+#: app/[locale]/global-error.tsx:16
+#: app/[locale]/error.tsx:23
+#: app/[locale]/(auth)/error/page.tsx:58
+msgid "Something went wrong"
+msgstr "Quelque chose s'est mal passé"
+
+#: components/game/Table.tsx:352
+msgid "{sourceUsername} added a row to {targetUsername}"
+msgstr "{sourceUsername} a ajouté une rangée à {targetUsername}"
+
+#: components/game/TableBootUserModal.tsx:44
+msgid "Boot User"
+msgstr "Expulser l'utilisateur"
+
+#: components/game/ServerMessage.tsx:21
+msgid "You are not logged in"
+msgstr "Vous n'êtes pas connecté"
+
+#: components/game/Table.tsx:935
+msgid "Use Item:"
+msgstr "Utiliser l'objet :"
+
+#: app/[locale]/(protected)/account/profile/change-password.form.tsx:230
+#: app/[locale]/(auth)/sign-up/sign-up.form.tsx:198
+#: app/[locale]/(auth)/reset-password/reset-password.form.tsx:141
+msgid "Confirm Password"
+msgstr "Confirmer le mot de passe"
+
+#: lib/keyboard/keyboard-key-labels.ts:11
+msgid "Space"
+msgstr "Espace"
+
+#: app/[locale]/(legal)/terms-of-service/page.tsx:34
+msgid "<0>Effective Date: {date}</0><1><2>1. Introduction</2><3>Welcome to {name}! By accessing and using our services, you agree to comply with these Terms of Service.</3></1><4><5>2. User Responsibilities</5><6>You are responsible for maintaining the confidentiality of your account details, and you agree not to share your account with anyone.</6></4><7><8>3. Prohibited Activities</8><9>You agree not to engage in any activity that would harm, disrupt, or interfere with {name} or its users.</9></7><10><11>4. Termination</11><12>We reserve the right to suspend or terminate your access to the service if you violate these Terms of Service.</12></10><13><14>5. Limitation of Liability</14><15>{name} is not responsible for any loss or damage arising from your use of the service.</15></13><16><17>6. Contact Us</17><18>If you have any questions, please contact us at <19>{supportEmail}</19>.</18></16>"
+msgstr "<0>Date d'entrée en vigueur : {date}</0><1><2>1. Introduction</2><3>Bienvenue sur {name} ! En accédant et en utilisant nos services, vous acceptez de vous conformer à ces conditions d'utilisation.</3></1><4><5>2. Responsabilités de l'utilisateur</5><6>Vous êtes responsable de la confidentialité de vos détails de compte et vous acceptez de ne pas partager votre compte avec d'autres.</6></4><7><8>3. Activités interdites</8><9>Vous acceptez de ne pas participer à toute activité qui nuirait, perturberait ou interférerait avec {name} ou ses utilisateurs.</9></7><10><11>4. Résiliation</11><12>Nous nous réservons le droit de suspendre ou de résilier votre accès au service si vous violez ces conditions d'utilisation.</12></10><13><14>5. Limitation de responsabilité</14><15>{name} n'est pas responsable des pertes ou dommages résultant de votre utilisation du service.</15></13><16><17>6. Nous contacter</17><18>Si vous avez des questions, veuillez nous contacter à <19>{supportEmail}</19>.</18></16>"
+
+#: app/[locale]/(protected)/account/settings/settings.form.tsx:153
+msgid "Dark"
+msgstr "Sombre"
+
+#: components/game/PlayerInformationModal.tsx:74
+msgid "Player information of {username}"
+msgstr "Informations du joueur {username}"
+
+#: app/[locale]/(protected)/account/profile/change-password.form.tsx:73
+#: app/[locale]/(auth)/sign-up/sign-up.form.tsx:80
+#: app/[locale]/(auth)/reset-password/reset-password.form.tsx:61
+msgid "The password and password confirmation do not match."
+msgstr "Le mot de passe et la confirmation du mot de passe ne correspondent pas."
+
+#: components/game/Table.tsx:245
+msgid "You can use a special cell"
+msgstr "Vous pouvez utiliser une cellule spéciale"
+
+#: components/game/Table.tsx:388
+msgid "{sourceUsername} removed powers from {targetUsername}"
+msgstr "{sourceUsername} a supprimé les pouvoirs de {targetUsername}"
+
+#: components/game/TableInvitationModal.tsx:30
+msgid "Rated"
+msgstr "Évalué"
+
+#: components/game/Table.tsx:164
+#: components/game/CreateTableModal.tsx:41
+msgid "You must select a table type."
+msgstr "Vous devez sélectionner un type de table."
+
+#: components/ui/Calendar.tsx:67
+msgid "December"
+msgstr "Décembre"
+
+#: components/Sidebar.tsx:70
+msgid "You have been booted from a table."
+msgstr "Vous avez été expulsé d'une table."
+
+#: app/[locale]/(protected)/account/profile/passkeys.form.tsx:120
+msgid "The passkey has been updated!"
+msgstr "La clé d'accès a été mise à jour!"
+
+#: components/ui/Calendar.tsx:56
+msgid "January"
+msgstr "Janvier"
+
+#: app/[locale]/(protected)/account/profile/profile.form.tsx:105
+msgid "Your profile has been updated! You will be redirected in 3 seconds..."
+msgstr "Votre profil a été mis à jour ! Vous serez redirigé dans 3 secondes..."
+
+#: app/[locale]/(auth)/sign-in/sign-in.form.tsx:97
+#: app/[locale]/(auth)/sign-in/sign-in.form.tsx:132
+#: app/[locale]/(auth)/sign-in/sign-in.form.tsx:160
+msgid "You’re signed in successfully. Welcome back!"
+msgstr "Connexion réussie. Bon retour !"
+
+#: lib/keyboard/keyboard-key-labels.ts:68
+msgid "Numpad 8"
+msgstr "Pavé numérique 8"
+
+#: lib/keyboard/keyboard-key-labels.ts:10
+msgid "Down Arrow"
+msgstr "Flèche bas"
+
+#: app/[locale]/(auth)/sign-in/sign-in.form.tsx:69
+msgid "The email or the password is invalid."
+msgstr "Le courriel ou le mot de passe est invalide."
+
+#: components/game/Table.tsx:820
+msgid "Quit"
+msgstr "Quitter"
+
+#: components/game/Table.tsx:367
+msgid "{sourceUsername} stoned {targetUsername}"
+msgstr "{sourceUsername} a lancé des pierres à {targetUsername}"
+
+#: components/game/RoomTable.tsx:129
+msgid "Option: rated"
+msgstr "Option : évalué"
+
+#: components/game/RoomsList.tsx:68
+msgid "Advanced"
+msgstr "Avancé"
+
+#: components/ui/Calendar.tsx:66
+msgid "November"
+msgstr "Novembre"
+
+#: app/[locale]/(protected)/account/profile/change-email.form.tsx:80
+#: app/[locale]/(protected)/account/profile/change-email.form.tsx:114
+msgid "A verification email has been sent to your new email address. Please check your inbox or your spam folder."
+msgstr "Un courriel de vérification a été envoyé à votre nouvelle adresse courriel. Veuillez vérifier votre boîte de réception ou votre dossier de courriers indésirables."
+
+#: components/towers/PlayerBoard.tsx:413
+#: components/game/Table.tsx:726
+msgid "Start"
+msgstr "Commencer"
+
+#: components/game/Table.tsx:311
+msgid "{powerLevel, select, minor {You can drop a stone} normal {You can drop 2 stones} mega {You can drop 3 stones} other {You can drop stones}}"
+msgstr "{powerLevel, select, minor {Vous pouvez déposer une pierre} normal {Vous pouvez déposer 2 pierres} mega {Vous pouvez déposer 3 pierres} other {Vous pouvez déposer des pierres}}"
+
+#: components/game/TableChangeKeysPanel.tsx:134
+msgid "Save"
+msgstr "Sauvegarder"
+
+#: components/game/Table.tsx:382
+msgid "{sourceUsername} sent a Medusa piece to {targetUsername}"
+msgstr "{sourceUsername} a envoyé une pièce Méduse à {targetUsername}"
+
+#: components/game/TableChangeKeysPanel.tsx:101
+msgid "Your key bindings have been saved successfully!"
+msgstr "Les touches de contrôle ont été enregistrées avec succès !"
+
+#: lib/keyboard/keyboard-key-labels.ts:69
+msgid "Numpad 9"
+msgstr "Pavé numérique 9"
+
+#: components/Sidebar.tsx:219
+msgid "Expand sidebar"
+msgstr "Élargir la barre latérale"
+
+#: components/ui/Calendar.tsx:62
+msgid "July"
+msgstr "Juillet"
+
+#: components/game/Table.tsx:903
+msgid "Left:"
+msgstr "Gauche :"
+
+#: components/game/TableGameDemoPanel.tsx:694
+msgid "Opponent"
+msgstr "Adversaire"
+
+#: components/game/Room.tsx:184
+msgid "Play Now"
+msgstr "Jouer maintenant"
+
+#: components/game/RoomsList.tsx:72
+msgid "{usersCount, plural, zero {no users} one {# user} other {# users}}"
+msgstr "{usersCount, plural, zero {aucun utilisateur} one {# utilisateur} other {# utilisateurs}}"
+
+#: constants/routes.ts:15
+msgid "Profile"
+msgstr "Profil"
+
+#: app/[locale]/(protected)/account/settings/settings.form.tsx:127
+msgid "Language"
+msgstr "Langue"
+
+#: lib/keyboard/keyboard-key-labels.ts:17
+msgid "Page Down"
+msgstr "Page suivante"
+
+#: components/game/TableGameDemoPanel.tsx:145
+msgid "Drop Stones"
+msgstr "Pierres tombantes"
+
+#: constants/routes.ts:19
+msgid "Delete Account"
+msgstr "Supprimer le compte"
+
+#: app/[locale]/(protected)/account/delete/delete.form.tsx:128
+msgid "Confirm Deletion"
+msgstr "Confirmer la suppression"
+
+#: components/game/Table.tsx:299
+msgid "You can remove a row"
+msgstr "Vous pouvez supprimer une rangée"
+
+#: components/UserAvatar.tsx:50
+msgid "{username}’s avatar"
+msgstr "Avatar de {username}"
+
+#: app/[locale]/(auth)/sign-in-with-magic-link/sign-in-with-magic-link.form.tsx:99
+msgid "Email Me A Sign In Link"
+msgstr "Envoyez-moi un lien de connexion par courriel"
+
+#: constants/f-key-messages.ts:7
+msgid "I rule the world!"
+msgstr "Je domine le monde !"
+
+#: lib/keyboard/keyboard-key-labels.ts:15
+msgid "End"
+msgstr "Fin"
+
+#: components/game/Table.tsx:886
+msgid "You win!"
+msgstr "Vous avez gagné !"
+
+#: constants/routes.ts:26
+msgid "Terms of Service"
+msgstr "Conditions d'utilisation"
+
+#: components/game/TableGameDemoPanel.tsx:143
+msgid "Add Row"
+msgstr "Ajouter une rangée"
+
+#: app/[locale]/(protected)/account/settings/settings.form.tsx:51
+msgid "The language is invalid."
+msgstr "La langue est invalide."
+
+#: lib/keyboard/keyboard-key-labels.ts:62
+msgid "Numpad 2"
+msgstr "Pavé numérique 2"
+
+#: lib/keyboard/keyboard-key-labels.ts:67
+msgid "Numpad 7"
+msgstr "Pavé numérique 7"
+
+#: app/[locale]/(protected)/account/delete/delete.form.tsx:76
+msgid "Your account deletion request has been accepted. To complete the process, please confirm by clicking the link sent to your email."
+msgstr "Votre demande de suppression de compte a été acceptée. Pour finaliser le processus, veuillez confirmer en cliquant sur le lien envoyé à votre courriel."
+
+#: app/[locale]/(protected)/account/profile/change-password.form.tsx:230
+msgid "Confirm New Password"
+msgstr "Confirmer le nouveau mot de passe"
+
+#: components/game/Room.tsx:187
+#: components/game/CreateTableModal.tsx:79
+msgid "Create Table"
+msgstr "Créer une table"
+
+#: components/ui/Modal.tsx:80
+#: components/ui/Calendar.tsx:388
+#: components/game/PlayerInformationModal.tsx:75
+#: components/game/InstantMessageModal.tsx:42
+#: components/game/AlertModal.tsx:18
+msgid "Close"
+msgstr "Fermer"
+
+#: app/[locale]/(protected)/account/profile/linked-social-accounts.form.tsx:119
+msgid "Link"
+msgstr "Lier"
+
+#: components/game/TableGameDemoPanel.tsx:144
+msgid "Clump"
+msgstr "Grappe"
+
+#: components/game/PlayersList.tsx:201
+msgid "Rating"
+msgstr "Évaluation"
+
+#: constants/f-key-messages.ts:9
+msgid "I can destroy at will."
+msgstr "Je peux détruire à volonté."
+
+#: components/ui/Calendar.tsx:61
+msgid "June"
+msgstr "Juin"
+
+#: components/game/Room.tsx:157
+msgid "Joining room"
+msgstr "Connexion à la salle"
+
+#: app/[locale]/(auth)/sign-in/sign-in.form.tsx:188
+msgid "Remember me"
+msgstr "Se souvenir de moi"
+
+#: components/game/TableGameDemoPanel.tsx:506
+msgid "Your mission: Remove blocks from your and your partner's boards!"
+msgstr "Votre mission : Retirez des blocs de votre plateau et de celui de votre partenaire !"
+
+#: components/game/Table.tsx:772
+msgid "Private"
+msgstr "Privé"
+
+#: app/[locale]/(protected)/account/profile/profile.form.tsx:51
+#: app/[locale]/(protected)/account/profile/passkeys.form.tsx:48
+#: app/[locale]/(auth)/sign-up/sign-up.form.tsx:51
+msgid "The name is invalid."
+msgstr "Le nom est invalide."
+
+#. js-lingui-explicit-id
+#: components/game/Chat.tsx:96
+msgid "{tableHostUsername} has booted {username} from the table."
+msgstr "{tableHostUsername} a expulsé {username} de la table."
+
+#. js-lingui-explicit-id
+#: components/Sidebar.tsx:110
+msgid "{username} declined your invitation."
+msgstr "{username} a refusé votre invitation."
+
+#. js-lingui-explicit-id
+#: components/Sidebar.tsx:106
+msgid "{username} declined your invitation. Reason: {reason}"
+msgstr "{username} a refusé votre invitation. Raison: {reason}"
+
+#. js-lingui-explicit-id
+#: components/game/Chat.tsx:112
+msgid "{username} has accepted the invitation to the table."
+msgstr "{username} a accepté l'invitation à la table."
+
+#. js-lingui-explicit-id
+#: components/game/Chat.tsx:108
+msgid "{username} has joined the table."
+msgstr "{username} a rejoint la table."
+
+#. js-lingui-explicit-id
+#: components/game/Chat.tsx:116
+msgid "{username} has left the table."
+msgstr "{username} a quitté la table."
+
+#. js-lingui-explicit-id
+#: components/game/Chat.tsx:73
+msgid "{username} is a hero of {appName}!"
+msgstr "{username} est un héros de {appName} !"
+
+#. js-lingui-explicit-id
+#: components/game/Chat.tsx:56
+msgid "{username}: {message}"
+msgstr "{username} : {message}"
+
+#. js-lingui-explicit-id
+#: components/game/Chat.tsx:61
+msgid "{username}’s old rating: {oldRating}; new rating: {newRating}"
+msgstr "Ancien classement de {username} : {oldRating}; nouveau classement : {newRating}"
+
+#. js-lingui-explicit-id
+#: components/EmailTemplate.tsx:67
+msgid "© {copyrightYear} {appName}, All Rights Reserved"
+msgstr "© {copyrightYear} {appName}, Tous droits réservés"

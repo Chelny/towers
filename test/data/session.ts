@@ -1,20 +1,16 @@
 import { mockUser1 } from "@/test/data/user"
 
 export const mockSession = {
-  data: {
-    user: mockUser1,
-    session: {
-      id: "mock-user-1",
-      userId: mockUser1.id,
-      token: "mockToken",
-      expiresAt: new Date(),
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    },
-    accounts: [],
+  user: mockUser1,
+  session: {
+    id: "mock-user-1",
+    userId: mockUser1.id,
+    token: "mockToken",
+    expiresAt: new Date(),
+    createdAt: new Date(),
+    updatedAt: new Date(),
   },
-  isPending: false,
-  error: null,
+  accounts: [],
 }
 
 export const mockSessionCredentialAccount = {

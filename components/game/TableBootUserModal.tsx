@@ -30,12 +30,12 @@ export default function TableBootUserModal({
   isRatingsVisible,
   onCancel,
 }: TableBootUserModalProps): ReactNode {
-  const { socket } = useSocket()
+  const { socketRef } = useSocket()
   const { t } = useLingui()
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null)
 
   const handleSelectedPlayer = (): void => {
-    socket?.emit(SocketEvents.TABLE_BOOT_USER, { roomId, tableId, hostId, userToBootId: selectedPlayerId })
+    socketRef.current?.emit(SocketEvents.TABLE_BOOT_USER, { roomId, tableId, hostId, userToBootId: selectedPlayerId })
     onCancel?.()
   }
 

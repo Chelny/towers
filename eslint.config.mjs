@@ -17,7 +17,7 @@ const compat = new FlatCompat({
 
 export default [
   {
-    ignores: ["node_modules/", ".next/"],
+    ignores: ["node_modules/", ".next/", "prisma/app/generated/prisma/client"],
   },
   ...compat.extends("next/core-web-vitals"),
   pluginLingui.configs["flat/recommended"],

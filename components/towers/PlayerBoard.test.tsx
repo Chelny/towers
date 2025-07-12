@@ -5,36 +5,20 @@ import PlayerBoard from "@/components/towers/PlayerBoard"
 import { SocketEvents } from "@/constants/socket-events"
 import { ModalProvider } from "@/context/ModalContext"
 import { TowersGameState } from "@/enums/towers-game-state"
-import { authClient } from "@/lib/auth-client"
 import { BoardPlainObject } from "@/server/towers/classes/Board"
 import { NextPiecesPlainObject } from "@/server/towers/classes/NextPieces"
 import { PowerBarPlainObject } from "@/server/towers/classes/PowerBar"
 import { TableInvitationManagerPlainObject } from "@/server/towers/classes/TableInvitationManager"
 import { UserMuteManagerPlainObject } from "@/server/towers/classes/UserMuteManager"
-import { mockSession } from "@/test/data/session"
+import { mockSocket } from "@/test/data/socket"
 import { mockUser1 } from "@/test/data/user"
 import { mockUserStats1 } from "@/test/data/user-stats"
-import { mockSocket } from "@/vitest.setup"
 
 vi.mock("next/image", () => ({
   __esModule: true,
   default: (props: ImgHTMLAttributes<HTMLImageElement>) => {
     // eslint-disable-next-line @next/next/no-img-element
     return <img {...props} crossOrigin={props.crossOrigin} role="img" alt={props.alt} />
-  },
-}))
-
-vi.mock("@/context/SocketContext", async () => {
-  const actual = await vi.importActual("@/context/SocketContext")
-  return {
-    ...actual,
-    useSocket: () => ({ socket: mockSocket }),
-  }
-})
-
-vi.mock("@/lib/auth-client", () => ({
-  authClient: {
-    useSession: vi.fn(),
   },
 }))
 
@@ -111,14 +95,6 @@ const defaultProps = {
 }
 
 describe("PlayerBoard", () => {
-  beforeEach(() => {
-    vi.mocked(authClient.useSession).mockReturnValue(mockSession)
-  })
-
-  afterEach(() => {
-    vi.clearAllMocks()
-  })
-
   it("should display Join button when seat is available", () => {
     const openSeat = {
       ...defaultSeat,
@@ -208,7 +184,7 @@ describe("PlayerBoard", () => {
     fireEvent.keyDown(document, { key: "ArrowUp", code: "ArrowUp" })
 
     waitFor(() => {
-      expect(mockSocket.emit).toHaveBeenCalledWith(SocketEvents.PIECE_CYCLE, {
+      expect(mockSocket.current.emit).toHaveBeenCalledWith(SocketEvents.PIECE_CYCLE, {
         tableId: "mock-table-1",
         seatNumber: 1,
       })
@@ -228,7 +204,7 @@ describe("PlayerBoard", () => {
     fireEvent.keyDown(document, { key: "ArrowRight", code: "ArrowRight" })
 
     waitFor(() => {
-      expect(mockSocket.emit).toHaveBeenCalledWith(SocketEvents.PIECE_MOVE, {
+      expect(mockSocket.current.emit).toHaveBeenCalledWith(SocketEvents.PIECE_MOVE, {
         tableId: "mock-table-1",
         seatNumber: 1,
         direction: "right",
@@ -249,7 +225,7 @@ describe("PlayerBoard", () => {
     fireEvent.keyDown(document, { key: "ArrowLeft", code: "ArrowLeft" })
 
     waitFor(() => {
-      expect(mockSocket.emit).toHaveBeenCalledWith(SocketEvents.PIECE_MOVE, {
+      expect(mockSocket.current.emit).toHaveBeenCalledWith(SocketEvents.PIECE_MOVE, {
         tableId: "mock-table-1",
         seatNumber: 1,
         direction: "left",
@@ -270,7 +246,7 @@ describe("PlayerBoard", () => {
     fireEvent.keyDown(document, { key: "Space", code: "Space" })
 
     waitFor(() => {
-      expect(mockSocket.emit).toHaveBeenCalledWith(SocketEvents.POWER_USE, {
+      expect(mockSocket.current.emit).toHaveBeenCalledWith(SocketEvents.POWER_USE, {
         tableId: "mock-table-1",
         seatNumber: 1,
       })
@@ -288,6 +264,6 @@ describe("PlayerBoard", () => {
     board.focus()
 
     fireEvent.keyDown(document, { key: "ArrowLeft", code: "ArrowLeft" })
-    expect(mockSocket.emit).not.toHaveBeenCalled()
+    expect(mockSocket.current.emit).not.toHaveBeenCalled()
   })
 })

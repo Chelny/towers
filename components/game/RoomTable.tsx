@@ -21,12 +21,12 @@ type RoomTableProps = {
 
 export default function RoomTable({ roomId, table, user }: RoomTableProps): ReactNode {
   const router = useRouter()
-  const { socket, isConnected } = useSocket()
+  const { socketRef, isConnected } = useSocket()
   const seatMapping: number[][] = [
     [1, 3, 5, 7],
     [2, 4, 6, 8],
   ]
-  const hostUsername: string | undefined = table.host?.user?.username
+  const hostUsername: string | null | undefined = table.host?.user?.username
   const [hasAccess, setHasAccess] = useState<boolean>(false)
   const isPrivate: boolean = table.tableType === TableType.PRIVATE
   const isProtected: boolean = table.tableType === TableType.PROTECTED
@@ -42,12 +42,12 @@ export default function RoomTable({ roomId, table, user }: RoomTableProps): Reac
 
   const handleJoinTable = (seatNumber?: number): void => {
     if (seatNumber) {
-      socket?.emit(
+      socketRef.current?.emit(
         SocketEvents.TABLE_JOIN,
         { roomId, tableId: table.id, seatNumber },
         (response: { success: boolean; message: string }) => {
           if (response.success) {
-            socket.emit(SocketEvents.TABLE_GET, { roomId, tableId: table.id })
+            socketRef.current?.emit(SocketEvents.TABLE_GET, { roomId, tableId: table.id })
           }
         },
       )

@@ -8,13 +8,7 @@ type SupportedLocales = string
 
 const loadCatalog = async (locale: SupportedLocales): Promise<Record<string, Messages>> => {
   try {
-    // TypeError [ERR_UNKNOWN_FILE_EXTENSION]: Unknown file extension ".po" for /.../towers/translations/locales/*.po"
-    if (process.env.BYPASS_LINGUI_ERRORS) {
-      throw new Error("ERR_UNKNOWN_FILE_EXTENSION")
-    }
-
-    const { messages } = await import(`@/translations/locales/${locale}.po`)
-    // const { messages } = await import(`@lingui/loader!@/translations/locales/${locale}.po`)
+    const { messages } = await import(`@lingui/loader!@/translations/locales/${locale}/messages.po`)
     return { [locale]: messages }
   } catch (error) {
     logger.error(`Failed to load locale ${locale}: ${error}`)
@@ -25,13 +19,16 @@ const loadCatalog = async (locale: SupportedLocales): Promise<Record<string, Mes
 const catalogs: Record<string, Messages>[] = await Promise.all(locales.map(loadCatalog))
 
 // Transform array of catalogs into a single object
-export const allMessages: AllMessages = catalogs.reduce((acc, oneCatalog) => {
-  return { ...acc, ...oneCatalog }
-}, {})
+export const allMessages: AllMessages = catalogs.reduce(
+  (acc: Record<string, Messages>, oneCatalog: Record<string, Messages>) => {
+    return { ...acc, ...oneCatalog }
+  },
+  {},
+)
 
 type AllI18nInstances = { [K in SupportedLocales]: I18n }
 
-export const allI18nInstances: AllI18nInstances = locales.reduce((acc, locale) => {
+export const allI18nInstances: AllI18nInstances = locales.reduce((acc: {}, locale: string) => {
   const messages: Messages = allMessages[locale] ?? {}
   const i18n: I18n = setupI18n({
     locale,

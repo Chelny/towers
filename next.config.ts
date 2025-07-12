@@ -16,7 +16,6 @@ const nextConfig: NextConfig = {
     EMAIL_SENDER: process.env.EMAIL_SENDER,
     EMAIL_RECIPIENT: process.env.EMAIL_RECIPIENT,
     GOOGLE_ANALYTICS: process.env.GOOGLE_ANALYTICS,
-    BYPASS_LINGUI_ERRORS: process.env.BYPASS_LINGUI_ERRORS,
   },
   eslint: {
     ignoreDuringBuilds: true,
@@ -37,14 +36,6 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     swcPlugins: [["@lingui/swc-plugin", {}]],
-    turbo: {
-      rules: {
-        "*.po": {
-          loaders: ["@lingui/loader"],
-          as: "*.ts",
-        },
-      },
-    },
   },
   images: {
     remotePatterns: [
@@ -98,6 +89,14 @@ const nextConfig: NextConfig = {
     ]
   },
   serverExternalPackages: ["pino", "pino-pretty"],
+  turbopack: {
+    rules: {
+      "*.po": {
+        loaders: ["@lingui/loader"],
+        as: "*.ts",
+      },
+    },
+  },
   webpack: (config) => {
     config.cache = false
     config.module.rules.push({

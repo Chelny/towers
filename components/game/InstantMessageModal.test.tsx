@@ -1,27 +1,11 @@
 import { fireEvent, render, screen } from "@testing-library/react"
 import { Mock } from "vitest"
-import { authClient } from "@/lib/auth-client"
 import { InstantMessagePlainObject } from "@/server/towers/classes/InstantMessage"
 import { UserPlainObject } from "@/server/towers/classes/User"
-import { mockSession } from "@/test/data/session"
+import { mockSocket } from "@/test/data/socket"
 import { mockUser1, mockUser2 } from "@/test/data/user"
 import { mockUserStats1, mockUserStats2 } from "@/test/data/user-stats"
-import { mockSocket } from "@/vitest.setup"
 import InstantMessageModal from "./InstantMessageModal"
-
-vi.mock("@/context/SocketContext", async () => {
-  const actual = await vi.importActual("@/context/SocketContext")
-  return {
-    ...actual,
-    useSocket: () => ({ socket: mockSocket }),
-  }
-})
-
-vi.mock("@/lib/auth-client", () => ({
-  authClient: {
-    useSession: vi.fn(),
-  },
-}))
 
 const mockInstantMessage: InstantMessagePlainObject = {
   id: "mock-instant-message",
@@ -42,7 +26,6 @@ describe("InstantMessageModal", () => {
   beforeEach(() => {
     HTMLDialogElement.prototype.showModal = vi.fn()
     HTMLDialogElement.prototype.close = vi.fn()
-    vi.mocked(authClient.useSession).mockReturnValue(mockSession)
   })
 
   it("should render the modal with message and sender info", () => {
@@ -63,7 +46,7 @@ describe("InstantMessageModal", () => {
     expect(input.value).toBe("Hey! Wanna play?")
 
     const mockCallback: Mock = vi.fn((_, __, cb) => cb({ success: true }))
-    mockSocket.emit = mockCallback
+    mockSocket.current.emit = mockCallback
 
     const replyButton: HTMLElement = screen.getByText("Reply")
     fireEvent.click(replyButton)

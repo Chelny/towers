@@ -1,10 +1,10 @@
-import { RefObject, useCallback, useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 
 export const useOnScreen = <T extends HTMLElement>(
   options?: IntersectionObserverInit,
 ): [(node: T | null) => void, boolean] => {
   const [isVisible, setIsVisible] = useState<boolean>(false)
-  const observerRef: RefObject<IntersectionObserver | null> = useRef<IntersectionObserver | null>(null)
+  const observerRef = useRef<IntersectionObserver>(null)
 
   const setRef = useCallback(
     (node: T | null) => {

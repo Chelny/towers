@@ -23,7 +23,7 @@ export default function TableChangeKeysPanel({
   onChangeView,
 }: TableChangeKeysPanelProps): ReactNode {
   const { i18n, t } = useLingui()
-  const { socket, isConnected } = useSocket()
+  const { socketRef, isConnected } = useSocket()
   const [controlKeys, setControlKeys] = useState<TowersControlKeys>({ ...initialControlKeys })
   const [selectedKey, setSelectedKey] = useState<keyof TowersControlKeys | null>(null)
   const [showErrorMessage, setShowErrorMessage] = useState<boolean>(false)
@@ -67,7 +67,7 @@ export default function TableChangeKeysPanel({
     } else {
       setShowErrorMessage(false)
       setShowSuccessMessage(true)
-      socket?.emit(SocketEvents.GAME_SAVE_CONTROL_KEYS, { controlKeys })
+      socketRef.current?.emit(SocketEvents.GAME_SAVE_CONTROL_KEYS, { controlKeys })
     }
   }
 

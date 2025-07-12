@@ -13,7 +13,7 @@ import {
   RATING_PLATINUM,
 } from "@/constants/game"
 import { useModal } from "@/context/ModalContext"
-import { authClient } from "@/lib/auth-client"
+import { useSocket } from "@/context/SocketContext"
 import { UserPlainObject } from "@/server/towers/classes/User"
 
 type PlayersListProps = {
@@ -29,7 +29,7 @@ export default function PlayersList({
   isTableNumberVisible = false,
   onSelectedPlayer,
 }: PlayersListProps): ReactNode {
-  const { data: session } = authClient.useSession()
+  const { session } = useSocket()
   const { t } = useLingui()
   const { openModal } = useModal()
   const [sortKey, setSortKey] = useState<"name" | "rating" | "table">("name")
@@ -168,7 +168,7 @@ export default function PlayersList({
       {/* Players List Heading */}
       <div
         className={clsx(
-          "grid gap-1 pe-3 border-b border-gray-200 divide-x-2 divide-gray-200 bg-gray-50",
+          "grid gap-1 pe-3 border-b border-gray-200 bg-gray-50",
           "rtl:divide-x-reverse",
           "dark:border-b-dark-game-players-border dark:border-dark-game-players-border dark:divide-dark-game-players-border dark:bg-dark-game-players-header",
           isRatingsVisible && isTableNumberVisible ? "grid-cols-[5fr_4fr_3fr]" : "grid-cols-[8fr_4fr]",
@@ -242,7 +242,7 @@ export default function PlayersList({
           <div
             key={player.user?.id}
             className={clsx(
-              "grid gap-1 divide-x-2 divide-gray-200 cursor-pointer",
+              "grid gap-1 cursor-pointer",
               "rtl:divide-x-reverse",
               "dark:divide-dark-game-players-border",
               isRatingsVisible && isTableNumberVisible ? "grid-cols-[5fr_4fr_3fr]" : "grid-cols-[8fr_4fr]",

@@ -1,11 +1,10 @@
-import { cookies } from "next/headers"
-import { betterAuth } from "better-auth"
+import { betterAuth, User as BetterAuthUser } from "better-auth"
 import { prismaAdapter } from "better-auth/adapters/prisma"
 import { nextCookies } from "better-auth/next-js"
 import { admin, customSession, magicLink, openAPI, username } from "better-auth/plugins"
 import { passkey } from "better-auth/plugins/passkey"
-import { Account, User } from "db"
-import { APP_CONFIG, APP_COOKIES, COOKIE_PREFIX } from "@/constants/app"
+import { Account, User, WebsiteTheme } from "db"
+import { APP_CONFIG, COOKIE_PREFIX } from "@/constants/app"
 import { getAccountsByUserId } from "@/data/account"
 import { getUserById } from "@/data/user"
 import {
@@ -27,16 +26,71 @@ export const auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),
+  plugins: [
+    openAPI(), // http://localhost:3000/api/auth/reference
+    customSession(async (session) => {
+      const user: User | null = await getUserById(session.user.id)
+      const accounts: Account[] = await getAccountsByUserId(session.user.id)
+
+      return {
+        user: {
+          ...session.user,
+          ...user,
+        },
+        session: session.session,
+        accounts,
+      }
+    }),
+    username({
+      minUsernameLength: 4,
+      maxUsernameLength: 32,
+      usernameValidator: (username: string) => {
+        if (username === "admin") {
+          return false
+        }
+
+        return true
+      },
+    }),
+    magicLink({
+      sendMagicLink: async (data: { email: string; url: string; token: string }) => {
+        await sendMagicLinkEmail(data)
+      },
+      expiresIn: 600, // 10 minutes
+    }),
+    passkey({
+      rpID: process.env.NODE_ENV === "development" ? "localhost" : "", // TODO: Set production rpID
+      rpName: APP_CONFIG.NAME,
+      origin: process.env.BETTER_AUTH_URL,
+      schema: {
+        passkey: {
+          modelName: "Passkey",
+        },
+      },
+    }),
+    admin(),
+    nextCookies(), // Make sure this is the last plugin in the array
+  ],
   user: {
     modelName: "User",
     additionalFields: {
       birthdate: {
         type: "date",
         required: false,
+        input: true,
+      },
+      username: {
+        type: "string",
+        input: true,
       },
       language: {
         type: "string",
         defaultValue: "en",
+        input: true,
+      },
+      role: {
+        type: "string",
+        required: false,
       },
       isOnline: {
         type: "boolean",
@@ -46,16 +100,37 @@ export const auth = betterAuth({
         type: "date",
         required: false,
       },
+      theme: {
+        type: "string",
+        defaultValue: WebsiteTheme.SYSTEM,
+      },
+      banned: {
+        type: "boolean",
+        required: false,
+      },
+      banReason: {
+        type: "string",
+        required: false,
+      },
+      banExpires: {
+        type: "date",
+        required: false,
+      },
     },
     changeEmail: {
       enabled: true,
-      sendChangeEmailVerification: async (data) => {
+      sendChangeEmailVerification: async (data: {
+        user: BetterAuthUser
+        newEmail: string
+        url: string
+        token: string
+      }) => {
         await sendEmailChangeEmail(data)
       },
     },
     deleteUser: {
       enabled: true,
-      sendDeleteAccountVerification: async (data) => {
+      sendDeleteAccountVerification: async (data: { user: BetterAuthUser; url: string; token: string }) => {
         await sendDeleteUserEmail(data)
       },
     },
@@ -73,26 +148,35 @@ export const auth = betterAuth({
     modelName: "Account",
     accountLinking: {
       enabled: true,
+      trustedProviders: ["email-password", "github", "google"],
+      allowDifferentEmails: true,
+      allowUnlinkingAll: true,
     },
   },
   verification: {
     modelName: "Verification",
   },
+  rateLimit: {
+    enabled: true,
+    storage: "database",
+    modelName: "RateLimit",
+  },
   emailVerification: {
     sendOnSignUp: true,
-    sendVerificationEmail: async (data) => {
+    sendVerificationEmail: async (data: { user: BetterAuthUser; url: string; token: string }) => {
       await sendEmailVerificationEmail(data)
     },
-    autoSignInAfterVerification: false,
+    expiresIn: 3600, // 1 hour
+    autoSignInAfterVerification: true,
   },
   emailAndPassword: {
     enabled: true,
     autoSignIn: false,
     requireEmailVerification: true,
-    sendResetPassword: async (data) => {
+    sendResetPassword: async (data: { user: BetterAuthUser; url: string; token: string }) => {
       await sendPasswordResetEmail(data)
     },
-    resetPasswordTokenExpiresIn: 3600, // 60 minutes
+    resetPasswordTokenExpiresIn: 3600, // 1 hour
   },
   socialProviders: {
     github: {
@@ -104,17 +188,17 @@ export const auth = betterAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     },
   },
+  advanced: {
+    database: {
+      generateId: false,
+    },
+    cookiePrefix: COOKIE_PREFIX,
+  },
   databaseHooks: {
     user: {
       create: {
         before: async (user) => {
           const username: string = generateRandomUsername(user.email)
-
-          // @ts-ignore
-          if (!user.username) {
-            const cookiesStore = await cookies()
-            cookiesStore.set(APP_COOKIES.NEW_USER, "true")
-          }
 
           return {
             data: {
@@ -128,57 +212,17 @@ export const auth = betterAuth({
       },
     },
   },
-  advanced: {
-    generateId: false,
-    cookiePrefix: COOKIE_PREFIX,
-  },
-  rateLimit: {
-    storage: "database",
-    modelName: "RateLimit",
-  },
-  plugins: [
-    openAPI(), // http://localhost:3000/api/auth/reference
-    customSession(async (session) => {
-      const user: User | null = await getUserById(session.user.id)
-      const accounts: Account[] = await getAccountsByUserId(session.user.id)
-
-      return {
-        user: {
-          ...session.user,
-          ...user,
-        },
-        session: session.session,
-        accounts,
-      }
-    }),
-    username(),
-    magicLink({
-      sendMagicLink: async (data) => {
-        await sendMagicLinkEmail(data)
-      },
-      expiresIn: 600, // 10 minutes
-    }),
-    passkey({
-      rpID: "towers",
-      rpName: APP_CONFIG.NAME,
-      origin: process.env.BETTER_AUTH_URL,
-      schema: {
-        passkey: {
-          modelName: "Passkey",
-          fields: {},
-        },
-      },
-    }),
-    admin(),
-    nextCookies(), // Make sure this is the last plugin in the array,
-  ],
   onAPIError: {
-    onError: (error) => {
-      logger.warn(`Better-Auth API error: ${JSON.stringify(error)}`)
+    throw: true,
+    onError: (error: unknown) => {
+      logger.error(`Better-Auth API error: ${JSON.stringify(error)}`)
     },
+    errorURL: "/error",
   },
   logger: {
     disabled: process.env.NODE_ENV === "production",
     level: "debug",
   },
 })
+
+export type Session = typeof auth.$Infer.Session

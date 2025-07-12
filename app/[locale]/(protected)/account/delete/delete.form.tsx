@@ -1,6 +1,7 @@
 "use client"
 
 import { ClipboardEvent, FormEvent, ReactNode, useState } from "react"
+import { ErrorContext } from "@better-fetch/fetch"
 import { Trans, useLingui } from "@lingui/react/macro"
 import { Value, ValueError } from "@sinclair/typebox/value"
 import clsx from "clsx/lite"
@@ -60,21 +61,22 @@ export function DeleteAccountForm(): ReactNode {
             setIsLoading(true)
             setFormState(INITIAL_FORM_STATE)
           },
-          onSuccess: () => {
+          onResponse: () => {
             setIsLoading(false)
+          },
+          onError: (ctx: ErrorContext) => {
+            setFormState({
+              success: false,
+              message: ctx.error.message,
+            })
+          },
+          onSuccess: () => {
             setFormState({
               success: true,
               message: t({
                 message:
                   "Your account deletion request has been accepted. To complete the process, please confirm by clicking the link sent to your email.",
               }),
-            })
-          },
-          onError: (ctx) => {
-            setIsLoading(false)
-            setFormState({
-              success: false,
-              message: ctx.error.message,
             })
           },
         },
@@ -117,7 +119,10 @@ export function DeleteAccountForm(): ReactNode {
 
       <Button
         type="submit"
-        className="mt-4 border-t-red-200 border-e-red-400 border-b-red-400 border-s-red-200 bg-red-500 text-white"
+        className={clsx(
+          "mt-4 border-t-red-200 border-e-red-400 border-b-red-400 border-s-red-200 bg-red-500 text-white",
+          "dark:border-t-red-200 dark:border-e-red-400 dark:border-b-red-400 dark:border-s-red-200 dark:bg-red-500",
+        )}
         disabled={isLoading}
       >
         <Trans>Confirm Deletion</Trans>

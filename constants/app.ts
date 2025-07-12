@@ -10,6 +10,6 @@ export const APP_CONFIG = {
 export const COOKIE_PREFIX = "towers"
 export const APP_COOKIES = {
   LOCALE: `${COOKIE_PREFIX}.locale`,
-  NEW_USER: `${COOKIE_PREFIX}.new_user`,
+  SETTINGS_FORM_STATE: `${COOKIE_PREFIX}.settings_form_state`,
   THEME: `${COOKIE_PREFIX}.theme`,
 }

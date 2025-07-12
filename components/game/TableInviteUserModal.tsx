@@ -7,7 +7,6 @@ import PlayersListSkeleton from "@/components/skeleton/PlayersListSkeleton"
 import Modal from "@/components/ui/Modal"
 import { SocketEvents } from "@/constants/socket-events"
 import { useSocket } from "@/context/SocketContext"
-import { authClient } from "@/lib/auth-client"
 import { UserPlainObject } from "@/server/towers/classes/User"
 
 const PlayersList = dynamic(() => import("@/components/game/PlayersList"), {
@@ -29,13 +28,12 @@ export default function TableInviteUserModal({
   isRatingsVisible,
   onCancel,
 }: TableInviteUserModalProps): ReactNode {
-  const { socket } = useSocket()
+  const { socketRef, session } = useSocket()
   const { t } = useLingui()
-  const { data: session } = authClient.useSession()
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null)
 
   const handleUserToInvite = (): void => {
-    socket?.emit(SocketEvents.TABLE_INVITE_USER, {
+    socketRef.current?.emit(SocketEvents.TABLE_INVITE_USER, {
       roomId,
       tableId,
       inviterUserId: session?.user.id,

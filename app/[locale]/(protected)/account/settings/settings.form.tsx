@@ -1,6 +1,6 @@
 "use client"
 
-import { FormEvent, ReactNode, useState } from "react"
+import { FormEvent, ReactNode, useEffect, useState } from "react"
 import { usePathname, useRouter } from "next/navigation"
 import { Trans, useLingui } from "@lingui/react/macro"
 import { Value, ValueError } from "@sinclair/typebox/value"
@@ -16,6 +16,7 @@ import AlertMessage from "@/components/ui/AlertMessage"
 import Button from "@/components/ui/Button"
 import Select from "@/components/ui/Select"
 import { INITIAL_FORM_STATE } from "@/constants/api"
+import { APP_COOKIES } from "@/constants/app"
 import { Session } from "@/lib/auth-client"
 import { logger } from "@/lib/logger"
 import { defaultLocale, Language, languages, SupportedLocales } from "@/translations/languages"
@@ -82,13 +83,15 @@ export function SettingsForm({ session }: SettingsFormProps): ReactNode {
           // Set theme dynamically
           setTheme(payload.theme.toLowerCase())
 
-          // Dynamically change language
-          const pathNameWithoutLocale: string[] = pathname?.split("/")?.slice(2) ?? []
-          const newPath: string = `/${payload.language}/${pathNameWithoutLocale.join("/")}`
+          if (payload.language !== session?.user.language) {
+            // Show form success message after page reload from language change
+            localStorage.setItem(APP_COOKIES.SETTINGS_FORM_STATE, JSON.stringify(data))
 
-          setTimeout(() => {
+            // Dynamically change language
+            const pathNameWithoutLocale: string[] = pathname?.split("/")?.slice(2) ?? []
+            const newPath: string = `/${payload.language}/${pathNameWithoutLocale.join("/")}`
             router.push(newPath)
-          }, 2000)
+          }
         })
         .catch(async (error) => {
           const data: ApiResponse = await error.json()
@@ -97,6 +100,15 @@ export function SettingsForm({ session }: SettingsFormProps): ReactNode {
         })
     }
   }
+
+  useEffect(() => {
+    const savedState: string | null = localStorage.getItem(APP_COOKIES.SETTINGS_FORM_STATE)
+
+    if (savedState) {
+      setFormState(JSON.parse(savedState))
+      localStorage.removeItem(APP_COOKIES.SETTINGS_FORM_STATE)
+    }
+  }, [])
 
   return (
     <div
@@ -121,7 +133,7 @@ export function SettingsForm({ session }: SettingsFormProps): ReactNode {
             <Select.Option key={language.locale} value={language.locale}>
               <div className="flex gap-2">
                 <div>{language.flag}</div>
-                <div>{i18n._(language.msg)}</div>
+                <div>{i18n._(language.label)}</div>
               </div>
             </Select.Option>
           ))}

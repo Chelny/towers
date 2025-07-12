@@ -1,6 +1,7 @@
 "use client"
 
 import { ClipboardEvent, FormEvent, ReactNode, useState } from "react"
+import { ErrorContext } from "@better-fetch/fetch"
 import { Trans, useLingui } from "@lingui/react/macro"
 import { ValueError } from "@sinclair/typebox/errors"
 import { Value } from "@sinclair/typebox/value"
@@ -94,7 +95,6 @@ export function SignUpForm({ locale }: SignUpFormProps): ReactNode {
           username: payload.username,
           password: payload.password,
           // image: payload.image ? convertImageToBase64(payload.image) : null,
-          // @ts-ignore
           language: locale,
           callbackURL: CALLBACK_URL,
         },
@@ -103,21 +103,22 @@ export function SignUpForm({ locale }: SignUpFormProps): ReactNode {
             setIsLoading(true)
             setFormState(INITIAL_FORM_STATE)
           },
+          onResponse: () => {
+            setIsLoading(false)
+          },
+          onError: (ctx: ErrorContext) => {
+            setFormState({
+              success: false,
+              message: ctx.error.message,
+            })
+          },
           onSuccess: () => {
             const email: string = payload.email
-            setIsLoading(false)
             setFormState({
               success: true,
               message: t({
                 message: `A confirmation email has been sent to ${email}. If you don’t see it in your inbox, please check your spam or junk folder.`,
               }),
-            })
-          },
-          onError: (ctx) => {
-            setIsLoading(false)
-            setFormState({
-              success: false,
-              message: ctx.error.message,
             })
           },
         },

@@ -5,6 +5,8 @@ vi.mock("@lingui/core/macro", () => ({
     if (count === 1 && forms.one) return forms.one.replace("#", count.toString())
     return forms.other.replace("#", count?.toString())
   },
+  select: vi.fn(),
+  selectOrdinal: vi.fn(),
   t: (key: Record<string, string>) => key.message,
 }))
 
@@ -16,6 +18,9 @@ vi.mock("@lingui/react", () => ({
 }))
 
 vi.mock("@lingui/react/macro", () => ({
+  Plural: vi.fn(),
+  Select: vi.fn(),
+  SelectOrdinal: vi.fn(),
   Trans: ({ children }: { id?: string; values?: Record<string, unknown>; children?: React.ReactNode }) => {
     if (typeof children === "string") return <>{children}</>
     if (Array.isArray(children)) return <>{children}</>

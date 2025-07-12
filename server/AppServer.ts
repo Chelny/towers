@@ -15,7 +15,7 @@ export class AppServer {
   private readonly protocol: string = process.env.PROTOCOL || "http"
   private readonly hostname: string = process.env.HOSTNAME || "localhost"
   private readonly port: number = parseInt(process.env.PORT || "3000", 10)
-  private app = next({ dev: this.dev, hostname: this.hostname, port: this.port, turbopack: true })
+  private app = next({ dev: this.dev, hostname: this.hostname, port: this.port })
   private handler = this.app.getRequestHandler()
   private httpServer!: HttpServer
   private io!: SocketServer

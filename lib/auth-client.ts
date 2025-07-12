@@ -6,7 +6,7 @@ import {
   passkeyClient,
   usernameClient,
 } from "better-auth/client/plugins"
-import { createAuthClient } from "better-auth/react"
+import { createAuthClient, ErrorContext } from "better-auth/react"
 import type { auth } from "@/lib/auth"
 import { logger } from "@/lib/logger"
 
@@ -20,7 +20,7 @@ export const authClient = createAuthClient({
     adminClient(),
   ],
   fetchOptions: {
-    onError: async (context) => {
+    onError: async (context: ErrorContext) => {
       const { response } = context
       if (response.status === 429) {
         const retryAfter: string | null = response.headers.get("X-Retry-After")

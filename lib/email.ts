@@ -1,17 +1,18 @@
 import { i18n, I18n } from "@lingui/core"
+import { User as BetterAuthUser } from "better-auth"
 import { initLingui } from "@/app/init-lingui"
 import { APP_CONFIG } from "@/constants/app"
 import { EMAIL_COLORS } from "@/constants/email"
-import { Session } from "@/lib/auth-client"
 
 const ctaStyle: string = `display: block; padding: 10px 20px; border: 1px solid ${EMAIL_COLORS.buttonBorder}; border-radius: 8px; background-color: ${EMAIL_COLORS.buttonBackground}; font-size: 18px; font-family: Helvetica, Arial, sans-serif; color: ${EMAIL_COLORS.buttonText}; font-weight: 500; text-align: center; text-decoration: none;`
 
 export const sendEmailVerificationEmail = async (data: {
-  user: Session["user"]
+  user: BetterAuthUser
   url: string
   token: string
 }): Promise<void> => {
-  const i18n: I18n = initLingui(data.user.language!)
+  // @ts-ignore
+  const i18n: I18n = initLingui(data.user.language)
 
   await fetch(`${process.env.BASE_URL}/api/send`, {
     method: "POST",
@@ -29,6 +30,7 @@ export const sendEmailVerificationEmail = async (data: {
         "Hi {name},\n\nWe received a request to verify your email address. To proceed, copy and paste the following link in a browser: {url}\n\nThe verification token will expire 1 hour after receiving this message.\n\nIf you did not make this request or if you believe your account has been compromised, contact our support team immediately.\n\n",
         { name: data.user.name, url: data.url },
       ),
+      // @ts-ignore
       locale: data.user.language,
     }),
   })
@@ -54,11 +56,12 @@ export const sendMagicLinkEmail = async (data: { email: string; token: string; u
 }
 
 export const sendPasswordResetEmail = async (data: {
-  user: Session["user"]
+  user: BetterAuthUser
   url: string
   token: string
 }): Promise<void> => {
-  const i18n: I18n = initLingui(data.user.language!)
+  // @ts-ignore
+  const i18n: I18n = initLingui(data.user.language)
 
   await fetch(`${process.env.BASE_URL}/api/send`, {
     method: "POST",
@@ -74,18 +77,20 @@ export const sendPasswordResetEmail = async (data: {
         "Hi {name},\n\nWe’ve received a request to reset your password. Reset your password by copying and pasting the following link in a browser: {url}\n\nThe link will expire 1 hour after receiving this message.\n\nIf you did not request a new password or if you believe your account has been compromised, contact our support team immediately.\n\n",
         { name: data.user.name, url: data.url },
       ),
+      // @ts-ignore
       locale: data.user.language,
     }),
   })
 }
 
 export const sendEmailChangeEmail = async (data: {
-  user: Session["user"]
+  user: BetterAuthUser
   newEmail: string
   url: string
   token: string
 }): Promise<void> => {
-  const i18n: I18n = initLingui(data.user.language!)
+  // @ts-ignore
+  const i18n: I18n = initLingui(data.user.language)
 
   await fetch(`${process.env.BASE_URL}/api/send`, {
     method: "POST",
@@ -106,11 +111,12 @@ export const sendEmailChangeEmail = async (data: {
 }
 
 export const sendDeleteUserEmail = async (data: {
-  user: Session["user"]
+  user: BetterAuthUser
   url: string
   token: string
 }): Promise<void> => {
-  const i18n: I18n = initLingui(data.user.language!)
+  // @ts-ignore
+  const i18n: I18n = initLingui(data.user.language)
 
   await fetch(`${process.env.BASE_URL}/api/send`, {
     method: "POST",

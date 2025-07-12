@@ -3,9 +3,7 @@ import Room from "@/components/game/Room"
 import { ROUTE_TOWERS } from "@/constants/routes"
 import { GameProvider } from "@/context/GameContext"
 import { ModalProvider } from "@/context/ModalContext"
-import { authClient } from "@/lib/auth-client"
 import { RoomLevel, RoomPlainObject } from "@/server/towers/classes/Room"
-import { mockSession } from "@/test/data/session"
 import { mockUseRouter, mockUseSearchParams } from "@/vitest.setup"
 
 const mockRoom: RoomPlainObject = {
@@ -26,12 +24,6 @@ vi.mock("next/navigation", () => ({
   })),
 }))
 
-vi.mock("@/lib/auth-client", () => ({
-  authClient: {
-    useSession: vi.fn(),
-  },
-}))
-
 const renderRoom = () => {
   render(
     <GameProvider>
@@ -43,10 +35,6 @@ const renderRoom = () => {
 }
 
 describe("Room", () => {
-  beforeEach(() => {
-    vi.mocked(authClient.useSession).mockReturnValue(mockSession)
-  })
-
   it("should redirect if room join fails", () => {
     renderRoom()
 

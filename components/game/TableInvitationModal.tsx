@@ -1,6 +1,6 @@
 "use client"
 
-import { ChangeEvent, ReactNode, useState } from "react"
+import { ChangeEvent, InputEvent, ReactNode, useState } from "react"
 import { Trans, useLingui } from "@lingui/react/macro"
 import Checkbox from "@/components/ui/Checkbox"
 import Input from "@/components/ui/Input"
@@ -20,7 +20,7 @@ export default function TableInvitationModal({
   onAcceptInvitation,
   onCancel,
 }: TableInvitationModalProps): ReactNode {
-  const { socket } = useSocket()
+  const { socketRef } = useSocket()
   const { t } = useLingui()
   const [reason, setReason] = useState<string | undefined>(undefined)
   const [declineAll, setDeclineAll] = useState<boolean>(false)
@@ -30,7 +30,7 @@ export default function TableInvitationModal({
   const ratedOption: string = tableInvitation.tableIsRated ? t({ message: "Rated" }) : t({ message: "Not Rated" })
 
   const handleAcceptInvitation = (): void => {
-    socket?.emit(SocketEvents.TABLE_INVITATION_ACCEPTED, {
+    socketRef.current?.emit(SocketEvents.TABLE_INVITATION_ACCEPTED, {
       roomId: tableInvitation.roomId,
       tableId: tableInvitation.tableId,
       inviteeUserId: tableInvitation.inviteeUserId,
@@ -40,7 +40,7 @@ export default function TableInvitationModal({
   }
 
   const handleDeclineInvitation = (): void => {
-    socket?.emit(SocketEvents.TABLE_INVITATION_DECLINED, {
+    socketRef.current?.emit(SocketEvents.TABLE_INVITATION_DECLINED, {
       roomId: tableInvitation.roomId,
       tableId: tableInvitation.tableId,
       inviteeUserId: tableInvitation.inviteeUserId,
@@ -76,7 +76,7 @@ export default function TableInvitationModal({
             label={t({ message: "Reason" })}
             defaultValue={reason}
             dataTestId="table-invitation_input-text_reason"
-            onInput={(event: ChangeEvent<HTMLInputElement>) => setReason(event.target.value)}
+            onInput={(event: InputEvent<HTMLInputElement>) => setReason((event.target as HTMLInputElement).value)}
           />
           <Checkbox
             id="declineAll"

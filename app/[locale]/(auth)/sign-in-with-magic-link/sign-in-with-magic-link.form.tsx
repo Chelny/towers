@@ -1,6 +1,7 @@
 "use client"
 
 import { FormEvent, ReactNode, useState } from "react"
+import { ErrorContext } from "@better-fetch/fetch"
 import { Trans, useLingui } from "@lingui/react/macro"
 import { ValueError } from "@sinclair/typebox/errors"
 import { Value } from "@sinclair/typebox/value"
@@ -61,19 +62,20 @@ export function SignInWithMagicLinkForm(): ReactNode {
             setIsLoading(true)
             setFormState(INITIAL_FORM_STATE)
           },
-          onSuccess: () => {
-            const email: string = payload.email
+          onResponse: () => {
             setIsLoading(false)
-            setFormState({
-              success: true,
-              message: t({ message: `We’ve sent a magic sign-in link to ${email}` }),
-            })
           },
-          onError: (ctx) => {
-            setIsLoading(false)
+          onError: (ctx: ErrorContext) => {
             setFormState({
               success: false,
               message: ctx.error.message,
+            })
+          },
+          onSuccess: () => {
+            const email: string = payload.email
+            setFormState({
+              success: true,
+              message: t({ message: `We’ve sent a magic sign-in link to ${email}` }),
             })
           },
         },

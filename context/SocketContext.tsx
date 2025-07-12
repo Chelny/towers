@@ -1,27 +1,57 @@
 "use client"
 
-import { Context, createContext, PropsWithChildren, ReactNode, useContext, useEffect, useState } from "react"
+import {
+  Context,
+  createContext,
+  createRef,
+  PropsWithChildren,
+  ReactNode,
+  RefObject,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react"
 import { io, Socket } from "socket.io-client"
-import { authClient } from "@/lib/auth-client"
+import { Session } from "@/lib/auth-client"
 import { logger } from "@/lib/logger"
 
 interface SocketContextType {
-  socket: Socket | null
+  socketRef: RefObject<Socket | null>
   isConnected: boolean
+  session: Session | null
 }
 
 export const SocketContext: Context<SocketContextType> = createContext<SocketContextType>({
-  socket: null,
+  socketRef: createRef<Socket>(),
   isConnected: false,
+  session: null,
 })
 
-export const SocketProvider = ({ children }: PropsWithChildren): ReactNode => {
-  const { data: session, isPending } = authClient.useSession()
-  const [socket, setSocket] = useState<Socket | null>(null)
+export const SocketProvider = ({ children, session }: PropsWithChildren<{ session: Session | null }>): ReactNode => {
+  const socketRef = useRef<Socket | null>(null)
   const [isConnected, setIsConnected] = useState<boolean>(false)
 
   useEffect(() => {
-    const newSocket: Socket = io({
+    if (!session) {
+      if (socketRef.current) {
+        // TODO: Show a modal or redirect user to sign in page
+        logger.warn("No session found. Disconnecting socket and prompting user to re-auth.")
+        socketRef.current.disconnect()
+        socketRef.current = null
+      }
+
+      return
+    }
+
+    if (socketRef.current) {
+      logger.info("Socket already exists. No new connection.")
+      return
+    }
+
+    // Session is ready, socket will be created
+    const socket: Socket = io({
+      auth: { session },
       autoConnect: true,
       reconnection: true,
       reconnectionDelay: 10000,
@@ -29,76 +59,14 @@ export const SocketProvider = ({ children }: PropsWithChildren): ReactNode => {
       withCredentials: true,
     })
 
-    setSocket(newSocket)
-
-    const handleConnect = (): void => {
-      setIsConnected(true)
-    }
-
-    const handleDisconnect = (): void => {
-      setIsConnected(false)
-    }
-
-    newSocket.on("connect", handleConnect)
-    newSocket.on("disconnect", handleDisconnect)
-
-    return () => {
-      newSocket.off("connect", handleConnect)
-      newSocket.off("disconnect", handleDisconnect)
-      newSocket.disconnect()
-      setSocket(null)
-    }
-  }, [])
-
-  useEffect(() => {
-    if (isPending || !socket) return
-
-    if (session) {
-      socket.auth = { session }
-      socket.connect()
-    } else {
-      socket.disconnect()
-    }
-  }, [isPending, socket, session])
-
-  useEffect(() => {
-    if (!isPending && !session && socket) {
-      // TODO: Show a modal or redirect
-      logger.warn("No session found. Disconnecting socket and prompting user to re-auth.")
-      socket.disconnect()
-    }
-  }, [isPending, session, socket])
-
-  useEffect(() => {
-    if (!socket) return
-
-    const handleOnline = (): void => {
-      logger.info("You are online. Reconnecting socket...")
-      socket.connect()
-    }
-
-    const handleOffline = (): void => {
-      logger.warn("You are offline. Disconnecting socket...")
-      socket.disconnect()
-    }
-
-    window.addEventListener("online", handleOnline)
-    window.addEventListener("offline", handleOffline)
-
-    return () => {
-      window.removeEventListener("online", handleOnline)
-      window.removeEventListener("offline", handleOffline)
-    }
-  }, [socket])
-
-  useEffect(() => {
-    if (!socket) return
+    socketRef.current = socket
 
     // **************************************************
     // * Socket IO Events
     // **************************************************
 
     socket.on("connect", () => {
+      setIsConnected(true)
       logger.info(`Socket connected. Socket ID: ${socket.id}.`)
     })
 
@@ -130,6 +98,7 @@ export const SocketProvider = ({ children }: PropsWithChildren): ReactNode => {
     })
 
     socket.on("disconnect", (reason: string) => {
+      setIsConnected(false)
       logger.info(`Socket disconnected due to ${reason}.`)
     })
 
@@ -139,7 +108,7 @@ export const SocketProvider = ({ children }: PropsWithChildren): ReactNode => {
 
     socket.on("socket:disconnect:success", () => {
       socket.disconnect()
-      setSocket(null)
+      socketRef.current = null
     })
 
     // **************************************************
@@ -150,7 +119,30 @@ export const SocketProvider = ({ children }: PropsWithChildren): ReactNode => {
       logger.error(`Server error: ${message}.`)
     })
 
+    // **************************************************
+    // * Network Events
+    // **************************************************
+
+    const handleOnline = (): void => {
+      logger.info("You are online. Reconnecting socket...")
+      socket.connect()
+    }
+
+    const handleOffline = (): void => {
+      logger.warn("You are offline. Disconnecting socket...")
+      socket.disconnect()
+    }
+
+    window.addEventListener("online", handleOnline)
+    window.addEventListener("offline", handleOffline)
+
+    // **************************************************
+    // * Cleanups
+    // **************************************************
+
     return () => {
+      socketRef.current = null
+
       socket.off("connect")
       socket.off("connect_error")
       socket.off("ping")
@@ -162,10 +154,14 @@ export const SocketProvider = ({ children }: PropsWithChildren): ReactNode => {
       socket.off("error")
       socket.off("socket:disconnect:success")
       socket.off("server:error")
-    }
-  }, [socket])
+      socket.disconnect()
 
-  return <SocketContext.Provider value={{ socket, isConnected }}>{children}</SocketContext.Provider>
+      window.removeEventListener("online", handleOnline)
+      window.removeEventListener("offline", handleOffline)
+    }
+  }, [session])
+
+  return <SocketContext.Provider value={{ socketRef, isConnected, session }}>{children}</SocketContext.Provider>
 }
 
 export const useSocket = (): SocketContextType => {

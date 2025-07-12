@@ -1,19 +1,8 @@
 "use client"
 
-import React, {
-  ChangeEvent,
-  FormEvent,
-  MouseEvent,
-  ReactNode,
-  RefObject,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react"
+import React, { ChangeEvent, FormEvent, MouseEvent, ReactNode, useEffect, useMemo, useRef, useState } from "react"
 import dynamic from "next/dynamic"
 import { useRouter, useSearchParams } from "next/navigation"
-import { plural } from "@lingui/core/macro"
 import { Plural, Trans, Select as TransSelect, useLingui } from "@lingui/react/macro"
 import { Type } from "@sinclair/typebox"
 import { Value, ValueError } from "@sinclair/typebox/value"
@@ -32,6 +21,7 @@ import TableHeaderSkeleton from "@/components/skeleton/TableHeaderSkeleton"
 import PlayerBoard from "@/components/towers/PlayerBoard"
 import Button from "@/components/ui/Button"
 import Checkbox from "@/components/ui/Checkbox"
+import { InputImperativeHandle } from "@/components/ui/Input"
 import Select from "@/components/ui/Select"
 import { FKey, fKeyMessages } from "@/constants/f-key-messages"
 import { DEFAULT_TOWERS_CONTROL_KEYS } from "@/constants/game"
@@ -45,7 +35,6 @@ import { TablePanelView } from "@/enums/table-panel-view"
 import { TableType } from "@/enums/table-type"
 import { TowersControlKeys } from "@/enums/towers-control-keys"
 import { TowersGameState } from "@/enums/towers-game-state"
-import { authClient } from "@/lib/auth-client"
 import { getReadableKeyLabel } from "@/lib/keyboard/get-readable-key-label"
 import { logger } from "@/lib/logger"
 import { PowerBarItemPlainObject } from "@/server/towers/classes/PowerBar"
@@ -90,15 +79,14 @@ export default function Table(): ReactNode {
   }
 
   const { i18n, t } = useLingui()
-  const { data: session } = authClient.useSession()
-  const { socket, isConnected } = useSocket()
+  const { socketRef, isConnected, session } = useSocket()
   const { addJoinedTable, removeJoinedTable } = useGame()
   const { openModal } = useModal()
   const hasJoinedRef: React.RefObject<boolean> = useRef<boolean>(false)
   const [hasJoined, setHasJoined] = useState<boolean>(false)
   const joinedTableSidebarRef = useRef<Set<string>>(new Set<string>())
-  const formRef: RefObject<HTMLFormElement | null> = useRef<HTMLFormElement | null>(null)
-  const messageInputRef: RefObject<HTMLInputElement | null> = useRef<HTMLInputElement | null>(null)
+  const formRef = useRef<HTMLFormElement>(null)
+  const messageInputRef = useRef<InputImperativeHandle>(null)
   const [room, setRoom] = useState<RoomPlainObject>()
   const [table, setTable] = useState<TablePlainObject>()
   const [user, setUser] = useState<UserPlainObject>()
@@ -106,12 +94,13 @@ export default function Table(): ReactNode {
   const [gameState, setGameState] = useState<TowersGameState>(TowersGameState.WAITING)
   const [countdown, setCountdown] = useState<number | null>(null)
   const [timer, setTimer] = useState<number | null>(null)
-  const [winners, setWinners] = useState<UserPlainObject[]>([])
+  const [winnersCount, setWinnersCount] = useState<number>(0)
+  const [firstWinner, setFirstWinner] = useState<string | undefined>(undefined)
+  const [secondWinner, setSecondWinner] = useState<string | undefined>(undefined)
   const [isWinner, setIsWinner] = useState<boolean>(false)
   const [isPlayedThisRound, setIsPlayedThisRound] = useState<boolean>(false)
   const [errorMessages, setErrorMessages] = useState<ChangeTableOptionsFormValidationErrors>({})
   const [gameOverAnimationClass, setGameOverAnimationClass] = useState("animate-move-up")
-  const [winningMessage, setWinningMessage] = useState<string>("")
   const [view, setView] = useState<TablePanelView>(TablePanelView.GAME)
   const [controlKeys, setControlKeys] = useState<TowersControlKeys>(DEFAULT_TOWERS_CONTROL_KEYS)
   const [seatNumber, setSeatNumber] = useState<number | undefined>(undefined)
@@ -122,234 +111,6 @@ export default function Table(): ReactNode {
   >(undefined)
   const [usedPowerItemTextOpacity, setUsedPowerItemTextOpacity] = useState<number>(1)
   const isDone: boolean = hasJoined && !!table
-
-  useEffect(() => {
-    if (room && table && !joinedTableSidebarRef.current.has(table.id)) {
-      addJoinedTable({
-        id: table.id,
-        roomId: room.id,
-        roomName: room.name,
-        tableNumber: table.tableNumber,
-      })
-      joinedTableSidebarRef.current.add(table.id)
-    }
-  }, [room, table])
-
-  useEffect(() => {
-    setSeatNumber(user?.tables?.[tableId]?.seatNumber)
-    setIsReady(!!user?.tables?.[tableId]?.isReady)
-  }, [user])
-
-  useEffect(() => {
-    if (!socket || !roomId || !tableId || hasJoinedRef.current) return
-
-    hasJoinedRef.current = true
-
-    socket.emit(SocketEvents.TABLE_JOIN, { roomId, tableId }, (response: { success: boolean; message: string }) => {
-      if (response.success) {
-        socket.emit(SocketEvents.TABLE_GET, { roomId, tableId })
-        setHasJoined(true)
-      } else {
-        router.push(`${ROUTE_TOWERS.PATH}?room=${roomId}`)
-      }
-    })
-
-    socket.emit(SocketEvents.GAME_GET_CONTROL_KEYS)
-  }, [socket, roomId])
-
-  useEffect(() => {
-    if (!socket || !roomId || !tableId || !hasJoinedRef.current) return
-
-    const handleTableData = ({ room, table }: { room: RoomPlainObject; table: TablePlainObject }): void => {
-      setRoom(room)
-      setTable(table)
-    }
-
-    const handleTableUpdate = (): void => {
-      socket.emit(SocketEvents.TABLE_GET, { roomId, tableId })
-    }
-
-    const handleControlKeys = ({ controlKeys }: { controlKeys: TowersControlKeys }): void => {
-      setControlKeys(controlKeys)
-    }
-
-    const handleGameState = ({ gameState }: { gameState: TowersGameState }): void => {
-      setGameState(gameState)
-    }
-
-    const handleCountdown = ({ countdown }: { countdown: number }): void => {
-      setCountdown(countdown)
-    }
-
-    const handleTimer = ({ timer }: { timer: number }): void => {
-      setTimer(timer)
-    }
-
-    const handlePowerFire = ({
-      sourceUsername,
-      targetUsername,
-      targetSeatNumber,
-      powerItem,
-    }: {
-      sourceUsername: string
-      targetUsername: string
-      targetSeatNumber: number
-      powerItem: PowerBarItemPlainObject
-    }): void => {
-      if (seatNumber === targetSeatNumber) {
-        socket.emit(SocketEvents.GAME_POWER_APPLY, { sourceUsername, targetUsername, powerItem })
-      }
-
-      setUsedPowerItem({ sourceUsername, targetUsername, powerItem })
-    }
-
-    const handleGameOver = ({
-      winners,
-      isWinner,
-      isPlayedThisRound,
-    }: {
-      winners: UserPlainObject[]
-      isWinner: boolean
-      isPlayedThisRound: boolean
-    }): void => {
-      setWinners(winners)
-      setIsWinner(isWinner)
-      setIsPlayedThisRound(isPlayedThisRound)
-    }
-
-    socket.on(SocketEvents.TABLE_DATA, handleTableData)
-    socket.on(SocketEvents.TABLE_DATA_UPDATED, handleTableUpdate)
-    socket.on(SocketEvents.TABLE_CHAT_UPDATED, handleTableUpdate)
-    socket.on(SocketEvents.GAME_CONTROL_KEYS, handleControlKeys)
-    socket.on(SocketEvents.GAME_STATE, handleGameState)
-    socket.on(SocketEvents.GAME_COUNTDOWN, handleCountdown)
-    socket.on(SocketEvents.GAME_TIMER, handleTimer)
-    socket.on(SocketEvents.GAME_POWER_FIRE, handlePowerFire)
-    socket.on(SocketEvents.GAME_OVER, handleGameOver)
-
-    return () => {
-      socket.off(SocketEvents.TABLE_DATA, handleTableData)
-      socket.off(SocketEvents.TABLE_DATA_UPDATED, handleTableUpdate)
-      socket.off(SocketEvents.TABLE_CHAT_UPDATED, handleTableUpdate)
-      socket.off(SocketEvents.GAME_CONTROL_KEYS, handleControlKeys)
-      socket.off(SocketEvents.GAME_STATE, handleGameState)
-      socket.off(SocketEvents.GAME_COUNTDOWN, handleCountdown)
-      socket.off(SocketEvents.GAME_TIMER, handleTimer)
-      socket.off(SocketEvents.GAME_POWER_FIRE, handlePowerFire)
-      socket.off(SocketEvents.GAME_OVER, handleGameOver)
-    }
-  }, [socket, roomId, tableId, seatNumber, hasJoinedRef.current])
-
-  useEffect(() => {
-    if (!table) return
-
-    setUser(table.users?.find((user: UserPlainObject) => user.user?.id === session?.user.id))
-  }, [table, session?.user.id])
-
-  useEffect(() => {
-    if (!table?.seats) return
-
-    setSeats(() => {
-      if (typeof seatNumber === "undefined") return table.seats
-
-      const updatedSeats: ServerTowersTeam[] = structuredClone(table.seats)
-
-      const selectedTeamIndex: number = updatedSeats.findIndex((team: ServerTowersTeam) =>
-        team.seats.some((seat: ServerTowersSeat) => seat.seatNumber === seatNumber),
-      )
-
-      if (selectedTeamIndex <= 0) return updatedSeats
-
-      // Swap the selected team with the first team (teamNumber = 1)
-      const selectedTeam: ServerTowersTeam = updatedSeats[selectedTeamIndex]
-      const firstTeam: ServerTowersTeam = updatedSeats[0]
-
-      // Swap the teams
-      updatedSeats[selectedTeamIndex] = firstTeam
-      updatedSeats[0] = selectedTeam
-
-      // Swap `targetNumber` values between seats of both teams
-      for (let i = 0; i < Math.min(selectedTeam.seats.length, firstTeam.seats.length); i++) {
-        const temp: number = selectedTeam.seats[i].targetNumber
-        selectedTeam.seats[i].targetNumber = firstTeam.seats[i].targetNumber
-        firstTeam.seats[i].targetNumber = temp
-      }
-
-      return updatedSeats
-    })
-  }, [table?.seats, seatNumber])
-
-  useEffect(() => {
-    if (!socket) return
-
-    const handleFKeyMessage = (event: KeyboardEvent): void => {
-      const keyCode: FKey = event.code as FKey
-
-      if (keyCode in fKeyMessages) {
-        event.preventDefault()
-        socket.emit(SocketEvents.TABLE_MESSAGE_SEND, {
-          roomId,
-          tableId,
-          type: TableChatMessageType.F_KEY,
-          messageVariables: { username: session?.user.username, fKey: keyCode },
-        })
-      }
-    }
-
-    window.addEventListener("keydown", handleFKeyMessage)
-
-    return () => {
-      window.removeEventListener("keydown", handleFKeyMessage)
-    }
-  }, [socket, roomId, tableId])
-
-  useEffect(() => {
-    if (gameState === TowersGameState.GAME_OVER) {
-      const timer: NodeJS.Timeout = setTimeout(() => {
-        setGameOverAnimationClass("animate-move-down")
-      }, 9000)
-
-      return () => clearTimeout(timer)
-    } else if (gameOverAnimationClass === "animate-move-down") {
-      setGameOverAnimationClass("animate-move-up")
-    }
-  }, [gameState])
-
-  useEffect(() => {
-    if (winners && winners?.length > 0) {
-      const user1: string | undefined = winners[0]?.user?.username
-      const user2: string | undefined = winners[1]?.user?.username
-      const value: number = winners.length
-
-      setWinningMessage(
-        plural(value, {
-          one: `Congratulations\n${user1}`,
-          other: `Congratulations\n${user1} and ${user2}`,
-        }),
-      )
-    } else {
-      setWinningMessage("")
-    }
-  }, [winners])
-
-  useEffect(() => {
-    setUsedPowerItemTextOpacity(1)
-
-    let current: number = 1.0
-    const step: number = 0.04 // Decrease by 4% at a time
-    const min: number = 0.6
-
-    const interval: NodeJS.Timeout = setInterval(() => {
-      current = Math.max(min, current - step)
-      setUsedPowerItemTextOpacity(current)
-
-      if (current <= min) {
-        clearInterval(interval)
-      }
-    }, 500)
-
-    return () => clearInterval(interval)
-  }, [usedPowerItem])
 
   const readyTeamsCount: number = useMemo(() => {
     let count: number = 0
@@ -433,7 +194,7 @@ export default function Table(): ReactNode {
     }
 
     if (typeof payload.tableType !== "undefined" || typeof payload.isRated !== "undefined") {
-      socket?.emit(SocketEvents.TABLE_UPDATE_SETTINGS, payload)
+      socketRef.current?.emit(SocketEvents.TABLE_UPDATE_SETTINGS, payload)
     }
   }
 
@@ -457,15 +218,15 @@ export default function Table(): ReactNode {
   }
 
   const handleSit = (seatNumber: number): void => {
-    socket?.emit(SocketEvents.SEAT_SIT, { roomId, tableId, seatNumber })
+    socketRef.current?.emit(SocketEvents.SEAT_SIT, { roomId, tableId, seatNumber })
   }
 
   const handleStand = (): void => {
-    socket?.emit(SocketEvents.SEAT_STAND, { roomId, tableId })
+    socketRef.current?.emit(SocketEvents.SEAT_STAND, { roomId, tableId })
   }
 
   const handleStart = (): void => {
-    socket?.emit(SocketEvents.SEAT_READY, { roomId, tableId, isReady: true })
+    socketRef.current?.emit(SocketEvents.SEAT_READY, { roomId, tableId, isReady: true })
   }
 
   const renderNextPowerBarItemText = (item: PowerBarItemPlainObject | undefined): ReactNode => {
@@ -673,23 +434,256 @@ export default function Table(): ReactNode {
   }
 
   const handleSendMessage = (event: React.KeyboardEvent<HTMLInputElement>): void => {
-    if (event.code === "Enter" && messageInputRef.current) {
+    if (event.code === "Enter" && messageInputRef.current?.value) {
       const text: string = messageInputRef.current.value.trim()
 
-      if (socket && text !== "") {
-        socket.emit(SocketEvents.TABLE_MESSAGE_SEND, { roomId, tableId, text })
+      if (socketRef.current && text !== "") {
+        socketRef.current?.emit(SocketEvents.TABLE_MESSAGE_SEND, { roomId, tableId, text })
+        messageInputRef.current.clear()
       }
     }
   }
 
   const handleQuitTable = (): void => {
-    socket?.emit(SocketEvents.TABLE_LEAVE, { roomId, tableId }, (response: { success: boolean; message: string }) => {
-      if (response.success) {
-        removeJoinedTable(tableId)
-        router.push(`${ROUTE_TOWERS.PATH}?room=${roomId}`)
-      }
-    })
+    socketRef.current?.emit(
+      SocketEvents.TABLE_LEAVE,
+      { roomId, tableId },
+      (response: { success: boolean; message: string }) => {
+        if (response.success) {
+          removeJoinedTable(tableId)
+          router.push(`${ROUTE_TOWERS.PATH}?room=${roomId}`)
+        }
+      },
+    )
   }
+
+  useEffect(() => {
+    if (room && table && !joinedTableSidebarRef.current.has(table.id)) {
+      addJoinedTable({
+        id: table.id,
+        roomId: room.id,
+        roomName: room.name,
+        tableNumber: table.tableNumber,
+      })
+      joinedTableSidebarRef.current.add(table.id)
+    }
+  }, [room, table])
+
+  useEffect(() => {
+    setSeatNumber(user?.tables?.[tableId]?.seatNumber)
+    setIsReady(!!user?.tables?.[tableId]?.isReady)
+  }, [user])
+
+  useEffect(() => {
+    if (!roomId || !tableId || hasJoinedRef.current) return
+
+    hasJoinedRef.current = true
+
+    socketRef.current?.emit(
+      SocketEvents.TABLE_JOIN,
+      { roomId, tableId },
+      (response: { success: boolean; message: string }) => {
+        if (response.success) {
+          socketRef.current?.emit(SocketEvents.TABLE_GET, { roomId, tableId })
+          setHasJoined(true)
+        } else {
+          router.push(`${ROUTE_TOWERS.PATH}?room=${roomId}`)
+        }
+      },
+    )
+
+    socketRef.current?.emit(SocketEvents.GAME_GET_CONTROL_KEYS)
+  }, [roomId])
+
+  useEffect(() => {
+    if (!roomId || !tableId || !hasJoinedRef.current) return
+
+    const handleTableData = ({ room, table }: { room: RoomPlainObject; table: TablePlainObject }): void => {
+      setRoom(room)
+      setTable(table)
+    }
+
+    const handleTableUpdate = (): void => {
+      socketRef.current?.emit(SocketEvents.TABLE_GET, { roomId, tableId })
+    }
+
+    const handleControlKeys = ({ controlKeys }: { controlKeys: TowersControlKeys }): void => {
+      setControlKeys(controlKeys)
+    }
+
+    const handleGameState = ({ gameState }: { gameState: TowersGameState }): void => {
+      setGameState(gameState)
+    }
+
+    const handleCountdown = ({ countdown }: { countdown: number }): void => {
+      setCountdown(countdown)
+    }
+
+    const handleTimer = ({ timer }: { timer: number }): void => {
+      setTimer(timer)
+    }
+
+    const handlePowerFire = ({
+      sourceUsername,
+      targetUsername,
+      targetSeatNumber,
+      powerItem,
+    }: {
+      sourceUsername: string
+      targetUsername: string
+      targetSeatNumber: number
+      powerItem: PowerBarItemPlainObject
+    }): void => {
+      if (seatNumber === targetSeatNumber) {
+        socketRef.current?.emit(SocketEvents.GAME_POWER_APPLY, { sourceUsername, targetUsername, powerItem })
+      }
+
+      setUsedPowerItem({ sourceUsername, targetUsername, powerItem })
+    }
+
+    const handleGameOver = ({
+      winners,
+      isWinner,
+      isPlayedThisRound,
+    }: {
+      winners: UserPlainObject[]
+      isWinner: boolean
+      isPlayedThisRound: boolean
+    }): void => {
+      setWinnersCount(winners?.length)
+
+      switch (winners.length) {
+        case 1:
+          setFirstWinner(winners[0].user?.username)
+          break
+        case 2:
+          setFirstWinner(winners[0].user?.username)
+          setSecondWinner(winners[1].user?.username)
+          break
+        default:
+          setFirstWinner(undefined)
+          setSecondWinner(undefined)
+          break
+      }
+
+      setIsWinner(isWinner)
+      setIsPlayedThisRound(isPlayedThisRound)
+    }
+
+    socketRef.current?.on(SocketEvents.TABLE_DATA, handleTableData)
+    socketRef.current?.on(SocketEvents.TABLE_DATA_UPDATED, handleTableUpdate)
+    socketRef.current?.on(SocketEvents.TABLE_CHAT_UPDATED, handleTableUpdate)
+    socketRef.current?.on(SocketEvents.GAME_CONTROL_KEYS, handleControlKeys)
+    socketRef.current?.on(SocketEvents.GAME_STATE, handleGameState)
+    socketRef.current?.on(SocketEvents.GAME_COUNTDOWN, handleCountdown)
+    socketRef.current?.on(SocketEvents.GAME_TIMER, handleTimer)
+    socketRef.current?.on(SocketEvents.GAME_POWER_FIRE, handlePowerFire)
+    socketRef.current?.on(SocketEvents.GAME_OVER, handleGameOver)
+
+    return () => {
+      socketRef.current?.off(SocketEvents.TABLE_DATA, handleTableData)
+      socketRef.current?.off(SocketEvents.TABLE_DATA_UPDATED, handleTableUpdate)
+      socketRef.current?.off(SocketEvents.TABLE_CHAT_UPDATED, handleTableUpdate)
+      socketRef.current?.off(SocketEvents.GAME_CONTROL_KEYS, handleControlKeys)
+      socketRef.current?.off(SocketEvents.GAME_STATE, handleGameState)
+      socketRef.current?.off(SocketEvents.GAME_COUNTDOWN, handleCountdown)
+      socketRef.current?.off(SocketEvents.GAME_TIMER, handleTimer)
+      socketRef.current?.off(SocketEvents.GAME_POWER_FIRE, handlePowerFire)
+      socketRef.current?.off(SocketEvents.GAME_OVER, handleGameOver)
+    }
+  }, [roomId, tableId, seatNumber, hasJoinedRef.current])
+
+  useEffect(() => {
+    if (!table) return
+
+    setUser(table.users?.find((user: UserPlainObject) => user.user?.id === session?.user.id))
+  }, [table, session?.user.id])
+
+  useEffect(() => {
+    if (!table?.seats) return
+
+    setSeats(() => {
+      if (typeof seatNumber === "undefined") return table.seats
+
+      const updatedSeats: ServerTowersTeam[] = structuredClone(table.seats)
+
+      const selectedTeamIndex: number = updatedSeats.findIndex((team: ServerTowersTeam) =>
+        team.seats.some((seat: ServerTowersSeat) => seat.seatNumber === seatNumber),
+      )
+
+      if (selectedTeamIndex <= 0) return updatedSeats
+
+      // Swap the selected team with the first team (teamNumber = 1)
+      const selectedTeam: ServerTowersTeam = updatedSeats[selectedTeamIndex]
+      const firstTeam: ServerTowersTeam = updatedSeats[0]
+
+      // Swap the teams
+      updatedSeats[selectedTeamIndex] = firstTeam
+      updatedSeats[0] = selectedTeam
+
+      // Swap `targetNumber` values between seats of both teams
+      for (let i = 0; i < Math.min(selectedTeam.seats.length, firstTeam.seats.length); i++) {
+        const temp: number = selectedTeam.seats[i].targetNumber
+        selectedTeam.seats[i].targetNumber = firstTeam.seats[i].targetNumber
+        firstTeam.seats[i].targetNumber = temp
+      }
+
+      return updatedSeats
+    })
+  }, [table?.seats, seatNumber])
+
+  useEffect(() => {
+    const handleFKeyMessage = (event: KeyboardEvent): void => {
+      const keyCode: FKey = event.code as FKey
+
+      if (keyCode in fKeyMessages) {
+        event.preventDefault()
+        socketRef.current?.emit(SocketEvents.TABLE_MESSAGE_SEND, {
+          roomId,
+          tableId,
+          type: TableChatMessageType.F_KEY,
+          messageVariables: { username: session?.user.username, fKey: keyCode },
+        })
+      }
+    }
+
+    window.addEventListener("keydown", handleFKeyMessage)
+
+    return () => {
+      window.removeEventListener("keydown", handleFKeyMessage)
+    }
+  }, [roomId, tableId])
+
+  useEffect(() => {
+    if (gameState === TowersGameState.GAME_OVER) {
+      const timer: NodeJS.Timeout = setTimeout(() => {
+        setGameOverAnimationClass("animate-move-down")
+      }, 9000)
+
+      return () => clearTimeout(timer)
+    } else if (gameOverAnimationClass === "animate-move-down") {
+      setGameOverAnimationClass("animate-move-up")
+    }
+  }, [gameState])
+
+  useEffect(() => {
+    setUsedPowerItemTextOpacity(1)
+
+    let current: number = 1.0
+    const step: number = 0.04 // Decrease by 4% at a time
+    const min: number = 0.6
+
+    const interval: NodeJS.Timeout = setInterval(() => {
+      current = Math.max(min, current - step)
+      setUsedPowerItemTextOpacity(current)
+
+      if (current <= min) {
+        clearInterval(interval)
+      }
+    }, 500)
+
+    return () => clearInterval(interval)
+  }, [usedPowerItem])
 
   if (!hasJoined || !table) {
     return (
@@ -891,7 +885,15 @@ export default function Table(): ReactNode {
                               <Trans>You win!</Trans>
                             </div>
                           )}
-                          <div className="text-fuchsia-600">{winningMessage}</div>
+                          {winnersCount > 0 && (
+                            <div className="text-fuchsia-600">
+                              <Plural
+                                value={winnersCount}
+                                one={`Congratulations\n${firstWinner}`}
+                                other={`Congratulations\n${firstWinner} and ${secondWinner}`}
+                              />
+                            </div>
+                          )}
                         </div>
                       </div>
                     )}

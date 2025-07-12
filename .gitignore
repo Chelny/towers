@@ -43,4 +43,4 @@ yarn-error.log*
 next-env.d.ts
 
 # Prisma
-/app/prisma/generated
+/prisma/app/generated/prisma/client/

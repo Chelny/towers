@@ -25,12 +25,13 @@ import {
   useGame,
 } from "@/context/GameContext"
 import { useModal } from "@/context/ModalContext"
+import { useSocket } from "@/context/SocketContext"
 import { SidebarMenuActionItem, SidebarMenuDropdownItem, SidebarMenuLinkItem } from "@/interfaces/sidebar-menu"
 import { authClient } from "@/lib/auth-client"
 
 export default function Sidebar(): ReactNode {
   const router = useRouter()
-  const { data: session, isPending } = authClient.useSession()
+  const { session } = useSocket()
   const { joinedRooms, joinedTables, notifications } = useGame()
   const { openModal, closeModal } = useModal()
   const { i18n, t } = useLingui()
@@ -123,7 +124,7 @@ export default function Sidebar(): ReactNode {
           onClick: () =>
             openModal(TableInvitationModal, {
               tableInvitation: tableInvitation,
-              onAcceptInvitation: (roomId, tableId) => {
+              onAcceptInvitation: (roomId: string, tableId: string) => {
                 router.push(`${ROUTE_TOWERS.PATH}?room=${roomId}&table=${tableId}`)
                 closeModal()
               },
@@ -203,7 +204,7 @@ export default function Sidebar(): ReactNode {
       {/* User image and collapse icon */}
       <div className={clsx("flex items-center gap-2", isExpanded ? "w-full" : "w-auto")}>
         <div className={clsx("flex-1 flex items-center gap-4", isExpanded && "ps-2")}>
-          <UserAvatar user={session?.user} isLoading={isPending} />
+          <UserAvatar user={session?.user} />
           {isExpanded && <span className="font-medium">{session?.user.name}</span>}
         </div>
         <div className={isExpanded ? "flex" : "hidden"}>
@@ -233,7 +234,6 @@ export default function Sidebar(): ReactNode {
           isExpanded={isExpanded}
           isLinkTextVisible={isLinkTextVisible}
           menuItems={getAccountAccordionLinks()}
-          disabled={isPending}
           onClick={() => setIsExpanded(true)}
         >
           <Trans>Account</Trans>
@@ -263,7 +263,6 @@ export default function Sidebar(): ReactNode {
             isExpanded={isExpanded}
             isLinkTextVisible={isLinkTextVisible}
             menuItems={gameMenuItems}
-            disabled={isPending}
             onClick={() => setIsExpanded(true)}
           >
             Towers

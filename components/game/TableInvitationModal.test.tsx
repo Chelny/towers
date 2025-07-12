@@ -4,29 +4,14 @@ import { Mock, vi } from "vitest"
 import TableInvitationModal from "@/components/game/TableInvitationModal"
 import { SocketEvents } from "@/constants/socket-events"
 import { TableType } from "@/enums/table-type"
-import { authClient } from "@/lib/auth-client"
 import { GamePlainObject } from "@/server/towers/classes/Game"
 import { TablePlainObject } from "@/server/towers/classes/Table"
 import { TableInvitationPlainObject } from "@/server/towers/classes/TableInvitation"
 import { UserPlainObject } from "@/server/towers/classes/User"
-import { mockSession } from "@/test/data/session"
+import { mockSocket } from "@/test/data/socket"
 import { mockUser1, mockUser2 } from "@/test/data/user"
 import { mockUserStats2 } from "@/test/data/user-stats"
-import { mockSocket, customScreen as screen } from "@/vitest.setup"
-
-vi.mock("@/context/SocketContext", async () => {
-  const actual = await vi.importActual("@/context/SocketContext")
-  return {
-    ...actual,
-    useSocket: () => ({ socket: mockSocket }),
-  }
-})
-
-vi.mock("@/lib/auth-client", () => ({
-  authClient: {
-    useSession: vi.fn(),
-  },
-}))
+import { customScreen as screen } from "@/vitest.setup"
 
 const mockRoomId: string = "mock-room-1"
 
@@ -69,7 +54,6 @@ describe("TableInvitationModal", () => {
   beforeEach(() => {
     HTMLDialogElement.prototype.showModal = vi.fn()
     HTMLDialogElement.prototype.close = vi.fn()
-    vi.mocked(authClient.useSession).mockReturnValue(mockSession)
   })
 
   const renderWithContext = (
@@ -107,7 +91,7 @@ describe("TableInvitationModal", () => {
 
     fireEvent.click(screen.getByText("Accept"))
 
-    expect(mockSocket.emit).toHaveBeenCalledWith(SocketEvents.TABLE_INVITATION_ACCEPTED, {
+    expect(mockSocket.current.emit).toHaveBeenCalledWith(SocketEvents.TABLE_INVITATION_ACCEPTED, {
       roomId: mockRoomId,
       tableId: mockTable.id,
       inviteeUserId: mockToUser.user?.id,
@@ -129,7 +113,7 @@ describe("TableInvitationModal", () => {
 
     fireEvent.click(screen.getByText("Decline"))
 
-    expect(mockSocket.emit).toHaveBeenCalledWith(SocketEvents.TABLE_INVITATION_DECLINED, {
+    expect(mockSocket.current.emit).toHaveBeenCalledWith(SocketEvents.TABLE_INVITATION_DECLINED, {
       roomId: mockTableInvitation.roomId,
       tableId: mockTableInvitation.tableId,
       inviteeUserId: mockToUser.user?.id,
@@ -153,7 +137,7 @@ describe("TableInvitationModal", () => {
     })
     fireEvent.click(screen.getByText("Decline"))
 
-    expect(mockSocket.emit).toHaveBeenCalledWith(SocketEvents.TABLE_INVITATION_DECLINED, {
+    expect(mockSocket.current.emit).toHaveBeenCalledWith(SocketEvents.TABLE_INVITATION_DECLINED, {
       roomId: mockTableInvitation.roomId,
       tableId: mockTableInvitation.tableId,
       inviteeUserId: mockToUser.user?.id,

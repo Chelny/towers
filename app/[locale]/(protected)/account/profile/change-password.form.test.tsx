@@ -16,7 +16,7 @@ describe("Change/Set Password Form", () => {
   })
 
   it("should render the set password form with all elements", () => {
-    render(<ChangePasswordForm session={{ ...mockSession.data, accounts: [mockSessionGitHubAccount] }} />)
+    render(<ChangePasswordForm session={{ ...mockSession, accounts: [mockSessionGitHubAccount] }} />)
 
     expect(screen.getByText(/Change\/Set Password/i)).toBeInTheDocument()
     expect(screen.queryByTestId("change-password_input-password_current-password")).not.toBeInTheDocument()
@@ -26,14 +26,14 @@ describe("Change/Set Password Form", () => {
   })
 
   it("should correctly mark the set password form fields as required", () => {
-    render(<ChangePasswordForm session={{ ...mockSession.data, accounts: [mockSessionGitHubAccount] }} />)
+    render(<ChangePasswordForm session={{ ...mockSession, accounts: [mockSessionGitHubAccount] }} />)
 
     expect(screen.getByTestId("set-password_input-password_password")).toHaveAttribute("required")
     expect(screen.getByTestId("set-password_input-password_confirm-password")).toHaveAttribute("required")
   })
 
   it("should display error messages when the set password form is submitted with empty fields", () => {
-    render(<ChangePasswordForm session={{ ...mockSession.data, accounts: [mockSessionGitHubAccount] }} />)
+    render(<ChangePasswordForm session={{ ...mockSession, accounts: [mockSessionGitHubAccount] }} />)
 
     fireEvent.click(screen.getByRole("button", { name: /Set Password/i }))
 
@@ -42,7 +42,7 @@ describe("Change/Set Password Form", () => {
   })
 
   it("should show an error in the set password form if passwords do not match", () => {
-    render(<ChangePasswordForm session={{ ...mockSession.data, accounts: [mockSessionGitHubAccount] }} />)
+    render(<ChangePasswordForm session={{ ...mockSession, accounts: [mockSessionGitHubAccount] }} />)
 
     fireEvent.input(screen.getByTestId("set-password_input-password_password"), { target: { value: "Password1234!" } })
     fireEvent.input(screen.getByTestId("set-password_input-password_confirm-password"), {
@@ -61,7 +61,7 @@ describe("Change/Set Password Form", () => {
 
     mockFetch.mockResolvedValue(mockFetchResponse(mockResponse))
 
-    render(<ChangePasswordForm session={{ ...mockSession.data, accounts: [mockSessionGitHubAccount] }} />)
+    render(<ChangePasswordForm session={{ ...mockSession, accounts: [mockSessionGitHubAccount] }} />)
 
     fireEvent.input(screen.getByTestId("set-password_input-password_password"), { target: { value: "Password1234!" } })
     fireEvent.input(screen.getByTestId("set-password_input-password_confirm-password"), {
@@ -79,7 +79,7 @@ describe("Change/Set Password Form", () => {
   })
 
   it("should render the change password form with all elements", () => {
-    render(<ChangePasswordForm session={{ ...mockSession.data, accounts: [mockSessionCredentialAccount] }} />)
+    render(<ChangePasswordForm session={{ ...mockSession, accounts: [mockSessionCredentialAccount] }} />)
 
     expect(screen.getByText(/Change\/Set Password/i)).toBeInTheDocument()
     expect(screen.getByTestId("change-password_input-password_current-password")).toBeInTheDocument()
@@ -90,7 +90,7 @@ describe("Change/Set Password Form", () => {
   })
 
   it("should correctly mark the change password form fields as required", () => {
-    render(<ChangePasswordForm session={{ ...mockSession.data, accounts: [mockSessionCredentialAccount] }} />)
+    render(<ChangePasswordForm session={{ ...mockSession, accounts: [mockSessionCredentialAccount] }} />)
 
     expect(screen.getByTestId("change-password_input-password_current-password")).toHaveAttribute("required")
     expect(screen.getByTestId("change-password_input-password_new-password")).toHaveAttribute("required")
@@ -98,7 +98,7 @@ describe("Change/Set Password Form", () => {
   })
 
   it("should display error messages when the change password form is submitted with empty fields", () => {
-    render(<ChangePasswordForm session={{ ...mockSession.data, accounts: [mockSessionCredentialAccount] }} />)
+    render(<ChangePasswordForm session={{ ...mockSession, accounts: [mockSessionCredentialAccount] }} />)
 
     fireEvent.click(screen.getByRole("button", { name: /Change Password/i }))
 
@@ -108,7 +108,7 @@ describe("Change/Set Password Form", () => {
   })
 
   it("should show an error in the change password form if passwords do not match", () => {
-    render(<ChangePasswordForm session={{ ...mockSession.data, accounts: [mockSessionCredentialAccount] }} />)
+    render(<ChangePasswordForm session={{ ...mockSession, accounts: [mockSessionCredentialAccount] }} />)
 
     fireEvent.input(screen.getByTestId("change-password_input-password_current-password"), {
       target: { value: "Password123!" },
@@ -134,7 +134,7 @@ describe("Change/Set Password Form", () => {
       callbacks.onSuccess()
     })
 
-    render(<ChangePasswordForm session={{ ...mockSession.data, accounts: [mockSessionCredentialAccount] }} />)
+    render(<ChangePasswordForm session={{ ...mockSession, accounts: [mockSessionCredentialAccount] }} />)
 
     fireEvent.input(screen.getByTestId("change-password_input-password_current-password"), {
       target: { value: "Password123!" },

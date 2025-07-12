@@ -1,12 +1,11 @@
 import { ReactNode } from "react"
-import { cookies, headers } from "next/headers"
+import { headers } from "next/headers"
 import { Metadata } from "next/types"
 import { I18n } from "@lingui/core"
 import { Trans } from "@lingui/react/macro"
 import { ProfileForm } from "@/app/[locale]/(protected)/account/profile/profile.form"
 import { initLingui } from "@/app/init-lingui"
 import Anchor from "@/components/ui/Anchor"
-import { APP_COOKIES } from "@/constants/app"
 import { ROUTE_GAMES, ROUTE_NEW_USER } from "@/constants/routes"
 import { auth } from "@/lib/auth"
 import { Session } from "@/lib/auth-client"
@@ -28,13 +27,11 @@ export default async function NewUser({ params }: NewUserProps): Promise<ReactNo
   const routeParams: Params = await params
   const i18n: I18n = initLingui(routeParams.locale)
   const session: Session | null = await auth.api.getSession({ headers: await headers() })
-  const cookiesStore = await cookies()
-  const isNewUser: string | undefined = cookiesStore.get(APP_COOKIES.NEW_USER)?.value
 
   return (
     <>
       <h1 className="mb-4 text-3xl">{i18n._(ROUTE_NEW_USER.TITLE)}</h1>
-      <ProfileForm session={session} isNewUser={isNewUser} />
+      <ProfileForm session={session} isNewUser />
       <div className="mt-4 text-center">
         <Anchor href={ROUTE_GAMES.PATH}>
           <Trans>Skip this step</Trans>

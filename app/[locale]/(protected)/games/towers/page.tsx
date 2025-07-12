@@ -1,10 +1,15 @@
 import { ReactNode } from "react"
 import type { Metadata } from "next"
+import dynamic from "next/dynamic"
 import { I18n } from "@lingui/core"
 import { initLingui } from "@/app/init-lingui"
-import RoomsList from "@/components/game/RoomsList"
 import TowersPageContent from "@/components/game/TowersPageContent"
+import RoomsListSkeleton from "@/components/skeleton/RoomsListSkeleton"
 import { ROUTE_TOWERS } from "@/constants/routes"
+
+const RoomsList = dynamic(() => import("@/components/game/RoomsList"), {
+  loading: () => <RoomsListSkeleton />,
+})
 
 type TowersProps = {
   params: Promise<Params>

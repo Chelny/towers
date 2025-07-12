@@ -1,6 +1,6 @@
 "use client"
 
-import { ChangeEvent, ReactNode, useState } from "react"
+import { InputEvent, ReactNode, useState } from "react"
 import { ReadonlyURLSearchParams, useSearchParams } from "next/navigation"
 import { useLingui } from "@lingui/react/macro"
 import { format } from "date-fns"
@@ -18,14 +18,14 @@ type InstantMessageModalProps = {
 
 export default function InstantMessageModal({ instantMessage, onCancel }: InstantMessageModalProps): ReactNode {
   const searchParams: ReadonlyURLSearchParams = useSearchParams()
-  const { socket } = useSocket()
+  const { socketRef } = useSocket()
   const { i18n, t } = useLingui()
   const [message, setMessage] = useState<string | undefined>(undefined)
-  const username: string | undefined = instantMessage.sender?.user?.username
+  const username: string | null | undefined = instantMessage.sender?.user?.username
   const rating: number | undefined = instantMessage.sender?.stats.rating
 
   const handleSendMessage = (): void => {
-    socket?.emit(
+    socketRef.current?.emit(
       SocketEvents.INSTANT_MESSAGE_SENT,
       { roomId: searchParams?.get("room"), recipientUserId: instantMessage?.sender.user?.id, message },
       (response: { success: boolean; message: string }) => {
@@ -52,7 +52,7 @@ export default function InstantMessageModal({ instantMessage, onCancel }: Instan
           label={t({ message: `Reply to ${username}` })}
           defaultValue={message}
           inlineButtonText={t({ message: "Reply" })}
-          onInput={(event: ChangeEvent<HTMLInputElement>) => setMessage(event.target.value)}
+          onInput={(event: InputEvent<HTMLInputElement>) => setMessage((event.target as HTMLInputElement).value)}
           onInlineButtonClick={handleSendMessage}
         />
       </div>

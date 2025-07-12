@@ -2,6 +2,7 @@
 
 import { ReactNode, useEffect, useState } from "react"
 import { ReadonlyURLSearchParams, useSearchParams } from "next/navigation"
+import { ErrorContext, SuccessContext } from "@better-fetch/fetch"
 import { Trans, useLingui } from "@lingui/react/macro"
 import AlertMessage from "@/components/ui/AlertMessage"
 import Button from "@/components/ui/Button"
@@ -32,12 +33,11 @@ export function LinkedSocialAccountsForm(): ReactNode {
         onRequest: () => {
           setIsLoading(true)
         },
-        onSuccess: (ctx) => {
+        onResponse: () => {
           setIsLoading(false)
-          setAccountsList(ctx.data)
         },
-        onError: () => {
-          setIsLoading(false)
+        onSuccess: (ctx: SuccessContext) => {
+          setAccountsList(ctx.data)
         },
       },
     )
@@ -61,20 +61,21 @@ export function LinkedSocialAccountsForm(): ReactNode {
             setIsLoading(true)
             setFormState(INITIAL_FORM_STATE)
           },
-          onSuccess: (ctx) => {
+          onResponse: () => {
             setIsLoading(false)
+          },
+          onError: (ctx: ErrorContext) => {
+            setFormState({
+              success: false,
+              message: ctx.error.message,
+            })
+          },
+          onSuccess: (ctx: SuccessContext) => {
             setFormState({
               success: true,
               message: t({ message: "The account has been linked!" }),
             })
             setAccountsList((prev) => [...prev, { id: ctx.data.id, provider: providerName }])
-          },
-          onError: (ctx) => {
-            setIsLoading(false)
-            setFormState({
-              success: false,
-              message: ctx.error.message,
-            })
           },
         },
       )

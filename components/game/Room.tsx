@@ -1,6 +1,6 @@
 "use client"
 
-import { KeyboardEvent, MouseEvent, ReactNode, RefObject, useEffect, useRef, useState } from "react"
+import { KeyboardEvent, MouseEvent, ReactNode, useEffect, useRef, useState } from "react"
 import dynamic from "next/dynamic"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Trans, useLingui } from "@lingui/react/macro"
@@ -14,13 +14,13 @@ import PlayersListSkeleton from "@/components/skeleton/PlayersListSkeleton"
 import RoomHeaderSkeleton from "@/components/skeleton/RoomHeaderSkeleton"
 import RoomTableSkeleton from "@/components/skeleton/RoomTableSkeleton"
 import Button from "@/components/ui/Button"
+import { InputImperativeHandle } from "@/components/ui/Input"
 import { RATING_DIAMOND, RATING_GOLD, RATING_MASTER, RATING_PLATINUM, RATING_SILVER } from "@/constants/game"
 import { ROUTE_TOWERS } from "@/constants/routes"
 import { SocketEvents } from "@/constants/socket-events"
 import { useGame } from "@/context/GameContext"
 import { useModal } from "@/context/ModalContext"
 import { useSocket } from "@/context/SocketContext"
-import { authClient } from "@/lib/auth-client"
 import { RoomPlainObject } from "@/server/towers/classes/Room"
 import { TablePlainObject } from "@/server/towers/classes/Table"
 import { UserPlainObject } from "@/server/towers/classes/User"
@@ -52,55 +52,58 @@ export default function Room(): ReactNode {
   }
 
   const { t } = useLingui()
-  const { data: session } = authClient.useSession()
-  const { socket, isConnected } = useSocket()
+  const { socketRef, isConnected, session } = useSocket()
   const { addJoinedRoom, removeJoinedRoom } = useGame()
   const { openModal } = useModal()
   const hasJoinedRef: React.RefObject<boolean> = useRef<boolean>(false)
   const [hasJoined, setHasJoined] = useState<boolean>(false)
   const joinedRoomSidebarRef = useRef<Set<string>>(new Set<string>())
-  const messageInputRef: RefObject<HTMLInputElement | null> = useRef<HTMLInputElement | null>(null)
+  const messageInputRef = useRef<InputImperativeHandle>(null)
   const [room, setRoom] = useState<RoomPlainObject>()
   const isDone: boolean = hasJoined && !!room
 
   useEffect(() => {
-    if (!socket || !roomId || hasJoinedRef.current) return
+    if (!roomId || hasJoinedRef.current) return
 
     hasJoinedRef.current = true
 
-    socket.emit(SocketEvents.ROOM_JOIN, { roomId }, (response: { success: boolean; message: string }): void => {
-      if (response.success) {
-        socket.emit(SocketEvents.ROOM_GET, { roomId })
-        setHasJoined(true)
-      } else {
-        router.push(ROUTE_TOWERS.PATH)
-      }
-    })
-  }, [socket, roomId])
+    socketRef.current?.emit(
+      SocketEvents.ROOM_JOIN,
+      { roomId },
+      (response: { success: boolean; message: string }): void => {
+        if (response.success) {
+          socketRef.current?.emit(SocketEvents.ROOM_GET, { roomId })
+          setHasJoined(true)
+        } else {
+          router.push(ROUTE_TOWERS.PATH)
+        }
+      },
+    )
+  }, [roomId])
 
   useEffect(() => {
-    if (!socket || !roomId || !hasJoinedRef.current) return
+    if (!roomId || !hasJoinedRef.current) return
 
     const handleRoomData = ({ room }: { room: RoomPlainObject }): void => {
       setRoom(room)
     }
 
     const handleRoomUpdate = (): void => {
-      socket.emit(SocketEvents.ROOM_GET, { roomId })
+      socketRef.current?.emit(SocketEvents.ROOM_GET, { roomId })
     }
 
-    socket.on(SocketEvents.ROOM_DATA, handleRoomData)
-    socket.on(SocketEvents.ROOM_DATA_UPDATED, handleRoomUpdate)
-    socket.on(SocketEvents.ROOM_CHAT_UPDATED, handleRoomUpdate)
-    socket.on(SocketEvents.ROOM_TABLE_ADDED, handleRoomUpdate)
+    socketRef.current?.on(SocketEvents.ROOM_DATA, handleRoomData)
+    socketRef.current?.on(SocketEvents.ROOM_DATA_UPDATED, handleRoomUpdate)
+    socketRef.current?.on(SocketEvents.ROOM_CHAT_UPDATED, handleRoomUpdate)
+    socketRef.current?.on(SocketEvents.ROOM_TABLE_ADDED, handleRoomUpdate)
 
     return () => {
-      socket.off(SocketEvents.ROOM_DATA, handleRoomData)
-      socket.off(SocketEvents.ROOM_DATA_UPDATED, handleRoomUpdate)
-      socket.off(SocketEvents.ROOM_CHAT_UPDATED, handleRoomUpdate)
-      socket.off(SocketEvents.ROOM_TABLE_ADDED, handleRoomUpdate)
+      socketRef.current?.off(SocketEvents.ROOM_DATA, handleRoomData)
+      socketRef.current?.off(SocketEvents.ROOM_DATA_UPDATED, handleRoomUpdate)
+      socketRef.current?.off(SocketEvents.ROOM_CHAT_UPDATED, handleRoomUpdate)
+      socketRef.current?.off(SocketEvents.ROOM_TABLE_ADDED, handleRoomUpdate)
     }
-  }, [socket, roomId, hasJoinedRef.current])
+  }, [roomId, hasJoinedRef.current])
 
   useEffect(() => {
     if (room && !joinedRoomSidebarRef.current.has(room.id)) {
@@ -110,7 +113,7 @@ export default function Room(): ReactNode {
   }, [room])
 
   const handlePlayNow = (): void => {
-    socket?.emit(
+    socketRef.current?.emit(
       SocketEvents.TABLE_PLAY_NOW,
       { roomId },
       (response: { success: boolean; message: string; data: { tableId: string } }): void => {
@@ -133,17 +136,18 @@ export default function Room(): ReactNode {
   }
 
   const handleSendMessage = (event: KeyboardEvent<HTMLInputElement>): void => {
-    if (event.code === "Enter" && messageInputRef.current) {
+    if (event.code === "Enter" && messageInputRef.current?.value) {
       const text: string = messageInputRef.current.value.trim()
 
-      if (socket && text !== "") {
-        socket.emit(SocketEvents.ROOM_MESSAGE_SEND, { roomId, text })
+      if (socketRef.current && text !== "") {
+        socketRef.current?.emit(SocketEvents.ROOM_MESSAGE_SEND, { roomId, text })
+        messageInputRef.current.clear()
       }
     }
   }
 
   const handleExitRoom = (): void => {
-    socket?.emit(SocketEvents.ROOM_LEAVE, { roomId }, (response: { success: boolean; message: string }) => {
+    socketRef.current?.emit(SocketEvents.ROOM_LEAVE, { roomId }, (response: { success: boolean; message: string }) => {
       if (response.success) {
         removeJoinedRoom(roomId)
         router.push(ROUTE_TOWERS.PATH)

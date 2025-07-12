@@ -1,6 +1,5 @@
 import { ComponentProps, ComponentPropsWithoutRef, forwardRef, ReactNode } from "react"
-import { i18n } from "@lingui/core"
-import { t } from "@lingui/core/macro"
+import { useLingui } from "@lingui/react/macro"
 import { clsx } from "clsx/lite"
 import Anchor from "@/components/ui/Anchor"
 
@@ -9,7 +8,11 @@ const Breadcrumb = forwardRef<
   ComponentPropsWithoutRef<"nav"> & {
     separator?: ReactNode
   }
->(({ ...props }, ref) => <nav ref={ref} aria-label={t({ message: "breadcrumb" })} {...props} />)
+>(({ ...props }, ref) => {
+  const { t } = useLingui()
+
+  return <nav ref={ref} aria-label={t({ message: "breadcrumb" })} {...props} />
+})
 Breadcrumb.displayName = "Breadcrumb"
 
 const BreadcrumbList = forwardRef<HTMLOListElement, ComponentPropsWithoutRef<"ol">>(({ className, ...props }, ref) => (
@@ -58,17 +61,21 @@ const BreadcrumbSeparator = ({ children, className, ...props }: ComponentProps<"
 )
 BreadcrumbSeparator.displayName = "BreadcrumbSeparator"
 
-const BreadcrumbEllipsis = ({ className, ...props }: ComponentProps<"span">) => (
-  <span
-    className={clsx("flex justify-center items-center", className)}
-    role="presentation"
-    aria-hidden="true"
-    {...props}
-  >
-    <span className="text-gray-400">...</span>
-    <span className="sr-only">{i18n._("More")}</span>
-  </span>
-)
+const BreadcrumbEllipsis = ({ className, ...props }: ComponentProps<"span">) => {
+  const { t } = useLingui()
+
+  return (
+    <span
+      className={clsx("flex justify-center items-center", className)}
+      role="presentation"
+      aria-hidden="true"
+      {...props}
+    >
+      <span className="text-gray-400">...</span>
+      <span className="sr-only">{t({ message: "More" })}</span>
+    </span>
+  )
+}
 BreadcrumbEllipsis.displayName = "BreadcrumbEllipsis"
 
 export {

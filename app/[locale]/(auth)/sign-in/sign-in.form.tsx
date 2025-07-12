@@ -1,12 +1,13 @@
 "use client"
 
-import { FormEvent, ReactNode, useEffect, useState } from "react"
+import { FormEvent, ReactNode, useState } from "react"
 import { useRouter } from "next/navigation"
+import { ErrorContext } from "@better-fetch/fetch"
 import { Trans, useLingui } from "@lingui/react/macro"
 import { ValueError } from "@sinclair/typebox/errors"
 import { Value } from "@sinclair/typebox/value"
 import clsx from "clsx/lite"
-import { PiMagicWandFill } from "react-icons/pi"
+import { PiKeyFill, PiMagicWandFill } from "react-icons/pi"
 import { SignInFormValidationErrors, SignInPayload, signInSchema } from "@/app/[locale]/(auth)/sign-in/sign-in.schema"
 import AlertMessage from "@/components/ui/AlertMessage"
 import Anchor from "@/components/ui/Anchor"
@@ -34,29 +35,6 @@ export function SignInForm(): ReactNode {
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [formState, setFormState] = useState<ApiResponse>(INITIAL_FORM_STATE)
   const { t } = useLingui()
-
-  const checkWebAuthnSupport = async (): Promise<void> => {
-    const isWebAuthnAvailable: boolean = typeof PublicKeyCredential !== "undefined"
-
-    if (!isWebAuthnAvailable) {
-      logger.warn("WebAuthn is not supported in this browser.")
-      return
-    }
-
-    const isAuthenticatorAvailable: boolean = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()
-
-    if (!isAuthenticatorAvailable) {
-      logger.warn("Passkeys are not supported on this device.")
-      return
-    }
-
-    try {
-      await authClient.signIn.passkey({ autoFill: false })
-      logger.info("Passkey sign-in initiated.")
-    } catch (error) {
-      logger.error(`Error initiating passkey sign-in: ${error}`)
-    }
-  }
 
   const handleSignIn = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault()
@@ -104,18 +82,19 @@ export function SignInForm(): ReactNode {
             setIsLoading(true)
             setFormState(INITIAL_FORM_STATE)
           },
-          onSuccess: () => {
+          onResponse: () => {
             setIsLoading(false)
-            setFormState({
-              success: true,
-              message: t({ message: "You’re signed in successfully. Welcome back!" }),
-            })
           },
-          onError: (ctx) => {
-            setIsLoading(false)
+          onError: (ctx: ErrorContext) => {
             setFormState({
               success: false,
               message: ctx.error.message,
+            })
+          },
+          onSuccess: () => {
+            setFormState({
+              success: true,
+              message: t({ message: "You’re signed in successfully. Welcome back!" }),
             })
           },
         },
@@ -138,27 +117,54 @@ export function SignInForm(): ReactNode {
           setIsLoading(true)
           setFormState(INITIAL_FORM_STATE)
         },
-        onSuccess: () => {
+        onResponse: () => {
           setIsLoading(false)
-          setFormState({
-            success: true,
-            message: t({ message: "You’re signed in successfully. Welcome back!" }),
-          })
         },
-        onError: (ctx) => {
-          setIsLoading(false)
+        onError: (ctx: ErrorContext) => {
           setFormState({
             success: false,
             message: ctx.error.message,
+          })
+        },
+        onSuccess: () => {
+          setFormState({
+            success: true,
+            message: t({ message: "You’re signed in successfully. Welcome back!" }),
           })
         },
       },
     )
   }
 
-  useEffect(() => {
-    checkWebAuthnSupport()
-  }, [])
+  const handleSignInWithPasskey = async (): Promise<void> => {
+    console.log("CHELNY handleSignInWithPasskey")
+    await authClient.signIn.passkey(
+      {
+        autoFill: true,
+      },
+      {
+        onRequest: () => {
+          setIsLoading(true)
+          setFormState(INITIAL_FORM_STATE)
+        },
+        onResponse: () => {
+          setIsLoading(false)
+        },
+        onError: (ctx: ErrorContext) => {
+          setFormState({
+            success: false,
+            message: ctx.error.message,
+          })
+        },
+        onSuccess: () => {
+          setFormState({
+            success: true,
+            message: t({ message: "You’re signed in successfully. Welcome back!" }),
+          })
+        },
+      },
+    )
+  }
 
   return (
     <form className="w-full" noValidate onSubmit={handleSignIn}>
@@ -189,17 +195,18 @@ export function SignInForm(): ReactNode {
         </div>
         <div className="flex-1 mb-3 text-end">
           <Anchor href={ROUTE_FORGOT_PASSWORD.PATH} dataTestId="sign-in_link_forgot-password">
-            <Trans>Forgot Password?</Trans>
+            {t({ message: "Forgot Password" })}
           </Anchor>
         </div>
       </div>
       <Button
         type="submit"
         className="w-full"
+        dataTestId="sign-in_button_sign-in-with-email-and-password"
         aria-label={t({ message: "Sign in with email and password" })}
         disabled={isLoading}
       >
-        <Trans>Sign In</Trans>
+        {t({ message: "Sign In" })}
       </Button>
       <div className="flex justify-center gap-1 my-4 text-center">
         <Trans>
@@ -212,7 +219,7 @@ export function SignInForm(): ReactNode {
       <div className="flex justify-between items-center mt-4 mb-6" role="separator">
         <hr className={clsx("flex-1 me-4 border border-neutral-200", "dark:border-slate-600")} />
         <span className={clsx("mx-auto text-gray-600 text-sm uppercase", "dark:text-gray-400")}>
-          <Trans>or sign in with</Trans>
+          {t({ message: "or sign in with" })}
         </span>
         <hr className={clsx("flex-1 h-0 ms-4 border border-neutral-200", "dark:border-slate-600")} />
       </div>
@@ -220,12 +227,11 @@ export function SignInForm(): ReactNode {
         <Button
           className="flex justify-center items-center w-full gap-x-2"
           disabled={isLoading}
+          dataTestId="sign-in_button_sign-in-with-magic-link"
           onClick={handleSignInWithMagicLink}
         >
           <PiMagicWandFill className="w-5 h-5" aria-hidden="true" />
-          <span>
-            <Trans>Magic Link</Trans>
-          </span>
+          <span>{t({ message: "Magic Link" })}</span>
         </Button>
         <div className="flex gap-2">
           {AUTH_PROVIDERS.map(({ name, label: provider, icon }: AuthProviderDetails) => (
@@ -234,6 +240,7 @@ export function SignInForm(): ReactNode {
               type="button"
               className="flex-1 flex justify-center items-center gap-2 w-full"
               disabled={isLoading}
+              dataTestId={`sign-in_button_sign-in-with-${name}`}
               aria-label={t({ message: `Sign in with ${provider}` })}
               onClick={() => handleSignInWithProvider(name)}
             >
@@ -242,6 +249,15 @@ export function SignInForm(): ReactNode {
             </Button>
           ))}
         </div>
+        <Button
+          className="flex justify-center items-center w-full gap-x-2"
+          disabled={isLoading || true} // FIXME: Passkey can't sign in
+          dataTestId="sign-in_button_sign-in-with-passkey"
+          onClick={() => handleSignInWithPasskey()}
+        >
+          <PiKeyFill className="w-5 h-5" aria-hidden="true" />
+          <span>{t({ message: "Passkey" })}</span>
+        </Button>
       </div>
       <div className="mt-4 text-center">
         <Trans>

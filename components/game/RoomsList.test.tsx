@@ -1,30 +1,15 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react"
-import { vi } from "vitest"
 import RoomsList from "@/components/game/RoomsList"
 import { ROUTE_TOWERS } from "@/constants/routes"
 import { SocketEvents } from "@/constants/socket-events"
-import { authClient } from "@/lib/auth-client"
 import { RoomLevel, RoomPlainObject } from "@/server/towers/classes/Room"
 import { UserPlainObject } from "@/server/towers/classes/User"
 import { mockSession } from "@/test/data/session"
-import { mockSocket, mockUseRouter } from "@/vitest.setup"
+import { mockSocket } from "@/test/data/socket"
+import { mockUseRouter } from "@/vitest.setup"
 
 vi.mock("next/navigation", () => ({
   useRouter: vi.fn(() => mockUseRouter),
-}))
-
-vi.mock("@/context/SocketContext", async () => {
-  const actual = await vi.importActual("@/context/SocketContext")
-  return {
-    ...actual,
-    useSocket: () => ({ socket: mockSocket }),
-  }
-})
-
-vi.mock("@/lib/auth-client", () => ({
-  authClient: {
-    useSession: vi.fn(),
-  },
 }))
 
 describe("RoomsList", () => {
@@ -34,7 +19,7 @@ describe("RoomsList", () => {
     level: RoomLevel.SOCIAL,
     isFull: false,
     tables: [],
-    users: [{ user: mockSession.data.user } as UserPlainObject],
+    users: [{ user: mockSession.user } as UserPlainObject],
     chat: { messages: [] },
   }
 
@@ -59,9 +44,7 @@ describe("RoomsList", () => {
   }
 
   beforeEach(() => {
-    vi.mocked(authClient.useSession).mockReturnValue(mockSession)
-
-    mockSocket.on = vi.fn((event, callback) => {
+    mockSocket.current.on = vi.fn((event, callback) => {
       if (event === SocketEvents.ROOMS_LIST) {
         callback({ rooms: [mockRoom1, mockRoom2, mockRoom3] })
       }

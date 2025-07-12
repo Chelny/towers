@@ -1,6 +1,6 @@
 "use client"
 
-import { ReactNode, RefObject, useEffect, useRef, useState } from "react"
+import { ReactNode, useEffect, useRef, useState } from "react"
 import { Trans, useLingui } from "@lingui/react/macro"
 import clsx from "clsx/lite"
 import { format } from "date-fns"
@@ -51,7 +51,7 @@ export default function Calendar({
   const [isCalendarVisible, setCalendarVisible] = useState<boolean>(false)
   const [view, setView] = useState<"month" | "year">("month")
   const [currentDecade, setCurrentDecade] = useState<number>(Math.floor(browsingDate.getUTCFullYear() / 10) * 10)
-  const calendarRef: RefObject<HTMLDivElement | null> = useRef<HTMLDivElement | null>(null)
+  const calendarRef = useRef<HTMLDivElement>(null)
   const monthNames: string[] = [
     t({ message: "January" }),
     t({ message: "February" }),

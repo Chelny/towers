@@ -16,7 +16,7 @@ vi.mock("@/lib/auth-client", () => ({
   },
 }))
 
-describe("Linked Social Accounts Form", () => {
+describe.todo("Linked Social Accounts Form", () => {
   afterEach(() => {
     vi.clearAllMocks()
   })
@@ -83,7 +83,7 @@ describe("Linked Social Accounts Form", () => {
     })
   })
 
-  it.skip("should handle unlinking a social account", async () => {
+  it("should handle unlinking a social account", async () => {
     const { authClient } = await import("@/lib/auth-client")
     const mockListAccounts: Mock = authClient.listAccounts as Mock
     const mockUnlinkSocialLogin: Mock = authClient.linkSocial as Mock

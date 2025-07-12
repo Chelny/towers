@@ -1,4 +1,5 @@
 import { usePathname } from "next/navigation"
+import { i18n } from "@lingui/core"
 import { render, screen } from "@testing-library/react"
 import {
   Breadcrumb,
@@ -15,6 +16,10 @@ vi.mock("next/navigation", () => ({
 }))
 
 describe("Breadcrumb", () => {
+  beforeAll(() => {
+    i18n.activate("en")
+  })
+
   it("should render breadcrumb structure correctly", () => {
     vi.mocked(usePathname).mockReturnValue("/home")
 

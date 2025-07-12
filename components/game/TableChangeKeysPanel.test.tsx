@@ -1,16 +1,8 @@
 import { fireEvent, render, screen } from "@testing-library/react"
 import { Mock } from "vitest"
 import { TablePanelView } from "@/enums/table-panel-view"
-import { mockSocket } from "@/vitest.setup"
+import { mockSocket } from "@/test/data/socket"
 import TableChangeKeysPanel from "./TableChangeKeysPanel"
-
-vi.mock("@/context/SocketContext", async () => {
-  const actual = await vi.importActual("@/context/SocketContext")
-  return {
-    ...actual,
-    useSocket: () => ({ socket: mockSocket, isConnected: true }),
-  }
-})
 
 const baseControlKeys = {
   MOVE_LEFT: "ArrowLeft",
@@ -60,7 +52,7 @@ describe("TableChangeKeysPanel", () => {
     fireEvent.click(saveButton)
 
     expect(screen.getByText(/Duplicate keys detected/)).toBeInTheDocument()
-    expect(mockSocket.emit).not.toHaveBeenCalled()
+    expect(mockSocket.current.emit).not.toHaveBeenCalled()
   })
 
   it("should call socket.emit and show success on save with unique keys", () => {
@@ -71,7 +63,7 @@ describe("TableChangeKeysPanel", () => {
     const saveButton: HTMLElement = screen.getByText("Save")
     fireEvent.click(saveButton)
 
-    expect(mockSocket.emit).toHaveBeenCalledWith(
+    expect(mockSocket.current.emit).toHaveBeenCalledWith(
       expect.anything(),
       expect.objectContaining({ controlKeys: baseControlKeys }),
     )

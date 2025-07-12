@@ -1,10 +1,9 @@
 "use client"
 
-import { ReactNode, useEffect, useState } from "react"
+import { ReactNode } from "react"
 import { Trans } from "@lingui/react/macro"
 import AlertMessage from "@/components/ui/AlertMessage"
 import { useSocket } from "@/context/SocketContext"
-import { authClient } from "@/lib/auth-client"
 
 type ServerMessageProps = {
   roomId: string
@@ -12,27 +11,11 @@ type ServerMessageProps = {
 }
 
 export default function ServerMessage({ roomId, tableId }: ServerMessageProps): ReactNode {
-  const { data: session, isPending } = authClient.useSession()
-  const { isConnected } = useSocket()
-  const [isInitialized, setIsInitialized] = useState<boolean>(false)
-  const username: string | undefined = session?.user.username
-
-  useEffect(() => {
-    if (!isPending) {
-      const timer: NodeJS.Timeout = setTimeout(() => {
-        setIsInitialized(true)
-      }, 1000)
-
-      return () => clearTimeout(timer)
-    }
-  }, [session])
-
-  if (!isInitialized) {
-    return <AlertMessage>&nbsp;</AlertMessage>
-  }
+  const { isConnected, session } = useSocket()
+  const username: string | null | undefined = session?.user.username
 
   if (isConnected) {
-    if (!isPending && !session) {
+    if (!session) {
       return (
         <AlertMessage type="error">
           <Trans>You are not logged in</Trans>
@@ -40,7 +23,7 @@ export default function ServerMessage({ roomId, tableId }: ServerMessageProps): 
       )
     }
 
-    if (!isPending && session) {
+    if (session) {
       return (
         <AlertMessage type="info">
           <Trans>Connected to the game as {username}</Trans>

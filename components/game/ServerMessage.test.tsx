@@ -1,14 +1,17 @@
 import { act } from "react"
 import { render, screen, waitFor } from "@testing-library/react"
 import ServerMessage from "@/components/game/ServerMessage"
-import { authClient } from "@/lib/auth-client"
-import { mockPendingSession, mockSession } from "@/test/data/session"
+import { mockSession } from "@/test/data/session"
 
-vi.mock("@/lib/auth-client", () => ({
-  authClient: {
-    useSession: vi.fn(),
-  },
-}))
+export const mockUseSocket = vi.fn()
+
+vi.mock("@/context/SocketContext", async () => {
+  const actual = await vi.importActual("@/context/SocketContext")
+  return {
+    ...actual,
+    useSocket: () => mockUseSocket(),
+  }
+})
 
 describe("ServerMessage", () => {
   const mockRoomId: string = "mock-room-1"
@@ -23,7 +26,11 @@ describe("ServerMessage", () => {
   })
 
   it("should render \"You are not logged in\" when unauthenticated and connected", async () => {
-    vi.mocked(authClient.useSession).mockReturnValue(mockPendingSession)
+    mockUseSocket.mockReturnValue({
+      socketRef: { current: null },
+      isConnected: true,
+      session: null,
+    })
 
     render(<ServerMessage roomId={mockRoomId} />)
 
@@ -37,8 +44,6 @@ describe("ServerMessage", () => {
   })
 
   it("should render user connected message when authenticated and connected", () => {
-    vi.mocked(authClient.useSession).mockReturnValue(mockSession)
-
     render(<ServerMessage roomId={mockRoomId} />)
 
     act(() => {
@@ -46,12 +51,16 @@ describe("ServerMessage", () => {
     })
 
     waitFor(() => {
-      expect(screen.getByText(`Connected to the game as ${mockSession.data?.user.username}`)).toBeInTheDocument()
+      expect(screen.getByText(`Connected to the game as ${mockSession.user.username}`)).toBeInTheDocument()
     })
   })
 
   it("should render \"Disconnected from server\" when not connected", () => {
-    vi.mocked(authClient.useSession).mockReturnValue(mockPendingSession)
+    mockUseSocket.mockReturnValue({
+      socketRef: { current: null },
+      isConnected: false,
+      session: mockSession,
+    })
 
     render(<ServerMessage roomId={mockRoomId} />)
 
@@ -66,8 +75,6 @@ describe("ServerMessage", () => {
 
   it("should render error messages when errorMessage exists", () => {
     const errorMessage: string = "Connection error occurred"
-
-    vi.mocked(authClient.useSession).mockReturnValue(mockPendingSession)
 
     render(<ServerMessage roomId={mockRoomId} />)
 

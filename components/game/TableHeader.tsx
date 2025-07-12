@@ -13,7 +13,7 @@ type TableHeaderProps = {
 
 export default function TableHeader({ room, table }: TableHeaderProps): ReactNode {
   const tableNumber: number | undefined = table?.tableNumber
-  const tableHostUsername: string | undefined = table?.host?.user?.username
+  const tableHostUsername: string | null | undefined = table?.host?.user?.username
 
   return (
     <div className="[grid-area:banner] flex justify-between items-center gap-6">

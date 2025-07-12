@@ -2,6 +2,7 @@
 
 import { ClipboardEvent, FormEvent, ReactNode, useEffect, useState } from "react"
 import { ReadonlyURLSearchParams, useRouter, useSearchParams } from "next/navigation"
+import { ErrorContext } from "@better-fetch/fetch"
 import { Trans, useLingui } from "@lingui/react/macro"
 import { ValueError } from "@sinclair/typebox/errors"
 import { Value } from "@sinclair/typebox/value"
@@ -77,20 +78,21 @@ export function ResetPasswordForm(): ReactNode {
             setIsLoading(true)
             setFormState(INITIAL_FORM_STATE)
           },
-          onSuccess: () => {
+          onResponse: () => {
             setIsLoading(false)
+          },
+          onError: (ctx: ErrorContext) => {
+            setFormState({
+              success: false,
+              message: ctx.error.message,
+            })
+          },
+          onSuccess: () => {
             setFormState({
               success: true,
               message: t({
                 message: "The password has been reset! You will be redirected to the sign in page in 3 seconds...",
               }),
-            })
-          },
-          onError: (ctx) => {
-            setIsLoading(false)
-            setFormState({
-              success: false,
-              message: ctx.error.message,
             })
           },
         },

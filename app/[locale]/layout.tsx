@@ -15,6 +15,7 @@ import { GameProvider } from "@/context/GameContext"
 import { ModalProvider } from "@/context/ModalContext"
 import { SocketProvider } from "@/context/SocketContext"
 import { auth } from "@/lib/auth"
+import { Session } from "@/lib/auth-client"
 import { Language, languages } from "@/translations/languages"
 import "../globals.css"
 
@@ -58,8 +59,8 @@ export default async function RootLayout({ children, params }: Readonly<RootLayo
     (language: Language) => language.locale === routeParams.locale,
   )
   const headersList: ReadonlyHeaders = await headers()
-  const nonce: string = headersList.get("x-nonce") || ""
-  const session = await auth.api.getSession({ headers: headersList })
+  const nonce: string | undefined = headersList.get("x-nonce") || undefined
+  const session: Session | null = await auth.api.getSession({ headers: headersList })
 
   initLingui(routeParams.locale)
 
@@ -75,7 +76,7 @@ export default async function RootLayout({ children, params }: Readonly<RootLayo
           disableTransitionOnChange
         >
           <LinguiClientProvider initialLocale={routeParams.locale} initialMessages={allMessages[routeParams.locale]}>
-            <SocketProvider>
+            <SocketProvider session={session}>
               <GameProvider>
                 <ModalProvider>{children}</ModalProvider>
               </GameProvider>

@@ -20,7 +20,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       return NextResponse.json(
         {
           success: false,
-          message: error.body.message,
+          message: error.body?.message,
         },
         // @ts-ignore
         { status: Status[error.status] },

@@ -21,7 +21,7 @@ export interface TableChatMessageVariables {
   heroCode?: string
   tableHostUsername?: string
   tableType?: TableType
-  username?: string
+  username?: string | null
 }
 
 export interface TableChatPlainObject {

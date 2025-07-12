@@ -1,6 +1,7 @@
 "use client"
 
 import { FormEvent, ReactNode, useState } from "react"
+import { ErrorContext } from "@better-fetch/fetch"
 import { Trans, useLingui } from "@lingui/react/macro"
 import { Value, ValueError } from "@sinclair/typebox/value"
 import {
@@ -60,18 +61,19 @@ export function ForgotPasswordForm(): ReactNode {
             setIsLoading(true)
             setFormState(INITIAL_FORM_STATE)
           },
-          onSuccess: () => {
+          onResponse: () => {
             setIsLoading(false)
-            setFormState({
-              success: true,
-              message: t({ message: "A reset password link has been sent in your inbox!" }),
-            })
           },
-          onError: (ctx) => {
-            setIsLoading(false)
+          onError: (ctx: ErrorContext) => {
             setFormState({
               success: false,
               message: ctx.error.message,
+            })
+          },
+          onSuccess: () => {
+            setFormState({
+              success: true,
+              message: t({ message: "A reset password link has been sent in your inbox!" }),
             })
           },
         },

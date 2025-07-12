@@ -1,14 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react"
 import { Mock } from "vitest"
 import TableInviteUserModal from "@/components/game/TableInviteUserModal"
-import { authClient } from "@/lib/auth-client"
-import { mockSession } from "@/test/data/session"
-
-vi.mock("@/lib/auth-client", () => ({
-  authClient: {
-    useSession: vi.fn(),
-  },
-}))
 
 const mockRoomId: string = "mock-room-1"
 const mockTableId: string = "mock-table-1"
@@ -17,7 +9,6 @@ describe("TableInviteUserModal", () => {
   beforeEach(() => {
     HTMLDialogElement.prototype.showModal = vi.fn()
     HTMLDialogElement.prototype.close = vi.fn()
-    vi.mocked(authClient.useSession).mockReturnValue(mockSession)
   })
 
   it("should render the invite user modal", () => {

@@ -10,16 +10,18 @@ export default defineConfig({
   },
   catalogs: [
     {
-      path: "<rootDir>/translations/locales/{locale}",
+      path: "<rootDir>/translations/locales/{locale}/messages",
       include: [
         "<rootDir>/app/",
         "<rootDir>/components/",
         "<rootDir>/constants/",
         "<rootDir>/lib/",
-        "<rootDir>/redux/",
         "<rootDir>/translations/languages.ts",
         "<rootDir>/utils/",
       ],
+      exclude: ["<rootDir>/prisma/**"],
     },
   ],
+  format: "po",
+  orderBy: "messageId",
 })

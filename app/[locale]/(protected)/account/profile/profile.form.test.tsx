@@ -20,7 +20,7 @@ describe("Sign Up Form", () => {
   })
 
   it("should render the form with all elements", () => {
-    render(<ProfileForm session={mockSession.data} />)
+    render(<ProfileForm session={mockSession} />)
 
     expect(screen.getByText(/Profile Information/i)).toBeInTheDocument()
     expect(screen.getByTestId("profile_input-text_name")).toBeInTheDocument()
@@ -30,7 +30,7 @@ describe("Sign Up Form", () => {
   })
 
   it("should correctly mark form fields as required", () => {
-    render(<ProfileForm session={mockSession.data} />)
+    render(<ProfileForm session={mockSession} />)
 
     expect(screen.getByTestId("profile_input-text_name")).toHaveAttribute("required")
     expect(screen.getByTestId("profile_input-date_birthdate")).not.toHaveAttribute("required")
@@ -38,7 +38,7 @@ describe("Sign Up Form", () => {
   })
 
   it("should display error messages when the form is submitted with empty fields", () => {
-    render(<ProfileForm session={mockSession.data} />)
+    render(<ProfileForm session={mockSession} />)
 
     fireEvent.input(screen.getByTestId("profile_input-text_name"), { target: { value: "" } })
     fireEvent.input(screen.getByTestId("profile_input-text_username"), { target: { value: "" } })
@@ -58,7 +58,7 @@ describe("Sign Up Form", () => {
       callbacks.onSuccess()
     })
 
-    render(<ProfileForm session={mockSession.data} />)
+    render(<ProfileForm session={mockSession} />)
 
     fireEvent.input(screen.getByTestId("profile_input-text_name"), { target: { value: "John Doe" } })
     fireEvent.input(screen.getByTestId("profile_input-text_username"), { target: { value: "john.doe" } })

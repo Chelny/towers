@@ -1,10 +1,8 @@
-import dotenv from "dotenv"
+import "dotenv/config"
 import path from "node:path"
 import type { PrismaConfig } from "prisma"
 
-dotenv.config()
-
 export default {
   earlyAccess: true,
-  schema: path.join("prisma"),
+  schema: path.join("prisma", "schema"),
 } satisfies PrismaConfig

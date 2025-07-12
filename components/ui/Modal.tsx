@@ -1,6 +1,6 @@
 "use client"
 
-import { FormEvent, PropsWithChildren, ReactNode, RefObject, useEffect, useRef } from "react"
+import { FormEvent, PropsWithChildren, ReactNode, useEffect, useRef } from "react"
 import { useLingui } from "@lingui/react/macro"
 import clsx from "clsx/lite"
 import Button from "@/components/ui/Button"
@@ -25,7 +25,7 @@ export default function Modal({
   onConfirm,
   onCancel,
 }: ModalProps): ReactNode {
-  const dialogRef: RefObject<HTMLDialogElement | null> = useRef<HTMLDialogElement | null>(null)
+  const dialogRef = useRef<HTMLDialogElement>(null)
   const { t } = useLingui()
 
   useEffect(() => {

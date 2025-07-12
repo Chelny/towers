@@ -45,7 +45,7 @@ export default function UserAvatar({
     )
   }
 
-  const username: string | undefined = user?.username
+  const username: string | null | undefined = user?.username
   const imageSrc: string = user?.image || placeholderSrc
   const imageAlt: string = user?.image ? t({ message: `${username}’s avatar` }) : placeholderAlt
 

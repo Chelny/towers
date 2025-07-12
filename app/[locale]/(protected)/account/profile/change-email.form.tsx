@@ -1,6 +1,7 @@
 "use client"
 
 import { ClipboardEvent, FormEvent, ReactNode, useState } from "react"
+import { ErrorContext } from "@better-fetch/fetch"
 import { Trans, useLingui } from "@lingui/react/macro"
 import { Value, ValueError } from "@sinclair/typebox/value"
 import { IoWarning } from "react-icons/io5"
@@ -64,21 +65,22 @@ export function ChangeEmailForm({ session }: ChangeEmailFormProps): ReactNode {
             setIsLoading(true)
             setFormState(INITIAL_FORM_STATE)
           },
-          onSuccess: () => {
+          onResponse: () => {
             setIsLoading(false)
+          },
+          onError: (ctx: ErrorContext) => {
+            setFormState({
+              success: false,
+              message: ctx.error.message,
+            })
+          },
+          onSuccess: () => {
             setFormState({
               success: true,
               message: t({
                 message:
                   "A verification email has been sent to your new email address. Please check your inbox or your spam folder.",
               }),
-            })
-          },
-          onError: (ctx) => {
-            setIsLoading(false)
-            setFormState({
-              success: false,
-              message: ctx.error.message,
             })
           },
         },
@@ -97,21 +99,22 @@ export function ChangeEmailForm({ session }: ChangeEmailFormProps): ReactNode {
             setIsLoading(true)
             setFormState(INITIAL_FORM_STATE)
           },
-          onSuccess: () => {
+          onResponse: () => {
             setIsLoading(false)
+          },
+          onError: (ctx: ErrorContext) => {
+            setFormState({
+              success: false,
+              message: ctx.error.message,
+            })
+          },
+          onSuccess: () => {
             setFormState({
               success: true,
               message: t({
                 message:
                   "A verification email has been sent to your new email address. Please check your inbox or your spam folder.",
               }),
-            })
-          },
-          onError: (ctx) => {
-            setIsLoading(false)
-            setFormState({
-              success: false,
-              message: ctx.error.message,
             })
           },
         },

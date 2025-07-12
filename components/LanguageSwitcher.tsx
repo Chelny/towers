@@ -36,7 +36,7 @@ export default function LanguageSwitcher(): ReactNode {
         <Select.Option key={language.locale} value={language.locale}>
           <div className="flex gap-2">
             <div>{language.flag}</div>
-            <div>{i18n._(language.msg)}</div>
+            <div>{i18n._(language.label)}</div>
           </div>
         </Select.Option>
       ))}

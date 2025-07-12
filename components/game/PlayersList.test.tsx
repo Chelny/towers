@@ -2,19 +2,11 @@ import { fireEvent, render, screen } from "@testing-library/react"
 import { Mock } from "vitest"
 import PlayersList from "@/components/game/PlayersList"
 import { ModalProvider } from "@/context/ModalContext"
-import { authClient } from "@/lib/auth-client"
 import { TableInvitationManagerPlainObject } from "@/server/towers/classes/TableInvitationManager"
 import { UserPlainObject } from "@/server/towers/classes/User"
 import { UserMuteManagerPlainObject } from "@/server/towers/classes/UserMuteManager"
-import { mockSession } from "@/test/data/session"
 import { mockUser1, mockUser2, mockUser3 } from "@/test/data/user"
 import { mockUserStats1, mockUserStats2, mockUserStats3 } from "@/test/data/user-stats"
-
-vi.mock("@/lib/auth-client", () => ({
-  authClient: {
-    useSession: vi.fn(),
-  },
-}))
 
 const handleSelectedPlayer: Mock = vi.fn()
 
@@ -163,7 +155,6 @@ describe("PlayersList", () => {
   beforeEach(() => {
     HTMLDialogElement.prototype.showModal = vi.fn()
     HTMLDialogElement.prototype.close = vi.fn()
-    vi.mocked(authClient.useSession).mockReturnValue(mockSession)
   })
 
   it("should render the players list correctly", () => {

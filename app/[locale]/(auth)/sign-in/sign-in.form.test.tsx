@@ -33,11 +33,12 @@ describe("Sign In Form", () => {
     expect(screen.getByTestId("sign-in_input-password_password")).toBeInTheDocument()
     expect(screen.getByTestId("sign-in_checkbox_remember-me")).toBeInTheDocument()
     expect(screen.getByText(/Forgot Password/i)).toBeInTheDocument()
-    expect(screen.getByRole("button", { name: /Sign in with email and password/i })).toBeInTheDocument()
+    expect(screen.getByTestId("sign-in_button_sign-in-with-email-and-password")).toBeInTheDocument()
     expect(screen.getByText(/Sign Up/i)).toBeInTheDocument()
-    expect(screen.getByRole("button", { name: /Magic Link/i })).toBeInTheDocument()
-    expect(screen.getByRole("button", { name: /Sign in with GitHub/i })).toBeInTheDocument()
-    expect(screen.getByRole("button", { name: /Sign in with Google/i })).toBeInTheDocument()
+    expect(screen.getByTestId("sign-in_button_sign-in-with-magic-link")).toBeInTheDocument()
+    expect(screen.getByTestId("sign-in_button_sign-in-with-github")).toBeInTheDocument()
+    expect(screen.getByTestId("sign-in_button_sign-in-with-google")).toBeInTheDocument()
+    expect(screen.getByTestId("sign-in_button_sign-in-with-passkey")).toBeInTheDocument()
   })
 
   it("should correctly mark form fields as required", () => {
@@ -69,7 +70,7 @@ describe("Sign In Form", () => {
 
     render(<SignInForm />)
 
-    fireEvent.click(screen.getByRole("button", { name: /Magic Link/i }))
+    fireEvent.click(screen.getByTestId("sign-in_button_sign-in-with-magic-link"))
 
     expect(mockPush).toHaveBeenCalledWith(ROUTE_SIGN_IN_WITH_MAGIC_LINK.PATH)
   })
@@ -77,7 +78,7 @@ describe("Sign In Form", () => {
   it("should display error messages when the form is submitted with empty fields", () => {
     render(<SignInForm />)
 
-    fireEvent.click(screen.getByRole("button", { name: /Sign in with email and password/i }))
+    fireEvent.click(screen.getByTestId("sign-in_button_sign-in-with-email-and-password"))
 
     expect(screen.getByText(/The email or the password is invalid/i)).toBeInTheDocument()
   })
@@ -98,7 +99,7 @@ describe("Sign In Form", () => {
 
     fireEvent.input(screen.getByTestId("sign-in_input-email_email"), { target: { value: "john.doe@example.com" } })
     fireEvent.input(screen.getByTestId("sign-in_input-password_password"), { target: { value: "Password!" } })
-    fireEvent.click(screen.getByRole("button", { name: /Sign in with email and password/i }))
+    fireEvent.click(screen.getByTestId("sign-in_button_sign-in-with-email-and-password"))
 
     await waitFor(() => {
       expect(screen.getByText(/Invalid email or password/i)).toBeInTheDocument()
@@ -120,15 +121,16 @@ describe("Sign In Form", () => {
     fireEvent.input(screen.getByTestId("sign-in_input-email_email"), { target: { value: "john.doe@example.com" } })
     fireEvent.input(screen.getByTestId("sign-in_input-password_password"), { target: { value: "Password123!" } })
 
-    const submitButton: HTMLButtonElement = screen.getByRole("button", { name: /Sign in with email and password/i })
+    const submitButton: HTMLButtonElement = screen.getByTestId("sign-in_button_sign-in-with-email-and-password")
     fireEvent.click(submitButton)
 
     expect(submitButton).toBeDisabled()
 
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: /Magic Link/i })).toBeDisabled()
-      expect(screen.getByRole("button", { name: /Sign in with GitHub/i })).toBeDisabled()
-      expect(screen.getByRole("button", { name: /Sign in with Google/i })).toBeDisabled()
+      expect(screen.getByTestId("sign-in_button_sign-in-with-magic-link")).toBeDisabled()
+      expect(screen.getByTestId("sign-in_button_sign-in-with-github")).toBeDisabled()
+      expect(screen.getByTestId("sign-in_button_sign-in-with-google")).toBeDisabled()
+      expect(screen.getByTestId("sign-in_button_sign-in-with-passkey")).toBeDisabled()
     })
   })
 })

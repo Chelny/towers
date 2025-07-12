@@ -111,6 +111,9 @@
   --color-dark-game-players-row-even: #243342;
   --color-dark-game-players-border: #365066;
   --color-dark-game-change-keys-background: #202d3b;
+  --color-dark-skeleton-background: #2b3a48;
+  --color-dark-skeleton-border: #3a4a58;
+  --color-dark-skeleton-content-background: #415a6b;
 
   /* Line Height */
   --leading-default: 1;
@@ -294,10 +297,10 @@ body {
 dialog::backdrop {
   opacity: 25%;
   background-color: black;
+}
 
-  @variant dark {
-    opacity: 50%;
-  }
+html.dark dialog::backdrop {
+  opacity: 40%;
 }
 
 .small-screen-warning {

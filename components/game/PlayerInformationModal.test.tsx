@@ -1,17 +1,9 @@
 import { fireEvent, render, screen } from "@testing-library/react"
 import { Mock } from "vitest"
 import PlayerInformation from "@/components/game/PlayerInformationModal"
-import { authClient } from "@/lib/auth-client"
 import { UserPlainObject } from "@/server/towers/classes/User"
-import { mockSession } from "@/test/data/session"
 import { mockUser1, mockUser2 } from "@/test/data/user"
 import { mockUserStats1, mockUserStats2 } from "@/test/data/user-stats"
-
-vi.mock("@/lib/auth-client", () => ({
-  authClient: {
-    useSession: vi.fn(),
-  },
-}))
 
 const mockPlayer1: UserPlainObject = {
   user: {
@@ -33,7 +25,6 @@ describe("PlayerInformation", () => {
   beforeEach(() => {
     HTMLDialogElement.prototype.showModal = vi.fn()
     HTMLDialogElement.prototype.close = vi.fn()
-    vi.mocked(authClient.useSession).mockReturnValue(mockSession)
   })
 
   it("should hide message input and \"Send\" button when viewing current user's information", () => {

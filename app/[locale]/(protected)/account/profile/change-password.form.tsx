@@ -1,8 +1,10 @@
 "use client"
 
 import { ClipboardEvent, FormEvent, ReactNode, useEffect, useRef, useState } from "react"
+import { ErrorContext } from "@better-fetch/fetch"
 import { Trans, useLingui } from "@lingui/react/macro"
 import { Value, ValueError } from "@sinclair/typebox/value"
+import { Account } from "better-auth"
 import {
   ChangePasswordFormValidationErrors,
   ChangePasswordPayload,
@@ -14,7 +16,7 @@ import {
 import AlertMessage from "@/components/ui/AlertMessage"
 import Button from "@/components/ui/Button"
 import Checkbox from "@/components/ui/Checkbox"
-import Input from "@/components/ui/Input"
+import Input, { InputImperativeHandle } from "@/components/ui/Input"
 import { INITIAL_FORM_STATE } from "@/constants/api"
 import { authClient } from "@/lib/auth-client"
 import { Session } from "@/lib/auth-client"
@@ -28,9 +30,9 @@ export function ChangePasswordForm({ session }: ChangePasswordFormProps): ReactN
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [formState, setFormState] = useState<ApiResponse>(INITIAL_FORM_STATE)
   const [isUserPasswordSet, setIsUserPasswordSet] = useState<boolean>(false)
-  const currentPasswordRef = useRef<HTMLInputElement>(null)
-  const newPasswordRef = useRef<HTMLInputElement>(null)
-  const confirmNewPasswordRef = useRef<HTMLInputElement>(null)
+  const currentPasswordRef = useRef<InputImperativeHandle>(null)
+  const newPasswordRef = useRef<InputImperativeHandle>(null)
+  const confirmNewPasswordRef = useRef<InputImperativeHandle>(null)
   const { t } = useLingui()
 
   const handleChangeSetPassword = (event: FormEvent<HTMLFormElement>): void => {
@@ -151,19 +153,23 @@ export function ChangePasswordForm({ session }: ChangePasswordFormProps): ReactN
             setIsLoading(true)
             setFormState(INITIAL_FORM_STATE)
           },
-          onSuccess: () => {
+          onResponse: () => {
             setIsLoading(false)
-            setFormState({
-              success: true,
-              message: t({ message: "The password has been updated!" }),
-            })
           },
-          onError: (ctx) => {
-            setIsLoading(false)
+          onError: (ctx: ErrorContext) => {
             setFormState({
               success: false,
               message: ctx.error.message,
             })
+          },
+          onSuccess: () => {
+            setFormState({
+              success: true,
+              message: t({ message: "The password has been updated!" }),
+            })
+            currentPasswordRef.current?.clear()
+            newPasswordRef.current?.clear()
+            confirmNewPasswordRef.current?.clear()
           },
         },
       )
@@ -172,28 +178,10 @@ export function ChangePasswordForm({ session }: ChangePasswordFormProps): ReactN
 
   useEffect(() => {
     if (session) {
-      const isPasswordFound: Session["accounts"][0] | undefined = session?.accounts.find(
-        (account: Session["accounts"][0]) => account.password,
-      )
+      const isPasswordFound: Account | undefined = session?.accounts.find((account: Account) => account.password)
       setIsUserPasswordSet(typeof isPasswordFound !== "undefined")
     }
   }, [session])
-
-  useEffect(() => {
-    if (formState?.success) {
-      if (currentPasswordRef.current) {
-        currentPasswordRef.current.value = ""
-      }
-
-      if (newPasswordRef.current) {
-        newPasswordRef.current.value = ""
-      }
-
-      if (confirmNewPasswordRef.current) {
-        confirmNewPasswordRef.current.value = ""
-      }
-    }
-  }, [formState])
 
   return (
     <>
