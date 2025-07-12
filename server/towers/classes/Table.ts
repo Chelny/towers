@@ -47,7 +47,6 @@ export class Table {
   public host?: User
   private _tableType: TableType
   public isRated: boolean
-  public tableInvitations: Map<string, TableInvitation> = new Map<string, TableInvitation>()
   public seats: TableSeat[]
   public users: User[] = []
   private tableSeatManager: TableSeatManager = new TableSeatManager()
@@ -256,6 +255,10 @@ export class Table {
     let isChanged: boolean = false
 
     if (typeof options.tableType !== "undefined" && this.tableType !== options.tableType) {
+      if (this.tableType === TableType.PUBLIC && [TableType.PROTECTED, TableType.PRIVATE].includes(options.tableType)) {
+        this.setSeatedUsersAsInvited()
+      }
+
       this.tableType = options.tableType
       isChanged = true
     }
@@ -266,6 +269,24 @@ export class Table {
     }
 
     return isChanged
+  }
+
+  /**
+   * Automatically authorize seated users to play when the table type changes
+   * from public to protected/private.
+   */
+  private setSeatedUsersAsInvited(): void {
+    for (const user of this.users) {
+      if (
+        this.host &&
+        user.user.id != this.host.user.id &&
+        !user.tableInvitationManager.getReceivedInvitationByTableId(this.id)
+      ) {
+        const invitation: TableInvitation = new TableInvitation(this.room.id, this, this.host, user)
+        this.host.tableInvitationManager.addSentInvitation(invitation)
+        user.tableInvitationManager.addReceivedInvitation(invitation)
+      }
+    }
   }
 
   /**
