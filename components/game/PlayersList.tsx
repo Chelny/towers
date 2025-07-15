@@ -17,6 +17,7 @@ import { useSocket } from "@/context/SocketContext"
 import { UserPlainObject } from "@/server/towers/classes/User"
 
 type PlayersListProps = {
+  roomId: string
   users: UserPlainObject[] | undefined
   isRatingsVisible?: boolean | null
   isTableNumberVisible?: boolean
@@ -24,6 +25,7 @@ type PlayersListProps = {
 }
 
 export default function PlayersList({
+  roomId,
   users,
   isRatingsVisible = false,
   isTableNumberVisible = false,
@@ -106,6 +108,7 @@ export default function PlayersList({
 
   const handleOpenPlayerInfoModal = (): void => {
     openModal(PlayerInformationModal, {
+      roomId,
       currentUser,
       player: sortedPlayersList?.find((player: UserPlainObject) => player.user?.id === selectedPlayerId),
       isRatingsVisible,

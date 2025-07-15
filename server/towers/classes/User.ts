@@ -1,6 +1,7 @@
 import { DisconnectReason, Server, Socket } from "socket.io"
 import { DEFAULT_TOWERS_CONTROL_KEYS } from "@/constants/game"
 import { SocketEvents } from "@/constants/socket-events"
+import { TableType } from "@/enums/table-type"
 import { TowersControlKeys } from "@/enums/towers-control-keys"
 import { Session } from "@/lib/auth-client"
 import {
@@ -17,6 +18,7 @@ export interface UserPlainObject {
   stats: UserStatsPlainObject
   mute: UserMuteManagerPlainObject
   tableInvitations: TableInvitationManagerPlainObject
+  lastActiveAt?: number
   rooms: Record<string, UserRoom>
   tables: Record<string, UserTable>
   lastJoinedTable?: UserTable
@@ -28,8 +30,10 @@ export interface UserRoom {
 }
 
 export interface UserTable {
+  id: string
   roomId: string
   tableNumber: number
+  tableType: TableType
   seatNumber?: number
   teamNumber?: number
   isReady: boolean
@@ -51,10 +55,12 @@ export class User {
   public stats: UserStats
   public tableInvitationManager: TableInvitationManager
   public muteManager: UserMuteManager = new UserMuteManager()
+  public lastActiveAt?: number
   private rooms: Map<string, UserRoom> = new Map<string, UserRoom>()
   private tables: Map<string, UserTable> = new Map<string, UserTable>()
   private onGetControlKeys: () => void = this.handleGetControlKeys.bind(this)
   private onSaveControlKeys: (data: { controlKeys: TowersControlKeys }) => void = this.handleSaveControlKeys.bind(this)
+  private onPing: () => void = this.handlePing.bind(this)
 
   constructor(io: Server, socket: Socket, user: Session["user"]) {
     this.io = io
@@ -69,6 +75,7 @@ export class User {
   private registerSocketListeners(): void {
     this.socket.on(SocketEvents.GAME_GET_CONTROL_KEYS, this.onGetControlKeys)
     this.socket.on(SocketEvents.GAME_SAVE_CONTROL_KEYS, this.onSaveControlKeys)
+    this.socket.on(SocketEvents.PING, this.onPing)
 
     this.socket.on("disconnect", (reason: DisconnectReason) => {
       const shouldCleanup: boolean =
@@ -87,6 +94,7 @@ export class User {
   private cleanupSocketListeners(): void {
     this.socket.off(SocketEvents.GAME_GET_CONTROL_KEYS, this.onGetControlKeys)
     this.socket.off(SocketEvents.GAME_SAVE_CONTROL_KEYS, this.onSaveControlKeys)
+    this.socket.off(SocketEvents.PING, this.onPing)
   }
 
   private handleGetControlKeys(): void {
@@ -98,9 +106,14 @@ export class User {
     this.socket.emit(SocketEvents.GAME_CONTROL_KEYS, { controlKeys })
   }
 
+  private handlePing(): void {
+    this.lastActiveAt = Date.now()
+  }
+
   public joinRoom(roomId: string): void {
     if (!this.isInRoom(roomId)) {
       this.rooms.set(roomId, { createdAt: Date.now() })
+      this.lastActiveAt = Date.now()
     }
   }
 
@@ -114,11 +127,13 @@ export class User {
 
     room.updatedAt = Date.now()
     Object.assign(room, roomInfo)
+    this.lastActiveAt = Date.now()
   }
 
   public leaveRoom(roomId: string): void {
     if (this.isInRoom(roomId)) {
       this.rooms.delete(roomId)
+      this.lastActiveAt = Date.now()
     }
   }
 
@@ -133,6 +148,7 @@ export class User {
       } as UserTable
 
       this.tables.set(tableId, joinedTable)
+      this.lastActiveAt = Date.now()
     }
   }
 
@@ -174,12 +190,31 @@ export class User {
 
     table.updatedAt = Date.now()
     Object.assign(table, tableInfo)
+    this.lastActiveAt = Date.now()
   }
 
   public leaveTable(tableId: string): void {
     if (this.isInTable(tableId)) {
       this.tables.delete(tableId)
+      this.lastActiveAt = Date.now()
     }
+  }
+
+  public canWatch(target: User): UserTable | null {
+    const targetTable: UserTable | undefined = Array.from(target.tables.values()).find(
+      (table: UserTable) => table.isPlaying,
+    )
+    if (!targetTable) return null
+
+    const alreadyAtSameTable: boolean = Array.from(this.tables.values()).some(
+      (table: UserTable) => table.roomId === targetTable.roomId && table.tableNumber === targetTable.tableNumber,
+    )
+
+    if (alreadyAtSameTable) return null
+
+    if (targetTable.tableType === TableType.PRIVATE) return null
+
+    return targetTable
   }
 
   public toPlainObject(): UserPlainObject {
@@ -193,6 +228,7 @@ export class User {
       stats: this.stats.toPlainObject(),
       mute: this.muteManager.toPlainObject(),
       tableInvitations: this.tableInvitationManager.toPlainObject(),
+      lastActiveAt: this.lastActiveAt,
       rooms: Object.fromEntries(this.rooms.entries()),
       tables: Object.fromEntries(this.tables.entries()),
       lastJoinedTable,

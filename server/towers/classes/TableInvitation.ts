@@ -105,7 +105,7 @@ export class TableInvitation {
       id: this.id,
       roomId: this.roomId,
       inviteeUsername: this.invitee.user.username,
-      reason,
+      declinedReason: this.declinedReason,
     })
 
     logger.debug(

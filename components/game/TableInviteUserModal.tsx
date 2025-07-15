@@ -53,6 +53,7 @@ export default function TableInviteUserModal({
     >
       <div className="overflow-y-auto h-72">
         <PlayersList
+          roomId={roomId}
           users={usersToInvite}
           isRatingsVisible={isRatingsVisible}
           isTableNumberVisible

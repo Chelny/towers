@@ -7,7 +7,7 @@ import { InstantMessage } from "@/server/towers/classes/InstantMessage"
 import { Room } from "@/server/towers/classes/Room"
 import { Table } from "@/server/towers/classes/Table"
 import { TableChatMessageVariables } from "@/server/towers/classes/TableChat"
-import { User } from "@/server/towers/classes/User"
+import { User, UserTable } from "@/server/towers/classes/User"
 import { rooms } from "@/server/towers/room-store"
 
 interface Callback<T = {}> {
@@ -24,11 +24,9 @@ export class TowersSocketHandler {
   ) {}
 
   public registerSocketListeners(): void {
-    this.registerUserSocketListeners()
     this.registerRoomSocketListeners()
-    this.registerChatSocketListeners()
     this.registerTableSocketListeners()
-    this.registerSeatSocketListeners()
+    this.registerUserSocketListeners()
 
     this.socket.on("disconnect", (reason: DisconnectReason) => {
       const shouldCleanup: boolean =
@@ -44,19 +42,11 @@ export class TowersSocketHandler {
     })
   }
 
-  private registerUserSocketListeners(): void {
-    this.socket.on(SocketEvents.USER_MUTE, this.handleUserMute)
-  }
-
   private registerRoomSocketListeners(): void {
     this.socket.on(SocketEvents.ROOM_JOIN, this.handleRoomJoin)
     this.socket.on(SocketEvents.ROOM_LEAVE, this.handleRoomLeave)
     this.socket.on(SocketEvents.ROOM_MESSAGE_SEND, this.handleRoomMessageSend)
     this.socket.on(SocketEvents.ROOM_GET, this.handleRoomGet)
-  }
-
-  private registerChatSocketListeners(): void {
-    this.socket.on(SocketEvents.INSTANT_MESSAGE_SENT, this.handleInstantMessageSent)
   }
 
   private registerTableSocketListeners(): void {
@@ -72,23 +62,23 @@ export class TowersSocketHandler {
     this.socket.on(SocketEvents.TABLE_INVITATION_DECLINED, this.handleTableInvitationDeclined)
     this.socket.on(SocketEvents.TABLE_BOOT_USER, this.handleTableBootUser)
     this.socket.on(SocketEvents.TABLE_TYPED_HERO_CODE, this.handleHeroCode)
-  }
-
-  private registerSeatSocketListeners(): void {
     this.socket.on(SocketEvents.SEAT_SIT, this.handleSeatSit)
     this.socket.on(SocketEvents.SEAT_STAND, this.handleSeatStand)
     this.socket.on(SocketEvents.SEAT_READY, this.handleSeatReady)
+    this.socket.on(SocketEvents.GAME_WATCH_USER_AT_TABLE, this.handleWatchUserAtTable)
+  }
+
+  private registerUserSocketListeners(): void {
+    this.socket.on(SocketEvents.USER_MUTE, this.handleUserMute)
+    this.socket.on(SocketEvents.USER_PING, this.handleUserPing)
+    this.socket.on(SocketEvents.INSTANT_MESSAGE_SENT, this.handleInstantMessageSent)
   }
 
   private cleanupSocketListeners(): void {
-    this.socket.off(SocketEvents.USER_MUTE, this.handleUserMute)
-
     this.socket.off(SocketEvents.ROOM_JOIN, this.handleRoomJoin)
     this.socket.off(SocketEvents.ROOM_LEAVE, this.handleRoomLeave)
     this.socket.off(SocketEvents.ROOM_MESSAGE_SEND, this.handleRoomMessageSend)
     this.socket.off(SocketEvents.ROOM_GET, this.handleRoomGet)
-
-    this.socket.on(SocketEvents.INSTANT_MESSAGE_SENT, this.handleInstantMessageSent)
 
     this.socket.off(SocketEvents.TABLE_JOIN, this.handleTableJoin)
     this.socket.off(SocketEvents.TABLE_LEAVE, this.handleTableLeave)
@@ -106,14 +96,10 @@ export class TowersSocketHandler {
     this.socket.off(SocketEvents.SEAT_SIT, this.handleSeatSit)
     this.socket.off(SocketEvents.SEAT_STAND, this.handleSeatStand)
     this.socket.off(SocketEvents.SEAT_READY, this.handleSeatReady)
-  }
 
-  private handleUserMute = ({ userId }: { userId: string }): void => {
-    if (this.user.muteManager.isMuted(userId)) {
-      this.user.muteManager.unmuteUser(userId)
-    } else {
-      this.user.muteManager.muteUser(userId)
-    }
+    this.socket.off(SocketEvents.USER_MUTE, this.handleUserMute)
+    this.socket.off(SocketEvents.USER_PING, this.handleUserPing)
+    this.socket.on(SocketEvents.INSTANT_MESSAGE_SENT, this.handleInstantMessageSent)
   }
 
   private handleRoomJoin = (
@@ -162,27 +148,6 @@ export class TowersSocketHandler {
   private handleRoomGet = ({ roomId }: { roomId: string }): void => {
     const room: Room | undefined = rooms.get(roomId)
     if (room) this.socket.emit(SocketEvents.ROOM_DATA, { room: room.toPlainObject(this.user) })
-  }
-
-  private handleInstantMessageSent = (
-    { roomId, recipientUserId, message }: { roomId: string; recipientUserId: string; message: string },
-    callback: ({ success, message }: Callback) => void,
-  ): void => {
-    const room: Room | undefined = rooms.get(roomId)
-
-    if (room) {
-      const recipient: User | undefined = room.users.find((user: User) => user.user.id === recipientUserId)
-
-      if (recipient) {
-        const instantMessage: InstantMessage = new InstantMessage(room, this.user, recipient)
-        instantMessage.sendInstantMessage(this.user, recipient, message)
-        callback({ success: true, message: "Message has been sent." })
-      } else {
-        callback({ success: false, message: "The recipient not found." })
-      }
-    } else {
-      callback({ success: false, message: "Room not found." })
-    }
   }
 
   private handleTableJoin = (
@@ -498,6 +463,74 @@ export class TowersSocketHandler {
           table: table.toPlainObject(this.user),
         })
       }
+    }
+  }
+
+  private handleWatchUserAtTable = (
+    { roomId, userId }: { roomId: string; userId: string },
+    callback: ({ success, message, data }: Callback) => void,
+  ): void => {
+    const room: Room | undefined = rooms.get(roomId)
+
+    if (room) {
+      const user: User | undefined = room.users.find((user: User) => user.user.id === userId)
+
+      if (user) {
+        const userTable: UserTable | null = this.user.canWatch(user)
+
+        if (userTable !== null) {
+          callback({
+            success: true,
+            message: "You can watch user playing.",
+            data: { roomId: userTable.roomId, tableId: userTable.id },
+          })
+        } else {
+          callback({ success: false, message: "Cannot watch user playing." })
+        }
+      } else {
+        callback({ success: false, message: "User not found." })
+      }
+    }
+  }
+
+  private handleUserMute = ({ userId }: { userId: string }): void => {
+    if (this.user.muteManager.isMuted(userId)) {
+      this.user.muteManager.unmuteUser(userId)
+    } else {
+      this.user.muteManager.muteUser(userId)
+    }
+  }
+
+  private handleUserPing = ({ roomId, userId }: { roomId: string; userId: string }): void => {
+    const room: Room | undefined = rooms.get(roomId)
+
+    if (room) {
+      const user: User | undefined = room.users.find((user: User) => user.user.id === userId)
+
+      if (user) {
+        this.io.to(user.socket.id).emit(SocketEvents.USER_PING_RECEIVED, { fromUsername: user.user.username })
+      }
+    }
+  }
+
+  private handleInstantMessageSent = (
+    { roomId, recipientUserId, message }: { roomId: string; recipientUserId: string; message: string },
+    callback: ({ success, message }: Callback) => void,
+  ): void => {
+    const room: Room | undefined = rooms.get(roomId)
+
+    if (room) {
+      const recipient: User | undefined = room.users.find((user: User) => user.user.id === recipientUserId)
+
+      if (recipient) {
+        const instantMessage: InstantMessage = new InstantMessage(room, this.user, recipient)
+        instantMessage.sendInstantMessage(this.user, recipient, message)
+        callback({ success: true, message: "Message has been sent." })
+      } else {
+        callback({ success: false, message: "Recipient not found." })
+      }
+    } else {
+      callback({ success: false, message: "Room not found." })
     }
   }
 }

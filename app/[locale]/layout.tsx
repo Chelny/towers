@@ -14,6 +14,7 @@ import { APP_CONFIG, APP_COOKIES } from "@/constants/app"
 import { GameProvider } from "@/context/GameContext"
 import { ModalProvider } from "@/context/ModalContext"
 import { SocketProvider } from "@/context/SocketContext"
+import { ToastProvider } from "@/context/ToastContext"
 import { auth } from "@/lib/auth"
 import { Session } from "@/lib/auth-client"
 import { Language, languages } from "@/translations/languages"
@@ -78,7 +79,9 @@ export default async function RootLayout({ children, params }: Readonly<RootLayo
           <LinguiClientProvider initialLocale={routeParams.locale} initialMessages={allMessages[routeParams.locale]}>
             <SocketProvider session={session}>
               <GameProvider>
-                <ModalProvider>{children}</ModalProvider>
+                <ModalProvider>
+                  <ToastProvider>{children}</ToastProvider>
+                </ModalProvider>
               </GameProvider>
             </SocketProvider>
           </LinguiClientProvider>

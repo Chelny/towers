@@ -112,6 +112,12 @@ This project is inspired by Yahoo! Towers but is an independent work. It is not 
 
 1. Start Postgres server
 
+1. Generate Prisma schema
+
+   ```sh
+   pnpm prisma:generate
+   ```
+
 1. Push Prisma schema to database
 
    ```sh
@@ -151,10 +157,11 @@ _TODO_
 - [ ] Fix passkeys (sign-in and profile)
 - [ ] Add OTP (email and phone)
 - [ ] Add tooltip (?)
-- [ ] Add toast (?)
+- [x] Add toast
 - [ ] Add predefined avatars or allow users to upload their own avatar
 - [ ] Prevent user from accessing the profile page while in a game room (show prompt on click)
-- [ ] Add "Watch" button on Player Information modal - on click it should redirect to the player's most recent joined table
+- [x] Add "Watch" button on Player Information modal - on click it should redirect to the player's most recent joined table
+- [x] Add "Ping" button on Player Information modal - on click it should poke the other player
 
 See the [open issues](https://github.com/Chelny/towers/issues) for a full list of proposed features (and known issues).
 

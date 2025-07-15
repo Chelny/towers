@@ -1,7 +1,4 @@
 export const SocketEvents = {
-  // === User ===
-  USER_MUTE: "userMute",
-
   // === Rooms ===
   ROOMS_GET: "roomsGet",
   ROOMS_LIST: "roomsList",
@@ -16,10 +13,6 @@ export const SocketEvents = {
   ROOM_MESSAGE_SEND: "roomMessageSend",
   ROOM_CHAT_UPDATED: "roomChatUpdated",
   ROOM_TABLE_ADDED: "roomTableAdded",
-
-  // === Chat ===
-  INSTANT_MESSAGE_SENT: "instantMessageSent",
-  INSTANT_MESSAGE_RECEIVED: "instantMessageReceived",
 
   // === Table ===
   TABLE_PLAY_NOW: "tablePlayNow",
@@ -61,6 +54,7 @@ export const SocketEvents = {
   GAME_HOO_ADD_BLOCKS: "gameHooAddBlocks",
   GAME_BLOCKS_MARKED_FOR_REMOVAL: "gameMarkedForRemoval",
   GAME_CLIENT_BLOCKS_ANIMATION_DONE: "gameClientBlocksAnimationDone",
+  GAME_WATCH_USER_AT_TABLE: "gameWatchUserAtTable",
 
   // === Game Board ===
   PIECE_MOVE: "pieceMove",
@@ -69,4 +63,14 @@ export const SocketEvents = {
   PIECE_DROP_STOP: "pieceDropStop",
   PIECE_SPEED: "pieceSpeed",
   POWER_USE: "powerUse",
+
+  // === User ===
+  USER_MUTE: "userMute",
+  USER_PING: "userPing",
+  USER_PING_RECEIVED: "userPingReceived",
+  INSTANT_MESSAGE_SENT: "instantMessageSent",
+  INSTANT_MESSAGE_RECEIVED: "instantMessageReceived",
+
+  // === Socket.io
+  PING: "ping",
 }

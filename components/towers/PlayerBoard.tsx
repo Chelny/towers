@@ -84,7 +84,7 @@ export default function PlayerBoard({
   const [blocksToRemove, setBlocksToRemove] = useState<BlockToRemove[]>([])
 
   const handleOpenPlayerInfoModal = (player: UserPlainObject): void => {
-    openModal(PlayerInformationModal, { currentUser, player, isRatingsVisible })
+    openModal(PlayerInformationModal, { roomId, currentUser, player, isRatingsVisible })
   }
 
   const handleMovePiece = (direction: "left" | "right"): void => {

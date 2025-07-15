@@ -3,10 +3,12 @@
 import { ReactNode, useEffect } from "react"
 import dynamic from "next/dynamic"
 import { useRouter, useSearchParams } from "next/navigation"
+import { useLingui } from "@lingui/react/macro"
 import { ROUTE_TOWERS } from "@/constants/routes"
 import { SocketEvents } from "@/constants/socket-events"
 import { useGame } from "@/context/GameContext"
 import { useSocket } from "@/context/SocketContext"
+import { useToast } from "@/context/ToastContext"
 import { InstantMessagePlainObject } from "@/server/towers/classes/InstantMessage"
 import { DeclinedTableInvitationPlainObject, TableInvitationPlainObject } from "@/server/towers/classes/TableInvitation"
 
@@ -25,7 +27,9 @@ export default function TowersPageContent(): ReactNode {
   }
 
   const { socketRef } = useSocket()
+  const { i18n, t } = useLingui()
   const { removeJoinedTable, addNotification, setActiveRoomId, activeTableId, setActiveTableId } = useGame()
+  const { showToast } = useToast()
 
   useEffect(() => {
     setActiveRoomId(roomId)
@@ -33,7 +37,13 @@ export default function TowersPageContent(): ReactNode {
   }, [roomId, tableId, setActiveRoomId, setActiveTableId])
 
   useEffect(() => {
-    const handleInstantMessage = (instantMessage: InstantMessagePlainObject) => {
+    const handlePingReceived = ({ fromUsername }: { fromUsername: string }): void => {
+      showToast({
+        message: t({ message: `${fromUsername} has pinged you!` }),
+      })
+    }
+
+    const handleInstantMessage = (instantMessage: InstantMessagePlainObject): void => {
       addNotification({ ...instantMessage, type: "instantMessage" })
     }
 
@@ -42,7 +52,17 @@ export default function TowersPageContent(): ReactNode {
     }
 
     const handleInvitationDeclined = (tableInvitation: DeclinedTableInvitationPlainObject): void => {
-      addNotification({ ...tableInvitation, type: "tableInvitation" })
+      showToast({
+        message: tableInvitation.declinedReason
+          ? i18n._("{username} declined your invitation. Reason: {reason}", {
+              username: tableInvitation.inviteeUsername,
+              reason: tableInvitation.declinedReason,
+            })
+          : i18n._("{username} declined your invitation.", {
+              username: tableInvitation.inviteeUsername,
+            }),
+        duration: 10_000,
+      })
     }
 
     const handleUserBooted = ({
@@ -75,12 +95,14 @@ export default function TowersPageContent(): ReactNode {
       }
     }
 
+    socketRef.current?.on(SocketEvents.USER_PING_RECEIVED, handlePingReceived)
     socketRef.current?.on(SocketEvents.INSTANT_MESSAGE_RECEIVED, handleInstantMessage)
     socketRef.current?.on(SocketEvents.TABLE_INVITATION_NOTIFICATION, handleInvitation)
     socketRef.current?.on(SocketEvents.TABLE_INVITATION_DECLINED_NOTIFICATION, handleInvitationDeclined)
     socketRef.current?.on(SocketEvents.TABLE_BOOTED_USER_NOTIFICATION, handleUserBooted)
 
     return () => {
+      socketRef.current?.off(SocketEvents.USER_PING_RECEIVED, handlePingReceived)
       socketRef.current?.off(SocketEvents.INSTANT_MESSAGE_RECEIVED, handleInstantMessage)
       socketRef.current?.off(SocketEvents.TABLE_INVITATION_NOTIFICATION, handleInvitation)
       socketRef.current?.off(SocketEvents.TABLE_INVITATION_DECLINED_NOTIFICATION, handleInvitationDeclined)

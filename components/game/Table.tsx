@@ -1038,7 +1038,7 @@ export default function Table(): ReactNode {
               </div>
 
               <div className="w-[385px]">
-                <PlayersList users={table?.users} isRatingsVisible={room?.level !== RoomLevel.SOCIAL} />
+                <PlayersList roomId={roomId} users={table?.users} isRatingsVisible={room?.level !== RoomLevel.SOCIAL} />
               </div>
             </div>
           </div>

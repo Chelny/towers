@@ -96,10 +96,6 @@ export const auth = betterAuth({
         type: "boolean",
         defaultValue: false,
       },
-      lastActiveAt: {
-        type: "date",
-        required: false,
-      },
       theme: {
         type: "string",
         defaultValue: WebsiteTheme.SYSTEM,

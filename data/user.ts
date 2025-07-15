@@ -18,8 +18,9 @@ export const getUserByUsername = async (username: string): Promise<User | null> 
  * @param id
  */
 export const setUserLastActiveAt = async (id: string): Promise<void> => {
+  // TODO: Set lastActiveAt?
   await prisma.user.update({
     where: { id },
-    data: { isOnline: true, lastActiveAt: new Date() },
+    data: { isOnline: true },
   })
 }

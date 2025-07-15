@@ -186,8 +186,10 @@ export class Table {
     }
 
     user.joinTable(this.id, {
+      id: this.id,
       roomId: this.room.id,
       tableNumber: this.tableNumber,
+      tableType: this.tableType,
       seatNumber,
     })
   }
@@ -256,7 +258,7 @@ export class Table {
 
     if (typeof options.tableType !== "undefined" && this.tableType !== options.tableType) {
       if (this.tableType === TableType.PUBLIC && [TableType.PROTECTED, TableType.PRIVATE].includes(options.tableType)) {
-        this.setSeatedUsersAsInvited()
+        this.autoInviteSeatedUsers()
       }
 
       this.tableType = options.tableType
@@ -268,6 +270,10 @@ export class Table {
       isChanged = true
     }
 
+    if (isChanged && this.host) {
+      this.host.lastActiveAt = Date.now()
+    }
+
     return isChanged
   }
 
@@ -275,7 +281,7 @@ export class Table {
    * Automatically authorize seated users to play when the table type changes
    * from public to protected/private.
    */
-  private setSeatedUsersAsInvited(): void {
+  private autoInviteSeatedUsers(): void {
     for (const user of this.users) {
       if (
         this.host &&
@@ -333,6 +339,8 @@ export class Table {
       toUser.socket.emit(SocketEvents.TABLE_INVITATION_NOTIFICATION, invitation.toPlainObject())
       logger.debug(`${fromUser.user.username} invited ${toUser.user.username} to table #${this.tableNumber}.`)
     }
+
+    this.host.lastActiveAt = Date.now()
   }
 
   /**
@@ -389,6 +397,8 @@ export class Table {
 
     host.tableInvitationManager.removeSentInvitationByTableId(this.id)
     userToBoot.tableInvitationManager.removeReceivedInvitationByTableId(this.id)
+
+    this.host.lastActiveAt = Date.now()
   }
 
   /**
@@ -415,6 +425,8 @@ export class Table {
     this.tableSeatManager.assignSeat(user, this.seats, seatNumber)
     user.updateJoinedTable(this.id, { seatNumber })
     logger.debug(`${user.user?.username} is seated at seat #${seatNumber}.`)
+
+    user.lastActiveAt = Date.now()
   }
 
   /**
@@ -438,6 +450,8 @@ export class Table {
     if (this.game.state === TowersGameState.COUNTDOWN || this.game.state === TowersGameState.WAITING) {
       this.game.handleUserDepartureMidGame(user)
     }
+
+    user.lastActiveAt = Date.now()
   }
 
   /**
@@ -461,6 +475,8 @@ export class Table {
     } else {
       logger.debug("Not enough ready users or teams to play.")
     }
+
+    user.lastActiveAt = Date.now()
   }
 
   /**

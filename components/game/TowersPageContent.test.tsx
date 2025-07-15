@@ -3,6 +3,7 @@ import { render, screen, waitFor } from "@testing-library/react"
 import TowersPageContent from "@/components/game/TowersPageContent"
 import { GameProvider } from "@/context/GameContext"
 import { ModalProvider } from "@/context/ModalContext"
+import { ToastProvider } from "@/context/ToastContext"
 import { mockUseRouter, mockUseSearchParams } from "@/vitest.setup"
 
 vi.mock("next/image", () => ({
@@ -30,7 +31,9 @@ const renderTowersPageContent = () => {
   render(
     <GameProvider>
       <ModalProvider>
-        <TowersPageContent />
+        <ToastProvider>
+          <TowersPageContent />
+        </ToastProvider>
       </ModalProvider>
     </GameProvider>,
   )

@@ -22,7 +22,7 @@ export async function generateMetadata({ params, searchParams }: TowersProps): P
   const i18n: I18n = initLingui(routeParams.locale)
   let title: string = i18n._(ROUTE_TOWERS.TITLE)
 
-  // TODO: To remove?
+  // TODO: To implement when database will be set
   // if (routeSearchParams.room) {
   //   const room: TowersRoom | null = await prisma.towersRoom.findUnique({
   //     where: { id: routeSearchParams.room as string },

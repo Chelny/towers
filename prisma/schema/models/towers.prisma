@@ -18,6 +18,7 @@ model TowersGamePlayer {
   roomChat                 TowersRoomChatMessage[]
   tableSeats               TowersTableSeat[]
   tableChat                TowersTableChatMessage[]
+  lastActiveAt             DateTime?
   createdAt                DateTime                 @default(now())
   updatedAt                DateTime                 @updatedAt
 }

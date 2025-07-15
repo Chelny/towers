@@ -1,18 +1,21 @@
 "use client"
 
 import { InputEvent, ReactNode, useEffect, useState } from "react"
-import { ReadonlyURLSearchParams, useSearchParams } from "next/navigation"
-import { Trans, useLingui } from "@lingui/react/macro"
-import { formatDistanceToNow } from "date-fns"
+import { ReadonlyURLSearchParams, useRouter, useSearchParams } from "next/navigation"
+import { useLingui } from "@lingui/react/macro"
+import { Duration, formatDuration, intervalToDuration } from "date-fns"
+import Button from "@/components/ui/Button"
 import Checkbox from "@/components/ui/Checkbox"
 import Input from "@/components/ui/Input"
 import Modal from "@/components/ui/Modal"
+import { ROUTE_TOWERS } from "@/constants/routes"
 import { SocketEvents } from "@/constants/socket-events"
 import { useSocket } from "@/context/SocketContext"
 import { UserPlainObject } from "@/server/towers/classes/User"
 import { getDateFnsLocale } from "@/translations/languages"
 
 type PlayerInformationModalProps = {
+  roomId: string
   currentUser?: UserPlainObject
   player?: UserPlainObject
   isRatingsVisible?: boolean | null
@@ -20,6 +23,7 @@ type PlayerInformationModalProps = {
 }
 
 export default function PlayerInformationModal({
+  roomId,
   currentUser,
   player,
   isRatingsVisible = false,
@@ -28,8 +32,10 @@ export default function PlayerInformationModal({
   const searchParams: ReadonlyURLSearchParams = useSearchParams()
   const { socketRef, session } = useSocket()
   const { i18n, t } = useLingui()
+  const router = useRouter()
   const [isCurrentUser, setIsCurrentUser] = useState<boolean>(false)
   const [message, setMessage] = useState<string | undefined>(undefined)
+  const [watchUserAtTable, setWatchUserAtTable] = useState<string | null>(null)
   const [idleTime, setIdleTime] = useState<string | undefined>(undefined)
   const username: string | null | undefined = player?.user?.username
   const rating: number | undefined = player?.stats.rating
@@ -54,20 +60,50 @@ export default function PlayerInformationModal({
     socketRef.current?.emit(SocketEvents.USER_MUTE, { userId: player?.user?.id })
   }
 
+  const handleWatch = (): void => {
+    if (watchUserAtTable) {
+      router.push(watchUserAtTable)
+    }
+
+    onCancel?.()
+  }
+
+  const handlePing = (): void => {
+    socketRef.current?.emit(SocketEvents.USER_PING, { roomId, userId: player?.user?.id })
+  }
+
   useEffect(() => {
     setIsCurrentUser(player?.user?.id === session?.user?.id)
   }, [player, session])
 
   useEffect(() => {
-    if (player?.user?.lastActiveAt) {
-      const lastActiveAt: Date = new Date(player.user?.lastActiveAt)
-      const relativeTime: string = formatDistanceToNow(lastActiveAt, {
-        addSuffix: true,
+    if (!player?.user?.id || !session?.user?.id || isCurrentUser) return
+
+    socketRef.current?.emit(
+      SocketEvents.GAME_WATCH_USER_AT_TABLE,
+      { roomId, userId: player.user.id },
+      (response: { success: boolean; message: string; data: { roomId: string; tableId: string } }) => {
+        if (response.success) {
+          setWatchUserAtTable(`${ROUTE_TOWERS.PATH}?room=${response?.data?.roomId}&table=${response?.data?.tableId}`)
+        } else {
+          setWatchUserAtTable(null)
+        }
+      },
+    )
+  }, [player?.user?.id, session?.user?.id])
+
+  useEffect(() => {
+    if (player?.lastActiveAt) {
+      const lastActiveAt: Date = new Date(player.lastActiveAt)
+      const duration: Duration = intervalToDuration({ start: lastActiveAt, end: new Date() })
+      const formattedIdleTime: string = formatDuration(duration, {
         locale: getDateFnsLocale(i18n.locale),
+        format: ["hours", "minutes", "seconds"],
       })
-      setIdleTime(relativeTime)
+
+      setIdleTime(formattedIdleTime)
     }
-  }, [player?.user?.lastActiveAt])
+  }, [player?.lastActiveAt])
 
   return (
     <Modal
@@ -79,11 +115,11 @@ export default function PlayerInformationModal({
       <div className="flex flex-col gap-2">
         {isRatingsVisible && (
           <div>
-            <Trans>Rating: {rating}</Trans> <br />
-            <Trans>Games Completed: {gamesCompleted}</Trans> <br />
-            <Trans>Wins: {wins}</Trans> <br />
-            <Trans>Loses: {loses}</Trans> <br />
-            <Trans>Streak: {streak}</Trans> <br />
+            {t({ message: `Rating: ${rating}` })} <br />
+            {t({ message: `Games Completed: ${gamesCompleted}` })} <br />
+            {t({ message: `Wins: ${wins}` })} <br />
+            {t({ message: `Loses: ${loses}` })} <br />
+            {t({ message: `Streak: ${streak}` })} <br />
           </div>
         )}
         {!isCurrentUser && (
@@ -96,19 +132,31 @@ export default function PlayerInformationModal({
             onInlineButtonClick={handleSendMessage}
           />
         )}
-        <div>
-          <Trans>Idle Time: {idleTime}</Trans>
+        <div className="mb-2">{t({ message: `Idle Time: ${idleTime}` })}</div>
+        <div className="flex items-center gap-4">
+          {!isCurrentUser && (
+            <>
+              <div className="w-fit -mb-4">
+                <Checkbox
+                  id="muteUser"
+                  label={t({ message: "Ignore" })}
+                  defaultChecked={currentUser?.mute?.mutedUsers?.some(
+                    (mutedUser: { userId: string }) => mutedUser.userId === player?.user?.id,
+                  )}
+                  onChange={handleMuteUser}
+                />
+              </div>
+              <Button className="w-fit" dataTestId="player-information_button_ping" onClick={handlePing}>
+                {t({ message: "Ping" })}
+              </Button>
+            </>
+          )}
+          {watchUserAtTable && (
+            <Button className="w-fit" dataTestId="player-information_button_watch" onClick={handleWatch}>
+              {t({ message: "Watch" })}
+            </Button>
+          )}
         </div>
-        {!isCurrentUser && (
-          <Checkbox
-            id="muteUser"
-            label={t({ message: "Ignore" })}
-            defaultChecked={currentUser?.mute?.mutedUsers?.some(
-              (mutedUser: { userId: string }) => mutedUser.userId === player?.user?.id,
-            )}
-            onChange={handleMuteUser}
-          />
-        )}
       </div>
     </Modal>
   )

@@ -321,6 +321,7 @@ export default function Room(): ReactNode {
 
             <div className="w-[385px]">
               <PlayersList
+                roomId={roomId}
                 users={room?.users}
                 isRatingsVisible={room && room?.level !== RoomLevel.SOCIAL}
                 isTableNumberVisible

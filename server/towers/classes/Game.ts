@@ -45,7 +45,7 @@ export class Game {
   private isGameOver: boolean = false
   public winners: User[] = []
   private playerGameInstances: Map<string, PlayerTowersGame> = new Map<string, PlayerTowersGame>()
-  private static COUNTDOWN_START_NUMBER: number = 3 // TODO: Put it back to 15 seconds
+  private static COUNTDOWN_START_NUMBER: number = 15
   private static VALID_GAME_MIN_SECONDS: number = 15
 
   /**
@@ -173,34 +173,6 @@ export class Game {
   }
 
   private startGame(): void {
-    // this.table.users.forEach((user: User) => {
-    //   const seat: TableSeat | undefined = this.tableSeatManager.getUserSeat(user.user.id)
-
-    //   if (
-    //     typeof seat !== "undefined" && typeof user.getSeatNumber(this.table.id) !== "undefined" &&
-    //     user.isReadyInTable(this.table.id)
-    //   ) {
-    //     seat.initialize()
-    //     this.playersThisRound.push({ userId: user.user.id, teamNumber: seat.teamNumber })
-
-    //     const gameInstance: PlayerTowersGame = new PlayerTowersGame(
-    //       user,
-    //       this.table.id,
-    //       this.table.users,
-    //       this.table.chat,
-    //       this.tableSeatManager,
-    //     )
-
-    //     this.playerGameInstances.set(user.user.id, gameInstance)
-
-    //     gameInstance.startGameLoop()
-
-    //     user.updateJoinedTable(this.table.id, { isPlaying: true })
-    //   }
-
-    //   this.emitTableDataToUser(user)
-    // })
-
     this.table.seats.filter((seat: TableSeat) => seat.occupiedBy).forEach((seat: TableSeat) => seat.initialize())
 
     this.table.seats

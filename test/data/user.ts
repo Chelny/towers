@@ -5,7 +5,6 @@ const commonUserProperties = {
   language: "en",
   role: "user",
   isOnline: true,
-  lastActiveAt: new Date(),
   theme: WebsiteTheme.SYSTEM,
   banned: false,
   banReason: null,

@@ -2,7 +2,7 @@
 
 import { Context, createContext, PropsWithChildren, ReactNode, useCallback, useContext, useState } from "react"
 import { InstantMessagePlainObject } from "@/server/towers/classes/InstantMessage"
-import { DeclinedTableInvitationPlainObject, TableInvitationPlainObject } from "@/server/towers/classes/TableInvitation"
+import { TableInvitationPlainObject } from "@/server/towers/classes/TableInvitation"
 
 export type GameRoomSummary = {
   id: string
@@ -23,7 +23,7 @@ export type GameInstantMessage = InstantMessagePlainObject & {
   status?: NotificationStatus
 }
 
-export type GameTableInvitation = (TableInvitationPlainObject | DeclinedTableInvitationPlainObject) & {
+export type GameTableInvitation = TableInvitationPlainObject & {
   status?: NotificationStatus
 }
 

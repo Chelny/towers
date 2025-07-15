@@ -2,11 +2,18 @@ import { fireEvent, render, screen } from "@testing-library/react"
 import { Mock } from "vitest"
 import PlayersList from "@/components/game/PlayersList"
 import { ModalProvider } from "@/context/ModalContext"
+import { TableType } from "@/enums/table-type"
 import { TableInvitationManagerPlainObject } from "@/server/towers/classes/TableInvitationManager"
 import { UserPlainObject } from "@/server/towers/classes/User"
 import { UserMuteManagerPlainObject } from "@/server/towers/classes/UserMuteManager"
 import { mockUser1, mockUser2, mockUser3 } from "@/test/data/user"
 import { mockUserStats1, mockUserStats2, mockUserStats3 } from "@/test/data/user-stats"
+import { mockUseRouter, mockUseSearchParams } from "@/vitest.setup"
+
+vi.mock("next/navigation", () => ({
+  useRouter: vi.fn(() => mockUseRouter),
+  useSearchParams: vi.fn(() => mockUseSearchParams),
+}))
 
 const handleSelectedPlayer: Mock = vi.fn()
 
@@ -20,8 +27,10 @@ const mockPlayers: UserPlainObject[] = [
     },
     tables: {
       "mock-table-1": {
+        id: "mock-table-1",
         roomId: "mock-room-1",
         tableNumber: 1,
+        tableType: TableType.PUBLIC,
         seatNumber: 1,
         teamNumber: 1,
         isReady: false,
@@ -30,8 +39,10 @@ const mockPlayers: UserPlainObject[] = [
       },
     },
     lastJoinedTable: {
+      id: "mock-table-1",
       roomId: "mock-room-1",
       tableNumber: 1,
+      tableType: TableType.PUBLIC,
       seatNumber: 1,
       teamNumber: 1,
       isReady: false,
@@ -66,8 +77,10 @@ const mockPlayers: UserPlainObject[] = [
     },
     tables: {
       "mock-table-1": {
+        id: "mock-table-1",
         roomId: "mock-room-1",
         tableNumber: 1,
+        tableType: TableType.PUBLIC,
         seatNumber: 2,
         teamNumber: 1,
         isReady: false,
@@ -76,8 +89,10 @@ const mockPlayers: UserPlainObject[] = [
       },
     },
     lastJoinedTable: {
+      id: "mock-table-1",
       roomId: "mock-room-1",
       tableNumber: 1,
+      tableType: TableType.PUBLIC,
       seatNumber: 2,
       teamNumber: 1,
       isReady: false,
@@ -112,8 +127,10 @@ const mockPlayers: UserPlainObject[] = [
     },
     tables: {
       "mock-table-1": {
+        id: "mock-table-1",
         roomId: "mock-room-1",
         tableNumber: 1,
+        tableType: TableType.PUBLIC,
         seatNumber: 3,
         teamNumber: 2,
         isReady: false,
@@ -122,8 +139,10 @@ const mockPlayers: UserPlainObject[] = [
       },
     },
     lastJoinedTable: {
+      id: "mock-table-3",
       roomId: "mock-room-1",
       tableNumber: 3,
+      tableType: TableType.PUBLIC,
       seatNumber: 2,
       teamNumber: 1,
       isReady: false,
@@ -160,7 +179,7 @@ describe("PlayersList", () => {
   it("should render the players list correctly", () => {
     render(
       <ModalProvider>
-        <PlayersList users={mockPlayers} onSelectedPlayer={handleSelectedPlayer} />
+        <PlayersList roomId="mock-room-1" users={mockPlayers} onSelectedPlayer={handleSelectedPlayer} />
       </ModalProvider>,
     )
 
@@ -172,7 +191,7 @@ describe("PlayersList", () => {
   it("should sort players by name in ascending and descending order", () => {
     render(
       <ModalProvider>
-        <PlayersList users={mockPlayers} onSelectedPlayer={handleSelectedPlayer} />
+        <PlayersList roomId="mock-room-1" users={mockPlayers} onSelectedPlayer={handleSelectedPlayer} />
       </ModalProvider>,
     )
 
@@ -185,7 +204,7 @@ describe("PlayersList", () => {
   it("should call onSelectedPlayer when a player row is clicked", () => {
     render(
       <ModalProvider>
-        <PlayersList users={mockPlayers} onSelectedPlayer={handleSelectedPlayer} />
+        <PlayersList roomId="mock-room-1" users={mockPlayers} onSelectedPlayer={handleSelectedPlayer} />
       </ModalProvider>,
     )
 
@@ -196,7 +215,7 @@ describe("PlayersList", () => {
   it("should open the PlayerInformation modal when a player row is double-clicked", () => {
     render(
       <ModalProvider>
-        <PlayersList users={mockPlayers} onSelectedPlayer={handleSelectedPlayer} />
+        <PlayersList roomId="mock-room-1" users={mockPlayers} onSelectedPlayer={handleSelectedPlayer} />
       </ModalProvider>,
     )
 

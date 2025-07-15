@@ -47,6 +47,7 @@ export abstract class Chat<T extends ChatMessage> {
     } as T
 
     this.messages.push(msg)
+    message.user.lastActiveAt = Date.now()
   }
 
   /**
@@ -61,7 +62,7 @@ export abstract class Chat<T extends ChatMessage> {
   public toPlainObject(user: User): ChatPlainObject {
     return {
       messages: this.messages
-        .filter((message) => {
+        .filter((message: T) => {
           const periods: UserMutePeriod[] = user.muteManager.getMutePeriods(message.user.user.id)
           if (!periods.length) return true
 

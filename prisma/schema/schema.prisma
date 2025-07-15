@@ -20,7 +20,6 @@ model User {
   language         String            @default("en")
   role             String?
   isOnline         Boolean           @default(false)
-  lastActiveAt     DateTime?
   theme            WebsiteTheme      @default(SYSTEM)
   banned           Boolean?
   banReason        String?

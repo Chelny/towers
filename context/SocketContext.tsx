@@ -13,6 +13,7 @@ import {
   useState,
 } from "react"
 import { io, Socket } from "socket.io-client"
+import { SocketEvents } from "@/constants/socket-events"
 import { Session } from "@/lib/auth-client"
 import { logger } from "@/lib/logger"
 
@@ -72,10 +73,6 @@ export const SocketProvider = ({ children, session }: PropsWithChildren<{ sessio
 
     socket.on("connect_error", (error: Error) => {
       logger.error(`Socket connection error: ${error.message}.`)
-    })
-
-    socket.on("ping", () => {
-      logger.info("Ping event received.")
     })
 
     socket.on("reconnect", (attempt: number) => {
@@ -145,7 +142,6 @@ export const SocketProvider = ({ children, session }: PropsWithChildren<{ sessio
 
       socket.off("connect")
       socket.off("connect_error")
-      socket.off("ping")
       socket.off("reconnect")
       socket.off("reconnect_attempt")
       socket.off("reconnect_error")
@@ -160,6 +156,16 @@ export const SocketProvider = ({ children, session }: PropsWithChildren<{ sessio
       window.removeEventListener("offline", handleOffline)
     }
   }, [session])
+
+  useEffect(() => {
+    if (!socketRef.current) return
+
+    const interval: NodeJS.Timeout = setInterval(() => {
+      socketRef.current?.emit(SocketEvents.PING)
+    }, 30_000)
+
+    return () => clearInterval(interval)
+  }, [socketRef])
 
   return <SocketContext.Provider value={{ socketRef, isConnected, session }}>{children}</SocketContext.Provider>
 }

@@ -20,7 +20,7 @@ describe("Settings Form", () => {
   })
 
   it("should render the form with all elements", () => {
-    render(<SettingsForm session={mockSession.data} />)
+    render(<SettingsForm session={mockSession} />)
 
     expect(screen.getByTestId("settings_select_language")).toBeInTheDocument()
     expect(screen.getByTestId("settings_select_theme")).toBeInTheDocument()
@@ -35,7 +35,7 @@ describe("Settings Form", () => {
 
     mockFetch.mockResolvedValue(mockFetchResponse(mockResponse))
 
-    render(<SettingsForm session={mockSession.data} />)
+    render(<SettingsForm session={mockSession} />)
 
     fireEvent.click(screen.getByTestId("settings_select_language"))
     fireEvent.click(screen.getByRole("option", { name: /French/i }))
@@ -61,7 +61,7 @@ describe("Settings Form", () => {
 
     mockFetch.mockResolvedValue(mockFetchResponse(mockResponse))
 
-    render(<SettingsForm session={mockSession.data} />)
+    render(<SettingsForm session={mockSession} />)
 
     fireEvent.click(screen.getByRole("button", { name: /Update Settings/i }))
 
@@ -76,7 +76,7 @@ describe("Settings Form", () => {
 
     mockFetch.mockResolvedValue(mockFetchResponse(mockResponse))
 
-    render(<SettingsForm session={mockSession.data} />)
+    render(<SettingsForm session={mockSession} />)
 
     fireEvent.click(screen.getByTestId("settings_select_language"))
     fireEvent.click(screen.getByRole("option", { name: /French/i }))

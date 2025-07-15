@@ -49,7 +49,12 @@ export default function TableBootUserModal({
       onCancel={onCancel}
     >
       <div className="overflow-y-auto h-52">
-        <PlayersList users={usersToBoot} isRatingsVisible={isRatingsVisible} onSelectedPlayer={setSelectedPlayerId} />
+        <PlayersList
+          roomId={roomId}
+          users={usersToBoot}
+          isRatingsVisible={isRatingsVisible}
+          onSelectedPlayer={setSelectedPlayerId}
+        />
       </div>
     </Modal>
   )

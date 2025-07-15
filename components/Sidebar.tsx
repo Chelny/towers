@@ -81,7 +81,7 @@ export default function Sidebar(): ReactNode {
           }
         }
 
-        // Table invitation (accepted/declined)
+        // Table invitation
         const tableInvitation: GameTableInvitation = notification as Extract<
           GameNotification,
           { type: "tableInvitation" }
@@ -92,30 +92,6 @@ export default function Sidebar(): ReactNode {
           notification,
         } as SidebarMenuDropdownItem
 
-        // Declined invitation
-        if (!("tableNumber" in tableInvitation)) {
-          return {
-            ...base,
-            label: i18n._("Invitation declined from {username}", {
-              username: tableInvitation.inviteeUsername,
-            }),
-            onClick: () =>
-              openModal(AlertModal, {
-                title: t({ message: "Invitation Declined" }),
-                message: tableInvitation.declinedReason
-                  ? i18n._("{username} declined your invitation. Reason: {reason}", {
-                      username: tableInvitation.inviteeUsername,
-                      reason: tableInvitation.declinedReason,
-                    })
-                  : i18n._("{username} declined your invitation.", {
-                      username: tableInvitation.inviteeUsername,
-                    }),
-                testId: "invitation-declined",
-              }),
-          }
-        }
-
-        // Active invitation
         return {
           ...base,
           label: i18n._("Invitation to table #{tableNumber}", {
