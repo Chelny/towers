@@ -1,27 +1,26 @@
 <a name="readme-top"></a>
 
-<!-- PROJECT SHIELDS -->
-
 [![Contributors](https://img.shields.io/github/contributors/Chelny/towers.svg?style=for-the-badge)](https://github.com/Chelny/towers/graphs/contributors)
 [![Forks](https://img.shields.io/github/forks/Chelny/towers.svg?style=for-the-badge)](https://github.com/Chelny/towers/network/members)
 [![Stargazers](https://img.shields.io/github/stars/Chelny/towers.svg?style=for-the-badge)](https://github.com/Chelny/towers/stargazers)
 [![Issues](https://img.shields.io/github/issues/Chelny/towers.svg?style=for-the-badge)](https://github.com/Chelny/towers/issues)
 [![MIT License](https://img.shields.io/github/license/Chelny/towers.svg?style=for-the-badge)](https://github.com/Chelny/towers/blob/master/LICENSE.txt)
 
-<!-- PROJECT LOGO -->
 <br />
-<div align="center">
-  <a href="https://github.com/Chelny/towers">
-    <img src="public/images/logo.png" alt="Logo" width="64" height="64">
-  </a>
 
-  <h3 align="center">Towers</h3>
+<div align="center">
+  <div style="background-color: #00635E;">
+    <a href="https://github.com/Chelny/towers">
+      <img src="public/images/logo.png" alt="Logo" width="96" height="96">
+    </a>
+  </div>
+
+  <br />
+
+  <h1 align="center" style="border-bottom: none;">Towers</h1>
 
   <p align="center">
-    <a href="https://github.com/Chelny/towers"><strong>Explore the docs »</strong></a>
-    <br />
-    <br />
-    <a href="https://github.com/Chelny/towers">View Demo</a>
+    <del>View Demo</del>
     ·
     <a href="https://github.com/Chelny/towers/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
     ·
@@ -29,7 +28,8 @@
   </p>
 </div>
 
-<!-- TABLE OF CONTENTS -->
+<br />
+
 <details>
   <summary>Table of Contents</summary>
   <ol>
@@ -54,29 +54,26 @@
   </ol>
 </details>
 
-<!-- ABOUT THE PROJECT -->
-
 ## About The Project
 
 This project is inspired by Yahoo! Towers but is an independent work. It is not affiliated with or endorsed by Yahoo! or its entities.
 
 ### Built With
 
-[![HTML5](https://img.shields.io/badge/html5-%23E34F26.svg?style=for-the-badge&logo=html5&logoColor=white)](https://html.spec.whatwg.org/)
-[![CSS3](https://img.shields.io/badge/css3-%231572B6.svg?style=for-the-badge&logo=css3&logoColor=white)](https://www.w3.org/TR/CSS/#css)
-[![TailwindCSS](https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
-[![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Next JS](https://img.shields.io/badge/Next-black?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/)
-[![Stylelint](https://img.shields.io/badge/stylelint-000?style=for-the-badge&logo=stylelint&logoColor=white)](https://stylelint.io/)
-[![ESLint](https://img.shields.io/badge/eslint-3A33D1?style=for-the-badge&logo=eslint&logoColor=white)](https://eslint.org/)
-[![Prettier](https://img.shields.io/badge/prettier-1A2C34?style=for-the-badge&logo=prettier&logoColor=F7BA3E)](https://prettier.io/docs/en/options.html)
-[![Prisma](https://img.shields.io/badge/Prisma-3982CE?style=for-the-badge&logo=Prisma&logoColor=white)](https://www.prisma.io/)
-[![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
-[![Socket.IO](https://img.shields.io/badge/socket.io-black?style=for-the-badge&logo=socketdotio&logoColor=white)](https://socket.io/)
+![HTML5](https://img.shields.io/badge/html5-%23E34F26.svg?style=for-the-badge&logo=html5&logoColor=white)
+![CSS3](https://img.shields.io/badge/css3-%231572B6.svg?style=for-the-badge&logo=css3&logoColor=white)
+![TailwindCSS](https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)
+![Next JS](https://img.shields.io/badge/Next-black?style=for-the-badge&logo=next.js&logoColor=white)
+![Stylelint](https://img.shields.io/badge/stylelint-000?style=for-the-badge&logo=stylelint&logoColor=white)
+![ESLint](https://img.shields.io/badge/eslint-3A33D1?style=for-the-badge&logo=eslint&logoColor=white)
+![Prettier](https://img.shields.io/badge/prettier-1A2C34?style=for-the-badge&logo=prettier&logoColor=F7BA3E)
+![Vitest](https://img.shields.io/badge/-Vitest-252529?style=for-the-badge&logo=vitest&logoColor=FCC72B)
+![Prisma](https://img.shields.io/badge/Prisma-3982CE?style=for-the-badge&logo=Prisma&logoColor=white)
+![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white)
+![Socket.IO](https://img.shields.io/badge/socket.io-black?style=for-the-badge&logo=socketdotio&logoColor=white)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-<!-- GETTING STARTED -->
 
 ## Getting Started
 
@@ -142,40 +139,32 @@ This project is inspired by Yahoo! Towers but is an independent work. It is not 
 
 <p align="end">(<a href="#readme-top">back to top</a>)</p>
 
-<!-- USAGE -->
-
 ## Usage
 
 _TODO_
 
 <p align="end">(<a href="#readme-top">back to top</a>)</p>
 
-<!-- ROADMAP -->
-
 ## Roadmap
 
 - [ ] Fix passkeys (sign-in and profile)
 - [ ] Add OTP (email and phone)
-- [ ] Add tooltip (?)
-- [x] Add toast
-- [ ] Add predefined avatars or allow users to upload their own avatar
+- [ ] Add tooltip component (?)
+- [ ] Add avatars
 - [ ] Prevent user from accessing the profile page while in a game room (show prompt on click)
-- [x] Add "Watch" button on Player Information modal - on click it should redirect to the player's most recent joined table
-- [x] Add "Ping" button on Player Information modal - on click it should poke the other player
+- [ ] Double-check "Ping" logic
+- [ ] Implement Options modal
+- [ ] Implement Chat modal
 
 See the [open issues](https://github.com/Chelny/towers/issues) for a full list of proposed features (and known issues).
 
 <p align="end">(<a href="#readme-top">back to top</a>)</p>
-
-<!-- LICENSE -->
 
 ## License
 
 Distributed under the MIT License. See `LICENSE.txt` for more information.
 
 <p align="end">(<a href="#readme-top">back to top</a>)</p>
-
-<!-- CONTACT -->
 
 ## Contact
 
@@ -184,8 +173,6 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 [![Twitter](https://img.shields.io/badge/Twitter-1DA1F2?style=for-the-badge&logo=twitter&logoColor=white)](https://twitter.com/Chelny)
 
 <p align="end">(<a href="#readme-top">back to top</a>)</p>
-
-<!-- ACKNOWLEDGMENTS -->
 
 ## Acknowledgments
 

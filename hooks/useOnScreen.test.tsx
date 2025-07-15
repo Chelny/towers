@@ -5,7 +5,7 @@ import { useOnScreen } from "@/hooks/useOnScreen"
 
 let mockObserverCallback: IntersectionObserverCallback | undefined
 let mockObserverOptions: IntersectionObserverInit | undefined
-const mockDisconnect = vi.fn()
+const mockDisconnect: Mock = vi.fn()
 
 const triggerObserver = async (el: HTMLElement, data: Partial<IntersectionObserverEntry>) => {
   await waitFor(() => {

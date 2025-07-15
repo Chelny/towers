@@ -10,8 +10,11 @@ import { NextPiecesPlainObject } from "@/server/towers/classes/NextPieces"
 import { PowerBarPlainObject } from "@/server/towers/classes/PowerBar"
 import { TableInvitationManagerPlainObject } from "@/server/towers/classes/TableInvitationManager"
 import { UserMuteManagerPlainObject } from "@/server/towers/classes/UserMuteManager"
+import { mockJoinedRooms } from "@/test/data/room"
 import { mockSocket } from "@/test/data/socket"
+import { mockJoinedTables1, mockLastJoinedTable1 } from "@/test/data/table"
 import { mockUser1 } from "@/test/data/user"
+import { mockUserControlKeys1 } from "@/test/data/user-control-keys"
 import { mockUserStats1 } from "@/test/data/user-stats"
 
 vi.mock("next/image", () => ({
@@ -28,46 +31,10 @@ const defaultSeat = {
   teamNumber: 1,
   occupiedBy: {
     user: mockUser1,
-    rooms: {
-      "mock-room-1": {
-        createdAt: Date.now(),
-      },
-    },
-    tables: {
-      "mock-table-1": {
-        roomId: "mock-room-1",
-        tableNumber: 1,
-        seatNumber: 1,
-        teamNumber: 1,
-        isReady: false,
-        isPlaying: false,
-        createdAt: Date.now(),
-      },
-    },
-    lastJoinedTable: {
-      roomId: "mock-room-1",
-      tableNumber: 1,
-      seatNumber: 1,
-      teamNumber: 1,
-      isReady: false,
-      isPlaying: false,
-      createdAt: Date.now(),
-    },
-    controlKeys: {
-      MOVE_LEFT: "ArrowLeft",
-      MOVE_RIGHT: "ArrowRight",
-      CYCLE: "ArrowUp",
-      DROP: "ArrowDown",
-      USE_ITEM: "Space",
-      USE_ITEM_ON_PLAYER_1: "1",
-      USE_ITEM_ON_PLAYER_2: "2",
-      USE_ITEM_ON_PLAYER_3: "3",
-      USE_ITEM_ON_PLAYER_4: "4",
-      USE_ITEM_ON_PLAYER_5: "5",
-      USE_ITEM_ON_PLAYER_6: "6",
-      USE_ITEM_ON_PLAYER_7: "7",
-      USE_ITEM_ON_PLAYER_8: "8",
-    },
+    rooms: mockJoinedRooms,
+    tables: mockJoinedTables1,
+    lastJoinedTable: mockLastJoinedTable1,
+    controlKeys: mockUserControlKeys1,
     stats: mockUserStats1,
     tableInvitations: {} as TableInvitationManagerPlainObject,
     mute: {} as UserMuteManagerPlainObject,
