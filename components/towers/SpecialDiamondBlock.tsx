@@ -1,5 +1,5 @@
-import { ReactNode } from "react"
-import { SpecialDiamond } from "@/interfaces/towers"
+import { ReactNode } from "react";
+import { SpecialDiamond } from "@/interfaces/towers";
 
 type SpecialDiamondBlockProps = {
   block: SpecialDiamond
@@ -20,5 +20,5 @@ export default function SpecialDiamondBlock({ block }: SpecialDiamondBlockProps)
         <div className="special-diamond" data-testid="special-diamond_remove-stones"></div>
       )}
     </>
-  )
+  );
 }

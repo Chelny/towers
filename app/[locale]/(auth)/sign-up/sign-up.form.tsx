@@ -1,37 +1,37 @@
-"use client"
+"use client";
 
-import { ClipboardEvent, FormEvent, ReactNode, useState } from "react"
-import { ErrorContext } from "@better-fetch/fetch"
-import { Trans, useLingui } from "@lingui/react/macro"
-import { ValueError } from "@sinclair/typebox/errors"
-import { Value } from "@sinclair/typebox/value"
-import clsx from "clsx/lite"
-import { SignUpFormValidationErrors, SignUpPayload, signUpSchema } from "@/app/[locale]/(auth)/sign-up/sign-up.schema"
-import AlertMessage from "@/components/ui/AlertMessage"
-import Anchor from "@/components/ui/Anchor"
-import Button from "@/components/ui/Button"
-import Calendar from "@/components/ui/Calendar"
-import Checkbox from "@/components/ui/Checkbox"
-import Input from "@/components/ui/Input"
-import { INITIAL_FORM_STATE } from "@/constants/api"
-import { CALLBACK_URL, ROUTE_PRIVACY_POLICY, ROUTE_SIGN_IN, ROUTE_TERMS_OF_SERVICE } from "@/constants/routes"
-import { authClient } from "@/lib/auth-client"
-import { logger } from "@/lib/logger"
-import { SupportedLocales } from "@/translations/languages"
+import { ClipboardEvent, FormEvent, ReactNode, useState } from "react";
+import { ErrorContext } from "@better-fetch/fetch";
+import { Trans, useLingui } from "@lingui/react/macro";
+import { ValueError } from "@sinclair/typebox/errors";
+import { Value } from "@sinclair/typebox/value";
+import clsx from "clsx/lite";
+import { SignUpFormValidationErrors, SignUpPayload, signUpSchema } from "@/app/[locale]/(auth)/sign-up/sign-up.schema";
+import AlertMessage from "@/components/ui/AlertMessage";
+import Anchor from "@/components/ui/Anchor";
+import Button from "@/components/ui/Button";
+import Calendar from "@/components/ui/Calendar";
+import Checkbox from "@/components/ui/Checkbox";
+import Input from "@/components/ui/Input";
+import { INITIAL_FORM_STATE } from "@/constants/api";
+import { CALLBACK_URL, ROUTE_PRIVACY_POLICY, ROUTE_SIGN_IN, ROUTE_TERMS_OF_SERVICE } from "@/constants/routes";
+import { authClient } from "@/lib/authClient";
+import { logger } from "@/lib/logger";
+import { SupportedLocales } from "@/translations/languages";
 
 type SignUpFormProps = {
   locale: SupportedLocales
 }
 
 export function SignUpForm({ locale }: SignUpFormProps): ReactNode {
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [formState, setFormState] = useState<ApiResponse>(INITIAL_FORM_STATE)
-  const { t } = useLingui()
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [formState, setFormState] = useState<ApiResponse>(INITIAL_FORM_STATE);
+  const { t } = useLingui();
 
   const handleSignUp = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
-    event.preventDefault()
+    event.preventDefault();
 
-    const formData: FormData = new FormData(event.currentTarget)
+    const formData: FormData = new FormData(event.currentTarget);
     const payload: SignUpPayload = {
       name: formData.get("name") as string,
       birthdate: formData.get("birthdate") as string,
@@ -40,44 +40,44 @@ export function SignUpForm({ locale }: SignUpFormProps): ReactNode {
       password: formData.get("password") as string,
       confirmPassword: formData.get("confirmPassword") as string,
       termsAndConditions: formData.get("termsAndConditions") === "on",
-    }
+    };
 
-    const errors: ValueError[] = Array.from(Value.Errors(signUpSchema, payload))
-    const errorMessages: SignUpFormValidationErrors = {}
+    const errors: ValueError[] = Array.from(Value.Errors(signUpSchema, payload));
+    const errorMessages: SignUpFormValidationErrors = {};
 
     for (const error of errors) {
       switch (error.path.replace("/", "")) {
         case "name":
-          errorMessages.name = t({ message: "The name is invalid." })
-          break
+          errorMessages.name = t({ message: "The name is invalid." });
+          break;
         case "birthdate":
           if (payload.birthdate) {
-            errorMessages.birthdate = t({ message: "The birthdate is invalid." })
+            errorMessages.birthdate = t({ message: "The birthdate is invalid." });
           }
-          break
+          break;
         case "email":
-          errorMessages.email = t({ message: "The email is invalid." })
-          break
+          errorMessages.email = t({ message: "The email is invalid." });
+          break;
         case "username":
-          errorMessages.username = t({ message: "The username is invalid." })
-          break
+          errorMessages.username = t({ message: "The username is invalid." });
+          break;
         case "password":
-          errorMessages.password = t({ message: "The password is invalid." })
-          break
+          errorMessages.password = t({ message: "The password is invalid." });
+          break;
         case "confirmPassword":
-          errorMessages.confirmPassword = t({ message: "The password confirmation is invalid." })
-          break
+          errorMessages.confirmPassword = t({ message: "The password confirmation is invalid." });
+          break;
         case "termsAndConditions":
-          errorMessages.termsAndConditions = t({ message: "You must accept the terms and conditions." })
-          break
+          errorMessages.termsAndConditions = t({ message: "You must accept the terms and conditions." });
+          break;
         default:
-          logger.warn(`Sign Up Validation: Unknown error at ${error.path}`)
-          break
+          logger.warn(`Sign Up Validation: Unknown error at ${error.path}`);
+          break;
       }
     }
 
     if (payload.password !== payload.confirmPassword) {
-      errorMessages.confirmPassword = t({ message: "The password and password confirmation do not match." })
+      errorMessages.confirmPassword = t({ message: "The password and password confirmation do not match." });
     }
 
     if (Object.keys(errorMessages).length > 0) {
@@ -85,7 +85,7 @@ export function SignUpForm({ locale }: SignUpFormProps): ReactNode {
         success: false,
         message: t({ message: "Validation errors occurred." }),
         error: errorMessages,
-      })
+      });
     } else {
       await authClient.signUp.email(
         {
@@ -100,31 +100,31 @@ export function SignUpForm({ locale }: SignUpFormProps): ReactNode {
         },
         {
           onRequest: () => {
-            setIsLoading(true)
-            setFormState(INITIAL_FORM_STATE)
+            setIsLoading(true);
+            setFormState(INITIAL_FORM_STATE);
           },
           onResponse: () => {
-            setIsLoading(false)
+            setIsLoading(false);
           },
           onError: (ctx: ErrorContext) => {
             setFormState({
               success: false,
               message: ctx.error.message,
-            })
+            });
           },
           onSuccess: () => {
-            const email: string = payload.email
+            const email: string = payload.email;
             setFormState({
               success: true,
               message: t({
                 message: `A confirmation email has been sent to ${email}. If you don’t see it in your inbox, please check your spam or junk folder.`,
               }),
-            })
+            });
           },
         },
-      )
+      );
     }
-  }
+  };
 
   return (
     <form className="w-full" noValidate data-testid="sign-up_form" onSubmit={handleSignUp}>
@@ -227,5 +227,5 @@ export function SignUpForm({ locale }: SignUpFormProps): ReactNode {
         <Trans>Sign Up</Trans>
       </Button>
     </form>
-  )
+  );
 }

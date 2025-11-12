@@ -1,50 +1,50 @@
-"use client"
+"use client";
 
-import { ReactNode, useEffect, useState } from "react"
-import { ReadonlyURLSearchParams, useSearchParams } from "next/navigation"
-import { ErrorContext, SuccessContext } from "@better-fetch/fetch"
-import { Trans, useLingui } from "@lingui/react/macro"
-import AlertMessage from "@/components/ui/AlertMessage"
-import Button from "@/components/ui/Button"
-import { INITIAL_FORM_STATE } from "@/constants/api"
-import { AUTH_PROVIDERS } from "@/constants/auth-providers"
-import { ROUTE_PROFILE } from "@/constants/routes"
-import { authClient } from "@/lib/auth-client"
-import { AuthProvider, AuthProviderDetails } from "@/lib/providers"
+import { ReactNode, useEffect, useState } from "react";
+import { ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
+import { ErrorContext, SuccessContext } from "@better-fetch/fetch";
+import { Trans, useLingui } from "@lingui/react/macro";
+import AlertMessage from "@/components/ui/AlertMessage";
+import Button from "@/components/ui/Button";
+import { INITIAL_FORM_STATE } from "@/constants/api";
+import { AUTH_PROVIDERS } from "@/constants/auth-providers";
+import { ROUTE_PROFILE } from "@/constants/routes";
+import { authClient } from "@/lib/authClient";
+import { AuthProvider, AuthProviderDetails } from "@/lib/providers";
 
 export function LinkedSocialAccountsForm(): ReactNode {
-  const searchParams: ReadonlyURLSearchParams = useSearchParams()
-  const errorParam: string | null = searchParams.get("error")
-  const [accountList, setAccountsList] = useState<{ id: string; provider: string }[]>([])
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [formState, setFormState] = useState<ApiResponse>(INITIAL_FORM_STATE)
-  const { t } = useLingui()
+  const searchParams: ReadonlyURLSearchParams = useSearchParams();
+  const errorParam: string | null = searchParams.get("error");
+  const [accountList, setAccountsList] = useState<{ id: string; provider: string }[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [formState, setFormState] = useState<ApiResponse>(INITIAL_FORM_STATE);
+  const { t } = useLingui();
 
   const errorMessages: Record<string, string> = {
     "email_doesn't_match": t({
       message: "The email you provided does not match the one associated with your account.",
     }),
-  }
+  };
 
   const getLinkedAccounts = async (): Promise<void> => {
     await authClient.listAccounts(
       {},
       {
         onRequest: () => {
-          setIsLoading(true)
+          setIsLoading(true);
         },
         onResponse: () => {
-          setIsLoading(false)
+          setIsLoading(false);
         },
         onSuccess: (ctx: SuccessContext) => {
-          setAccountsList(ctx.data)
+          setAccountsList(ctx.data);
         },
       },
-    )
-  }
+    );
+  };
 
   const isProviderLinked = (providerName: AuthProvider) =>
-    accountList.some((account) => account.provider === providerName)
+    accountList.some((account) => account.provider === providerName);
 
   const handleLinkUnlink = async (providerName: AuthProvider): Promise<void> => {
     if (isProviderLinked(providerName)) {
@@ -58,40 +58,40 @@ export function LinkedSocialAccountsForm(): ReactNode {
         },
         {
           onRequest: () => {
-            setIsLoading(true)
-            setFormState(INITIAL_FORM_STATE)
+            setIsLoading(true);
+            setFormState(INITIAL_FORM_STATE);
           },
           onResponse: () => {
-            setIsLoading(false)
+            setIsLoading(false);
           },
           onError: (ctx: ErrorContext) => {
             setFormState({
               success: false,
               message: ctx.error.message,
-            })
+            });
           },
           onSuccess: (ctx: SuccessContext) => {
             setFormState({
               success: true,
               message: t({ message: "The account has been linked!" }),
-            })
-            setAccountsList((prev) => [...prev, { id: ctx.data.id, provider: providerName }])
+            });
+            setAccountsList((prev) => [...prev, { id: ctx.data.id, provider: providerName }]);
           },
         },
-      )
+      );
     }
-  }
+  };
 
   useEffect(() => {
     if (errorParam && errorMessages[errorParam]) {
       setFormState({
         success: false,
         message: errorMessages[errorParam],
-      })
+      });
     }
 
-    getLinkedAccounts()
-  }, [])
+    getLinkedAccounts();
+  }, []);
 
   return (
     <>
@@ -122,5 +122,5 @@ export function LinkedSocialAccountsForm(): ReactNode {
         ))}
       </ul>
     </>
-  )
+  );
 }

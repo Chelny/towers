@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import { ReactNode, Suspense } from "react"
-import { ReadonlyURLSearchParams, useSearchParams } from "next/navigation"
-import { Trans } from "@lingui/react/macro"
-import GoToHomepageLink from "@/components/GoToHomepageLink"
-import { APP_CONFIG } from "@/constants/app"
+import { ReactNode, Suspense } from "react";
+import { ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
+import { Trans } from "@lingui/react/macro";
+import GoToHomepageLink from "@/components/GoToHomepageLink";
+import { APP_CONFIG } from "@/constants/app";
 
 const generateErrorMessage = (errorCode: string, message: ReactNode) => (
   <div className="flex flex-col gap-4">
@@ -23,7 +23,7 @@ const generateErrorMessage = (errorCode: string, message: ReactNode) => (
       </Trans>
     </div>
   </div>
-)
+);
 
 const errorMap: Record<string, ReactNode> = {
   account_not_linked: generateErrorMessage(
@@ -38,19 +38,19 @@ const errorMap: Record<string, ReactNode> = {
       <Trans>We were unable to create your account at this time.</Trans>
     </>,
   ),
-}
+};
 
 export default function AuthError(): ReactNode {
   return (
     <Suspense>
       <ErrorMessage />
     </Suspense>
-  )
+  );
 }
 
 function ErrorMessage(): ReactNode {
-  const searchParams: ReadonlyURLSearchParams = useSearchParams()
-  const error: string = searchParams.get("error") as string
+  const searchParams: ReadonlyURLSearchParams = useSearchParams();
+  const error: string = searchParams.get("error") as string;
 
   return (
     <div className="flex flex-col">
@@ -70,5 +70,5 @@ function ErrorMessage(): ReactNode {
       )}
       <GoToHomepageLink />
     </div>
-  )
+  );
 }

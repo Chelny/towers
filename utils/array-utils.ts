@@ -6,12 +6,12 @@
  * @returns A new board array with the remaining cells filled with empty strings at the start.
  */
 export const padBoardToMaxCells = (board: string[], maxCells: number = 78): string[] => {
-  const paddingCount: number = maxCells - board.length
+  const paddingCount: number = maxCells - board.length;
 
-  if (paddingCount <= 0) return board
+  if (paddingCount <= 0) return board;
 
-  return [...Array(paddingCount).fill(""), ...board]
-}
+  return [...Array(paddingCount).fill(""), ...board];
+};
 
 /**
  * Splits an array of items into a 2D array based on a specified number of columns or rows,
@@ -31,25 +31,25 @@ export const padBoardToMaxCells = (board: string[], maxCells: number = 78): stri
  * // => [ ['A','C','E'], ['B','D','F'] ]
  */
 export const splitIntoColumns = <T>(items: T[], count: number, fill: "rows" | "cols" = "rows"): T[][] => {
-  if (count <= 0) return []
+  if (count <= 0) return [];
 
-  const total: number = items.length
+  const total: number = items.length;
 
   if (fill === "cols") {
     // Fill top to bottom in `count` columns
-    const columns: T[][] = Array.from({ length: count }, () => [])
-    items.forEach((item: T, i: number) => columns[i % count].push(item))
-    return columns
+    const columns: T[][] = Array.from({ length: count }, () => []);
+    items.forEach((item: T, i: number) => columns[i % count].push(item));
+    return columns;
   } else {
     // Fill left to right in `count` rows
-    const rowLength: number = Math.ceil(total / count)
-    const columns: T[][] = Array.from({ length: rowLength }, () => [])
+    const rowLength: number = Math.ceil(total / count);
+    const columns: T[][] = Array.from({ length: rowLength }, () => []);
 
     for (let i = 0; i < total; i++) {
-      const colIndex = Math.floor(i / count)
-      columns[colIndex].push(items[i])
+      const colIndex = Math.floor(i / count);
+      columns[colIndex].push(items[i]);
     }
 
-    return columns
+    return columns;
   }
-}
+};

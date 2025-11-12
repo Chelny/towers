@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
   ClipboardEvent,
@@ -11,11 +11,11 @@ import {
   useImperativeHandle,
   useRef,
   useState,
-} from "react"
-import { Trans, useLingui } from "@lingui/react/macro"
-import clsx from "clsx/lite"
-import { FaEye, FaEyeSlash } from "react-icons/fa6"
-import Button from "@/components/ui/Button"
+} from "react";
+import { Trans, useLingui } from "@lingui/react/macro";
+import clsx from "clsx/lite";
+import { FaEye, FaEyeSlash } from "react-icons/fa6";
+import Button from "@/components/ui/Button";
 
 export interface InputImperativeHandle {
   value: string | null | undefined
@@ -69,40 +69,40 @@ export default forwardRef<InputImperativeHandle, InputProps>(function Input(
   }: InputProps,
   ref: ForwardedRef<InputImperativeHandle>,
 ): ReactNode {
-  const { t } = useLingui()
-  const inputRef = useRef<HTMLInputElement>(null)
-  const [value, setValue] = useState<string | null | undefined>(defaultValue)
-  const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false)
-  const inputType: string = type === "password" && isPasswordVisible ? "text" : type
+  const { t } = useLingui();
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [value, setValue] = useState<string | null | undefined>(defaultValue);
+  const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
+  const inputType: string = type === "password" && isPasswordVisible ? "text" : type;
 
   const handleInput = (event: InputEvent<HTMLInputElement>): void => {
-    setValue((event.target as HTMLInputElement).value)
-    onInput?.(event)
-  }
+    setValue((event.target as HTMLInputElement).value);
+    onInput?.(event);
+  };
 
   const handlePaste = (event: ClipboardEvent<HTMLInputElement>): void => {
-    onPaste?.(event)
-  }
+    onPaste?.(event);
+  };
 
   const handleKeydown = (event: KeyboardEvent<HTMLInputElement>): void => {
     if (event.key === "Enter") {
       if (typeof inlineButtonText !== "undefined") {
-        onInlineButtonClick?.()
+        onInlineButtonClick?.();
       }
     }
 
-    onKeyDown?.(event)
-  }
+    onKeyDown?.(event);
+  };
 
   const handleTogglePasswordVisibility = (): void => {
-    setIsPasswordVisible((isPasswordVisible: boolean) => !isPasswordVisible)
-  }
+    setIsPasswordVisible((isPasswordVisible: boolean) => !isPasswordVisible);
+  };
 
   useImperativeHandle(ref, () => ({
     value,
     focus: () => inputRef.current?.focus(),
     clear: () => setValue(""),
-  }))
+  }));
 
   return (
     <div className="flex flex-col mb-4">
@@ -128,6 +128,7 @@ export default forwardRef<InputImperativeHandle, InputProps>(function Input(
               type === "password" && "pe-7",
               "read-only:bg-gray-200",
               "disabled:border-t-gray-600/50 disabled:border-e-gray-400/50 disabled:border-b-gray-400/50 disabled:border-s-gray-600/50 disabled:bg-gray-200/50 disabled:text-black/50 disabled:cursor-not-allowed",
+              type === "password" && "rtl:text-end",
               "dark:border-t-dark-input-border-top dark:border-e-dark-input-border-end dark:border-b-dark-input-border-bottom dark:border-s-dark-input-border-start dark:bg-dark-input-background dark:text-dark-input-text",
               "dark:read-only:bg-dark-input-readonly-background dark:read-only:text-dark-input-readonly-text",
               "dark:disabled:border-t-dark-input-border-top/50 dark:disabled:border-e-dark-input-border-end/50 dark:disabled:border-b-dark-input-border-bottom/50 dark:disabled:border-s-dark-input-border-start/50 dark:disabled:bg-dark-input-disabled-background dark:disabled:text-dark-input-disabled-text",
@@ -140,6 +141,7 @@ export default forwardRef<InputImperativeHandle, InputProps>(function Input(
             required={required}
             readOnly={readOnly}
             disabled={disabled}
+            dir={type === "password" ? "ltr" : undefined}
             aria-labelledby={`${id}Label`}
             aria-describedby={description ? `${id}Description` : undefined}
             aria-placeholder={placeholder}
@@ -166,6 +168,7 @@ export default forwardRef<InputImperativeHandle, InputProps>(function Input(
           <Button
             type="button"
             className="shrink-0"
+            disabled={disabled}
             dataTestId={dataTestId ? `${dataTestId}_inline-button` : undefined}
             onClick={onInlineButtonClick}
           >
@@ -184,5 +187,5 @@ export default forwardRef<InputImperativeHandle, InputProps>(function Input(
         </span>
       )}
     </div>
-  )
-})
+  );
+});

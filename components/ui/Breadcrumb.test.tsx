@@ -1,6 +1,6 @@
-import { usePathname } from "next/navigation"
-import { i18n } from "@lingui/core"
-import { render, screen } from "@testing-library/react"
+import { usePathname } from "next/navigation";
+import { i18n } from "@lingui/core";
+import { render, screen } from "@testing-library/react";
 import {
   Breadcrumb,
   BreadcrumbEllipsis,
@@ -9,19 +9,19 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/Breadcrumb"
+} from "@/components/ui/Breadcrumb";
 
 vi.mock("next/navigation", () => ({
   usePathname: vi.fn(),
-}))
+}));
 
 describe("Breadcrumb", () => {
   beforeAll(() => {
-    i18n.activate("en")
-  })
+    i18n.activate("en");
+  });
 
   it("should render breadcrumb structure correctly", () => {
-    vi.mocked(usePathname).mockReturnValue("/home")
+    vi.mocked(usePathname).mockReturnValue("/home");
 
     render(
       <Breadcrumb>
@@ -31,14 +31,14 @@ describe("Breadcrumb", () => {
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>,
-    )
+    );
 
-    const homeLink: HTMLElement = screen.getByText("Home")
-    expect(homeLink).toHaveAttribute("href", "/")
-  })
+    const homeLink: HTMLElement = screen.getByText("Home");
+    expect(homeLink).toHaveAttribute("href", "/");
+  });
 
   it("should render breadcrumb links correctly based on the path", () => {
-    vi.mocked(usePathname).mockReturnValue("/account/profile")
+    vi.mocked(usePathname).mockReturnValue("/account/profile");
 
     render(
       <Breadcrumb>
@@ -56,16 +56,16 @@ describe("Breadcrumb", () => {
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>,
-    )
+    );
 
-    expect(screen.getByText("Home")).toHaveAttribute("href", "/")
-    expect(screen.getByText("Account")).toHaveAttribute("href", "/account")
-    expect(screen.getByText("Profile")).toBeInTheDocument()
-    expect(screen.getByText("Profile")).not.toHaveAttribute("href")
-  })
+    expect(screen.getByText("Home")).toHaveAttribute("href", "/");
+    expect(screen.getByText("Account")).toHaveAttribute("href", "/account");
+    expect(screen.getByText("Profile")).toBeInTheDocument();
+    expect(screen.getByText("Profile")).not.toHaveAttribute("href");
+  });
 
   it("should render breadcrumb with separators", () => {
-    vi.mocked(usePathname).mockReturnValue("/account/settings")
+    vi.mocked(usePathname).mockReturnValue("/account/settings");
 
     render(
       <Breadcrumb>
@@ -83,14 +83,14 @@ describe("Breadcrumb", () => {
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>,
-    )
+    );
 
-    const separators: HTMLElement[] = screen.getAllByText("/")
-    expect(separators).toHaveLength(2)
-  })
+    const separators: HTMLElement[] = screen.getAllByText("/");
+    expect(separators).toHaveLength(2);
+  });
 
   it("should render breadcrumb links with hyphenated names", () => {
-    vi.mocked(usePathname).mockReturnValue("/account/change-password")
+    vi.mocked(usePathname).mockReturnValue("/account/change-password");
 
     render(
       <Breadcrumb>
@@ -108,13 +108,13 @@ describe("Breadcrumb", () => {
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>,
-    )
+    );
 
-    expect(screen.getByText("Change Password")).toBeInTheDocument()
-  })
+    expect(screen.getByText("Change Password")).toBeInTheDocument();
+  });
 
   it("should render breadcrumb with ellipsis when path is too long", () => {
-    vi.mocked(usePathname).mockReturnValue("/very/long/path/to/account/settings")
+    vi.mocked(usePathname).mockReturnValue("/very/long/path/to/account/settings");
 
     render(
       <Breadcrumb>
@@ -134,8 +134,8 @@ describe("Breadcrumb", () => {
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>,
-    )
+    );
 
-    expect(screen.getByText("...")).toBeInTheDocument()
-  })
-})
+    expect(screen.getByText("...")).toBeInTheDocument();
+  });
+});

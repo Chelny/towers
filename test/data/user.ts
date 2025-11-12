@@ -1,17 +1,16 @@
-import { User, WebsiteTheme } from "db"
+import { User, UserRole, WebsiteTheme } from "db";
 
 const commonUserProperties = {
   displayUsername: null,
   language: "en",
-  role: "user",
-  isOnline: true,
+  role: UserRole.USER,
   theme: WebsiteTheme.SYSTEM,
   banned: false,
   banReason: null,
   banExpires: null,
   createdAt: new Date(),
   updatedAt: new Date(),
-}
+};
 
 export const mockUser1: User = {
   id: "user1",
@@ -22,7 +21,7 @@ export const mockUser1: User = {
   username: "john.doe",
   image: "https://example.com/avatar.jpg",
   ...commonUserProperties,
-}
+};
 
 export const mockUser2: User = {
   id: "user2",
@@ -33,7 +32,7 @@ export const mockUser2: User = {
   username: "janesmith",
   image: null,
   ...commonUserProperties,
-}
+};
 
 export const mockUser3: User = {
   id: "user3",
@@ -44,7 +43,7 @@ export const mockUser3: User = {
   username: "samlee",
   image: null,
   ...commonUserProperties,
-}
+};
 
 export const mockUser4: User = {
   id: "user4",
@@ -55,7 +54,7 @@ export const mockUser4: User = {
   username: "chrisgreen",
   image: null,
   ...commonUserProperties,
-}
+};
 
 export const mockUser5: User = {
   id: "user5",
@@ -66,4 +65,4 @@ export const mockUser5: User = {
   username: "patwhite",
   image: null,
   ...commonUserProperties,
-}
+};

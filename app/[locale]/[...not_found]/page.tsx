@@ -1,7 +1,7 @@
-import type { ReactElement, ReactNode } from "react"
-import { notFound } from "next/navigation"
-import { I18n, MessageDescriptor } from "@lingui/core"
-import { initLingui } from "@/app/init-lingui"
+import type { ReactElement, ReactNode } from "react";
+import { notFound } from "next/navigation";
+import { I18n, MessageDescriptor } from "@lingui/core";
+import { initLingui } from "@/app/init-lingui";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -9,34 +9,34 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/Breadcrumb"
-import { ROUTE_HOME, ROUTES } from "@/constants/routes"
+} from "@/components/ui/Breadcrumb";
+import { ROUTE_HOME, ROUTES } from "@/constants/routes";
 
 type NotFoundProps = {
   params: Promise<Params>
 }
 
 export default async function NotFound({ params }: NotFoundProps): Promise<ReactNode> {
-  const routeParams: Params = await params
-  const i18n: I18n = initLingui(routeParams.locale)
+  const routeParams: Params = await params;
+  const i18n: I18n = initLingui(routeParams.locale);
 
   if (!isValidRoute(routeParams.not_found)) {
-    notFound() // Redirect to a 404 page if the route is invalid
+    notFound(); // Redirect to a 404 page if the route is invalid
   }
 
-  const breadcrumbItems: ReactElement[] = []
-  let breadcrumbPage: ReactElement = <></>
+  const breadcrumbItems: ReactElement[] = [];
+  let breadcrumbPage: ReactElement = <></>;
 
   for (let i = 0; i < routeParams.not_found.length; i++) {
-    const route: string = routeParams.not_found[i]
-    const href: string = `/${routeParams.not_found.at(0)}/${route}`
+    const route: string = routeParams.not_found[i];
+    const href: string = `/${routeParams.not_found.at(0)}/${route}`;
 
     if (i === routeParams.not_found.length - 1) {
       breadcrumbPage = (
         <BreadcrumbItem>
           <BreadcrumbPage>{route}</BreadcrumbPage>
         </BreadcrumbItem>
-      )
+      );
     } else {
       breadcrumbItems.push(
         <>
@@ -44,7 +44,7 @@ export default async function NotFound({ params }: NotFoundProps): Promise<React
             <BreadcrumbLink href={href}>{route}</BreadcrumbLink>
           </BreadcrumbItem>
         </>,
-      )
+      );
     }
   }
 
@@ -59,12 +59,12 @@ export default async function NotFound({ params }: NotFoundProps): Promise<React
         {breadcrumbPage}
       </BreadcrumbList>
     </Breadcrumb>
-  )
+  );
 }
 
 function isValidRoute(not_found: string[]): boolean {
-  if (!not_found || not_found.length === 0) return false
+  if (!not_found || not_found.length === 0) return false;
   return not_found.every((segment: string) =>
     ROUTES.map((route: { TITLE: MessageDescriptor; PATH: string }) => route.PATH).includes(segment),
-  )
+  );
 }

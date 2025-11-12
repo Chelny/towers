@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import { PropsWithChildren, ReactNode } from "react"
-import Link from "next/link"
-import clsx from "clsx/lite"
+import { PropsWithChildren, ReactNode } from "react";
+import Link from "next/link";
+import clsx from "clsx/lite";
 
 type AnchorProps = PropsWithChildren<{
   href: string
@@ -28,5 +28,5 @@ export default function Anchor({
     >
       {children}
     </Link>
-  )
+  );
 }

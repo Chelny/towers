@@ -1,51 +1,51 @@
-"use client"
+"use client";
 
-import { ClipboardEvent, FormEvent, ReactNode, useState } from "react"
-import { ErrorContext } from "@better-fetch/fetch"
-import { Trans, useLingui } from "@lingui/react/macro"
-import { Value, ValueError } from "@sinclair/typebox/value"
-import { IoWarning } from "react-icons/io5"
+import { ClipboardEvent, FormEvent, ReactNode, useState } from "react";
+import { ErrorContext } from "@better-fetch/fetch";
+import { Trans, useLingui } from "@lingui/react/macro";
+import { Value, ValueError } from "@sinclair/typebox/value";
+import { IoWarning } from "react-icons/io5";
 import {
   ChangeEmailFormValidationErrors,
   ChangeEmailPayload,
   changeEmailSchema,
-} from "@/app/[locale]/(protected)/account/profile/change-email.schema"
-import AlertMessage from "@/components/ui/AlertMessage"
-import Button from "@/components/ui/Button"
-import Input from "@/components/ui/Input"
-import { INITIAL_FORM_STATE } from "@/constants/api"
-import { authClient } from "@/lib/auth-client"
-import { Session } from "@/lib/auth-client"
-import { logger } from "@/lib/logger"
+} from "@/app/[locale]/(protected)/account/profile/change-email.schema";
+import AlertMessage from "@/components/ui/AlertMessage";
+import Button from "@/components/ui/Button";
+import Input from "@/components/ui/Input";
+import { INITIAL_FORM_STATE } from "@/constants/api";
+import { authClient } from "@/lib/authClient";
+import { Session } from "@/lib/authClient";
+import { logger } from "@/lib/logger";
 
 type ChangeEmailFormProps = {
   session: Session | null
 }
 
 export function ChangeEmailForm({ session }: ChangeEmailFormProps): ReactNode {
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [formState, setFormState] = useState<ApiResponse>(INITIAL_FORM_STATE)
-  const { t } = useLingui()
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [formState, setFormState] = useState<ApiResponse>(INITIAL_FORM_STATE);
+  const { t } = useLingui();
 
   const handleChangeEmail = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
-    event.preventDefault()
+    event.preventDefault();
 
-    const formData: FormData = new FormData(event.currentTarget)
+    const formData: FormData = new FormData(event.currentTarget);
     const payload: ChangeEmailPayload = {
       email: formData.get("email") as string,
-    }
+    };
 
-    const errors: ValueError[] = Array.from(Value.Errors(changeEmailSchema, payload))
-    const errorMessages: ChangeEmailFormValidationErrors = {}
+    const errors: ValueError[] = Array.from(Value.Errors(changeEmailSchema, payload));
+    const errorMessages: ChangeEmailFormValidationErrors = {};
 
     for (const error of errors) {
       switch (error.path.replace("/", "")) {
         case "email":
-          errorMessages.email = t({ message: "The email is invalid." })
-          break
+          errorMessages.email = t({ message: "The email is invalid." });
+          break;
         default:
-          logger.warn(`Change Email Validation: Unknown error at ${error.path}`)
-          break
+          logger.warn(`Change Email Validation: Unknown error at ${error.path}`);
+          break;
       }
     }
 
@@ -54,7 +54,7 @@ export function ChangeEmailForm({ session }: ChangeEmailFormProps): ReactNode {
         success: false,
         message: t({ message: "Validation errors occurred." }),
         error: errorMessages,
-      })
+      });
     } else {
       await authClient.changeEmail(
         {
@@ -62,17 +62,17 @@ export function ChangeEmailForm({ session }: ChangeEmailFormProps): ReactNode {
         },
         {
           onRequest: () => {
-            setIsLoading(true)
-            setFormState(INITIAL_FORM_STATE)
+            setIsLoading(true);
+            setFormState(INITIAL_FORM_STATE);
           },
           onResponse: () => {
-            setIsLoading(false)
+            setIsLoading(false);
           },
           onError: (ctx: ErrorContext) => {
             setFormState({
               success: false,
               message: ctx.error.message,
-            })
+            });
           },
           onSuccess: () => {
             setFormState({
@@ -81,12 +81,12 @@ export function ChangeEmailForm({ session }: ChangeEmailFormProps): ReactNode {
                 message:
                   "A verification email has been sent to your new email address. Please check your inbox or your spam folder.",
               }),
-            })
+            });
           },
         },
-      )
+      );
     }
-  }
+  };
 
   const handleSendVerificationEmail = async (): Promise<void> => {
     if (session?.user.email) {
@@ -96,17 +96,17 @@ export function ChangeEmailForm({ session }: ChangeEmailFormProps): ReactNode {
         },
         {
           onRequest: () => {
-            setIsLoading(true)
-            setFormState(INITIAL_FORM_STATE)
+            setIsLoading(true);
+            setFormState(INITIAL_FORM_STATE);
           },
           onResponse: () => {
-            setIsLoading(false)
+            setIsLoading(false);
           },
           onError: (ctx: ErrorContext) => {
             setFormState({
               success: false,
               message: ctx.error.message,
-            })
+            });
           },
           onSuccess: () => {
             setFormState({
@@ -115,12 +115,12 @@ export function ChangeEmailForm({ session }: ChangeEmailFormProps): ReactNode {
                 message:
                   "A verification email has been sent to your new email address. Please check your inbox or your spam folder.",
               }),
-            })
+            });
           },
         },
-      )
+      );
     }
-  }
+  };
 
   return (
     <>
@@ -160,5 +160,5 @@ export function ChangeEmailForm({ session }: ChangeEmailFormProps): ReactNode {
         </Button>
       </form>
     </>
-  )
+  );
 }

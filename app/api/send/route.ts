@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from "next/server"
-import { CreateEmailResponse, Resend } from "resend"
-import EmailTemplate from "@/components/EmailTemplate"
+import { NextRequest, NextResponse } from "next/server";
+import { CreateEmailResponse, Resend } from "resend";
+import EmailTemplate from "@/components/EmailTemplate";
 
 type SendEmailData = {
   email: string
@@ -10,10 +10,10 @@ type SendEmailData = {
   locale: string
 }
 
-const resend: Resend = new Resend(process.env.RESEND_API_KEY)
+const resend: Resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
-  const body: SendEmailData = await request.json()
+  const body: SendEmailData = await request.json();
 
   try {
     const { data, error }: CreateEmailResponse = await resend.emails.send({
@@ -22,12 +22,12 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       subject: body.subject,
       react: EmailTemplate({ html: body.html, locale: body.locale }),
       text: body.text,
-    })
+    });
 
-    if (error) return NextResponse.json(error, { status: 500 })
+    if (error) return NextResponse.json(error, { status: 500 });
 
-    return NextResponse.json(data)
+    return NextResponse.json(data);
   } catch (error) {
-    return NextResponse.json(error, { status: 500 })
+    return NextResponse.json(error, { status: 500 });
   }
 }

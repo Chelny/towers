@@ -1,16 +1,16 @@
-"use client"
+"use client";
 
-import { FormEvent, ReactNode, useState } from "react"
-import { useLingui } from "@lingui/react/macro"
-import { Type } from "@sinclair/typebox"
-import { Value, ValueError } from "@sinclair/typebox/value"
-import { TableType } from "db"
-import Checkbox from "@/components/ui/Checkbox"
-import Modal from "@/components/ui/Modal"
-import Select from "@/components/ui/Select"
-import { SocketEvents } from "@/constants/socket-events"
-import { useSocket } from "@/context/SocketContext"
-import { logger } from "@/lib/logger"
+import { FormEvent, ReactNode, useState } from "react";
+import { useLingui } from "@lingui/react/macro";
+import { Type } from "@sinclair/typebox";
+import { Value, ValueError } from "@sinclair/typebox/value";
+import { TableType } from "db";
+import useSWRMutation from "swr/mutation";
+import Checkbox from "@/components/ui/Checkbox";
+import Modal from "@/components/ui/Modal";
+import Select from "@/components/ui/Select";
+import { fetcher } from "@/lib/fetcher";
+import { logger } from "@/lib/logger";
 
 type CreateTableModalProps = {
   roomId: string
@@ -18,20 +18,41 @@ type CreateTableModalProps = {
   onCancel: () => void
 }
 
+type CreateTablePayloadFetcher = CreateTablePayload & { roomId: string }
+
 export default function CreateTableModal({ roomId, onCreateTableSuccess, onCancel }: CreateTableModalProps): ReactNode {
-  const { t } = useLingui()
-  const { socketRef } = useSocket()
-  const [errorMessages, setErrorMessages] = useState<CreateTableFormValidationErrors>({})
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
+  const { t } = useLingui();
+  const [errorMessages, setErrorMessages] = useState<CreateTableFormValidationErrors>({});
+
+  const {
+    error: createTableError,
+    trigger: createTable,
+    isMutating: isCreateTableMutating,
+  } = useSWRMutation(
+    "/api/games/towers/tables",
+    (url: string, { arg }: { arg: CreateTablePayloadFetcher }) =>
+      fetcher<string>(url, { method: "POST", body: JSON.stringify(arg) }),
+    {
+      onSuccess(response: ApiResponse<string>) {
+        if (response.success) {
+          const tableId: string | undefined = response.data;
+          if (tableId) {
+            onCreateTableSuccess(tableId);
+            onCancel?.();
+          }
+        }
+      },
+    },
+  );
 
   const handleFormValidation = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
-    const formElement: EventTarget & HTMLFormElement = event.currentTarget
-    const formData: FormData = new FormData(formElement)
+    const formElement: EventTarget & HTMLFormElement = event.currentTarget;
+    const formData: FormData = new FormData(formElement);
     const payload: CreateTablePayload = {
       tableType: formData.get("tableType") as TableType,
       isRated: formData.get("isRated") === "on",
-    }
-    const errors: ValueError[] = Array.from(Value.Errors(createTableSchema, payload))
+    };
+    const errors: ValueError[] = Array.from(Value.Errors(createTableSchema, payload));
 
     for (const error of errors) {
       switch (error.path.replace("/", "")) {
@@ -39,46 +60,32 @@ export default function CreateTableModal({ roomId, onCreateTableSuccess, onCance
           setErrorMessages((prev: CreateTableFormValidationErrors) => ({
             ...prev,
             tableType: t({ message: "You must select a table type." }),
-          }))
-          break
+          }));
+          break;
         case "isRated":
           setErrorMessages((prev: CreateTableFormValidationErrors) => ({
             ...prev,
             isRated: t({ message: "You must rate this game." }),
-          }))
-          break
+          }));
+          break;
         default:
-          logger.warn(`Create Table Validation: Unknown error at ${error.path}`)
-          break
+          logger.warn(`Create Table Validation: Unknown error at ${error.path}`);
+          break;
       }
     }
 
     if (Object.keys(errorMessages).length === 0) {
-      await handleCreateTable(payload)
+      await createTable({ ...payload, roomId });
     }
-  }
+  };
 
-  const handleCreateTable = async (body: CreateTablePayload): Promise<void> => {
-    setIsSubmitting(true)
-
-    socketRef.current?.emit(
-      SocketEvents.TABLE_CREATE,
-      { roomId, tableType: body.tableType, isRated: body.isRated },
-      (response: { success: boolean; message: string; data: { tableId: string } }) => {
-        if (response.success) {
-          setIsSubmitting(false)
-          onCreateTableSuccess(response.data.tableId)
-          onCancel?.()
-        }
-      },
-    )
-  }
+  if (createTableError) return <div>Error: {createTableError.message}</div>;
 
   return (
     <Modal
       title={t({ message: "Create Table" })}
       confirmText={t({ message: "Create" })}
-      isConfirmButtonDisabled={isSubmitting}
+      isConfirmButtonDisabled={isCreateTableMutating}
       dataTestId="create-table"
       onConfirm={handleFormValidation}
       onCancel={onCancel}
@@ -102,7 +109,7 @@ export default function CreateTableModal({ roomId, onCreateTableSuccess, onCance
         errorMessage={errorMessages.isRated}
       />
     </Modal>
-  )
+  );
 }
 
 export const createTableSchema = Type.Object({
@@ -112,7 +119,7 @@ export const createTableSchema = Type.Object({
     Type.Literal(TableType.PRIVATE),
   ]),
   isRated: Type.Boolean(),
-})
+});
 
 export type CreateTablePayload = FormPayload<typeof createTableSchema>
 export type CreateTableFormValidationErrors = FormValidationErrors<keyof CreateTablePayload>

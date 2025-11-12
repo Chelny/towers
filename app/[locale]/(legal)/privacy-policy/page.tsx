@@ -1,32 +1,32 @@
-import { ReactNode } from "react"
-import { Metadata } from "next"
-import { I18n } from "@lingui/core"
-import { Trans } from "@lingui/react/macro"
-import { initLingui } from "@/app/init-lingui"
-import Anchor from "@/components/ui/Anchor"
-import { APP_CONFIG } from "@/constants/app"
-import { ROUTE_DELETE_ACCOUNT, ROUTE_PRIVACY_POLICY } from "@/constants/routes"
+import { ReactNode } from "react";
+import { Metadata } from "next";
+import { I18n } from "@lingui/core";
+import { Trans } from "@lingui/react/macro";
+import { initLingui } from "@/app/init-lingui";
+import Anchor from "@/components/ui/Anchor";
+import { APP_CONFIG } from "@/constants/app";
+import { ROUTE_DELETE_ACCOUNT, ROUTE_PRIVACY_POLICY } from "@/constants/routes";
 
 type PrivacyPolicyProps = {
   params: Promise<Params>
 }
 
 export async function generateMetadata({ params }: PrivacyPolicyProps): Promise<Metadata> {
-  const routeParams: Params = await params
-  const i18n: I18n = initLingui(routeParams.locale)
+  const routeParams: Params = await params;
+  const i18n: I18n = initLingui(routeParams.locale);
 
   return {
     title: i18n._(ROUTE_PRIVACY_POLICY.TITLE),
-  }
+  };
 }
 
 export default async function PrivacyPolicy({ params }: PrivacyPolicyProps): Promise<ReactNode> {
-  const routeParams: Params = await params
-  const i18n: I18n = initLingui(routeParams.locale)
-  const name: string = APP_CONFIG.NAME
-  const supportEmail: string = APP_CONFIG.EMAIL.SUPPORT
+  const routeParams: Params = await params;
+  const i18n: I18n = initLingui(routeParams.locale);
+  const name: string = APP_CONFIG.NAME;
+  const supportEmail: string = APP_CONFIG.EMAIL.SUPPORT;
 
-  const date: string = i18n.date(new Date("2024/01/01"))
+  const date: string = i18n.date(new Date("2024/01/01"));
 
   return (
     <>
@@ -110,5 +110,5 @@ export default async function PrivacyPolicy({ params }: PrivacyPolicyProps): Pro
         </section>
       </Trans>
     </>
-  )
+  );
 }

@@ -1,11 +1,11 @@
-import { ReactNode } from "react"
-import clsx from "clsx/lite"
-import DefenseBlock from "@/components/towers/DefenseBlock"
-import RegularBlock from "@/components/towers/RegularBlock"
-import { NextPieceBlock } from "@/interfaces/towers"
-import { PiecePlainObject } from "@/server/towers/classes/Piece"
-import { getClassNameForBlock, getClassNameForBlockPowerType } from "@/utils/block-class-names-utils"
-import { isTowersPieceBlock } from "@/utils/block-guards-utils"
+import { ReactNode } from "react";
+import clsx from "clsx/lite";
+import DefenseBlock from "@/components/towers/DefenseBlock";
+import RegularBlock from "@/components/towers/RegularBlock";
+import { NextPieceBlock } from "@/interfaces/towers";
+import { PiecePlainObject } from "@/server/towers/game/Piece";
+import { getClassNameForBlock, getClassNameForBlockPowerType } from "@/utils/block-class-names-utils";
+import { isTowersPieceBlock } from "@/utils/block-guards-utils";
 
 type NextPieceProps = {
   nextPiece?: PiecePlainObject
@@ -31,5 +31,5 @@ export default function NextPiece({ nextPiece }: NextPieceProps): ReactNode {
         </div>
       ))}
     </>
-  )
+  );
 }

@@ -1,8 +1,8 @@
-import { GameNotification } from "@/context/GameContext"
+import { TowersNotificationWithRelations } from "db";
 
 export interface SidebarMenuBaseItem {
   id: string
-  label: string
+  label?: string
 }
 
 export interface SidebarMenuLinkItem extends SidebarMenuBaseItem {
@@ -10,15 +10,18 @@ export interface SidebarMenuLinkItem extends SidebarMenuBaseItem {
   children?: (SidebarMenuLinkItem | SidebarMenuActionItem)[]
 }
 
+export interface SidebarMenuButtonItem extends SidebarMenuBaseItem {
+  unreadCount: number
+  onClick: () => void
+}
+
 export interface SidebarMenuActionItem extends SidebarMenuBaseItem {
-  children: SidebarMenuDropdownItem[]
+  children: TowersNotificationWithRelations[]
   unreadCount: number
 }
 
 export interface SidebarMenuDropdownItem extends SidebarMenuBaseItem {
   roomId: string
-  notification: GameNotification
-  onClick: () => void
 }
 
-export type MenuItem = SidebarMenuLinkItem | SidebarMenuActionItem | SidebarMenuDropdownItem
+export type MenuItem = SidebarMenuLinkItem | SidebarMenuButtonItem | SidebarMenuActionItem | SidebarMenuDropdownItem

@@ -1,54 +1,53 @@
-"use client"
+"use client";
 
-import { ReactNode, useEffect, useMemo, useState } from "react"
-import { Trans, useLingui } from "@lingui/react/macro"
-import clsx from "clsx/lite"
-import { BsSortAlphaDown, BsSortAlphaDownAlt, BsSortNumericDown, BsSortNumericDownAlt } from "react-icons/bs"
-import PlayerInformationModal from "@/components/game/PlayerInformationModal"
+import { ReactNode, useEffect, useMemo, useState } from "react";
+import { Trans, useLingui } from "@lingui/react/macro";
+import clsx from "clsx/lite";
+import { PlayerWithRelations } from "db";
+import { BsSortAlphaDown, BsSortAlphaDownAlt, BsSortNumericDown, BsSortNumericDownAlt } from "react-icons/bs";
+import PlayerInformationModal from "@/components/game/PlayerInformationModal";
 import {
   PROVISIONAL_MAX_COMPLETED_GAMES,
   RATING_DIAMOND,
   RATING_GOLD,
   RATING_MASTER,
   RATING_PLATINUM,
-} from "@/constants/game"
-import { useModal } from "@/context/ModalContext"
-import { useSocket } from "@/context/SocketContext"
-import { UserPlainObject } from "@/server/towers/classes/User"
+} from "@/constants/game";
+import { useModal } from "@/context/ModalContext";
+import { useSocket } from "@/context/SocketContext";
 
 type PlayersListProps = {
   roomId: string
-  users: UserPlainObject[] | undefined
+  players: PlayerWithRelations[] | undefined
   isRatingsVisible?: boolean | null
   isTableNumberVisible?: boolean
-  onSelectedPlayer?: (userId: string) => void
+  onSelectedPlayer?: (playerId: string) => void
 }
 
 export default function PlayersList({
   roomId,
-  users,
+  players,
   isRatingsVisible = false,
   isTableNumberVisible = false,
   onSelectedPlayer,
 }: PlayersListProps): ReactNode {
-  const { session } = useSocket()
-  const { t } = useLingui()
-  const { openModal } = useModal()
-  const [sortKey, setSortKey] = useState<"name" | "rating" | "table">("name")
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
-  const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null)
-  const [currentUser, setCurrentUser] = useState<UserPlainObject>()
-  const [isRTL, setIsRtl] = useState<boolean>(false)
-  const [isDarkMode, setIsDarkMode] = useState<boolean>(false)
-  const dividerPosition: string = isRTL ? "calc(100% - 63.7%) 0" : "63.7% 0"
-  const dividerPosition1: string = isRTL ? "calc(100% - 39.3%) 0" : "39.3% 0"
-  const dividerPosition2: string = isRTL ? "calc(100% - 72.1%) 0" : "72.1% 0"
-  const lightLinearGradient: string = "linear-gradient(to bottom, #e5e7eb 0%, #e5e7eb 100%)"
-  const darkLinearGradient: string = "linear-gradient(to bottom, #365066 0%, #365066 100%)"
+  const { session } = useSocket();
+  const { t } = useLingui();
+  const { openModal } = useModal();
+  const [sortKey, setSortKey] = useState<"name" | "rating" | "table">("name");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
+  const [isRTL, setIsRtl] = useState<boolean>(false);
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
+  const dividerPosition: string = isRTL ? "calc(100% - 63.7%) 0" : "63.7% 0";
+  const dividerPosition1: string = isRTL ? "calc(100% - 39.3%) 0" : "39.3% 0";
+  const dividerPosition2: string = isRTL ? "calc(100% - 72.1%) 0" : "72.1% 0";
+  const lightLinearGradient: string = "linear-gradient(to bottom, #e5e7eb 0%, #e5e7eb 100%)";
+  const darkLinearGradient: string = "linear-gradient(to bottom, #365066 0%, #365066 100%)";
   const lightRepeatingLinear: string =
-    "repeating-linear-gradient(0deg, #f9fafb, #f9fafb 50%, transparent 50%, transparent)"
+    "repeating-linear-gradient(0deg, #f9fafb, #f9fafb 50%, transparent 50%, transparent)";
   const darkRepeatingLinear: string =
-    "repeating-linear-gradient(0deg, #243342, #243342 50%, transparent 50%, transparent)"
+    "repeating-linear-gradient(0deg, #243342, #243342 50%, transparent 50%, transparent)";
 
   const bgImages: string = [
     isRatingsVisible && !isTableNumberVisible && (isDarkMode ? darkLinearGradient : lightLinearGradient),
@@ -58,7 +57,7 @@ export default function PlayersList({
     isDarkMode ? darkRepeatingLinear : lightRepeatingLinear,
   ]
     .filter(Boolean)
-    .join(", ")
+    .join(", ");
 
   const bgPositions: string = [
     isRatingsVisible && !isTableNumberVisible && dividerPosition,
@@ -68,7 +67,7 @@ export default function PlayersList({
     "0 0",
   ]
     .filter(Boolean)
-    .join(", ")
+    .join(", ");
 
   const bgRepeats: string = [
     isRatingsVisible && !isTableNumberVisible && "no-repeat",
@@ -78,7 +77,7 @@ export default function PlayersList({
     "repeat-y",
   ]
     .filter(Boolean)
-    .join(", ")
+    .join(", ");
 
   const bgSizes: string = [
     isRatingsVisible && !isTableNumberVisible && "2px 100%",
@@ -88,78 +87,74 @@ export default function PlayersList({
     "100% 78px",
   ]
     .filter(Boolean)
-    .join(", ")
+    .join(", ");
+
+  const sortedPlayersList = useMemo(() => {
+    if (!players) return [];
+
+    return players.slice().sort((a: PlayerWithRelations, b: PlayerWithRelations) => {
+      if (!a.player.stats || !b.player.stats) return 0;
+
+      switch (sortKey) {
+        case "name":
+          const nameA: string = a.player.user.username || "";
+          const nameB: string = b.player.user.username || "";
+
+          return sortOrder === "asc" ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
+        case "rating":
+          if (!isRatingsVisible) break;
+
+          const isProvisionalA: boolean = a.player.stats.gamesCompleted < PROVISIONAL_MAX_COMPLETED_GAMES;
+          const isProvisionalB: boolean = b.player.stats.gamesCompleted < PROVISIONAL_MAX_COMPLETED_GAMES;
+
+          // Add "provisional" first in ASC order
+          if (isProvisionalA && !isProvisionalB) return sortOrder === "asc" ? -1 : 1;
+          if (!isProvisionalA && isProvisionalB) return sortOrder === "asc" ? 1 : -1;
+
+          const ratingA: number = a.player.stats.rating || 0;
+          const ratingB: number = b.player.stats.rating || 0;
+
+          return sortOrder === "asc" ? ratingA - ratingB : ratingB - ratingA;
+        case "table":
+          const tableNumberA: number = a.player.tablesJoined[a.player.tablesJoined?.length - 1]?.table?.tableNumber || 0;
+          const tableNumberB: number = b.player.tablesJoined[a.player.tablesJoined?.length - 1]?.table?.tableNumber || 0;
+
+          return sortOrder === "asc" ? tableNumberA - tableNumberB : tableNumberB - tableNumberA;
+        default:
+          break;
+      }
+
+      return 0;
+    });
+  }, [players, sortKey, sortOrder]);
+
+  useEffect(() => {
+    setIsRtl(document.documentElement.dir === "rtl");
+    setIsDarkMode(document.documentElement.classList.contains("dark"));
+  }, []);
 
   const handleSort = (key: "name" | "rating" | "table"): void => {
     if (sortKey === key) {
-      setSortOrder(sortOrder === "asc" ? "desc" : "asc")
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
     } else {
-      setSortKey(key)
-      setSortOrder("asc")
+      setSortKey(key);
+      setSortOrder("asc");
     }
-  }
+  };
 
   const handlePlayersRowClick = (playerId: string | undefined): void => {
     if (playerId) {
-      setSelectedPlayerId(playerId)
-      onSelectedPlayer?.(playerId)
+      setSelectedPlayerId(playerId);
+      onSelectedPlayer?.(playerId);
     }
-  }
+  };
 
-  const handleOpenPlayerInfoModal = (): void => {
+  const handlePlayerInformation = (): void => {
     openModal(PlayerInformationModal, {
-      roomId,
-      currentUser,
-      player: sortedPlayersList?.find((player: UserPlainObject) => player.user?.id === selectedPlayerId),
+      player: sortedPlayersList.find((player: PlayerWithRelations) => player.playerId === selectedPlayerId)?.player,
       isRatingsVisible,
-    })
-  }
-
-  const sortedPlayersList = useMemo(() => {
-    if (!users) return []
-
-    return users.slice().sort((a: UserPlainObject, b: UserPlainObject) => {
-      switch (sortKey) {
-        case "name":
-          const nameA: string = a.user?.username || ""
-          const nameB: string = b.user?.username || ""
-
-          return sortOrder === "asc" ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA)
-        case "rating":
-          if (!isRatingsVisible) break
-
-          const isProvisionalA: boolean = a.stats.gamesCompleted < PROVISIONAL_MAX_COMPLETED_GAMES
-          const isProvisionalB: boolean = b.stats.gamesCompleted < PROVISIONAL_MAX_COMPLETED_GAMES
-
-          // Add "provisional" first in ASC order
-          if (isProvisionalA && !isProvisionalB) return sortOrder === "asc" ? -1 : 1
-          if (!isProvisionalA && isProvisionalB) return sortOrder === "asc" ? 1 : -1
-
-          const ratingA: number = a.stats.rating || 0
-          const ratingB: number = b.stats.rating || 0
-
-          return sortOrder === "asc" ? ratingA - ratingB : ratingB - ratingA
-        case "table":
-          const tableNumberA: number = a.lastJoinedTable?.tableNumber || 0
-          const tableNumberB: number = b.lastJoinedTable?.tableNumber || 0
-
-          return sortOrder === "asc" ? tableNumberA - tableNumberB : tableNumberB - tableNumberA
-        default:
-          break
-      }
-
-      return 0
-    })
-  }, [users, sortKey, sortOrder])
-
-  useEffect(() => {
-    setIsRtl(document.documentElement.dir === "rtl")
-    setIsDarkMode(document.documentElement.classList.contains("dark"))
-  }, [])
-
-  useEffect(() => {
-    setCurrentUser(users?.find((user: UserPlainObject) => user.user?.id === session?.user.id))
-  }, [users])
+    });
+  };
 
   return (
     <div
@@ -241,49 +236,65 @@ export default function PlayersList({
           backgroundOrigin: "content-box",
         }}
       >
-        {sortedPlayersList?.map((player: UserPlainObject) => (
-          <div
-            key={player.user?.id}
-            className={clsx(
-              "grid gap-1 cursor-pointer",
-              "rtl:divide-x-reverse",
-              "dark:divide-dark-game-players-border",
-              isRatingsVisible && isTableNumberVisible ? "grid-cols-[5fr_4fr_3fr]" : "grid-cols-[8fr_4fr]",
-              selectedPlayerId === player.user?.id && "!bg-blue-100 dark:!bg-blue-900",
-              player.user?.id === session?.user.id && "text-blue-700 dark:text-blue-400",
-            )}
-            role="button"
-            tabIndex={0}
-            onClick={() => handlePlayersRowClick(player.user?.id)}
-            onDoubleClick={handleOpenPlayerInfoModal}
-          >
-            <div className="p-2 truncate">
-              <div className="flex items-center gap-1">
-                {isRatingsVisible && (
-                  <div
-                    className={clsx(
-                      "shrink-0 w-4 h-4",
-                      player.stats.rating >= RATING_MASTER && "bg-red-400",
-                      player.stats.rating >= RATING_DIAMOND && player.stats.rating < RATING_MASTER && "bg-orange-400",
-                      player.stats.rating >= RATING_PLATINUM && player.stats.rating < RATING_DIAMOND && "bg-purple-400",
-                      player.stats.rating >= RATING_GOLD && player.stats.rating < RATING_PLATINUM && "bg-cyan-600",
-                      player.stats.rating < RATING_GOLD && "bg-green-600",
-                      player.stats.gamesCompleted < PROVISIONAL_MAX_COMPLETED_GAMES && "!bg-gray-400",
-                    )}
-                  />
-                )}
-                <div className="truncate">{player.user?.username}</div>
-              </div>
-            </div>
-            {isRatingsVisible && (
+        {sortedPlayersList?.map((player: PlayerWithRelations) => {
+          if (!player.player.stats) return null;
+
+          return (
+            <div
+              key={player.player.id}
+              className={clsx(
+                "grid gap-1 cursor-pointer",
+                "rtl:divide-x-reverse",
+                "dark:divide-dark-game-players-border",
+                isRatingsVisible && isTableNumberVisible ? "grid-cols-[5fr_4fr_3fr]" : "grid-cols-[8fr_4fr]",
+                selectedPlayerId === player.player.id && "!bg-blue-100 dark:!bg-blue-900",
+                player.player.id === session?.user.id && "text-blue-700 dark:text-blue-400",
+              )}
+              role="button"
+              tabIndex={0}
+              onClick={() => handlePlayersRowClick(player.player.id)}
+              onDoubleClick={handlePlayerInformation}
+            >
               <div className="p-2 truncate">
-                {player.stats.gamesCompleted >= PROVISIONAL_MAX_COMPLETED_GAMES ? player.stats.rating : "provisional"}
+                <div className="flex items-center gap-1">
+                  {isRatingsVisible && (
+                    <div
+                      className={clsx(
+                        "shrink-0 w-4 h-4",
+                        player.player.stats.rating >= RATING_MASTER && "bg-red-400",
+                        player.player.stats.rating >= RATING_DIAMOND &&
+                          player.player.stats.rating < RATING_MASTER &&
+                          "bg-orange-400",
+                        player.player.stats.rating >= RATING_PLATINUM &&
+                          player.player.stats.rating < RATING_DIAMOND &&
+                          "bg-purple-400",
+                        player.player.stats.rating >= RATING_GOLD &&
+                          player.player.stats.rating < RATING_PLATINUM &&
+                          "bg-cyan-600",
+                        player.player.stats.rating < RATING_GOLD && "bg-green-600",
+                        player.player.stats.gamesCompleted < PROVISIONAL_MAX_COMPLETED_GAMES && "!bg-gray-400",
+                      )}
+                    />
+                  )}
+                  <div className="truncate">{player.player.user?.username}</div>
+                </div>
               </div>
-            )}
-            {isTableNumberVisible && <div className="p-2 truncate">{player.lastJoinedTable?.tableNumber}</div>}
-          </div>
-        ))}
+              {isRatingsVisible && (
+                <div className="p-2 truncate">
+                  {player.player.stats.gamesCompleted >= PROVISIONAL_MAX_COMPLETED_GAMES
+                    ? player.player.stats.rating
+                    : "provisional"}
+                </div>
+              )}
+              {isTableNumberVisible && (
+                <div className="p-2 truncate">
+                  {player.player.tablesJoined[player.player.tablesJoined?.length - 1]?.table?.tableNumber}
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
     </div>
-  )
+  );
 }

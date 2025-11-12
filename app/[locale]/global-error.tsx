@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { ReactNode } from "react"
-import { Trans } from "@lingui/react/macro"
+import { ReactNode } from "react";
+import { Trans } from "@lingui/react/macro";
 
 type GlobalErrorProps = {
   error: Error & { digest?: string }
@@ -20,5 +20,5 @@ export default function GlobalError({ error, reset }: GlobalErrorProps): ReactNo
         </button>
       </body>
     </html>
-  )
+  );
 }

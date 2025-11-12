@@ -1,51 +1,65 @@
-"use client"
+"use client";
 
-import { ReactNode, useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-import { Plural, Trans, useLingui } from "@lingui/react/macro"
-import clsx from "clsx/lite"
-import Button from "@/components/ui/Button"
-import { ROUTE_TOWERS } from "@/constants/routes"
-import { SocketEvents } from "@/constants/socket-events"
-import { useSocket } from "@/context/SocketContext"
-import { RoomLevel, RoomPlainObject } from "@/server/towers/classes/Room"
-import { UserPlainObject } from "@/server/towers/classes/User"
+import { ReactNode, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Plural, Trans, useLingui } from "@lingui/react/macro";
+import clsx from "clsx/lite";
+import { RoomLevel, TowersRoomPlayerWithRelations, TowersRoomsListWithCount } from "db";
+import useSWR from "swr";
+import Button from "@/components/ui/Button";
+import { ROUTE_TOWERS } from "@/constants/routes";
+import { SocketEvents } from "@/constants/socket-events";
+import { useSocket } from "@/context/SocketContext";
+import { fetcher } from "@/lib/fetcher";
 
 export default function RoomsList(): ReactNode {
-  const router = useRouter()
-  const { socketRef, session } = useSocket()
-  const { t } = useLingui()
-  const [rooms, setRooms] = useState<RoomPlainObject[]>([])
+  const router = useRouter();
+  const { socketRef, isConnected, session } = useSocket();
+  const { t } = useLingui();
+  const [rooms, setRooms] = useState<TowersRoomsListWithCount[]>([]);
+
+  const { error: roomsError, mutate: loadRoomsList } = useSWR<ApiResponse<TowersRoomsListWithCount[]>>(
+    "/api/games/towers/rooms",
+    fetcher,
+    {
+      shouldRetryOnError: false,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      onSuccess: (response: ApiResponse<TowersRoomsListWithCount[]>) => {
+        if (response.success && response.data) {
+          setRooms(response.data);
+        }
+      },
+    },
+  );
 
   useEffect(() => {
-    socketRef.current?.emit(SocketEvents.ROOMS_GET)
+    if (!socketRef.current) return;
 
-    const handleRoomsList = ({ rooms }: { rooms: RoomPlainObject[] }): void => {
-      setRooms(rooms)
-    }
+    const handleUpdateRoomslist = async (): Promise<void> => {
+      await loadRoomsList();
+    };
 
-    const handleRoomsListUpdated = (): void => {
-      socketRef.current?.emit(SocketEvents.ROOMS_GET)
-    }
-
-    socketRef.current?.on(SocketEvents.ROOMS_LIST, handleRoomsList)
-    socketRef.current?.on(SocketEvents.ROOMS_LIST_UPDATED, handleRoomsListUpdated)
+    socketRef.current?.on(SocketEvents.ROOMS_LIST_UPDATED, handleUpdateRoomslist);
 
     return () => {
-      socketRef.current?.off(SocketEvents.ROOMS_LIST, handleRoomsList)
-      socketRef.current?.off(SocketEvents.ROOMS_LIST_UPDATED, handleRoomsListUpdated)
-    }
-  }, [socketRef.current])
+      socketRef.current?.off(SocketEvents.ROOMS_LIST_UPDATED, handleUpdateRoomslist);
+    };
+  }, [isConnected]);
 
   const handleJoinRoom = (roomId: string): void => {
-    router.push(`${ROUTE_TOWERS.PATH}?room=${roomId}`)
-  }
+    router.push(`${ROUTE_TOWERS.PATH}?room=${roomId}`);
+  };
+
+  if (roomsError) return <div>Error: {roomsError.message}</div>;
 
   return (
     <ul className="grid grid-cols-[repeat(auto-fill,_minmax(14rem,_1fr))] gap-8">
-      {rooms?.map((room: RoomPlainObject) => {
-        const usersCount: number = room.users?.length
-        const isUserInRoom: boolean = room.users?.some((user: UserPlainObject) => user.user?.id === session?.user?.id)
+      {rooms?.map((room: TowersRoomsListWithCount) => {
+        const usersCount: number = room._count.players;
+        const isUserInRoom: boolean = room.players?.some(
+          (roomPlayer: TowersRoomPlayerWithRelations) => roomPlayer.player.id === session?.user?.id,
+        );
 
         return (
           <li
@@ -86,8 +100,8 @@ export default function RoomsList(): ReactNode {
               </Button>
             </div>
           </li>
-        )
+        );
       })}
     </ul>
-  )
+  );
 }

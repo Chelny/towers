@@ -1,5 +1,5 @@
-import { ReactNode } from "react"
-import clsx from "clsx/lite"
+import { ReactNode } from "react";
+import clsx from "clsx/lite";
 
 export default function LinkedSocialAccountsFormSkeleton(): ReactNode {
   return (
@@ -12,5 +12,5 @@ export default function LinkedSocialAccountsFormSkeleton(): ReactNode {
         </div>
       ))}
     </div>
-  )
+  );
 }

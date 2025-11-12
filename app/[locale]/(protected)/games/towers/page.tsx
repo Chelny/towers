@@ -1,15 +1,18 @@
-import { ReactNode } from "react"
-import type { Metadata } from "next"
-import dynamic from "next/dynamic"
-import { I18n } from "@lingui/core"
-import { initLingui } from "@/app/init-lingui"
-import TowersPageContent from "@/components/game/TowersPageContent"
-import RoomsListSkeleton from "@/components/skeleton/RoomsListSkeleton"
-import { ROUTE_TOWERS } from "@/constants/routes"
+import { ReactNode } from "react";
+import type { Metadata } from "next";
+import dynamic from "next/dynamic";
+import { I18n } from "@lingui/core";
+import { TowersPlayerLite, TowersRoom, TowersTable } from "db";
+import { initLingui } from "@/app/init-lingui";
+import TowersPageContent from "@/components/game/TowersPageContent";
+import RoomsListSkeleton from "@/components/skeleton/RoomsListSkeleton";
+import { ROUTE_TOWERS } from "@/constants/routes";
+import prisma from "@/lib/prisma";
+import { getTowersPlayerLiteIncludes } from "@/prisma/selects";
 
 const RoomsList = dynamic(() => import("@/components/game/RoomsList"), {
   loading: () => <RoomsListSkeleton />,
-})
+});
 
 type TowersProps = {
   params: Promise<Params>
@@ -17,54 +20,55 @@ type TowersProps = {
 }
 
 export async function generateMetadata({ params, searchParams }: TowersProps): Promise<Metadata> {
-  const routeParams: Params = await params
-  const routeSearchParams: SearchParams = await searchParams
-  const i18n: I18n = initLingui(routeParams.locale)
-  let title: string = i18n._(ROUTE_TOWERS.TITLE)
+  const routeParams: Params = await params;
+  const routeSearchParams: SearchParams = await searchParams;
+  const i18n: I18n = initLingui(routeParams.locale);
+  let title: string = i18n._(ROUTE_TOWERS.TITLE);
 
-  // TODO: To implement when database will be set
-  // if (routeSearchParams.room) {
-  //   const room: TowersRoom | null = await prisma.towersRoom.findUnique({
-  //     where: { id: routeSearchParams.room as string },
-  //   })
+  if (routeSearchParams.room) {
+    const room: TowersRoom | null = await prisma.towersRoom.findUnique({
+      where: { id: routeSearchParams.room as string },
+    });
 
-  //   const roomName: string | undefined = room?.name
-  //   title = t({ message: `Room: ${roomName}` })
+    if (room) {
+      const roomName: string = room.name;
+      title = i18n._("Room: {roomName}", { roomName });
 
-  //   if (routeSearchParams.table) {
-  //     const table: TowersTable | null = await prisma.towersTable.findUnique({
-  //       where: { id: routeSearchParams.table as string },
-  //     })
+      if (routeSearchParams.table) {
+        const table: TowersTable | null = await prisma.towersTable.findUnique({
+          where: { id: routeSearchParams.table as string },
+        });
 
-  //     if (table) {
-  //       const tableHost: ITowersUserProfile | null = await prisma.towersUserProfile.findUnique({
-  //         where: { userId: table?.hostId },
-  //         include: { user: true },
-  //       })
+        if (table) {
+          const tableHost: TowersPlayerLite | null = await prisma.towersPlayer.findUnique({
+            where: { id: table.hostPlayerId },
+            include: getTowersPlayerLiteIncludes(),
+          });
 
-  //       if (tableHost) {
-  //         const tableNumber: number = table.tableNumber
-  //         const tableHostUsername: string | undefined = tableHost.user.username
-  //         title += ` - ${t({ message: `Table: ${tableNumber} - Host: ${tableHostUsername}` })}`
-  //       }
-  //     }
-  //   }
-  // }
+          if (tableHost) {
+            const tableNumber: number = table.tableNumber;
+            const tableHostUsername: string | undefined = tableHost.user.username;
+            title += ` - ${i18n._("Table: {tableNumber} - Host: {tableHostUsername}", { tableNumber, tableHostUsername })}`;
+          }
+        }
+      }
+    }
+  }
 
   return {
     title,
     alternates: {
       canonical: `${process.env.BASE_URL}${ROUTE_TOWERS.PATH}`,
     },
-  }
+  };
 }
 
 export default async function Towers({ params, searchParams }: TowersProps): Promise<ReactNode> {
-  const routeParams: Params = await params
-  const routeSearchParams: SearchParams = await searchParams
-  const i18n: I18n = initLingui(routeParams.locale)
-  const roomId: string = routeSearchParams.room as string
-  const tableId: string = routeSearchParams.table as string
+  const routeParams: Params = await params;
+  const routeSearchParams: SearchParams = await searchParams;
+  const i18n: I18n = initLingui(routeParams.locale);
+  const roomId: string = routeSearchParams.room as string;
+  const tableId: string = routeSearchParams.table as string;
 
   if (!roomId && !tableId) {
     return (
@@ -72,8 +76,8 @@ export default async function Towers({ params, searchParams }: TowersProps): Pro
         <h1 className="mb-8 text-3xl">{i18n._(ROUTE_TOWERS.TITLE)}</h1>
         <RoomsList />
       </>
-    )
+    );
   }
 
-  return <TowersPageContent />
+  return <TowersPageContent />;
 }

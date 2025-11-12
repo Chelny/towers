@@ -1,179 +1,219 @@
-"use client"
+"use client";
 
-import { ReactNode, useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-import { Trans, useLingui } from "@lingui/react/macro"
-import clsx from "clsx/lite"
-import { GoSidebarExpand } from "react-icons/go"
-import { LuGamepad2 } from "react-icons/lu"
-import { PiSignOut } from "react-icons/pi"
-import { RiUserLine } from "react-icons/ri"
-import { TbTower } from "react-icons/tb"
-import AlertModal from "@/components/game/AlertModal"
-import InstantMessageModal from "@/components/game/InstantMessageModal"
-import TableInvitationModal from "@/components/game/TableInvitationModal"
-import SidebarMenuItem from "@/components/SidebarMenuItem"
-import UserAvatar from "@/components/UserAvatar"
-import { ROUTE_DELETE_ACCOUNT, ROUTE_HOME, ROUTE_PROFILE, ROUTE_SETTINGS, ROUTE_TOWERS } from "@/constants/routes"
+import { ReactNode, useEffect, useState } from "react";
+import { useLingui } from "@lingui/react/macro";
+import clsx from "clsx/lite";
 import {
-  GameInstantMessage,
-  GameNotification,
-  GameRoomSummary,
-  GameTableBootedMessage,
-  GameTableInvitation,
-  GameTableSummary,
-  useGame,
-} from "@/context/GameContext"
-import { useModal } from "@/context/ModalContext"
-import { useSocket } from "@/context/SocketContext"
-import { SidebarMenuActionItem, SidebarMenuDropdownItem, SidebarMenuLinkItem } from "@/interfaces/sidebar-menu"
-import { authClient } from "@/lib/auth-client"
+  ConversationParticipant,
+  ConversationParticipantWithRelations,
+  ConversationWithRelations,
+  InstantMessageWithRelations,
+  TowersNotificationWithRelations,
+} from "db";
+import { BsChatLeftDots } from "react-icons/bs";
+import { GoSidebarExpand } from "react-icons/go";
+import { LuGamepad2 } from "react-icons/lu";
+import { PiSignOut } from "react-icons/pi";
+import { RiUserLine } from "react-icons/ri";
+import { TbTower } from "react-icons/tb";
+import useSWR from "swr";
+import ConversationModal from "@/components/game/ConversationModal";
+import SidebarMenuItem from "@/components/SidebarMenuItem";
+import UserAvatar from "@/components/UserAvatar";
+import { ROUTE_DELETE_ACCOUNT, ROUTE_PROFILE, ROUTE_SETTINGS, ROUTE_TOWERS } from "@/constants/routes";
+import { SocketEvents } from "@/constants/socket-events";
+import { GameRoomSummary, GameTableSummary, useGame } from "@/context/GameContext";
+import { useModal } from "@/context/ModalContext";
+import { useSocket } from "@/context/SocketContext";
+import { SidebarMenuActionItem, SidebarMenuButtonItem, SidebarMenuLinkItem } from "@/interfaces/sidebar-menu";
+import { authClient } from "@/lib/authClient";
+import { fetcher } from "@/lib/fetcher";
 
 export default function Sidebar(): ReactNode {
-  const router = useRouter()
-  const { session } = useSocket()
-  const { joinedRooms, joinedTables, notifications } = useGame()
-  const { openModal, closeModal } = useModal()
-  const { i18n, t } = useLingui()
-  const [isExpanded, setIsExpanded] = useState<boolean>(false)
-  const [isLinkTextVisible, setIsLinkTextVisible] = useState<boolean>(false)
+  const { i18n, t } = useLingui();
+  const { openModal } = useModal();
+  const { socketRef, isConnected, session } = useSocket();
+  const { joinedRooms, joinedTables, activeTableId } = useGame();
+  const [isExpanded, setIsExpanded] = useState<boolean>(false);
+  const [isLinkTextVisible, setIsLinkTextVisible] = useState<boolean>(false);
+  const [conversationsMenuItems, setConversationsMenuItems] = useState<SidebarMenuButtonItem[]>([]);
+  const [gameMenuItems, setGameMenuItems] = useState<SidebarMenuLinkItem[]>([]);
+  const [notifications, setNotifications] = useState<TowersNotificationWithRelations[]>([]);
 
-  const gameMenuItems: SidebarMenuLinkItem[] = joinedRooms.map((room: GameRoomSummary) => {
-    // Room Notifications
-    const roomNotifications: GameNotification[] = notifications[room.id] ?? []
-    const notificationItems: SidebarMenuDropdownItem[] = roomNotifications.map<SidebarMenuDropdownItem>(
-      (notification: GameNotification) => {
-        // Instant message notification
-        if (notification.type === "instantMessage") {
-          const instantMessage: GameInstantMessage = notification as Extract<
-            GameNotification,
-            { type: "instantMessage" }
-          >
-          return {
-            id: `instant-message-${instantMessage.id}`,
-            roomId: notification.roomId,
-            notification,
-            label: i18n._("Instant message #{id} from {sender}", {
-              id: instantMessage.id.slice(0, 4),
-              sender: instantMessage.sender.user?.username,
-            }),
-            onClick: () => openModal(InstantMessageModal, { instantMessage }),
-          }
-        } else if (notification.type === "tableBootedMessage") {
-          const tableBootedMessage: GameTableBootedMessage = notification as Extract<
-            GameNotification,
-            { type: "tableBootedMessage" }
-          >
-          return {
-            id: `table-booted-message-${tableBootedMessage.id}`,
-            roomId: notification.roomId,
-            label: t({ message: "You have been booted from a table." }),
-            notification,
-            onClick: () =>
-              openModal(AlertModal, {
-                title: t({ message: "Booted from table" }),
-                message: i18n._("You have been booted from table #{tableNumber} by {host}.", {
-                  tableNumber: tableBootedMessage.tableNumber,
-                  host: tableBootedMessage.hostUsername,
-                }),
-                testId: "booted-user",
-              }),
-          }
-        }
+  const getAccountAccordionLinks = (): SidebarMenuLinkItem[] => {
+    return [
+      { id: ROUTE_PROFILE.ID, label: i18n._(ROUTE_PROFILE.TITLE), href: ROUTE_PROFILE.PATH },
+      { id: ROUTE_SETTINGS.ID, label: i18n._(ROUTE_SETTINGS.TITLE), href: ROUTE_SETTINGS.PATH },
+      { id: ROUTE_DELETE_ACCOUNT.ID, label: i18n._(ROUTE_DELETE_ACCOUNT.TITLE), href: ROUTE_DELETE_ACCOUNT.PATH },
+    ];
+  };
 
-        // Table invitation
-        const tableInvitation: GameTableInvitation = notification as Extract<
-          GameNotification,
-          { type: "tableInvitation" }
-        >
-        const base: SidebarMenuDropdownItem = {
-          id: `table-invitation-${tableInvitation.id}`,
-          roomId: notification.roomId,
-          notification,
-        } as SidebarMenuDropdownItem
+  const {
+    data: conversationsResponse,
+    error: conversationsError,
+    mutate: loadConversations,
+    isLoading: isLoadingConversations,
+  } = useSWR<ApiResponse<ConversationWithRelations[]>>("/api/conversations", fetcher, {
+    revalidateOnFocus: false,
+  });
 
-        return {
-          ...base,
-          label: i18n._("Invitation to table #{tableNumber}", {
-            tableNumber: tableInvitation.tableNumber,
-          }),
-          onClick: () =>
-            openModal(TableInvitationModal, {
-              tableInvitation: tableInvitation,
-              onAcceptInvitation: (roomId: string, tableId: string) => {
-                router.push(`${ROUTE_TOWERS.PATH}?room=${roomId}&table=${tableId}`)
-                closeModal()
-              },
-            }),
-        }
-      },
-    )
+  const {
+    data: notificationsResponse,
+    error: notificationsError,
+    mutate: loadNotifications,
+    isLoading: isLoadingNotifications,
+  } = useSWR<ApiResponse<TowersNotificationWithRelations[]>>("/api/games/towers/notifications", fetcher, {
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+  });
 
-    // Tables
-    const tables: SidebarMenuLinkItem[] = joinedTables
-      .filter((table: GameTableSummary) => table.roomId === room.id)
-      .map((table: GameTableSummary) => ({
-        id: `table-${table.id}`,
-        label: i18n._("Table #{tableNumber}", { tableNumber: table.tableNumber }),
-        href: `${room.basePath}?room=${room.id}&table=${table.id}`,
-      }))
+  useEffect(() => {
+    Promise.all([loadConversations(), loadNotifications()]);
+  }, []);
 
-    return {
-      id: `room-${room.id}`,
-      label: room.name,
-      href: `${room.basePath}?room=${room.id}`,
-      children: [
-        ...(notifications
-          ? [
-              {
-                id: `notifications-${room.id}`,
-                label: t({ message: "Notifications" }),
-                children: notificationItems,
-                unreadCount: notificationItems.filter(
-                  (n: SidebarMenuDropdownItem) => n.notification.status === "unread",
-                ).length,
-              } satisfies SidebarMenuActionItem,
-            ]
-          : []),
-        ...tables,
-      ],
+  useEffect(() => {
+    if (conversationsResponse?.data) {
+      setConversationsMenuItems(conversationsResponse.data.map(instantMessageMenuItem));
     }
-  })
+  }, [conversationsResponse?.data]);
+
+  useEffect(() => {
+    if (notificationsResponse?.data) {
+      setNotifications(notificationsResponse.data);
+    }
+  }, [notificationsResponse?.data]);
+
+  useEffect(() => {
+    const items: SidebarMenuLinkItem[] = joinedRooms.map((room: GameRoomSummary) => {
+      const roomNotifications: TowersNotificationWithRelations[] = notifications.filter(
+        (notification: TowersNotificationWithRelations) => notification.roomId === room.id,
+      );
+
+      const unreadRoomNotifications: TowersNotificationWithRelations[] = roomNotifications.filter(
+        (notification: TowersNotificationWithRelations) => !notification.readAt,
+      );
+
+      const tables: SidebarMenuLinkItem[] = joinedTables
+        .filter((table: GameTableSummary) => table.roomId === room.id)
+        .map((table: GameTableSummary) => ({
+          id: `table-${table.id}`,
+          label: i18n._("Table #{tableNumber}", { tableNumber: table.tableNumber }),
+          href: `${room.basePath}?room=${room.id}&table=${table.id}`,
+        }));
+
+      return {
+        id: `room-${room.id}`,
+        label: room.name,
+        href: `${room.basePath}?room=${room.id}`,
+        children: [
+          {
+            id: `notifications-${room.id}`,
+            label: t({ message: "Notifications" }),
+            children: roomNotifications,
+            unreadCount: unreadRoomNotifications.length,
+          } satisfies SidebarMenuActionItem,
+          ...tables,
+        ],
+      };
+    });
+
+    setGameMenuItems(items);
+  }, [joinedRooms, joinedTables, notifications]);
 
   useEffect(() => {
     if (isExpanded) {
       const timer: NodeJS.Timeout = setTimeout(() => {
-        setIsLinkTextVisible(true)
-      }, 300)
+        setIsLinkTextVisible(true);
+      }, 300);
 
-      return () => clearTimeout(timer)
+      return () => clearTimeout(timer);
     } else {
-      setIsLinkTextVisible(false)
+      setIsLinkTextVisible(false);
     }
-  }, [isExpanded])
+  }, [isExpanded]);
 
-  const getAccountAccordionLinks = (): SidebarMenuLinkItem[] => {
-    return [
-      { id: ROUTE_PROFILE.ID, href: ROUTE_PROFILE.PATH, label: i18n._(ROUTE_PROFILE.TITLE) },
-      { id: ROUTE_SETTINGS.ID, href: ROUTE_SETTINGS.PATH, label: i18n._(ROUTE_SETTINGS.TITLE) },
-      { id: ROUTE_DELETE_ACCOUNT.ID, href: ROUTE_DELETE_ACCOUNT.PATH, label: i18n._(ROUTE_DELETE_ACCOUNT.TITLE) },
-    ]
-  }
+  useEffect(() => {
+    if (!socketRef.current) return;
+
+    const handleUpdateConversation = ({ conversation }: { conversation: ConversationWithRelations }): void => {
+      setConversationsMenuItems((prev: SidebarMenuButtonItem[]) => {
+        const existingMenuItem: SidebarMenuButtonItem | undefined = prev.find(
+          (item: SidebarMenuButtonItem) => item.id === conversation.id,
+        );
+        const updatedMenuItem: SidebarMenuButtonItem = instantMessageMenuItem(conversation);
+
+        return existingMenuItem
+          ? prev.map((item: SidebarMenuButtonItem) => (item.id === conversation.id ? updatedMenuItem : item))
+          : [...prev, updatedMenuItem];
+      });
+    };
+
+    const handleUpdateConversationUneadCount = ({ conversationId }: { conversationId: string }): void => {
+      setConversationsMenuItems((prev: SidebarMenuButtonItem[]) =>
+        prev.map((item: SidebarMenuButtonItem) => (item.id === conversationId ? { ...item, unreadCount: 0 } : item)),
+      );
+    };
+
+    const handleUpdateNotification = ({ notification }: { notification: TowersNotificationWithRelations }): void => {
+      setNotifications((prev: TowersNotificationWithRelations[]) => [...prev, notification]);
+    };
+
+    socketRef.current?.on(SocketEvents.CONVERSATION_MESSAGE_SENT, handleUpdateConversation);
+    socketRef.current?.on(SocketEvents.CONVERSATION_MESSAGE_MARK_AS_READ, handleUpdateConversationUneadCount);
+    socketRef.current?.on(SocketEvents.TABLE_INVITATION_INVITED_NOTIFICATION, handleUpdateNotification);
+    socketRef.current?.on(SocketEvents.TABLE_INVITATION_DECLINED_NOTIFICATION, handleUpdateNotification);
+    socketRef.current?.on(SocketEvents.TABLE_BOOTED_NOTIFICATION, handleUpdateNotification);
+
+    return () => {
+      socketRef.current?.off(SocketEvents.CONVERSATION_MESSAGE_SENT, handleUpdateConversation);
+      socketRef.current?.off(SocketEvents.CONVERSATION_MESSAGE_MARK_AS_READ, handleUpdateConversationUneadCount);
+      socketRef.current?.off(SocketEvents.TABLE_INVITATION_INVITED_NOTIFICATION, handleUpdateNotification);
+      socketRef.current?.off(SocketEvents.TABLE_INVITATION_DECLINED_NOTIFICATION, handleUpdateNotification);
+      socketRef.current?.off(SocketEvents.TABLE_BOOTED_NOTIFICATION, handleUpdateNotification);
+    };
+  }, [isConnected, activeTableId]);
+
+  const instantMessageMenuItem = (conversation: ConversationWithRelations): SidebarMenuButtonItem => {
+    const currentParticipant: ConversationParticipantWithRelations | undefined = conversation.participants.find(
+      (participant: ConversationParticipant) => participant.userId === session?.user.id,
+    );
+
+    const otherParticipant: ConversationParticipantWithRelations | undefined = conversation.participants.find(
+      (conversationParticipant: ConversationParticipant) => conversationParticipant.userId !== session?.user.id,
+    );
+
+    const unreadMessages: InstantMessageWithRelations[] = conversation.messages.filter(
+      (message: InstantMessageWithRelations) => {
+        const isVisible: boolean = !message.visibleToUserId || message.visibleToUserId === session?.user.id;
+        const isFromOther: boolean = message.userId !== session?.user.id;
+        const isUnread: boolean =
+          !currentParticipant?.readAt || new Date(message.createdAt) > new Date(currentParticipant.readAt);
+        return isVisible && isFromOther && isUnread;
+      },
+    );
+
+    return {
+      id: conversation.id,
+      label: otherParticipant?.user.username,
+      unreadCount: unreadMessages.length,
+      onClick: () => openModal(ConversationModal, { id: conversation.id }),
+    };
+  };
 
   const handleSignOut = async (): Promise<void> => {
     await authClient.signOut({
       fetchOptions: {
         onSuccess: () => {
-          router.push(ROUTE_HOME.PATH)
+          socketRef.current?.emit(SocketEvents.SIGN_OUT);
         },
       },
-    })
-  }
+    });
+  };
 
   return (
     <aside
       className={clsx(
-        "shrink-0 flex flex-col gap-4 min-w-24 h-full px-2 py-4 border-e border-e-gray-700 shadow-xl bg-gray-800 text-white/90 transition transition-[width] duration-500 ease-in-out",
+        "shrink-0 flex flex-col gap-4 min-w-24 h-full px-2 py-4 border-e border-e-gray-700 shadow-xl bg-gray-800 text-white/90 transition duration-500 ease-in-out",
         isExpanded ? "w-72 items-start" : "w-24 items-center",
       )}
     >
@@ -212,7 +252,19 @@ export default function Sidebar(): ReactNode {
           menuItems={getAccountAccordionLinks()}
           onClick={() => setIsExpanded(true)}
         >
-          <Trans>Account</Trans>
+          {t({ message: "Account" })}
+        </SidebarMenuItem>
+        <SidebarMenuItem
+          id="instantMessages"
+          Icon={BsChatLeftDots}
+          ariaLabel={t({ message: "Instant Messages" })}
+          isExpanded={isExpanded}
+          isLinkTextVisible={isLinkTextVisible}
+          menuItems={conversationsMenuItems}
+          disabled={isLoadingConversations}
+          onClick={() => setIsExpanded(true)}
+        >
+          {t({ message: "Instant Messages" })}
         </SidebarMenuItem>
         <SidebarMenuItem
           id="rooms"
@@ -221,9 +273,8 @@ export default function Sidebar(): ReactNode {
           isExpanded={isExpanded}
           isLinkTextVisible={isLinkTextVisible}
           href={ROUTE_TOWERS.PATH}
-          disabled
         >
-          <Trans>Rooms</Trans>
+          {t({ message: "Rooms" })}
         </SidebarMenuItem>
       </nav>
 
@@ -261,9 +312,9 @@ export default function Sidebar(): ReactNode {
           isLinkTextVisible={isLinkTextVisible}
           onClick={handleSignOut}
         >
-          <Trans>Sign out</Trans>
+          {t({ message: "Sign out" })}
         </SidebarMenuItem>
       </nav>
     </aside>
-  )
+  );
 }

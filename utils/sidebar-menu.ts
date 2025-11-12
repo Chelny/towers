@@ -1,18 +1,13 @@
-import {
-  MenuItem,
-  SidebarMenuActionItem,
-  SidebarMenuDropdownItem,
-  SidebarMenuLinkItem,
-} from "@/interfaces/sidebar-menu"
+import { MenuItem, SidebarMenuActionItem, SidebarMenuButtonItem, SidebarMenuLinkItem } from "@/interfaces/sidebar-menu";
 
 export const isLinkItem = (item: MenuItem): item is SidebarMenuLinkItem => {
-  return "href" in item
-}
+  return "href" in item;
+};
+
+export const isButtontem = (item: MenuItem): item is SidebarMenuButtonItem => {
+  return "onClick" in item;
+};
 
 export const isActionItem = (item: MenuItem): item is SidebarMenuActionItem => {
-  return "children" in item && Array.isArray(item.children)
-}
-
-export const isDropdownItem = (item: MenuItem): item is SidebarMenuDropdownItem => {
-  return "onClick" in item && !("children" in item)
-}
+  return "children" in item && Array.isArray(item.children);
+};

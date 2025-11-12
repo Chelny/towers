@@ -1,14 +1,14 @@
-import { ReactNode } from "react"
-import clsx from "clsx/lite"
-import DefenseBlock from "@/components/towers/DefenseBlock"
-import RegularBlock from "@/components/towers/RegularBlock"
-import { BoardBlock } from "@/interfaces/towers"
+import { ReactNode } from "react";
+import clsx from "clsx/lite";
+import DefenseBlock from "@/components/towers/DefenseBlock";
+import RegularBlock from "@/components/towers/RegularBlock";
+import { BoardBlock } from "@/interfaces/towers";
 import {
   getBlockRemovalAnimationClass,
   getClassNameForBlock,
   getClassNameForBlockPowerType,
-} from "@/utils/block-class-names-utils"
-import { isTowersPieceBlock } from "@/utils/block-guards-utils"
+} from "@/utils/block-class-names-utils";
+import { isTowersPieceBlock } from "@/utils/block-guards-utils";
 
 type GridCellProps = {
   block: BoardBlock
@@ -35,5 +35,5 @@ export default function GridCell({ block, isOpponentBoard = false }: GridCellPro
         <RegularBlock letter={isTowersPieceBlock(block) && !isOpponentBoard ? block.letter : undefined} />
       )}
     </div>
-  )
+  );
 }

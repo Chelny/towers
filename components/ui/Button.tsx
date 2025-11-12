@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { MouseEvent, PropsWithChildren, ReactNode } from "react"
-import clsx from "clsx/lite"
+import { MouseEvent, PropsWithChildren, ReactNode } from "react";
+import clsx from "clsx/lite";
 
 type ButtonProps = PropsWithChildren<{
   type?: "button" | "submit" | "reset" | undefined
@@ -44,5 +44,5 @@ export default function Button({
     >
       {children}
     </button>
-  )
+  );
 }

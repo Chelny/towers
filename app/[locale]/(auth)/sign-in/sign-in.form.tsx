@@ -1,21 +1,21 @@
-"use client"
+"use client";
 
-import { FormEvent, ReactNode, useState } from "react"
-import { useRouter } from "next/navigation"
-import { ErrorContext } from "@better-fetch/fetch"
-import { Trans, useLingui } from "@lingui/react/macro"
-import { ValueError } from "@sinclair/typebox/errors"
-import { Value } from "@sinclair/typebox/value"
-import clsx from "clsx/lite"
-import { PiKeyFill, PiMagicWandFill } from "react-icons/pi"
-import { SignInFormValidationErrors, SignInPayload, signInSchema } from "@/app/[locale]/(auth)/sign-in/sign-in.schema"
-import AlertMessage from "@/components/ui/AlertMessage"
-import Anchor from "@/components/ui/Anchor"
-import Button from "@/components/ui/Button"
-import Checkbox from "@/components/ui/Checkbox"
-import Input from "@/components/ui/Input"
-import { INITIAL_FORM_STATE } from "@/constants/api"
-import { AUTH_PROVIDERS } from "@/constants/auth-providers"
+import { FormEvent, ReactNode, useState } from "react";
+import { useRouter } from "next/navigation";
+import { ErrorContext } from "@better-fetch/fetch";
+import { Trans, useLingui } from "@lingui/react/macro";
+import { ValueError } from "@sinclair/typebox/errors";
+import { Value } from "@sinclair/typebox/value";
+import clsx from "clsx/lite";
+import { PiKeyFill, PiMagicWandFill } from "react-icons/pi";
+import { SignInFormValidationErrors, SignInPayload, signInSchema } from "@/app/[locale]/(auth)/sign-in/sign-in.schema";
+import AlertMessage from "@/components/ui/AlertMessage";
+import Anchor from "@/components/ui/Anchor";
+import Button from "@/components/ui/Button";
+import Checkbox from "@/components/ui/Checkbox";
+import Input from "@/components/ui/Input";
+import { INITIAL_FORM_STATE } from "@/constants/api";
+import { AUTH_PROVIDERS } from "@/constants/auth-providers";
 import {
   CALLBACK_URL,
   ERROR_CALLBACK_URL,
@@ -25,41 +25,41 @@ import {
   ROUTE_SIGN_IN_WITH_MAGIC_LINK,
   ROUTE_SIGN_UP,
   ROUTE_TERMS_OF_SERVICE,
-} from "@/constants/routes"
-import { authClient } from "@/lib/auth-client"
-import { logger } from "@/lib/logger"
-import { AuthProvider, AuthProviderDetails } from "@/lib/providers"
+} from "@/constants/routes";
+import { authClient } from "@/lib/authClient";
+import { logger } from "@/lib/logger";
+import { AuthProvider, AuthProviderDetails } from "@/lib/providers";
 
 export function SignInForm(): ReactNode {
-  const router = useRouter()
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [formState, setFormState] = useState<ApiResponse>(INITIAL_FORM_STATE)
-  const { t } = useLingui()
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [formState, setFormState] = useState<ApiResponse>(INITIAL_FORM_STATE);
+  const { t } = useLingui();
 
   const handleSignIn = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
-    event.preventDefault()
+    event.preventDefault();
 
-    const formData: FormData = new FormData(event.currentTarget)
+    const formData: FormData = new FormData(event.currentTarget);
     const payload: SignInPayload = {
       email: formData.get("email") as string,
       password: formData.get("password") as string,
       rememberMe: formData.get("rememberMe") === "on",
-    }
+    };
 
-    const errors: ValueError[] = Array.from(Value.Errors(signInSchema, payload))
-    const errorMessages: SignInFormValidationErrors = {}
+    const errors: ValueError[] = Array.from(Value.Errors(signInSchema, payload));
+    const errorMessages: SignInFormValidationErrors = {};
 
     for (const error of errors) {
       switch (error.path.replace("/", "")) {
         case "email":
-          errorMessages.email = t({ message: "The email is invalid." })
-          break
+          errorMessages.email = t({ message: "The email is invalid." });
+          break;
         case "password":
-          errorMessages.password = t({ message: "The password is invalid." })
-          break
+          errorMessages.password = t({ message: "The password is invalid." });
+          break;
         default:
-          logger.warn(`Sign In Validation: Unknown error at ${error.path}`)
-          break
+          logger.warn(`Sign In Validation: Unknown error at ${error.path}`);
+          break;
       }
     }
 
@@ -68,7 +68,7 @@ export function SignInForm(): ReactNode {
         success: false,
         message: t({ message: "The email or the password is invalid." }),
         error: errorMessages,
-      })
+      });
     } else {
       await authClient.signIn.email(
         {
@@ -79,30 +79,30 @@ export function SignInForm(): ReactNode {
         },
         {
           onRequest: () => {
-            setIsLoading(true)
-            setFormState(INITIAL_FORM_STATE)
+            setIsLoading(true);
+            setFormState(INITIAL_FORM_STATE);
           },
           onResponse: () => {
-            setIsLoading(false)
+            setIsLoading(false);
           },
           onError: (ctx: ErrorContext) => {
             setFormState({
               success: false,
               message: ctx.error.message,
-            })
+            });
           },
           onSuccess: () => {
             setFormState({
               success: true,
               message: t({ message: "You’re signed in successfully. Welcome back!" }),
-            })
+            });
           },
         },
-      )
+      );
     }
-  }
+  };
 
-  const handleSignInWithMagicLink = (): void => router.push(ROUTE_SIGN_IN_WITH_MAGIC_LINK.PATH)
+  const handleSignInWithMagicLink = (): void => router.push(ROUTE_SIGN_IN_WITH_MAGIC_LINK.PATH);
 
   const handleSignInWithProvider = async (provider: AuthProvider): Promise<void> => {
     await authClient.signIn.social(
@@ -114,57 +114,56 @@ export function SignInForm(): ReactNode {
       },
       {
         onRequest: () => {
-          setIsLoading(true)
-          setFormState(INITIAL_FORM_STATE)
+          setIsLoading(true);
+          setFormState(INITIAL_FORM_STATE);
         },
         onResponse: () => {
-          setIsLoading(false)
+          setIsLoading(false);
         },
         onError: (ctx: ErrorContext) => {
           setFormState({
             success: false,
             message: ctx.error.message,
-          })
+          });
         },
         onSuccess: () => {
           setFormState({
             success: true,
             message: t({ message: "You’re signed in successfully. Welcome back!" }),
-          })
+          });
         },
       },
-    )
-  }
+    );
+  };
 
   const handleSignInWithPasskey = async (): Promise<void> => {
-    console.log("CHELNY handleSignInWithPasskey")
     await authClient.signIn.passkey(
       {
         autoFill: true,
       },
       {
         onRequest: () => {
-          setIsLoading(true)
-          setFormState(INITIAL_FORM_STATE)
+          setIsLoading(true);
+          setFormState(INITIAL_FORM_STATE);
         },
         onResponse: () => {
-          setIsLoading(false)
+          setIsLoading(false);
         },
         onError: (ctx: ErrorContext) => {
           setFormState({
             success: false,
             message: ctx.error.message,
-          })
+          });
         },
         onSuccess: () => {
           setFormState({
             success: true,
             message: t({ message: "You’re signed in successfully. Welcome back!" }),
-          })
+          });
         },
       },
-    )
-  }
+    );
+  };
 
   return (
     <form className="w-full" noValidate onSubmit={handleSignIn}>
@@ -273,5 +272,5 @@ export function SignInForm(): ReactNode {
         </Trans>
       </div>
     </form>
-  )
+  );
 }

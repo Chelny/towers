@@ -1,14 +1,14 @@
-"use client"
+"use client";
 
-import { PropsWithChildren, ReactNode, useEffect, useState } from "react"
-import Link from "next/link"
-import { ReadonlyURLSearchParams, usePathname, useSearchParams } from "next/navigation"
-import clsx from "clsx/lite"
-import { GoTriangleDown, GoTriangleLeft } from "react-icons/go"
-import { IconType } from "react-icons/lib"
-import { SidebarMenuSubItem } from "@/components/SidebarMenuSubItem"
-import { MenuItem } from "@/interfaces/sidebar-menu"
-import { isLinkItem } from "@/utils/sidebar-menu"
+import { PropsWithChildren, ReactNode, useEffect, useState } from "react";
+import Link from "next/link";
+import { ReadonlyURLSearchParams, usePathname, useSearchParams } from "next/navigation";
+import clsx from "clsx/lite";
+import { GoTriangleDown, GoTriangleLeft } from "react-icons/go";
+import { IconType } from "react-icons/lib";
+import { SidebarMenuSubItem } from "@/components/SidebarMenuSubItem";
+import { MenuItem } from "@/interfaces/sidebar-menu";
+import { isLinkItem } from "@/utils/sidebar-menu";
 
 type SidebarMenuItemProps = PropsWithChildren<{
   id: string
@@ -34,53 +34,53 @@ export default function SidebarMenuItem({
   disabled = false,
   onClick,
 }: SidebarMenuItemProps): ReactNode {
-  const pathname: string = usePathname()
-  const searchParams: ReadonlyURLSearchParams = useSearchParams()
-  const currentParams: Record<string, string> = Object.fromEntries(searchParams.entries())
-  const [isMounted, setIsMounted] = useState<boolean>(false)
-
-  useEffect(() => {
-    setIsMounted(true)
-  }, [])
+  const pathname: string = usePathname();
+  const searchParams: ReadonlyURLSearchParams = useSearchParams();
+  const currentParams: Record<string, string> = Object.fromEntries(searchParams.entries());
+  const [isMounted, setIsMounted] = useState<boolean>(false);
 
   const isActiveHref = (href: string): boolean => {
-    const [base, query = ""] = href.split("?")
-    if (!pathname?.endsWith(base)) return false
-    if (!query) return Object.keys(currentParams).length === 0
-    const qp: URLSearchParams = new URLSearchParams(query)
-    if ([...qp.keys()].length !== Object.keys(currentParams).length) return false
-    return [...qp.keys()].every((k: string) => currentParams[k] === qp.get(k))
-  }
+    const [base, query = ""] = href.split("?");
+    if (!pathname?.endsWith(base)) return false;
+    if (!query) return Object.keys(currentParams).length === 0;
+    const qp: URLSearchParams = new URLSearchParams(query);
+    if ([...qp.keys()].length !== Object.keys(currentParams).length) return false;
+    return [...qp.keys()].every((k: string) => currentParams[k] === qp.get(k));
+  };
 
   const isItemTreeActive = (item: MenuItem, isActiveHref: (href: string) => boolean): boolean => {
-    if (isLinkItem(item) && isActiveHref(item.href)) return true
+    if (isLinkItem(item) && isActiveHref(item.href)) return true;
     if ("children" in item && item.children)
-      return item.children.some((child: MenuItem) => isItemTreeActive(child, isActiveHref))
-    return false
-  }
+      return item.children.some((child: MenuItem) => isItemTreeActive(child, isActiveHref));
+    return false;
+  };
 
   const isItemActive: boolean = menuItems.some(
     (menuItem: MenuItem) =>
       ("href" in menuItem && isActiveHref(menuItem.href)) || isItemTreeActive(menuItem, isActiveHref),
-  )
+  );
 
-  const [isAccordionOpen, setAccordionOpen] = useState<boolean>(() => isItemActive)
-
-  useEffect(() => {
-    setAccordionOpen(isItemActive)
-  }, [isItemActive])
+  const [isAccordionOpen, setAccordionOpen] = useState<boolean>(() => isItemActive);
 
   const handleClick = (): void => {
     if (menuItems.length > 0) {
       if (!isExpanded) {
-        onClick?.()
+        onClick?.();
       } else {
-        setAccordionOpen((prev: boolean) => !prev)
+        setAccordionOpen((prev: boolean) => !prev);
       }
     } else {
-      onClick?.()
+      onClick?.();
     }
-  }
+  };
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    setAccordionOpen(isItemActive);
+  }, [isItemActive]);
 
   return (
     <div
@@ -183,5 +183,5 @@ export default function SidebarMenuItem({
         </ul>
       )}
     </div>
-  )
+  );
 }

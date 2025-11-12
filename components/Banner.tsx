@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import { ReactNode } from "react"
-import { Trans } from "@lingui/react/macro"
-import clsx from "clsx/lite"
+import { ReactNode } from "react";
+import { Trans } from "@lingui/react/macro";
+import clsx from "clsx/lite";
 
 export default function Banner(): ReactNode {
   return (
@@ -18,5 +18,5 @@ export default function Banner(): ReactNode {
         </span>
       </div>
     </div>
-  )
+  );
 }

@@ -1,12 +1,12 @@
-"use client"
+"use client";
 
-import { ReactNode } from "react"
-import { Trans } from "@lingui/react/macro"
-import clsx from "clsx/lite"
+import { ReactNode } from "react";
+import { Trans } from "@lingui/react/macro";
+import clsx from "clsx/lite";
 
 export default function SmallScreenWarning(): ReactNode {
-  const width: string = "1275px"
-  const height: string = "768px"
+  const width: string = "1275px";
+  const height: string = "768px";
 
   return (
     <div
@@ -27,5 +27,5 @@ export default function SmallScreenWarning(): ReactNode {
         </Trans>
       </p>
     </div>
-  )
+  );
 }

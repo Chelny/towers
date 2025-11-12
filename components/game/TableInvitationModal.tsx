@@ -1,16 +1,16 @@
-"use client"
+"use client";
 
-import { ChangeEvent, InputEvent, ReactNode, useState } from "react"
-import { Trans, useLingui } from "@lingui/react/macro"
-import Checkbox from "@/components/ui/Checkbox"
-import Input from "@/components/ui/Input"
-import Modal from "@/components/ui/Modal"
-import { SocketEvents } from "@/constants/socket-events"
-import { useSocket } from "@/context/SocketContext"
-import { TableInvitationPlainObject } from "@/server/towers/classes/TableInvitation"
+import { ChangeEvent, InputEvent, ReactNode, useState } from "react";
+import { Trans, useLingui } from "@lingui/react/macro";
+import { RoomLevel, TowersTableInvitationWithRelations } from "db";
+import useSWRMutation from "swr/mutation";
+import Checkbox from "@/components/ui/Checkbox";
+import Input from "@/components/ui/Input";
+import Modal from "@/components/ui/Modal";
+import { fetcher } from "@/lib/fetcher";
 
 type TableInvitationModalProps = {
-  tableInvitation: TableInvitationPlainObject
+  tableInvitation: TowersTableInvitationWithRelations
   onAcceptInvitation: (roomId: string, tableId: string) => void
   onCancel: () => void
 }
@@ -20,49 +20,72 @@ export default function TableInvitationModal({
   onAcceptInvitation,
   onCancel,
 }: TableInvitationModalProps): ReactNode {
-  const { socketRef } = useSocket()
-  const { t } = useLingui()
-  const [reason, setReason] = useState<string | undefined>(undefined)
-  const [declineAll, setDeclineAll] = useState<boolean>(false)
-  const username: string | undefined = tableInvitation.inviterUsername
-  const userRating: number = tableInvitation.inviterRating
-  const tableNumber: number = tableInvitation.tableNumber
-  const ratedOption: string = tableInvitation.tableIsRated ? t({ message: "Rated" }) : t({ message: "Not Rated" })
+  const { t } = useLingui();
+  const [reason, setReason] = useState<string | undefined>(undefined);
+  const [isDeclineAll, setIsDeclineAll] = useState<boolean>(false);
+  const username: string | undefined = tableInvitation.inviterPlayer.user.username;
+  const userRating: number | undefined = tableInvitation.inviterPlayer.stats?.rating;
+  const tableNumber: number | undefined = tableInvitation.table.tableNumber;
+  const ratedOption: string = tableInvitation.table.isRated ? t({ message: "Rated" }) : t({ message: "Not Rated" });
 
-  const handleAcceptInvitation = (): void => {
-    socketRef.current?.emit(SocketEvents.TABLE_INVITATION_ACCEPTED, {
-      roomId: tableInvitation.roomId,
-      tableId: tableInvitation.tableId,
-      inviteeUserId: tableInvitation.inviteeUserId,
-    })
-    onAcceptInvitation(tableInvitation.roomId, tableInvitation.tableId)
-    onCancel?.()
-  }
+  const {
+    error: acceptTableInviteError,
+    trigger: acceptTableInvite,
+    isMutating: isAcceptTableInviteMutating,
+  } = useSWRMutation(
+    `/api/games/towers/tables/${tableInvitation.tableId}/invite/${tableInvitation.id}/accept`,
+    (url: string) => fetcher<TowersTableInvitationWithRelations>(url, { method: "PATCH" }),
+    {
+      onSuccess(response: ApiResponse<TowersTableInvitationWithRelations>) {
+        if (response.success) {
+          const invitation: TowersTableInvitationWithRelations | undefined = response.data;
+          if (invitation) {
+            onAcceptInvitation(invitation.roomId, invitation.tableId);
+            onCancel?.();
+          }
+        }
+      },
+    },
+  );
 
-  const handleDeclineInvitation = (): void => {
-    socketRef.current?.emit(SocketEvents.TABLE_INVITATION_DECLINED, {
-      roomId: tableInvitation.roomId,
-      tableId: tableInvitation.tableId,
-      inviteeUserId: tableInvitation.inviteeUserId,
-      reason,
-    })
-    onCancel?.()
-  }
+  const {
+    error: declineTableInviteError,
+    trigger: declineTableInvite,
+    isMutating: isDeclineTableInviteMutating,
+  } = useSWRMutation(
+    `/api/games/towers/tables/${tableInvitation.tableId}/invite/${tableInvitation.id}/decline`,
+    (url: string, { arg }: { arg: { reason: string | undefined; isDeclineAll: boolean } }) =>
+      fetcher<void>(url, { method: "PATCH", body: JSON.stringify(arg) }),
+    {
+      onSuccess(response: ApiResponse<void>) {
+        if (response.success) {
+          onCancel?.();
+        }
+      },
+    },
+  );
 
   return (
     <Modal
       title={t({ message: "Invited" })}
       confirmText={t({ message: "Accept" })}
       cancelText={t({ message: "Decline" })}
+      isConfirmButtonDisabled={isAcceptTableInviteMutating || isDeclineTableInviteMutating}
       dataTestId="table-invitation"
-      onConfirm={handleAcceptInvitation}
-      onCancel={handleDeclineInvitation}
+      onConfirm={async () => await acceptTableInvite()}
+      onCancel={async () => await declineTableInvite({ reason, isDeclineAll })}
     >
       <div className="flex flex-col gap-4">
         <div>
-          <Trans>
-            {username} ({userRating}) has invited you to table #{tableNumber}.
-          </Trans>
+          {tableInvitation.table.room.level !== RoomLevel.SOCIAL ? (
+            <Trans>
+              {username} ({userRating}) has invited you to table #{tableNumber}.
+            </Trans>
+          ) : (
+            <Trans>
+              {username} has invited you to table #{tableNumber}.
+            </Trans>
+          )}
         </div>
         <div>
           <Trans>Game option: {ratedOption}</Trans>
@@ -75,18 +98,18 @@ export default function TableInvitationModal({
             id="reason"
             label={t({ message: "Reason" })}
             defaultValue={reason}
+            disabled={isAcceptTableInviteMutating || isDeclineTableInviteMutating}
             dataTestId="table-invitation_input-text_reason"
             onInput={(event: InputEvent<HTMLInputElement>) => setReason((event.target as HTMLInputElement).value)}
           />
           <Checkbox
-            id="declineAll"
+            id="isDeclineAll"
             label={t({ message: "Decline All Invitations" })}
-            defaultChecked={declineAll}
-            disabled
-            onChange={(event: ChangeEvent<HTMLInputElement>) => setDeclineAll(event.target.checked)}
+            defaultChecked={isDeclineAll}
+            onChange={(event: ChangeEvent<HTMLInputElement>) => setIsDeclineAll(event.target.checked)}
           />
         </div>
       </div>
     </Modal>
-  )
+  );
 }

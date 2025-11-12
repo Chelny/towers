@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { PropsWithChildren, ReactNode } from "react"
-import clsx from "clsx/lite"
+import { PropsWithChildren, ReactNode } from "react";
+import clsx from "clsx/lite";
 
 type AlertMessageProps = PropsWithChildren<{
   type?: "info" | "warning" | "success" | "error"
@@ -31,5 +31,5 @@ export default function AlertMessage({ children, type }: AlertMessageProps): Rea
     >
       {children}
     </div>
-  )
+  );
 }

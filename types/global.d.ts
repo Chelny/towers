@@ -1,10 +1,10 @@
-import { Static, TSchema } from "@sinclair/typebox"
-import { SupportedLocales } from "@/translations/languages"
+import { Static, TSchema } from "@sinclair/typebox";
+import { SupportedLocales } from "@/translations/languages";
 
 declare global {
   type ApiResponse<T = unknown> = {
     success: boolean
-    message: string
+    message?: string
     data?: T
     error?: string | FormValidationErrors
   }
@@ -23,4 +23,4 @@ declare global {
   type SearchParams = { [key: string]: string | string[] | undefined }
 }
 
-export {}
+export {};

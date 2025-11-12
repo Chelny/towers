@@ -1,15 +1,15 @@
-import { ReactNode } from "react"
-import clsx from "clsx/lite"
+import { ReactNode } from "react";
+import clsx from "clsx/lite";
 
 export default function RoomTableSkeleton(): ReactNode {
   const seatMapping: number[][] = [
     [1, 3, 5, 7],
     [2, 4, 6, 8],
-  ]
+  ];
 
   return (
     <div className="animate-pulse">
-      {Array.from({ length: 10 }).map((_, index: number) => (
+      {Array.from({ length: 50 }).map((_, index: number) => (
         <div key={index} className="flex flex-col mb-4">
           <div className="flex items-center">
             <div className="basis-20 row-span-2 flex justify-center items-center h-full px-2">
@@ -47,13 +47,15 @@ export default function RoomTableSkeleton(): ReactNode {
                 </div>
               </div>
               <div className="flex py-1 text-sm">
-                <div className={clsx("w-16 h-4 me-2 rounded-sm bg-gray-200")} />
-                <div className={clsx("w-24 h-4 rounded-sm bg-gray-200")} />
+                <div
+                  className={clsx("w-16 h-4 me-2 rounded-sm bg-gray-200", "dark:bg-dark-skeleton-content-background")}
+                />
+                <div className={clsx("w-24 h-4 rounded-sm bg-gray-200", "dark:bg-dark-skeleton-content-background")} />
               </div>
             </div>
           </div>
         </div>
       ))}
     </div>
-  )
+  );
 }

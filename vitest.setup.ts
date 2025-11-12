@@ -1,8 +1,8 @@
-import "@testing-library/jest-dom"
-import { screen } from "@testing-library/react"
-import { mockSession } from "@/test/data/session"
-import { mockSocket } from "@/test/data/socket"
-import { getAllByNormalizedText, getByNormalizedText } from "@/test/utils/getByNormalizedText"
+import "@testing-library/jest-dom";
+import { screen } from "@testing-library/react";
+import { mockSession } from "@/test/data/session";
+import { mockSocket } from "@/test/data/socket";
+import { getAllByNormalizedText, getByNormalizedText } from "@/test/utils/getByNormalizedText";
 
 vi.mock("pino", () => ({
   default: () => ({
@@ -11,15 +11,15 @@ vi.mock("pino", () => ({
     warn: vi.fn(),
     error: vi.fn(),
   }),
-}))
+}));
 
 vi.mock("@/context/SocketContext", async () => {
-  const actual = await vi.importActual("@/context/SocketContext")
+  const actual = await vi.importActual("@/context/SocketContext");
   return {
     ...actual,
     useSocket: () => ({ socketRef: mockSocket, isConnected: true, session: mockSession }),
-  }
-})
+  };
+});
 
 Object.defineProperty(window, "matchMedia", {
   writable: true,
@@ -33,7 +33,7 @@ Object.defineProperty(window, "matchMedia", {
     removeListener: vi.fn(),
     dispatchEvent: vi.fn(),
   })),
-})
+});
 
 export const mockUseRouter = {
   back: vi.fn(),
@@ -42,7 +42,7 @@ export const mockUseRouter = {
   push: vi.fn(),
   replace: vi.fn(),
   prefetch: vi.fn(),
-}
+};
 
 export const mockUseSearchParams = {
   get: vi.fn(),
@@ -58,18 +58,18 @@ export const mockUseSearchParams = {
   set: vi.fn(),
   sort: vi.fn(),
   [Symbol.iterator]: vi.fn(),
-}
+};
 
-export const mockFetch = (global.fetch = vi.fn())
+export const mockFetch = (global.fetch = vi.fn());
 
 export const mockFetchResponse = (data: ApiResponse) => {
   return {
     json: () => new Promise((resolve: (value: unknown) => void) => resolve(data)),
-  }
-}
+  };
+};
 
 export const customScreen = {
   ...screen,
   getByNormalizedText,
   getAllByNormalizedText,
-}
+};

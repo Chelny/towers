@@ -5,11 +5,15 @@ export const APP_CONFIG = {
   EMAIL: {
     SUPPORT: "support@towers.dev",
   },
-}
+};
 
-export const COOKIE_PREFIX = "towers"
-export const APP_COOKIES = {
-  LOCALE: `${COOKIE_PREFIX}.locale`,
-  SETTINGS_FORM_STATE: `${COOKIE_PREFIX}.settings_form_state`,
-  THEME: `${COOKIE_PREFIX}.theme`,
-}
+export const APP_PREFIX = "towers";
+
+export const APP_COOKIE_KEYS = {
+  LOCALE: `${APP_PREFIX}.locale`,
+};
+
+export const APP_STORAGE_KEYS = {
+  SETTINGS_FORM_STATE: `${APP_PREFIX}.settings_form_state`,
+  THEME: `${APP_PREFIX}.theme`,
+};

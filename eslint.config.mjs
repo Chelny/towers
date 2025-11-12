@@ -118,7 +118,7 @@ export default [
       ],
 
       "quotes": ["error", "double"],
-      "semi": ["error", "never"],
+      "semi": ["error", "always"],
 
       "sort-imports": [
         "error",

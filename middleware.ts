@@ -1,51 +1,38 @@
-import { NextRequest, NextResponse } from "next/server"
-import { getCookieCache } from "better-auth/cookies"
-import Negotiator from "negotiator"
-import { APP_COOKIES, COOKIE_PREFIX } from "@/constants/app"
-import { PROTECTED_ROUTES, PUBLIC_ROUTES, ROUTE_GAMES, ROUTE_SIGN_IN } from "@/constants/routes"
-import { Session } from "@/lib/auth"
-import { defaultLocale, Language, languages } from "@/translations/languages"
+import { NextRequest, NextResponse } from "next/server";
+import { betterFetch } from "@better-fetch/fetch";
+import { APP_COOKIE_KEYS } from "@/constants/app";
+import { PROTECTED_ROUTES, PUBLIC_ROUTES, ROUTE_GAMES, ROUTE_SIGN_IN } from "@/constants/routes";
+import { Session } from "@/lib/auth";
+import { getCurrentLocale } from "@/lib/locale";
+import { Language, languages } from "@/translations/languages";
 
 export default async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl
-  const host: string | null = request.headers.get("host")
-  const protocol: string = request.headers.get("x-forwarded-proto") || "http"
-  const origin: string = `${protocol}://${host}`
+  const { pathname } = request.nextUrl;
+  const host: string | null = request.headers.get("host");
+  const protocol: string = request.headers.get("x-forwarded-proto") || "http";
+  const origin: string = `${protocol}://${host}`;
 
   // Fetch session
-  const session: Session | null = await getCookieCache(request, { cookiePrefix: COOKIE_PREFIX })
-
-  // Localization
-  const userLocale: string | null | undefined = session?.user?.language
-  const cookieLocale: string | undefined = request.cookies.get(APP_COOKIES.LOCALE)?.value
-  const acceptLocale: string = getAcceptLanguage(request.headers)
-  let locale: string = userLocale || cookieLocale || acceptLocale || defaultLocale
-
-  const pathnameLocale: string = pathname.split("/")[1]
-  const locales: string[] = languages.map((language: Language) => language.locale)
-  const isValidLocale: boolean = locales.includes(pathnameLocale)
-
-  if (!isValidLocale) {
-    // Redirect if there is no locale
-    request.nextUrl.pathname = `/${locale}${pathname}`
-    // e.g. incoming request is /sign-in
-    // The new URL is now /en/sign-in
-    return NextResponse.redirect(request.nextUrl)
-  }
+  const { data: session } = await betterFetch<Session>("/api/auth/get-session", {
+    baseURL: request.nextUrl.origin,
+    headers: {
+      cookie: request.headers.get("cookie") || "",
+    },
+  });
 
   // Access control
   if (session) {
     if (PUBLIC_ROUTES.includes(pathname)) {
-      return NextResponse.redirect(new URL(ROUTE_GAMES.PATH, origin))
+      return NextResponse.redirect(new URL(ROUTE_GAMES.PATH, origin));
     }
   } else {
     if (PROTECTED_ROUTES.includes(pathname)) {
-      return NextResponse.redirect(new URL(ROUTE_SIGN_IN.PATH, origin))
+      return NextResponse.redirect(new URL(ROUTE_SIGN_IN.PATH, origin));
     }
   }
 
   // Content Security Policy (CSP)
-  const nonce: string = Buffer.from(crypto.randomUUID()).toString("base64")
+  const nonce: string = Buffer.from(crypto.randomUUID()).toString("base64");
   const devCspHeader: string = `
     default-src * 'unsafe-inline' 'unsafe-eval' data: blob:;
     script-src * 'unsafe-inline' 'unsafe-eval' data: blob:;
@@ -55,7 +42,7 @@ export default async function middleware(request: NextRequest) {
     font-src * data:;
     object-src *;
     frame-ancestors *;
-  `
+  `;
   const prodCspHeader: string = `
     default-src 'self';
     script-src 'self' 'nonce-${nonce}' 'strict-dynamic';
@@ -68,61 +55,67 @@ export default async function middleware(request: NextRequest) {
     frame-ancestors 'none';
     connect-src 'self' https://www.google-analytics.com;
     upgrade-insecure-requests;
-  `
-  const cspHeader: string = process.env.NODE_ENV === "production" ? prodCspHeader : devCspHeader
-  const contentSecurityPolicyHeader: string = cspHeader.replace(/\s{2,}/g, " ").trim()
+  `;
+  const cspHeader: string = process.env.NODE_ENV === "production" ? prodCspHeader : devCspHeader;
+  const contentSecurityPolicyHeader: string = cspHeader.replace(/\s{2,}/g, " ").trim();
 
-  const requestHeaders: Headers = new Headers(request.headers)
-  requestHeaders.set("Content-Security-Policy", contentSecurityPolicyHeader)
-  requestHeaders.set("x-nonce", nonce)
+  const requestHeaders: Headers = new Headers(request.headers);
+  requestHeaders.set("Content-Security-Policy", contentSecurityPolicyHeader);
+  requestHeaders.set("x-nonce", nonce);
 
   const response: NextResponse = NextResponse.next({
     request: {
       headers: requestHeaders,
     },
-  })
+  });
 
-  response.headers.set("Content-Security-Policy", contentSecurityPolicyHeader)
+  response.headers.set("Content-Security-Policy", contentSecurityPolicyHeader);
 
   // CORS
-  response.headers.set("Access-Control-Allow-Credentials", "true")
-  response.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization")
-  response.headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+  response.headers.set("Access-Control-Allow-Credentials", "true");
+  response.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  response.headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
 
-  const trustedOrigins: string[] = (process.env.TRUSTED_ORIGINS || "").split(",").map((origin) => origin.trim())
+  const trustedOrigins: string[] = (process.env.TRUSTED_ORIGINS || "").split(",").map((origin: string) => origin.trim());
 
   if (origin && trustedOrigins.includes(origin)) {
-    response.headers.set("Access-Control-Allow-Origin", origin)
+    response.headers.set("Access-Control-Allow-Origin", origin);
   } else {
-    response.headers.set("Access-Control-Allow-Origin", trustedOrigins[0] || "*")
+    response.headers.set("Access-Control-Allow-Origin", trustedOrigins[0] || "*");
   }
 
   if (pathname.startsWith("/api/")) {
-    response.headers.set("Content-Type", "application/json")
+    response.headers.set("Content-Type", "application/json");
+  }
+
+  // Localization
+  const cookieLocale: string | undefined = request.cookies.get(APP_COOKIE_KEYS.LOCALE)?.value;
+  const locale: string = getCurrentLocale(request, session);
+
+  const pathnameLocale: string = pathname.split("/")[1];
+  const locales: string[] = languages.map((language: Language) => language.locale);
+  const isValidLocale: boolean = locales.includes(pathnameLocale);
+
+  if (!isValidLocale) {
+    // Redirect if there is no locale
+    request.nextUrl.pathname = `/${locale}${pathname}`;
+    // e.g. incoming request is /sign-in
+    // The new URL is now /en/sign-in
+    return NextResponse.redirect(request.nextUrl);
   }
 
   // Sync locale cookie
   if (pathnameLocale !== cookieLocale) {
     // If the locale in the cookie doesn't match the pathname locale, update the cookie
-    response.cookies.set(APP_COOKIES.LOCALE, pathnameLocale, {
+    response.cookies.set(APP_COOKIE_KEYS.LOCALE, pathnameLocale, {
       httpOnly: true,
       path: "/",
       maxAge: 60 * 60 * 24 * 30, // Cache for 30 days
       secure: process.env.NODE_ENV === "production",
-    })
+    });
   }
 
-  return response
-}
-
-/**
- * Determine the locale from the "accept-language" header or fallback to the default locale.
- */
-function getAcceptLanguage(headers: Headers): string {
-  const acceptLanguage: string | undefined = headers.get("accept-language") || undefined
-  const negotiator: Negotiator = new Negotiator({ headers: { "accept-language": acceptLanguage } })
-  const locales: string[] = languages.map((language: Language) => language.locale)
-  return negotiator.languages(locales.slice())[0]
+  return response;
 }
 
 export const config = {
@@ -131,18 +124,17 @@ export const config = {
       /*
        * Match all request paths except for the ones starting with:
        * - api (API routes)
-       * - _next/static (static files)
-       * - _next/image (image optimization files)
+       * - _next (Next.js internal files, including static, image, and data routes)
        * - favicon.ico, sitemap.xml, robots.txt, manifest.webmanifest (metadata files)
        * - images (.svg, .png, .jpg, .jpeg, .gif, .webp)
        * - videos (.webm)
        */
       source:
-        "/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|manifest.webmanifest|.*\\.(?:svg|png|jpg|jpeg|gif|webp|webm)$).*)",
+        "/((?!api|_next|favicon.ico|sitemap.xml|robots.txt|manifest.webmanifest|.*\\.(?:svg|png|jpg|jpeg|gif|webp|webm)$).*)",
       missing: [
         { type: "header", key: "next-router-prefetch" },
         { type: "header", key: "purpose", value: "prefetch" },
       ],
     },
   ],
-}
+};

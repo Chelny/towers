@@ -1,109 +1,180 @@
-"use client"
+"use client";
 
-import { InputEvent, ReactNode, useEffect, useState } from "react"
-import { ReadonlyURLSearchParams, useRouter, useSearchParams } from "next/navigation"
-import { useLingui } from "@lingui/react/macro"
-import { Duration, formatDuration, intervalToDuration } from "date-fns"
-import Button from "@/components/ui/Button"
-import Checkbox from "@/components/ui/Checkbox"
-import Input from "@/components/ui/Input"
-import Modal from "@/components/ui/Modal"
-import { ROUTE_TOWERS } from "@/constants/routes"
-import { SocketEvents } from "@/constants/socket-events"
-import { useSocket } from "@/context/SocketContext"
-import { UserPlainObject } from "@/server/towers/classes/User"
-import { getDateFnsLocale } from "@/translations/languages"
+import { InputEvent, ReactNode, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Plural, useLingui } from "@lingui/react/macro";
+import { InstantMessageWithRelations, PlayerListWithRelations, UserMute } from "db";
+import useSWR from "swr";
+import useSWRMutation from "swr/mutation";
+import ConversationModal from "@/components/game/ConversationModal";
+import Button from "@/components/ui/Button";
+import Checkbox from "@/components/ui/Checkbox";
+import Input from "@/components/ui/Input";
+import Modal from "@/components/ui/Modal";
+import { ROUTE_TOWERS } from "@/constants/routes";
+import { SocketEvents } from "@/constants/socket-events";
+import { useModal } from "@/context/ModalContext";
+import { useSocket } from "@/context/SocketContext";
+import { fetcher } from "@/lib/fetcher";
 
 type PlayerInformationModalProps = {
-  roomId: string
-  currentUser?: UserPlainObject
-  player?: UserPlainObject
+  player?: PlayerListWithRelations
   isRatingsVisible?: boolean | null
   onCancel: () => void
 }
 
 export default function PlayerInformationModal({
-  roomId,
-  currentUser,
   player,
   isRatingsVisible = false,
   onCancel,
 }: PlayerInformationModalProps): ReactNode {
-  const searchParams: ReadonlyURLSearchParams = useSearchParams()
-  const { socketRef, session } = useSocket()
-  const { i18n, t } = useLingui()
-  const router = useRouter()
-  const [isCurrentUser, setIsCurrentUser] = useState<boolean>(false)
-  const [message, setMessage] = useState<string | undefined>(undefined)
-  const [watchUserAtTable, setWatchUserAtTable] = useState<string | null>(null)
-  const [idleTime, setIdleTime] = useState<string | undefined>(undefined)
-  const username: string | null | undefined = player?.user?.username
-  const rating: number | undefined = player?.stats.rating
-  const gamesCompleted: number | undefined = player?.stats.gamesCompleted
-  const wins: number | undefined = player?.stats.wins
-  const loses: number | undefined = player?.stats.loses
-  const streak: number | undefined = player?.stats.streak
+  const { socketRef, isConnected, session } = useSocket();
+  const { t } = useLingui();
+  const router = useRouter();
+  const { openModal } = useModal();
+  const [isCurrentUser, setIsCurrentUser] = useState<boolean>(false);
+  const [message, setMessage] = useState<string | undefined>(undefined);
+  const [targetNetDelay, setTargetNetDelay] = useState<number | null>(null);
+  const [myNetDelay, setMyNetDelay] = useState<number | null>(null);
+  const [watchUserAtTable, setWatchUserAtTable] = useState<string | null>(null);
+  const [idleTime, setIdleTime] = useState<number | null>(null);
+  const username: string | null | undefined = player?.user?.username;
+  const rating: number | undefined = player?.stats?.rating;
+  const gamesCompleted: number | undefined = player?.stats?.gamesCompleted;
+  const wins: number | undefined = player?.stats?.wins;
+  const losses: number | undefined = player?.stats?.losses;
+  const streak: number | undefined = player?.stats?.streak;
 
-  const handleSendMessage = (): void => {
-    socketRef.current?.emit(
-      SocketEvents.INSTANT_MESSAGE_SENT,
-      { roomId: searchParams?.get("room"), recipientUserId: player?.user?.id, message },
-      (response: { success: boolean; message: string }) => {
-        if (response.success) {
-          onCancel?.()
+  const {
+    error: sendInstantMessageError,
+    trigger: sendInstantMessage,
+    isMutating: isInstantMessageMutating,
+  } = useSWRMutation(
+    "/api/conversations/messages",
+    (url: string, { arg }: { arg: { recipientId: string; text: string } }) =>
+      fetcher<InstantMessageWithRelations>(url, { method: "POST", body: JSON.stringify(arg) }),
+    {
+      onSuccess(response: ApiResponse<InstantMessageWithRelations>) {
+        if (response.success && response.data) {
+          onCancel?.();
+          openModal(ConversationModal, { id: response.data.conversationId });
         }
       },
-    )
-  }
+    },
+  );
 
-  const handleMuteUser = (): void => {
-    socketRef.current?.emit(SocketEvents.USER_MUTE, { userId: player?.user?.id })
-  }
+  const {
+    data: canWatchUserAtTableResponse,
+    mutate: canWatchUserAtTable,
+    isLoading: isLoadingCanWatchUserAtTable,
+  } = useSWR<ApiResponse<{ roomId: string; tableId: string }>>(
+    `/api/games/towers/players/${player?.id}/can-watch-at-table`,
+    fetcher,
+    {
+      shouldRetryOnError: false,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+    },
+  );
+
+  const {
+    error: toggleMuteUserError,
+    trigger: toggleMuteUser,
+    isMutating: isToggleMuteUserMutating,
+  } = useSWRMutation("/api/users/mutes", (url: string, { arg }: { arg: { mutedUserId: string | undefined } }) =>
+    fetcher<void>(url, { method: "PATCH", body: JSON.stringify(arg) }),
+  );
+
+  useEffect(() => {
+    if (!player?.id || !session?.user?.id || isCurrentUser) return;
+    setIsCurrentUser(player?.id === session?.user?.id);
+    canWatchUserAtTable();
+  }, [player?.id, session?.user?.id]);
+
+  useEffect(() => {
+    if (!player?.lastActiveAt) return;
+
+    const lastActiveAt: number = new Date(player?.lastActiveAt).getTime();
+    const idleMs: number = Date.now() - lastActiveAt;
+    const idleSeconds: number = Number((idleMs / 1000).toFixed(2));
+
+    setIdleTime(idleSeconds);
+  }, [player?.lastActiveAt]);
+
+  useEffect(() => {
+    if (canWatchUserAtTableResponse?.data) {
+      const roomId: string = canWatchUserAtTableResponse?.data.roomId;
+      const tableId: string = canWatchUserAtTableResponse?.data.tableId;
+      setWatchUserAtTable(`${ROUTE_TOWERS.PATH}?room=${roomId}&table=${tableId}`);
+    } else {
+      setWatchUserAtTable(null);
+    }
+  }, [canWatchUserAtTableResponse?.data]);
+
+  useEffect(() => {
+    if (!socketRef.current) return;
+
+    const handlePlayerJoin = (): void => {
+      canWatchUserAtTable();
+    };
+
+    const handlePlayerLeave = (): void => {
+      canWatchUserAtTable();
+    };
+
+    // TODO: Listen to when user is playing and when they're not
+    socketRef.current?.on(SocketEvents.TABLE_PLAYER_JOINED, handlePlayerJoin);
+    socketRef.current?.on(SocketEvents.TABLE_PLAYER_LEFT, handlePlayerLeave);
+
+    return () => {
+      socketRef.current?.off(SocketEvents.TABLE_PLAYER_JOINED, handlePlayerJoin);
+      socketRef.current?.off(SocketEvents.TABLE_PLAYER_LEFT, handlePlayerLeave);
+    };
+  }, [isConnected]);
+
+  const handleSendMessage = async (): Promise<void> => {
+    const text: string | undefined = message?.trim();
+
+    if (player?.id && text && text !== "") {
+      await sendInstantMessage({ recipientId: player?.id, text });
+    }
+  };
+
+  const handleMuteUser = async (): Promise<void> => {
+    await toggleMuteUser({ mutedUserId: player?.id });
+  };
 
   const handleWatch = (): void => {
     if (watchUserAtTable) {
-      router.push(watchUserAtTable)
+      router.push(watchUserAtTable);
     }
 
-    onCancel?.()
-  }
+    onCancel?.();
+  };
 
   const handlePing = (): void => {
-    socketRef.current?.emit(SocketEvents.USER_PING, { roomId, userId: player?.user?.id })
-  }
+    if (!socketRef.current || !player?.id) return;
 
-  useEffect(() => {
-    setIsCurrentUser(player?.user?.id === session?.user?.id)
-  }, [player, session])
-
-  useEffect(() => {
-    if (!player?.user?.id || !session?.user?.id || isCurrentUser) return
+    const startTime: number = Date.now();
 
     socketRef.current?.emit(
-      SocketEvents.GAME_WATCH_USER_AT_TABLE,
-      { roomId, userId: player.user.id },
-      (response: { success: boolean; message: string; data: { roomId: string; tableId: string } }) => {
+      SocketEvents.PING_REQUEST,
+      { userId: player?.id },
+      (response: { success: boolean; message: string; data: { roundTrip?: number } }) => {
         if (response.success) {
-          setWatchUserAtTable(`${ROUTE_TOWERS.PATH}?room=${response?.data?.roomId}&table=${response?.data?.tableId}`)
-        } else {
-          setWatchUserAtTable(null)
+          const myDelayMs: number = Date.now() - startTime;
+          const targetDelayMs: number = response.data.roundTrip ?? 0;
+
+          // Convert to seconds
+          const myDelaySeconds: number = Number((myDelayMs / 1000).toFixed(2));
+          const targetDelaySeconds: number = Number((targetDelayMs / 1000).toFixed(2));
+
+          setMyNetDelay(myDelaySeconds);
+          setTargetNetDelay(targetDelaySeconds);
         }
       },
-    )
-  }, [player?.user?.id, session?.user?.id])
-
-  useEffect(() => {
-    if (player?.lastActiveAt) {
-      const lastActiveAt: Date = new Date(player.lastActiveAt)
-      const duration: Duration = intervalToDuration({ start: lastActiveAt, end: new Date() })
-      const formattedIdleTime: string = formatDuration(duration, {
-        locale: getDateFnsLocale(i18n.locale),
-        format: ["hours", "minutes", "seconds"],
-      })
-
-      setIdleTime(formattedIdleTime)
-    }
-  }, [player?.lastActiveAt])
+    );
+  };
 
   return (
     <Modal
@@ -118,7 +189,7 @@ export default function PlayerInformationModal({
             {t({ message: `Rating: ${rating}` })} <br />
             {t({ message: `Games Completed: ${gamesCompleted}` })} <br />
             {t({ message: `Wins: ${wins}` })} <br />
-            {t({ message: `Loses: ${loses}` })} <br />
+            {t({ message: `Losses: ${losses}` })} <br />
             {t({ message: `Streak: ${streak}` })} <br />
           </div>
         )}
@@ -128,36 +199,73 @@ export default function PlayerInformationModal({
             label={t({ message: "Send instant message" })}
             defaultValue={message}
             inlineButtonText={t({ message: "Send" })}
+            disabled={isInstantMessageMutating}
+            dataTestId="player-information_input-text_message"
             onInput={(event: InputEvent<HTMLInputElement>) => setMessage((event.target as HTMLInputElement).value)}
             onInlineButtonClick={handleSendMessage}
           />
         )}
-        <div className="mb-2">{t({ message: `Idle Time: ${idleTime}` })}</div>
-        <div className="flex items-center gap-4">
+        <div>
+          <Plural
+            value={idleTime}
+            zero={`Idle time: ${idleTime} seconds.`}
+            one={`Idle time: ${idleTime} second.`}
+            other={`Idle time: ${idleTime} seconds.`}
+          />
+        </div>
+        <div className="flex flex-col gap-2">
           {!isCurrentUser && (
-            <>
+            <div className="flex items-center gap-2">
+              <div className="w-fit">
+                <Button
+                  className="w-auto whitespace-nowrap"
+                  dataTestId="player-information_button_ping"
+                  onClick={handlePing}
+                >
+                  {t({ message: "Ping" })}
+                </Button>
+              </div>
+              {targetNetDelay !== null && myNetDelay !== null && (
+                <div className="text-sm">
+                  <Plural
+                    value={targetNetDelay}
+                    zero={`${username}’s net delay: ${targetNetDelay} seconds.`}
+                    one={`${username}’s net delay: ${targetNetDelay} second.`}
+                    other={`${username}’s net delay: ${targetNetDelay} seconds.`}
+                  />
+                  <br />
+                  <Plural
+                    value={myNetDelay}
+                    zero={`My net delay: ${myNetDelay} seconds.`}
+                    one={`My net delay: ${myNetDelay} second.`}
+                    other={`My net delay: ${myNetDelay} seconds.`}
+                  />
+                </div>
+              )}
+            </div>
+          )}
+          <div className="flex justify-between items-center">
+            {!isCurrentUser && (
               <div className="w-fit -mb-4">
                 <Checkbox
                   id="muteUser"
                   label={t({ message: "Ignore" })}
-                  defaultChecked={currentUser?.mute?.mutedUsers?.some(
-                    (mutedUser: { userId: string }) => mutedUser.userId === player?.user?.id,
+                  defaultChecked={player?.user?.mutedUsers?.some(
+                    (mutedUser: UserMute) => mutedUser.mutedUserId === player?.id,
                   )}
+                  disabled={isToggleMuteUserMutating}
                   onChange={handleMuteUser}
                 />
               </div>
-              <Button className="w-fit" dataTestId="player-information_button_ping" onClick={handlePing}>
-                {t({ message: "Ping" })}
+            )}
+            {!isLoadingCanWatchUserAtTable && watchUserAtTable && (
+              <Button className="w-fit" dataTestId="player-information_button_watch" onClick={handleWatch}>
+                {t({ message: "Watch" })}
               </Button>
-            </>
-          )}
-          {watchUserAtTable && (
-            <Button className="w-fit" dataTestId="player-information_button_watch" onClick={handleWatch}>
-              {t({ message: "Watch" })}
-            </Button>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </Modal>
-  )
+  );
 }
