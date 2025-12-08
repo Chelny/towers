@@ -1,8 +1,8 @@
-import { PropsWithChildren, ReactNode } from "react"
-import Image from "next/image"
-import { APP_CONFIG } from "@/constants/app"
+import { PropsWithChildren, ReactNode } from "react";
+import Image from "next/image";
+import { APP_CONFIG } from "@/constants/app";
 
-type LegalLayoutProps = PropsWithChildren<{}>
+type LegalLayoutProps = PropsWithChildren<{}>;
 
 export default function LegalLayout({ children }: LegalLayoutProps): ReactNode {
   return (
@@ -13,5 +13,5 @@ export default function LegalLayout({ children }: LegalLayoutProps): ReactNode {
       </div>
       <div className="container mx-auto px-4 py-8">{children}</div>
     </div>
-  )
+  );
 }

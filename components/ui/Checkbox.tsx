@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import { ChangeEvent, ReactNode, useEffect } from "react"
-import { useState } from "react"
-import clsx from "clsx/lite"
-import { TiTick } from "react-icons/ti"
+import { ChangeEvent, ReactNode, useEffect } from "react";
+import { useState } from "react";
+import clsx from "clsx/lite";
+import { TiTick } from "react-icons/ti";
 
 type CheckboxProps = {
   id: string
@@ -15,7 +15,7 @@ type CheckboxProps = {
   errorMessage?: string
   isNoBottomSpace?: boolean
   onChange?: (_: ChangeEvent<HTMLInputElement>) => void
-}
+};
 
 export default function Checkbox({
   id,
@@ -28,16 +28,16 @@ export default function Checkbox({
   isNoBottomSpace = false,
   onChange,
 }: CheckboxProps): ReactNode {
-  const [checked, setChecked] = useState<boolean>(defaultChecked)
+  const [checked, setChecked] = useState<boolean>(defaultChecked);
 
   useEffect(() => {
-    setChecked(defaultChecked)
-  }, [defaultChecked])
+    setChecked(defaultChecked);
+  }, [defaultChecked]);
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
-    setChecked(event.target.checked)
-    onChange?.(event)
-  }
+    setChecked(event.target.checked);
+    onChange?.(event);
+  };
 
   return (
     <div className={clsx("w-full", isNoBottomSpace ? "mb-0" : "mb-4")}>
@@ -85,5 +85,5 @@ export default function Checkbox({
         </span>
       )}
     </div>
-  )
+  );
 }

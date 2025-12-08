@@ -1,17 +1,17 @@
-"use client"
+"use client";
 
-import { ReactNode, useEffect, useRef, useState } from "react"
-import Image from "next/image"
-import { useLingui } from "@lingui/react/macro"
-import clsx from "clsx"
-import { FaLeftLong } from "react-icons/fa6"
-import DefenseBlock from "@/components/towers/DefenseBlock"
-import RegularBlock from "@/components/towers/RegularBlock"
-import Button from "@/components/ui/Button"
-import { BOARD_COLS } from "@/constants/game"
-import { TablePanelView } from "@/enums/table-panel-view"
-import { TowersBlockLetter } from "@/server/towers/classes/PieceBlock"
-import { padBoardToMaxCells, splitIntoColumns } from "@/utils/array-utils"
+import { ReactNode, useEffect, useRef, useState } from "react";
+import Image from "next/image";
+import { useLingui } from "@lingui/react/macro";
+import clsx from "clsx";
+import { FaLeftLong } from "react-icons/fa6";
+import DefenseBlock from "@/components/towers/DefenseBlock";
+import RegularBlock from "@/components/towers/RegularBlock";
+import Button from "@/components/ui/Button";
+import { BOARD_COLS } from "@/constants/game";
+import { TablePanelView } from "@/enums/table-panel-view";
+import { TowersBlockLetter } from "@/server/towers/game/PieceBlock";
+import { padBoardToMaxCells, splitIntoColumns } from "@/utils/array";
 
 interface PieceBlockPosition {
   x: number
@@ -72,7 +72,7 @@ const DEFAULT_ATTACK_BOARD = padBoardToMaxCells([
   "purple",
   "orange",
   "yellow",
-])
+]);
 
 const DEFAULT_DEFENSE_BOARD = padBoardToMaxCells([
   "",
@@ -129,16 +129,16 @@ const DEFAULT_DEFENSE_BOARD = padBoardToMaxCells([
   "purple",
   "orange",
   "purple",
-])
+]);
 
 export default function TableGameDemoPanel({ nextGameCountdown, onChangeView }: TableChangeKeysPanelProps): ReactNode {
-  const { i18n, t } = useLingui()
-  const videoRef = useRef<HTMLVideoElement | null>(null)
-  const [isVideoPaused, setIsVideoPaused] = useState<boolean>(false)
-  const [letters, setLetters] = useState<TowersBlockLetter[]>(["W", "E", "S"])
-  const [position, setPosition] = useState<PieceBlockPosition>({ x: 28, y: 28 })
-  const [arrowPressed, setArrowPressed] = useState<string | null>(null)
-  const randomArrow: string[] = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowUp", "ArrowUp", "ArrowDown", "center"]
+  const { i18n, t } = useLingui();
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [isVideoPaused, setIsVideoPaused] = useState<boolean>(false);
+  const [letters, setLetters] = useState<TowersBlockLetter[]>(["W", "E", "S"]);
+  const [position, setPosition] = useState<PieceBlockPosition>({ x: 28, y: 28 });
+  const [arrowPressed, setArrowPressed] = useState<string | null>(null);
+  const randomArrow: string[] = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowUp", "ArrowUp", "ArrowDown", "center"];
   const powerBlocks: PowerBlockDemo[] = [
     { letter: "T", attackLabel: t({ message: "Add Row" }), defenseLabel: t({ message: "Remove Row" }) },
     { letter: "O", attackLabel: t({ message: "Dither" }), defenseLabel: t({ message: "Clump" }) },
@@ -146,85 +146,85 @@ export default function TableGameDemoPanel({ nextGameCountdown, onChangeView }: 
     { letter: "E", attackLabel: t({ message: "Defuse" }), defenseLabel: t({ message: "Color Blast" }) },
     { letter: "R", attackLabel: t({ message: "Medusa Piece" }), defenseLabel: t({ message: "Midas Piece" }) },
     { letter: "S", attackLabel: t({ message: "Remove Powers" }), defenseLabel: t({ message: "Remove Color" }) },
-  ]
-  const powerColumns: PowerBlockDemo[][] = splitIntoColumns<PowerBlockDemo>(powerBlocks, 3)
-  const [visibleBlockPowerType, setVisibleBlockPowerType] = useState<"attack" | "defense">("attack")
-  const [visiblePowerBlocks, setVisiblePowerBlocks] = useState<PowerBlockDemo[]>([])
-  const [activePowerBlockIndex, setActivePowerBlockIndex] = useState<number | null>(null)
-  const [isSpaceBarPressed, setIsSpaceBarPressed] = useState<boolean>(false)
-  const [attackBoard, setAttackBoard] = useState<string[]>(DEFAULT_ATTACK_BOARD)
-  const [defenseBoard, setDefenseBoard] = useState<string[]>(DEFAULT_DEFENSE_BOARD)
+  ];
+  const powerColumns: PowerBlockDemo[][] = splitIntoColumns<PowerBlockDemo>(powerBlocks, 3);
+  const [visibleBlockPowerType, setVisibleBlockPowerType] = useState<"attack" | "defense">("attack");
+  const [visiblePowerBlocks, setVisiblePowerBlocks] = useState<PowerBlockDemo[]>([]);
+  const [activePowerBlockIndex, setActivePowerBlockIndex] = useState<number | null>(null);
+  const [isSpaceBarPressed, setIsSpaceBarPressed] = useState<boolean>(false);
+  const [attackBoard, setAttackBoard] = useState<string[]>(DEFAULT_ATTACK_BOARD);
+  const [defenseBoard, setDefenseBoard] = useState<string[]>(DEFAULT_DEFENSE_BOARD);
 
   const startVideo = (): void => {
     if (videoRef.current) {
-      videoRef.current.play()
-      setIsVideoPaused(false)
+      videoRef.current.play();
+      setIsVideoPaused(false);
     }
-  }
+  };
 
   const pauseVideo = (): void => {
     if (videoRef.current) {
-      videoRef.current.pause()
-      setIsVideoPaused(true)
+      videoRef.current.pause();
+      setIsVideoPaused(true);
     }
-  }
+  };
 
   const handleDemoVideo = (): void => {
     if (isVideoPaused) {
-      startVideo()
+      startVideo();
     } else {
-      pauseVideo()
+      pauseVideo();
     }
-  }
+  };
 
   const handleVideoEnded = (): void => {
-    setIsVideoPaused(true)
+    setIsVideoPaused(true);
     setTimeout(() => {
       if (videoRef.current) {
-        videoRef.current.currentTime = 0
-        videoRef.current.play()
-        setIsVideoPaused(false)
+        videoRef.current.currentTime = 0;
+        videoRef.current.play();
+        setIsVideoPaused(false);
       }
-    }, 3000)
-  }
+    }, 3000);
+  };
 
   const handleKeyClick = (key: string): void => {
-    setArrowPressed(key)
+    setArrowPressed(key);
 
     switch (key) {
       case "ArrowUp":
-        setPosition({ x: 28, y: -14 })
+        setPosition({ x: 28, y: -14 });
         setLetters((prev: TowersBlockLetter[]) => {
-          const rotated: TowersBlockLetter[] = [...prev]
-          const firstLetter: TowersBlockLetter = rotated.shift()!
-          rotated.push(firstLetter)
-          return rotated
-        })
-        break
+          const rotated: TowersBlockLetter[] = [...prev];
+          const firstLetter: TowersBlockLetter = rotated.shift()!;
+          rotated.push(firstLetter);
+          return rotated;
+        });
+        break;
       case "ArrowDown":
-        setPosition({ x: 28, y: 70 })
-        break
+        setPosition({ x: 28, y: 70 });
+        break;
       case "ArrowLeft":
-        setPosition({ x: 0, y: 28 })
-        break
+        setPosition({ x: 0, y: 28 });
+        break;
       case "ArrowRight":
-        setPosition({ x: 56, y: 28 })
-        break
+        setPosition({ x: 56, y: 28 });
+        break;
       default:
-        setPosition({ x: 28, y: 28 })
-        break
+        setPosition({ x: 28, y: 28 });
+        break;
     }
 
-    setTimeout(() => setArrowPressed(null), 200)
-  }
+    setTimeout(() => setArrowPressed(null), 200);
+  };
 
   const keyboardKeyClasses = (key: string): string =>
     `overflow-hidden flex w-10 h-10 pl-0.5 border-t-4 border-t-[#D6D7BD] border-r-4 border-r-[#D6D7BD] border-b-4 border-b-[#5E4511] border-l-4 border-l-[#5E4511] rounded-xs ring-1 ring-black shadow-sm bg-[#ECE3D7] text-black font-medium line-clamp-1 transition-transform duration-100 ${
       arrowPressed === key || (key === "Space" && isSpaceBarPressed) ? "scale-90 bg-[#A1978A]" : ""
-    }`
+    }`;
 
   const powerBarClasses: string =
-    "flex flex-col-reverse w-5 h-full p-0.5 border border-gray-200 mb-2 bg-neutral-600 dark:border-slate-500 dark:bg-slate-600"
+    "flex flex-col-reverse w-5 h-full p-0.5 border border-gray-200 mb-2 bg-neutral-600 dark:border-slate-500 dark:bg-slate-600";
 
   const renderRegularBlock = ({ letter }: { letter: TowersBlockLetter }): ReactNode => (
     <div
@@ -232,7 +232,7 @@ export default function TableGameDemoPanel({ nextGameCountdown, onChangeView }: 
     >
       <RegularBlock letter={letter} />
     </div>
-  )
+  );
 
   const renderAttackBlock = ({ letter, attackLabel, defenseLabel }: PowerBlockDemo): ReactNode => (
     <li key={letter} className="flex items-center gap-2">
@@ -243,92 +243,92 @@ export default function TableGameDemoPanel({ nextGameCountdown, onChangeView }: 
       </div>
       <span>{visibleBlockPowerType === "defense" ? defenseLabel : attackLabel}</span>
     </li>
-  )
+  );
 
   useEffect(() => {
-    startVideo()
-  }, [])
+    startVideo();
+  }, []);
 
   useEffect(() => {
-    setPosition({ x: 28, y: 28 })
+    setPosition({ x: 28, y: 28 });
 
-    let index: number = 0
+    let index: number = 0;
 
     const interval: NodeJS.Timeout = setInterval(() => {
-      const currentArrow: string = randomArrow[index]
+      const currentArrow: string = randomArrow[index];
 
-      handleKeyClick(currentArrow)
-      index++
+      handleKeyClick(currentArrow);
+      index++;
 
       if (index >= randomArrow.length) {
-        index = 0
+        index = 0;
       }
-    }, 1500)
+    }, 1500);
 
-    return () => clearInterval(interval)
-  }, [])
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
-    let index: number = 0
-    let isPaused: boolean = false
-    let interval: NodeJS.Timeout
-    let spacebarTimer: NodeJS.Timeout
-    let pauseTimer: NodeJS.Timeout
+    let index: number = 0;
+    let isPaused: boolean = false;
+    let interval: NodeJS.Timeout;
+    let spacebarTimer: NodeJS.Timeout;
+    let pauseTimer: NodeJS.Timeout;
 
     const tick = () => {
-      if (isPaused) return
+      if (isPaused) return;
 
-      setActivePowerBlockIndex(index)
+      setActivePowerBlockIndex(index);
 
       // Show all blocks from bottom up to current index
-      setVisiblePowerBlocks(powerBlocks.slice(index))
+      setVisiblePowerBlocks(powerBlocks.slice(index));
 
       spacebarTimer = setTimeout(() => {
-        setIsSpaceBarPressed(true)
-        setTimeout(() => setIsSpaceBarPressed(false), 200)
-      }, 1500)
+        setIsSpaceBarPressed(true);
+        setTimeout(() => setIsSpaceBarPressed(false), 200);
+      }, 1500);
 
-      const isLastBlock: boolean = index === powerBlocks.length - 1
+      const isLastBlock: boolean = index === powerBlocks.length - 1;
 
       if (isLastBlock) {
-        isPaused = true
+        isPaused = true;
 
         pauseTimer = setTimeout(() => {
           // Switch block type and reset
           setVisibleBlockPowerType((prev: "attack" | "defense") => {
             if (prev === "defense") {
-              setAttackBoard(DEFAULT_ATTACK_BOARD)
-              setDefenseBoard(DEFAULT_DEFENSE_BOARD)
-              return "attack"
+              setAttackBoard(DEFAULT_ATTACK_BOARD);
+              setDefenseBoard(DEFAULT_DEFENSE_BOARD);
+              return "attack";
             }
 
-            return "defense"
-          })
+            return "defense";
+          });
 
-          setActivePowerBlockIndex(null)
-          setVisiblePowerBlocks([])
-          index = 0
-          isPaused = false
-        }, 3000)
+          setActivePowerBlockIndex(null);
+          setVisiblePowerBlocks([]);
+          index = 0;
+          isPaused = false;
+        }, 3000);
       } else {
-        index++
+        index++;
       }
-    }
+    };
 
-    interval = setInterval(tick, 5000)
-    tick()
+    interval = setInterval(tick, 5000);
+    tick();
 
     return () => {
-      clearInterval(interval)
-      clearTimeout(spacebarTimer)
-      clearTimeout(pauseTimer)
-    }
-  }, [])
+      clearInterval(interval);
+      clearTimeout(spacebarTimer);
+      clearTimeout(pauseTimer);
+    };
+  }, []);
 
   useEffect(() => {
-    if (activePowerBlockIndex === null || !isSpaceBarPressed) return
+    if (activePowerBlockIndex === null || !isSpaceBarPressed) return;
 
-    const letter: TowersBlockLetter = powerBlocks[activePowerBlockIndex].letter
+    const letter: TowersBlockLetter = powerBlocks[activePowerBlockIndex].letter;
 
     if (letter === "T") {
       if (visibleBlockPowerType === "defense") {
@@ -336,144 +336,144 @@ export default function TableGameDemoPanel({ nextGameCountdown, onChangeView }: 
           Array(BOARD_COLS)
             .fill(null)
             .concat(prev.slice(0, prev.length - BOARD_COLS)),
-        )
+        );
       } else {
-        setAttackBoard((prev) => prev.concat(["blue", "purple", "green", "orange", "yellow", "gray"]).slice(BOARD_COLS))
+        setAttackBoard((prev) => prev.concat(["blue", "purple", "green", "orange", "yellow", "gray"]).slice(BOARD_COLS));
       }
     } else if (letter === "O") {
       if (visibleBlockPowerType === "defense") {
         setDefenseBoard((prev) => {
-          const board: string[] = [...prev]
+          const board: string[] = [...prev];
 
-          board[board.length - 19] = "orange"
-          board[board.length - 21] = "blue"
-          board[board.length - 30] = "yellow"
+          board[board.length - 19] = "orange";
+          board[board.length - 21] = "blue";
+          board[board.length - 30] = "yellow";
 
-          return board
-        })
+          return board;
+        });
       } else {
         setAttackBoard((prev) => {
-          const board: string[] = [...prev]
+          const board: string[] = [...prev];
 
-          board[board.length - 2] = "green"
-          board[board.length - 11] = "orange"
-          board[board.length - 20] = "yellow"
+          board[board.length - 2] = "green";
+          board[board.length - 11] = "orange";
+          board[board.length - 20] = "yellow";
 
-          return board
-        })
+          return board;
+        });
       }
     } else if (letter === "W") {
       if (visibleBlockPowerType === "defense") {
         setDefenseBoard((prev) => {
-          const board: string[] = [...prev]
+          const board: string[] = [...prev];
 
-          board[board.length - 10] = "medusa"
-          board[board.length - 16] = "blue"
+          board[board.length - 10] = "medusa";
+          board[board.length - 16] = "blue";
 
-          board[board.length - 5] = "medusa"
-          board[board.length - 11] = "gray"
-          board[board.length - 17] = "yellow"
-          board[board.length - 23] = "gray"
-          board[board.length - 29] = "green"
+          board[board.length - 5] = "medusa";
+          board[board.length - 11] = "gray";
+          board[board.length - 17] = "yellow";
+          board[board.length - 23] = "gray";
+          board[board.length - 29] = "green";
 
-          return board
-        })
+          return board;
+        });
       } else {
         setAttackBoard((prev) => {
-          const board: string[] = [...prev]
+          const board: string[] = [...prev];
 
-          board[board.length - 6] = "medusa"
-          board[board.length - 13] = "medusa"
-          board[board.length - 24] = "medusa"
+          board[board.length - 6] = "medusa";
+          board[board.length - 13] = "medusa";
+          board[board.length - 24] = "medusa";
 
-          return board
-        })
+          return board;
+        });
       }
     } else if (letter === "E") {
       if (visibleBlockPowerType === "defense") {
         setDefenseBoard((prev) => {
-          const board: string[] = [...prev]
+          const board: string[] = [...prev];
 
-          board[board.length - 19] = "purple"
-          board[board.length - 20] = "purple"
-          board[board.length - 21] = "purple"
-          board[board.length - 25] = "purple"
-          board[board.length - 26] = "purple"
-          board[board.length - 27] = "purple"
-          board[board.length - 32] = "purple"
+          board[board.length - 19] = "purple";
+          board[board.length - 20] = "purple";
+          board[board.length - 21] = "purple";
+          board[board.length - 25] = "purple";
+          board[board.length - 26] = "purple";
+          board[board.length - 27] = "purple";
+          board[board.length - 32] = "purple";
 
-          return board
-        })
+          return board;
+        });
       } else {
         setAttackBoard((prev) => {
-          const board: string[] = [...prev]
+          const board: string[] = [...prev];
 
-          board[board.length - 9] = "medusa"
-          board[board.length - 27] = "medusa"
-          board[board.length - 31] = "medusa"
-          board[board.length - 37] = "medusa"
+          board[board.length - 9] = "medusa";
+          board[board.length - 27] = "medusa";
+          board[board.length - 31] = "medusa";
+          board[board.length - 37] = "medusa";
 
-          return board
-        })
+          return board;
+        });
       }
     } else if (letter === "R") {
       if (visibleBlockPowerType === "defense") {
         setDefenseBoard((prev) => {
-          const board: string[] = [...prev]
+          const board: string[] = [...prev];
 
-          board[board.length - 19] = "green"
-          board[board.length - 20] = ""
-          board[board.length - 21] = ""
-          board[board.length - 25] = ""
-          board[board.length - 26] = ""
-          board[board.length - 27] = ""
-          board[board.length - 32] = ""
-          board[board.length - 38] = ""
-          board[board.length - 43] = ""
-          board[board.length - 44] = ""
+          board[board.length - 19] = "green";
+          board[board.length - 20] = "";
+          board[board.length - 21] = "";
+          board[board.length - 25] = "";
+          board[board.length - 26] = "";
+          board[board.length - 27] = "";
+          board[board.length - 32] = "";
+          board[board.length - 38] = "";
+          board[board.length - 43] = "";
+          board[board.length - 44] = "";
 
-          board[board.length - 29] = "yellow"
-          board[board.length - 30] = "yellow"
-          board[board.length - 36] = "yellow"
-          board[board.length - 42] = "yellow"
+          board[board.length - 29] = "yellow";
+          board[board.length - 30] = "yellow";
+          board[board.length - 36] = "yellow";
+          board[board.length - 42] = "yellow";
 
-          return board
-        })
+          return board;
+        });
       } else {
         setAttackBoard((prev) => {
-          const board: string[] = [...prev]
+          const board: string[] = [...prev];
 
-          board[board.length - 44] = "medusa"
+          board[board.length - 44] = "medusa";
 
-          return board
-        })
+          return board;
+        });
       }
     } else if (letter === "S") {
       if (visibleBlockPowerType === "defense") {
         setDefenseBoard((prev) => {
-          const board: string[] = [...prev]
+          const board: string[] = [...prev];
 
-          board[board.length - 24] = ""
-          board[board.length - 28] = ""
-          board[board.length - 29] = ""
-          board[board.length - 30] = ""
-          board[board.length - 36] = ""
-          board[board.length - 42] = ""
+          board[board.length - 24] = "";
+          board[board.length - 28] = "";
+          board[board.length - 29] = "";
+          board[board.length - 30] = "";
+          board[board.length - 36] = "";
+          board[board.length - 42] = "";
 
-          return board
-        })
+          return board;
+        });
       } else {
         setAttackBoard((prev) => {
-          const board: string[] = [...prev]
+          const board: string[] = [...prev];
 
-          board[board.length - 9] = "blue"
-          board[board.length - 14] = "green"
+          board[board.length - 9] = "blue";
+          board[board.length - 14] = "green";
 
-          return board
-        })
+          return board;
+        });
       }
     }
-  }, [activePowerBlockIndex, visibleBlockPowerType, isSpaceBarPressed])
+  }, [activePowerBlockIndex, visibleBlockPowerType, isSpaceBarPressed]);
 
   return (
     <div
@@ -741,7 +741,7 @@ export default function TableGameDemoPanel({ nextGameCountdown, onChangeView }: 
                 <FaLeftLong className="rtl:rotate-180" />
                 <div className="flex items-center gap-3 whitespace-nowrap">
                   <span>{t({ message: "Next game starting..." })}</span>
-                  <span className="text-orange-400 text-xl font-bold">15{nextGameCountdown}</span>
+                  <span className="text-orange-400 text-xl font-bold">{nextGameCountdown}</span>
                 </div>
               </div>
             )}
@@ -749,5 +749,5 @@ export default function TableGameDemoPanel({ nextGameCountdown, onChangeView }: 
         </div>
       </div>
     </div>
-  )
+  );
 }

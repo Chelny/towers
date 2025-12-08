@@ -1,150 +1,158 @@
-"use client"
+"use client";
 
-import { KeyboardEvent, ReactNode, Ref, useEffect, useMemo, useRef } from "react"
-import { useLingui } from "@lingui/react/macro"
-import clsx from "clsx/lite"
-import Input, { InputImperativeHandle } from "@/components/ui/Input"
-import { APP_CONFIG } from "@/constants/app"
-import { FKey, fKeyMessages } from "@/constants/f-key-messages"
-import { CHAT_MESSSAGE_MAX_LENGTH } from "@/constants/game"
-import { useSocket } from "@/context/SocketContext"
-import { TableChatMessageType } from "@/enums/table-chat-message-type"
-import { TableType } from "@/enums/table-type"
-import { ChatMessagePlainObject, ChatPlainObject } from "@/server/towers/classes/Chat"
-import { TableChatMessagePlainObject, TableChatMessageVariables } from "@/server/towers/classes/TableChat"
+import { KeyboardEvent, ReactNode, Ref, useEffect, useMemo, useRef } from "react";
+import { useLingui } from "@lingui/react/macro";
+import clsx from "clsx/lite";
+import { TableChatMessageType } from "db";
+import { TableType } from "db";
+import Input, { InputImperativeHandle } from "@/components/ui/Input";
+import { APP_CONFIG } from "@/constants/app";
+import { FKey, fKeyMessages } from "@/constants/f-key-messages";
+import { CHAT_MESSSAGE_MAX_LENGTH } from "@/constants/game";
+import { useSocket } from "@/context/SocketContext";
+import { RoomChatMessagePlainObject } from "@/server/towers/classes/RoomChatMessage";
+import { TableChatMessagePlainObject, TableChatMessageVariables } from "@/server/towers/classes/TableChatMessage";
+
+type ChatMessage = RoomChatMessagePlainObject | TableChatMessagePlainObject;
 
 type ChatProps = {
-  chat?: ChatPlainObject
+  chatMessages?: ChatMessage[]
   messageInputRef?: Ref<InputImperativeHandle>
   isMessageInputDisabled: boolean
   onSendMessage: (event: KeyboardEvent<HTMLInputElement>) => void
-}
+};
 
-export default function Chat({ chat, messageInputRef, isMessageInputDisabled, onSendMessage }: ChatProps): ReactNode {
-  const { session } = useSocket()
-  const { i18n, t } = useLingui()
-  const chatEndRef = useRef<HTMLDivElement>(null)
+export default function Chat({
+  chatMessages,
+  messageInputRef,
+  isMessageInputDisabled,
+  onSendMessage,
+}: ChatProps): ReactNode {
+  const { session } = useSocket();
+  const { i18n, t } = useLingui();
+  const chatEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = (): void => {
-    chatEndRef.current?.scrollIntoView({ behavior: "instant", block: "end" })
-  }
+    chatEndRef.current?.scrollIntoView({ behavior: "instant", block: "end" });
+  };
 
   const getTableAutomatedChatMessage = (
     type: TableChatMessageType,
-    messageVariables?: TableChatMessageVariables,
+    textVariables: TableChatMessageVariables | null,
   ): string => {
-    const encryptedChar: string | undefined = messageVariables?.encryptedChar
-    const decryptedChar: string | undefined = messageVariables?.decryptedChar
-    const fKey: FKey | undefined = messageVariables?.fKey
-    const oldRating: number | undefined = messageVariables?.oldRating
-    const newRating: number | undefined = messageVariables?.newRating
-    const heroCode: string | undefined = messageVariables?.heroCode
-    const tableHostUsername: string | undefined = messageVariables?.tableHostUsername
-    const tableType: TableType | undefined = messageVariables?.tableType
-    const username: string | null | undefined = messageVariables?.username
-    const appName: string = APP_CONFIG.NAME
-    let message: string = ""
+    const encryptedChar: string | undefined = textVariables?.encryptedChar;
+    const decryptedChar: string | undefined = textVariables?.decryptedChar;
+    const fKey: FKey | undefined = textVariables?.fKey;
+    const oldRating: number | undefined = textVariables?.oldRating;
+    const newRating: number | undefined = textVariables?.newRating;
+    const heroCode: string | undefined = textVariables?.heroCode;
+    const tableHostUsername: string | undefined = textVariables?.tableHostUsername;
+    const tableType: TableType | undefined = textVariables?.tableType;
+    const username: string | null | undefined = textVariables?.username;
+    const appName: string = APP_CONFIG.NAME;
+    let message: string = "";
 
     switch (type) {
       case TableChatMessageType.CIPHER_KEY:
-        message = i18n._("Cipher key: {encryptedChar} => {decryptedChar}", { encryptedChar, decryptedChar })
-        break
+        message = i18n._("Cipher key: {encryptedChar} => {decryptedChar}", { encryptedChar, decryptedChar });
+        break;
 
       case TableChatMessageType.F_KEY:
         if (typeof fKey !== "undefined") {
-          message = i18n._(fKeyMessages[fKey])
-          return i18n._("{username}: {message}", { username, message })
+          message = i18n._(fKeyMessages[fKey]);
+          return i18n._("{username}: {message}", { username, message });
         }
-        break
+        break;
 
       case TableChatMessageType.GAME_RATING:
         message = i18n._("{username}’s old rating: {oldRating}; new rating: {newRating}", {
           username,
           oldRating,
           newRating,
-        })
-        break
+        });
+        break;
 
       case TableChatMessageType.HERO_CODE:
-        if (heroCode) return heroCode
-        break
+        if (heroCode) return heroCode;
+        break;
 
       case TableChatMessageType.HERO_MESSAGE:
-        message = i18n._("{username} is a hero of {appName}!", { username, appName })
-        break
+        message = i18n._("{username} is a hero of {appName}!", { username, appName });
+        break;
 
       case TableChatMessageType.TABLE_HOST:
         message = i18n._(
           "You are the host of the table. This gives you the power to invite to [or boot people from] your table. You may also limit other player’s access to your table by selecting its \"Table Type\".",
-        )
-        break
+        );
+        break;
 
       case TableChatMessageType.TABLE_TYPE:
         switch (tableType) {
           case TableType.PROTECTED:
-            message = i18n._("Only people you have invited may play now.")
-            break
+            message = i18n._("Only people you have invited may play now.");
+            break;
           case TableType.PRIVATE:
-            message = i18n._("Only people you have invited may play or watch your table now.")
-            break
+            message = i18n._("Only people you have invited may play or watch your table now.");
+            break;
           default:
-            message = i18n._("Anyone may play or watch your table now.")
+            message = i18n._("Anyone may play or watch your table now.");
         }
-        break
+        break;
 
-      case TableChatMessageType.USER_BOOTED:
-        message = i18n._("{tableHostUsername} has booted {username} from the table.", { tableHostUsername, username })
-        break
+      case TableChatMessageType.USER_BOOTED_FROM_TABLE:
+        message = i18n._("{tableHostUsername} has booted {username} from the table.", { tableHostUsername, username });
+        break;
 
       case TableChatMessageType.USER_GRANTED_SEAT_ACCESS_INVITEE:
-        message = i18n._("You have been granted access to play by the host.")
-        break
+        message = i18n._("You have been granted access to play by the host.");
+        break;
 
       case TableChatMessageType.USER_GRANTED_SEAT_ACCESS_INVITER:
-        message = i18n._("You granted {username} access to play.", { username })
-        break
+        message = i18n._("You granted {username} access to play.", { username });
+        break;
 
-      case TableChatMessageType.USER_JOINED:
-        message = i18n._("{username} has joined the table.", { username })
-        break
+      case TableChatMessageType.USER_JOINED_TABLE:
+        message = i18n._("{username} has joined the table.", { username });
+        break;
 
-      case TableChatMessageType.USER_INVITED:
-        message = i18n._("{username} has accepted the invitation to the table.", { username })
-        break
+      case TableChatMessageType.USER_INVITED_TO_TABLE:
+        message = i18n._("{username} has accepted the invitation to the table.", { username });
+        break;
 
-      case TableChatMessageType.USER_LEFT:
-        message = i18n._("{username} has left the table.", { username })
-        break
+      case TableChatMessageType.USER_LEFT_TABLE:
+        message = i18n._("{username} has left the table.", { username });
+        break;
 
       default:
-        break
+        break;
     }
 
-    return `*** ${message}`
-  }
+    return `*** ${message}`;
+  };
 
   const translatedMessages = useMemo(() => {
-    return chat?.messages
-      .filter((message: ChatMessagePlainObject) => {
-        const visibleToUserId: string | undefined = (message as TableChatMessagePlainObject).visibleToUserId
-        return !visibleToUserId || visibleToUserId === session?.user.id
+    if (!chatMessages) return;
+
+    return chatMessages
+      .filter((message: ChatMessage) => {
+        const visibleToUserId: string | null = (message as TableChatMessagePlainObject).visibleToUserId;
+        return !visibleToUserId || visibleToUserId === session?.user.id;
       })
-      .map((message: ChatMessagePlainObject) => {
-        const messageVariables: TableChatMessageVariables | undefined = (message as TableChatMessagePlainObject)
-          .messageVariables
+      .map((message: ChatMessage) => {
+        const textVariables: TableChatMessageVariables | null = (message as TableChatMessagePlainObject).textVariables;
         const translatedMessage: string | null =
-          message.text ?? getTableAutomatedChatMessage((message as TableChatMessagePlainObject).type, messageVariables)
+          message.text ?? getTableAutomatedChatMessage((message as TableChatMessagePlainObject).type, textVariables);
 
         return {
           ...message,
           text: translatedMessage,
-        }
-      })
-  }, [chat])
+        };
+      });
+  }, [chatMessages]);
 
   useEffect(() => {
-    scrollToBottom()
-  }, [chat])
+    scrollToBottom();
+  }, [chatMessages]);
 
   return (
     <div className="overflow-hidden flex flex-col gap-1 h-full">
@@ -159,13 +167,13 @@ export default function Chat({ chat, messageInputRef, isMessageInputDisabled, on
         onKeyDown={onSendMessage}
       />
       <div className="overflow-y-auto flex-1 my-1">
-        {translatedMessages?.map((message: ChatMessagePlainObject) => {
+        {translatedMessages?.map((message: ChatMessage) => {
           // Table chat message
           if ("type" in message) {
             return (
               <div key={message.id} className="flex">
                 {(message as TableChatMessagePlainObject).type === TableChatMessageType.CHAT && (
-                  <span className="order-1">{message.user.user?.username}:&nbsp;</span>
+                  <span className="order-1">{message.player.user?.username}:&nbsp;</span>
                 )}
                 <span
                   className={clsx(
@@ -175,19 +183,19 @@ export default function Chat({ chat, messageInputRef, isMessageInputDisabled, on
                   {message.text}
                 </span>
               </div>
-            )
+            );
           }
 
           // Room chat message
           return (
             <div key={message.id} className="flex">
-              <span className="order-1">{message.user.user?.username}:&nbsp;</span>
+              <span className="order-1">{message.player?.user?.username}:&nbsp;</span>
               <span className="order-2">{message.text}</span>
             </div>
-          )
+          );
         })}
         <div ref={chatEndRef} />
       </div>
     </div>
-  )
+  );
 }

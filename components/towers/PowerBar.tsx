@@ -1,15 +1,15 @@
-import { ReactNode } from "react"
-import clsx from "clsx/lite"
-import DefenseBlock from "@/components/towers/DefenseBlock"
-import RegularBlock from "@/components/towers/RegularBlock"
-import SpecialDiamondBlock from "@/components/towers/SpecialDiamondBlock"
-import { PowerBarItemPlainObject, PowerBarPlainObject } from "@/server/towers/classes/PowerBar"
-import { getClassNameForBlock, getClassNameForBlockPowerType } from "@/utils/block-class-names-utils"
-import { isSpecialDiamond } from "@/utils/block-guards-utils"
+import { ReactNode } from "react";
+import clsx from "clsx/lite";
+import DefenseBlock from "@/components/towers/DefenseBlock";
+import RegularBlock from "@/components/towers/RegularBlock";
+import SpecialDiamondBlock from "@/components/towers/SpecialDiamondBlock";
+import { PowerBarItemPlainObject, PowerBarPlainObject } from "@/server/towers/game/PowerBar";
+import { getClassNameForBlock, getClassNameForBlockPowerType } from "@/utils/block-class-names";
+import { isSpecialDiamond } from "@/utils/block-guards";
 
 type PowerBarProps = {
-  powerBar?: PowerBarPlainObject
-}
+  powerBar: PowerBarPlainObject | null
+};
 
 export default function PowerBar({ powerBar }: PowerBarProps): ReactNode {
   return (
@@ -18,7 +18,7 @@ export default function PowerBar({ powerBar }: PowerBarProps): ReactNode {
         <div
           key={blockIndex}
           className={clsx(
-            "w-grid-cell h-grid-cell box-border text-center",
+            "w-grid-cell-width h-grid-cell-height box-border text-center",
             getClassNameForBlock(block),
             getClassNameForBlockPowerType(block),
           )}
@@ -33,5 +33,5 @@ export default function PowerBar({ powerBar }: PowerBarProps): ReactNode {
         </div>
       ))}
     </>
-  )
+  );
 }

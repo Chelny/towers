@@ -1,4 +1,4 @@
-const brandColor: string = "#115e59"
+const brandColor: string = "#115e59";
 
 export const EMAIL_COLORS: Record<string, string> = {
   background: "#efeef1",
@@ -8,7 +8,7 @@ export const EMAIL_COLORS: Record<string, string> = {
   buttonBorder: brandColor,
   buttonText: "#fff",
   footerText: "#999",
-}
+};
 
 export const BODY_STYLE: Record<string, string> = {
   padding: "8px",
@@ -16,4 +16,4 @@ export const BODY_STYLE: Record<string, string> = {
   fontFamily: "sans-serif",
   fontSize: "16px",
   lineHeight: "22px",
-}
+};

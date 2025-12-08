@@ -1,19 +1,19 @@
-import { ReactNode } from "react"
-import clsx from "clsx/lite"
-import DefenseBlock from "@/components/towers/DefenseBlock"
-import RegularBlock from "@/components/towers/RegularBlock"
-import { BoardBlock } from "@/interfaces/towers"
+import { ReactNode } from "react";
+import clsx from "clsx/lite";
+import DefenseBlock from "@/components/towers/DefenseBlock";
+import RegularBlock from "@/components/towers/RegularBlock";
+import { BoardBlock } from "@/interfaces/towers";
 import {
   getBlockRemovalAnimationClass,
   getClassNameForBlock,
   getClassNameForBlockPowerType,
-} from "@/utils/block-class-names-utils"
-import { isTowersPieceBlock } from "@/utils/block-guards-utils"
+} from "@/utils/block-class-names";
+import { isTowersPieceBlock } from "@/utils/block-guards";
 
 type GridCellProps = {
   block: BoardBlock
   isOpponentBoard?: boolean
-}
+};
 
 export default function GridCell({ block, isOpponentBoard = false }: GridCellProps): ReactNode {
   return (
@@ -22,7 +22,7 @@ export default function GridCell({ block, isOpponentBoard = false }: GridCellPro
         "flex items-center justify-center box-border",
         isOpponentBoard
           ? "opponent-cell w-grid-cell-opponent-width h-grid-cell-opponent-height"
-          : "w-grid-cell h-grid-cell",
+          : "w-grid-cell-width h-grid-cell-height",
         getClassNameForBlock(block),
         getClassNameForBlockPowerType(block),
         getBlockRemovalAnimationClass(block),
@@ -35,5 +35,5 @@ export default function GridCell({ block, isOpponentBoard = false }: GridCellPro
         <RegularBlock letter={isTowersPieceBlock(block) && !isOpponentBoard ? block.letter : undefined} />
       )}
     </div>
-  )
+  );
 }

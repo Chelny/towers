@@ -6,6 +6,7 @@ import js from "@eslint/js"
 import { FlatCompat } from "@eslint/eslintrc"
 import pluginLingui from "eslint-plugin-lingui"
 import unusedImports from "eslint-plugin-unused-imports"
+import stylistic from "@stylistic/eslint-plugin"
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -27,10 +28,12 @@ export default [
     plugins: {
       "@typescript-eslint": typescriptEslint,
       "unused-imports": unusedImports,
+      "@stylistic": stylistic
     },
 
     rules: {
       "@next/next/no-html-link-for-pages": "off",
+      "@stylistic/semi": ["error", "always"],
       "@typescript-eslint/no-explicit-any": "warn",
       "comma-dangle": ["error", "always-multiline"],
 
@@ -118,7 +121,6 @@ export default [
       ],
 
       "quotes": ["error", "double"],
-      "semi": ["error", "never"],
 
       "sort-imports": [
         "error",

@@ -1,46 +1,54 @@
-"use client"
+"use client";
 
-import { ReactNode, useEffect, useRef, useState } from "react"
-import { Trans } from "@lingui/react/macro"
-import clsx from "clsx/lite"
-import PlayerInformationModal from "@/components/game/PlayerInformationModal"
-import Grid from "@/components/towers/Grid"
-import NextPiece from "@/components/towers/NextPiece"
-import PowerBar from "@/components/towers/PowerBar"
-import Button from "@/components/ui/Button"
-import UserAvatar from "@/components/UserAvatar"
-import { MIN_READY_TEAMS_COUNT } from "@/constants/game"
-import { SocketEvents } from "@/constants/socket-events"
-import { useModal } from "@/context/ModalContext"
-import { useSocket } from "@/context/SocketContext"
-import { TowersControlKeys } from "@/enums/towers-control-keys"
-import { TowersGameState } from "@/enums/towers-game-state"
-import { BlockToRemove, BoardPlainObject } from "@/server/towers/classes/Board"
-import { NextPiecesPlainObject } from "@/server/towers/classes/NextPieces"
-import { PiecePlainObject } from "@/server/towers/classes/Piece"
-import { PowerBarItemPlainObject, PowerBarPlainObject } from "@/server/towers/classes/PowerBar"
-import { ServerTowersSeat } from "@/server/towers/classes/Table"
-import { TowersPieceBlockPlainObject } from "@/server/towers/classes/TowersPieceBlock"
-import { UserPlainObject } from "@/server/towers/classes/User"
+import { MouseEvent, ReactNode, useEffect, useRef, useState } from "react";
+import { Trans } from "@lingui/react/macro";
+import clsx from "clsx/lite";
+import { GameState } from "db";
+import { Socket } from "socket.io-client";
+import PlayerInformationModal from "@/components/game/PlayerInformationModal";
+import Grid from "@/components/towers/Grid";
+import NextPiece from "@/components/towers/NextPiece";
+import PowerBar from "@/components/towers/PowerBar";
+import Button from "@/components/ui/Button";
+import UserAvatar from "@/components/UserAvatar";
+import {
+  BLOCK_BREAK_ANIMATION_DURATION_MS,
+  MIN_ACTIVE_TEAMS_REQUIRED,
+  MIN_ACTIVE_TEAMS_REQUIRED_TEST,
+} from "@/constants/game";
+import { ClientToServerEvents } from "@/constants/socket/client-to-server";
+import { ServerToClientEvents } from "@/constants/socket/server-to-client";
+import { useModal } from "@/context/ModalContext";
+import { useSocket } from "@/context/SocketContext";
+import { ServerTowersSeat } from "@/interfaces/table-seats";
+import { PlayerPlainObject } from "@/server/towers/classes/Player";
+import { PlayerControlKeysPlainObject } from "@/server/towers/classes/PlayerControlKeys";
+import { TablePlayerPlainObject } from "@/server/towers/classes/TablePlayer";
+import { BlockToRemove, BoardPlainObject } from "@/server/towers/game/Board";
+import { NextPiecesPlainObject } from "@/server/towers/game/NextPieces";
+import { PiecePlainObject } from "@/server/towers/game/Piece";
+import { PowerBarItemPlainObject, PowerBarPlainObject } from "@/server/towers/game/PowerBar";
+import { TowersPieceBlockPlainObject } from "@/server/towers/game/TowersPieceBlock";
+import { isTestMode } from "@/server/towers/utils/test";
 
 type PlayerBoardProps = {
   roomId: string
   tableId: string
   seat: ServerTowersSeat
   isOpponentBoard: boolean
-  gameState?: TowersGameState
-  readyTeamsCount: number
+  gameState?: GameState
   isSitAccessGranted: boolean
-  isUserSeatedAnywhere: boolean
-  currentUser?: UserPlainObject
+  seatedTeamsCount: number
+  isPlayerSeated: boolean
+  tablePlayerForSeat?: TablePlayerPlainObject
   isRatingsVisible: boolean
   onSit: (seatNumber: number) => void
   onStand: (seatNumber: number) => void
   onStart: (seatNumber: number) => void
   onNextPowerBarItem: (nextPowerBarItem?: PowerBarItemPlainObject) => void
-}
+};
 
-const TYPING_TIMEOUT_MS = 3000
+const TYPING_TIMEOUT_MS = 3000;
 
 export default function PlayerBoard({
   roomId,
@@ -48,67 +56,158 @@ export default function PlayerBoard({
   seat,
   isOpponentBoard,
   gameState,
-  readyTeamsCount,
   isSitAccessGranted,
-  isUserSeatedAnywhere,
-  currentUser,
+  seatedTeamsCount,
+  isPlayerSeated,
+  tablePlayerForSeat,
   isRatingsVisible,
   onSit,
   onStand,
   onStart,
   onNextPowerBarItem,
 }: PlayerBoardProps): ReactNode {
-  const { socketRef, session } = useSocket()
-  const { openModal } = useModal()
-  const [isReversed, setIsReversed] = useState<boolean>(seat.seatNumber % 2 === 0)
-  const [nextPieces, setNextPieces] = useState<NextPiecesPlainObject>()
-  const [powerBar, setPowerBar] = useState<PowerBarPlainObject>()
-  const [board, setBoard] = useState<BoardPlainObject>()
-  const [currentPiece, setCurrentPiece] = useState<PiecePlainObject>()
-  const boardRefs = useRef<Record<string, HTMLDivElement | null>>({})
-  const isCurrentUserSeat: boolean = seat.occupiedBy?.user?.id === session?.user?.id
-  const [controlKeys, setControlKeys] = useState<TowersControlKeys | undefined>(seat.occupiedBy?.controlKeys)
-  const [isReady, setIsReady] = useState<boolean>(false)
-  const [isPlaying, setIsPlaying] = useState<boolean>(false)
-  const typedRef = useRef<string>("")
-  const typingTimerRef = useRef<NodeJS.Timeout>(null)
+  const { socketRef, isConnected, session } = useSocket();
+  const { openModal } = useModal();
+  const boardRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const controlKeys: PlayerControlKeysPlainObject | undefined = seat.occupiedByPlayer?.controlKeys;
+  const isReversed: boolean = seat.seatNumber % 2 === 0;
+  const [nextPieces, setNextPieces] = useState<NextPiecesPlainObject | null>(seat.nextPieces);
+  const [powerBar, setPowerBar] = useState<PowerBarPlainObject | null>(seat.powerBar);
+  const [board, setBoard] = useState<BoardPlainObject | null>(seat.board);
+  const [currentPiece, setCurrentPiece] = useState<PiecePlainObject | null>(null);
+  const [blocksToRemove, setBlocksToRemove] = useState<BlockToRemove[]>([]);
+  const typedRef = useRef<string>("");
+  const typingTimerRef = useRef<NodeJS.Timeout>(null);
+  const isReady: boolean = !!tablePlayerForSeat?.isReady;
+  const isPlaying: boolean = !!tablePlayerForSeat?.isPlaying;
   const isSeatAvailable: boolean =
-    (gameState === TowersGameState.WAITING && !seat.occupiedBy && !isUserSeatedAnywhere) ||
-    (gameState === TowersGameState.PLAYING && !seat.occupiedBy && !isUserSeatedAnywhere)
-  const isCurrentUserSeated: boolean = isCurrentUserSeat && !isReady && !isPlaying
-  const isUserReady: boolean =
-    gameState === TowersGameState.WAITING && isReady && !isPlaying && readyTeamsCount >= MIN_READY_TEAMS_COUNT
-  const isUserWaitingForMorePlayers: boolean =
-    gameState === TowersGameState.WAITING && isReady && !isPlaying && readyTeamsCount < MIN_READY_TEAMS_COUNT
-  const isUserWaitingForNextGame: boolean = gameState === TowersGameState.PLAYING && !!seat.occupiedBy && !isPlaying
-  const [blocksToRemove, setBlocksToRemove] = useState<BlockToRemove[]>([])
-
-  const handleOpenPlayerInfoModal = (player: UserPlainObject): void => {
-    openModal(PlayerInformationModal, { roomId, currentUser, player, isRatingsVisible })
-  }
-
-  const handleMovePiece = (direction: "left" | "right"): void => {
-    socketRef.current?.emit(SocketEvents.PIECE_MOVE, { tableId, seatNumber: seat.seatNumber, direction })
-  }
-
-  const handleCyclePiece = (): void => {
-    socketRef.current?.emit(SocketEvents.PIECE_CYCLE, { tableId, seatNumber: seat.seatNumber })
-  }
-
-  const handleDropPiece = (): void => {
-    socketRef.current?.emit(SocketEvents.PIECE_DROP, { tableId, seatNumber: seat.seatNumber })
-  }
-
-  const handleStopDropPiece = (): void => {
-    socketRef.current?.emit(SocketEvents.PIECE_DROP_STOP, { tableId, seatNumber: seat.seatNumber })
-  }
-
-  const handleUsePowerItem = (targetSeatNumber?: number): void => {
-    socketRef.current?.emit(SocketEvents.POWER_USE, { tableId, seatNumber: seat.seatNumber, targetSeatNumber })
-  }
+    (gameState === GameState.WAITING && !seat.occupiedByPlayer && !isPlayerSeated) ||
+    (gameState === GameState.PLAYING && !seat.occupiedByPlayer && !isPlayerSeated);
+  const isCurrentUserSeat: boolean = seat.occupiedByPlayerId === session?.user?.id;
+  const isCurrentUserSeated: boolean = isCurrentUserSeat && !isReady && !isPlaying;
+  const isPlayerReady: boolean =
+    gameState === GameState.WAITING &&
+    !!seat.occupiedByPlayer &&
+    isReady &&
+    !isPlaying &&
+    seatedTeamsCount >= (isTestMode() ? MIN_ACTIVE_TEAMS_REQUIRED_TEST : MIN_ACTIVE_TEAMS_REQUIRED);
+  const isPlayerWaitingForMorePlayers: boolean =
+    gameState === GameState.WAITING &&
+    !!seat.occupiedByPlayer &&
+    isReady &&
+    !isPlaying &&
+    seatedTeamsCount < (isTestMode() ? MIN_ACTIVE_TEAMS_REQUIRED_TEST : MIN_ACTIVE_TEAMS_REQUIRED);
+  const isPlayerWaitingForNextGame: boolean =
+    gameState === GameState.PLAYING && !!seat.occupiedByPlayer && !isCurrentUserSeat && !isReady && !isPlaying;
 
   useEffect(() => {
-    if (!tableId) return
+    // Set focus on correct seat when game starts
+    if (gameState === GameState.PLAYING) {
+      const boardEl: HTMLDivElement | null = isCurrentUserSeat ? boardRefs.current[seat.seatNumber - 1] : null;
+      boardEl?.focus();
+    }
+  }, [gameState]);
+
+  useEffect(() => {
+    if (!controlKeys) return;
+
+    const handleKeyDown = (event: KeyboardEvent): void => {
+      if (!isCurrentUserSeat || !isPlaying || board?.isGameOver) return;
+
+      const keyMap: { [key: string]: () => void } = {
+        [controlKeys.moveLeft]: () => handleMovePiece("left"),
+        [controlKeys.moveRight]: () => handleMovePiece("right"),
+        [controlKeys.cycleBlock]: handleCyclePiece,
+        [controlKeys.dropPiece]: handleDropPiece,
+        [controlKeys.useItem]: handleUsePowerItem,
+        [controlKeys.useItemOnPlayer1]: () => handleUsePowerItem(1),
+        [controlKeys.useItemOnPlayer2]: () => handleUsePowerItem(2),
+        [controlKeys.useItemOnPlayer3]: () => handleUsePowerItem(3),
+        [controlKeys.useItemOnPlayer4]: () => handleUsePowerItem(4),
+        [controlKeys.useItemOnPlayer5]: () => handleUsePowerItem(5),
+        [controlKeys.useItemOnPlayer6]: () => handleUsePowerItem(6),
+        [controlKeys.useItemOnPlayer7]: () => handleUsePowerItem(7),
+        [controlKeys.useItemOnPlayer8]: () => handleUsePowerItem(8),
+      };
+
+      if (keyMap[event.code]) {
+        event.preventDefault();
+        keyMap[event.code]();
+      }
+    };
+
+    const handleKeyUp = (event: KeyboardEvent): void => {
+      if (!isCurrentUserSeat || !isPlaying || board?.isGameOver) return;
+
+      if (event.code === controlKeys.dropPiece) {
+        handleStopDropPiece();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("keyup", handleKeyUp);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("keyup", handleKeyUp);
+    };
+  }, [controlKeys, isPlaying, board]);
+
+  useEffect(() => {
+    if (isCurrentUserSeat) {
+      onNextPowerBarItem(powerBar?.nextItem);
+    }
+  }, [isCurrentUserSeat, nextPieces]);
+
+  useEffect(() => {
+    const socket: Socket | null = socketRef.current;
+    if (!socket) return;
+
+    if (!isCurrentUserSeated) {
+      typedRef.current = "";
+      clearTimeout(typingTimerRef.current!);
+      return;
+    }
+
+    const handleKeyDown = (event: KeyboardEvent): void => {
+      const key: string = event.key?.toUpperCase();
+
+      if (!/^[A-Z0-9 ]$/.test(key)) return;
+
+      const activeElement: Element | null = document.activeElement;
+
+      if (
+        activeElement &&
+        (activeElement.tagName === "INPUT" ||
+          activeElement.tagName === "TEXTAREA" ||
+          (activeElement instanceof HTMLElement && activeElement.isContentEditable))
+      ) {
+        return;
+      }
+
+      typedRef.current += key;
+
+      if (typingTimerRef.current) clearTimeout(typingTimerRef.current);
+
+      typingTimerRef.current = setTimeout(() => {
+        typedRef.current = "";
+      }, TYPING_TIMEOUT_MS);
+
+      socket.emit(ClientToServerEvents.TABLE_TYPED_HERO_CODE, { tableId, code: typedRef.current });
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      typedRef.current = "";
+    };
+  }, [tableId, isCurrentUserSeated]);
+
+  useEffect(() => {
+    if (!isConnected || !socketRef.current) return;
+
+    const socket: Socket | null = socketRef.current;
 
     const handleGameUpdate = ({
       seatNumber: incomingSeatNumber,
@@ -124,17 +223,17 @@ export default function PlayerBoard({
       currentPiece: PiecePlainObject
     }): void => {
       // This board is tied to one seat only (props.seat), so if it's for this seat, update
-      if (incomingSeatNumber !== seat.seatNumber) return
+      if (incomingSeatNumber !== seat.seatNumber) return;
 
-      setBoard(board)
+      setBoard(board);
 
       // Only update current piece, next pieces, and power bar if it's the current player's board
       if (isCurrentUserSeat) {
-        setNextPieces(nextPieces)
-        setPowerBar(powerBar)
-        setCurrentPiece(currentPiece)
+        setNextPieces(nextPieces);
+        setPowerBar(powerBar);
+        setCurrentPiece(currentPiece);
       }
-    }
+    };
 
     const handleHooSendBlocks = ({
       tableId: id,
@@ -152,9 +251,9 @@ export default function PlayerBoard({
         isCurrentUserSeat &&
         teamNumber !== seat.teamNumber
       ) {
-        socketRef.current?.emit(SocketEvents.GAME_HOO_ADD_BLOCKS, { tableId, teamNumber, blocks })
+        socket.emit(ClientToServerEvents.GAME_HOO_ADD_BLOCKS, { tableId, teamNumber, blocks });
       }
-    }
+    };
 
     const handleBlocksMarkedForRemoval = async ({
       seatNumber,
@@ -163,133 +262,60 @@ export default function PlayerBoard({
       seatNumber: number
       blocks: BlockToRemove[]
     }) => {
-      if (seatNumber !== seat.seatNumber) return
+      if (seatNumber !== seat.seatNumber) return;
 
-      setBlocksToRemove(blocks)
-      await new Promise<void>((resolve) => setTimeout(resolve, 190))
-      setBlocksToRemove([])
+      setBlocksToRemove(blocks);
+      await new Promise<void>((resolve) => setTimeout(resolve, BLOCK_BREAK_ANIMATION_DURATION_MS));
+      setBlocksToRemove([]);
 
-      socketRef.current?.emit(SocketEvents.GAME_CLIENT_BLOCKS_ANIMATION_DONE)
+      socket.emit(ClientToServerEvents.GAME_CLIENT_BLOCKS_ANIMATION_DONE);
+    };
+
+    const attachListeners = (): void => {
+      socket.on(ServerToClientEvents.GAME_UPDATE, handleGameUpdate);
+      socket.on(ServerToClientEvents.GAME_HOO_SEND_BLOCKS, handleHooSendBlocks);
+      socket.on(ServerToClientEvents.GAME_BLOCKS_MARKED_FOR_REMOVAL, handleBlocksMarkedForRemoval);
+    };
+
+    if (socket.connected) {
+      attachListeners();
+    } else {
+      socket.once("connect", () => {
+        attachListeners();
+      });
     }
-
-    socketRef.current?.on(SocketEvents.GAME_UPDATE, handleGameUpdate)
-    socketRef.current?.on(SocketEvents.GAME_HOO_SEND_BLOCKS, handleHooSendBlocks)
-    socketRef.current?.on(SocketEvents.GAME_BLOCKS_MARKED_FOR_REMOVAL, handleBlocksMarkedForRemoval)
 
     return () => {
-      socketRef.current?.off(SocketEvents.GAME_UPDATE, handleGameUpdate)
-      socketRef.current?.off(SocketEvents.GAME_HOO_SEND_BLOCKS, handleHooSendBlocks)
-      socketRef.current?.off(SocketEvents.GAME_BLOCKS_MARKED_FOR_REMOVAL, handleBlocksMarkedForRemoval)
-    }
-  }, [tableId, seat])
+      socket.off(ServerToClientEvents.GAME_UPDATE, handleGameUpdate);
+      socket.off(ServerToClientEvents.GAME_HOO_SEND_BLOCKS, handleHooSendBlocks);
+      socket.off(ServerToClientEvents.GAME_BLOCKS_MARKED_FOR_REMOVAL, handleBlocksMarkedForRemoval);
+      socket.off("connect");
+    };
+  }, [isConnected, tableId, seat?.seatNumber, seat?.teamNumber, isCurrentUserSeat]);
 
-  useEffect(() => {
-    setIsReversed(seat.seatNumber % 2 === 0)
-    setNextPieces(seat.nextPieces)
-    setPowerBar(seat.powerBar)
-    setBoard(seat.board)
-    setControlKeys(seat.occupiedBy?.controlKeys)
-    setIsReady(!!seat.occupiedBy?.tables?.[tableId]?.isReady)
-    setIsPlaying(!!seat.occupiedBy?.tables?.[tableId]?.isPlaying)
-  }, [seat])
+  const handleOpenPlayerInfoModal = (selectedPlayer: PlayerPlainObject): void => {
+    openModal(PlayerInformationModal, { roomId, selectedPlayer, isRatingsVisible });
+  };
 
-  useEffect(() => {
-    // Set focus on correct seat when game starts
-    if (gameState === TowersGameState.PLAYING) {
-      const boardEl: HTMLDivElement | null = isCurrentUserSeat ? boardRefs.current[seat.seatNumber - 1] : null
-      boardEl?.focus()
-    }
-  }, [gameState, isCurrentUserSeat])
+  const handleMovePiece = (direction: "left" | "right"): void => {
+    socketRef.current?.emit(ClientToServerEvents.PIECE_MOVE, { direction });
+  };
 
-  useEffect(() => {
-    if (!controlKeys) return
+  const handleCyclePiece = (): void => {
+    socketRef.current?.emit(ClientToServerEvents.PIECE_CYCLE);
+  };
 
-    const handleKeyDown = (event: KeyboardEvent): void => {
-      if (!isCurrentUserSeat || !isPlaying || board?.isGameOver) return
+  const handleDropPiece = (): void => {
+    socketRef.current?.emit(ClientToServerEvents.PIECE_DROP);
+  };
 
-      const keyMap: { [key: string]: () => void } = {
-        [controlKeys.MOVE_LEFT]: () => handleMovePiece("left"),
-        [controlKeys.MOVE_RIGHT]: () => handleMovePiece("right"),
-        [controlKeys.CYCLE]: handleCyclePiece,
-        [controlKeys.DROP]: handleDropPiece,
-        [controlKeys.USE_ITEM]: handleUsePowerItem,
-        [controlKeys.USE_ITEM_ON_PLAYER_1]: () => handleUsePowerItem(1),
-        [controlKeys.USE_ITEM_ON_PLAYER_2]: () => handleUsePowerItem(2),
-        [controlKeys.USE_ITEM_ON_PLAYER_3]: () => handleUsePowerItem(3),
-        [controlKeys.USE_ITEM_ON_PLAYER_4]: () => handleUsePowerItem(4),
-        [controlKeys.USE_ITEM_ON_PLAYER_5]: () => handleUsePowerItem(5),
-        [controlKeys.USE_ITEM_ON_PLAYER_6]: () => handleUsePowerItem(6),
-        [controlKeys.USE_ITEM_ON_PLAYER_7]: () => handleUsePowerItem(7),
-        [controlKeys.USE_ITEM_ON_PLAYER_8]: () => handleUsePowerItem(8),
-      }
+  const handleStopDropPiece = (): void => {
+    socketRef.current?.emit(ClientToServerEvents.PIECE_DROP_STOP);
+  };
 
-      keyMap[event.code]?.()
-    }
-
-    const handleKeyUp = (event: KeyboardEvent): void => {
-      if (!isCurrentUserSeat || !isPlaying || board?.isGameOver) return
-
-      if (event.code === controlKeys.DROP) {
-        handleStopDropPiece()
-      }
-    }
-
-    document.addEventListener("keydown", handleKeyDown)
-    document.addEventListener("keyup", handleKeyUp)
-
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown)
-      document.removeEventListener("keyup", handleKeyUp)
-    }
-  }, [controlKeys])
-
-  useEffect(() => {
-    if (!isCurrentUserSeated) {
-      typedRef.current = ""
-      clearTimeout(typingTimerRef.current!)
-      return
-    }
-
-    const handleKeyDown = (event: KeyboardEvent): void => {
-      const key: string = event.key?.toUpperCase()
-
-      if (!/^[A-Z0-9 ]$/.test(key)) return
-
-      const activeElement: Element | null = document.activeElement
-
-      if (
-        activeElement &&
-        (activeElement.tagName === "INPUT" ||
-          activeElement.tagName === "TEXTAREA" ||
-          (activeElement instanceof HTMLElement && activeElement.isContentEditable))
-      ) {
-        return
-      }
-
-      typedRef.current += key
-
-      if (typingTimerRef.current) clearTimeout(typingTimerRef.current)
-
-      typingTimerRef.current = setTimeout(() => {
-        typedRef.current = ""
-      }, TYPING_TIMEOUT_MS)
-
-      socketRef.current?.emit(SocketEvents.TABLE_TYPED_HERO_CODE, { roomId, tableId, code: typedRef.current })
-    }
-
-    window.addEventListener("keydown", handleKeyDown)
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown)
-      typedRef.current = ""
-    }
-  }, [socketRef.current, isCurrentUserSeated])
-
-  useEffect(() => {
-    if (isCurrentUserSeat) {
-      onNextPowerBarItem(powerBar?.nextItem)
-    }
-  }, [isCurrentUserSeat, nextPieces])
+  const handleUsePowerItem = (targetSeatNumber?: number): void => {
+    socketRef.current?.emit(ClientToServerEvents.POWER_USE, { targetSeatNumber });
+  };
 
   return (
     <div className={clsx("flex flex-col", isOpponentBoard && "w-player-board-opponent-width")}>
@@ -302,25 +328,28 @@ export default function PlayerBoard({
         )}
         role="button"
         tabIndex={0}
-        onDoubleClick={() => (seat.occupiedBy ? handleOpenPlayerInfoModal(seat.occupiedBy) : undefined)}
+        onDoubleClick={() => (seat.occupiedByPlayer ? handleOpenPlayerInfoModal(seat.occupiedByPlayer) : undefined)}
       >
-        {seat.occupiedBy?.user?.id && (
+        {seat.occupiedByPlayerId && (
           <>
-            <div className={clsx(isOpponentBoard ? "w-4 h-4" : "w-6 h-6")}>
+            <div
+              className={clsx(isOpponentBoard ? "w-4 h-4" : "w-6 h-6")}
+              onDoubleClick={(event: MouseEvent) => event.stopPropagation()}
+            >
               <UserAvatar
-                user={seat.occupiedBy?.user}
+                user={seat.occupiedByPlayer?.user}
                 dimensions={isOpponentBoard ? "w-4 h-4" : "w-6 h-6"}
                 size={isOpponentBoard ? 16 : 24}
               />
             </div>
             <div
               className={clsx(
-                "truncate",
+                "truncate select-none",
                 isOpponentBoard ? "text-sm" : "text-base",
                 board?.isHooDetected && "text-red-500 dark:text-red-400",
               )}
             >
-              {seat.occupiedBy?.user.username}
+              {seat.occupiedByPlayer?.user.username}
             </div>
           </>
         )}
@@ -346,7 +375,7 @@ export default function PlayerBoard({
         <div
           ref={(element: HTMLDivElement | null) => {
             if (isCurrentUserSeat) {
-              boardRefs.current[seat.seatNumber - 1] = element
+              boardRefs.current[seat.seatNumber - 1] = element;
             }
           }}
           className={clsx(
@@ -374,16 +403,14 @@ export default function PlayerBoard({
               isOpponentBoard
                 ? "top-[90%] -translate-y-[90%] w-full px-1 py-2"
                 : "top-1/2 -translate-y-1/2 w-11/12 p-2",
-              ((gameState === TowersGameState.WAITING &&
-                isSitAccessGranted &&
-                (isSeatAvailable || isCurrentUserSeated)) ||
-                isUserReady ||
-                isUserWaitingForMorePlayers ||
-                isUserWaitingForNextGame) &&
+              ((gameState === GameState.WAITING && isSitAccessGranted && (isSeatAvailable || isCurrentUserSeated)) ||
+                isPlayerReady ||
+                isPlayerWaitingForMorePlayers ||
+                isPlayerWaitingForNextGame) &&
                 "shadow-md bg-neutral-800 dark:border dark:border-slate-600 dark:bg-slate-700",
             )}
           >
-            {gameState === TowersGameState.WAITING && isSitAccessGranted && (
+            {gameState === GameState.WAITING && isSitAccessGranted && (
               <>
                 {isSeatAvailable && (
                   <Button
@@ -417,7 +444,7 @@ export default function PlayerBoard({
               </>
             )}
 
-            {(isUserReady || isUserWaitingForMorePlayers || isUserWaitingForNextGame) && (
+            {(isPlayerReady || isPlayerWaitingForMorePlayers || isPlayerWaitingForNextGame) && (
               <p
                 className={clsx(
                   "flex justify-center items-center text-neutral-50 overflow-hidden",
@@ -426,16 +453,16 @@ export default function PlayerBoard({
                     : "h-16 text-board-button leading-default",
                 )}
               >
-                {isUserReady && <Trans>Ready</Trans>}
-                {isUserWaitingForMorePlayers && <Trans>Waiting for more players</Trans>}
-                {isUserWaitingForNextGame && <Trans>Waiting for the next game</Trans>}
+                {isPlayerReady && <Trans>Ready</Trans>}
+                {isPlayerWaitingForMorePlayers && <Trans>Waiting for more players</Trans>}
+                {isPlayerWaitingForNextGame && <Trans>Waiting for the next game</Trans>}
               </p>
             )}
           </div>
           <Grid
             isOpponentBoard={isOpponentBoard}
             board={board}
-            currentPiece={isCurrentUserSeat ? currentPiece : undefined}
+            currentPiece={isCurrentUserSeat && isPlaying ? currentPiece : null}
             blocksToRemove={blocksToRemove}
           />
         </div>
@@ -452,7 +479,7 @@ export default function PlayerBoard({
               //   "w-preview-piece-width",
               // )}
             >
-              {isCurrentUserSeat && <NextPiece nextPiece={nextPieces?.nextPiece} />}
+              {isCurrentUserSeat && isPlaying ? <NextPiece nextPiece={nextPieces?.nextPiece} /> : null}
             </div>
             <div
               className={clsx(
@@ -465,11 +492,11 @@ export default function PlayerBoard({
               // )}
               data-testid="player-board_container_power-bar"
             >
-              {isCurrentUserSeat && <PowerBar powerBar={powerBar} />}
+              <PowerBar powerBar={powerBar} />
             </div>
           </>
         )}
       </div>
     </div>
-  )
+  );
 }

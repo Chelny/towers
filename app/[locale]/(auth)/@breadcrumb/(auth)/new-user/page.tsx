@@ -1,22 +1,22 @@
-import { ReactNode } from "react"
-import { I18n } from "@lingui/core"
-import { initLingui } from "@/app/init-lingui"
+import { ReactNode } from "react";
+import { I18n } from "@lingui/core";
+import { initLingui } from "@/app/init-lingui";
 import {
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/Breadcrumb"
-import { ROUTE_HOME, ROUTE_NEW_USER } from "@/constants/routes"
+} from "@/components/ui/Breadcrumb";
+import { ROUTE_HOME, ROUTE_NEW_USER } from "@/constants/routes";
 
 type BreadcrumbSlotProps = {
   params: Promise<Params>
-}
+};
 
 export default async function BreadcrumbSlot({ params }: BreadcrumbSlotProps): Promise<ReactNode> {
-  const routeParams: Params = await params
-  const i18n: I18n = initLingui(routeParams.locale)
+  const routeParams: Params = await params;
+  const i18n: I18n = initLingui(routeParams.locale);
 
   return (
     <BreadcrumbList>
@@ -28,5 +28,5 @@ export default async function BreadcrumbSlot({ params }: BreadcrumbSlotProps): P
         <BreadcrumbPage>{i18n._(ROUTE_NEW_USER.TITLE)}</BreadcrumbPage>
       </BreadcrumbItem>
     </BreadcrumbList>
-  )
+  );
 }

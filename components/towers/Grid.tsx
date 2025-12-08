@@ -1,14 +1,14 @@
-import { ReactNode } from "react"
-import GridRow from "@/components/towers/GridRow"
-import { BlockToRemove, BoardGridRowPlainObject, BoardPlainObject } from "@/server/towers/classes/Board"
-import { PiecePlainObject } from "@/server/towers/classes/Piece"
+import { ReactNode } from "react";
+import GridRow from "@/components/towers/GridRow";
+import { BlockToRemove, BoardGridRowPlainObject, BoardPlainObject } from "@/server/towers/game/Board";
+import { PiecePlainObject } from "@/server/towers/game/Piece";
 
 type GridProps = {
   isOpponentBoard?: boolean
-  board?: BoardPlainObject
-  currentPiece?: PiecePlainObject
+  board: BoardPlainObject | null
+  currentPiece: PiecePlainObject | null
   blocksToRemove?: BlockToRemove[]
-}
+};
 
 export default function Grid({ board, isOpponentBoard = false, currentPiece, blocksToRemove }: GridProps): ReactNode {
   return (
@@ -24,5 +24,5 @@ export default function Grid({ board, isOpponentBoard = false, currentPiece, blo
         />
       ))}
     </div>
-  )
+  );
 }

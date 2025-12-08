@@ -1,53 +1,66 @@
-"use client"
+"use client";
 
-import { ChangeEvent, InputEvent, ReactNode, useState } from "react"
-import { Trans, useLingui } from "@lingui/react/macro"
-import Checkbox from "@/components/ui/Checkbox"
-import Input from "@/components/ui/Input"
-import Modal from "@/components/ui/Modal"
-import { SocketEvents } from "@/constants/socket-events"
-import { useSocket } from "@/context/SocketContext"
-import { TableInvitationPlainObject } from "@/server/towers/classes/TableInvitation"
+import { ChangeEvent, InputEvent, ReactNode, useState } from "react";
+import { Trans, useLingui } from "@lingui/react/macro";
+import { RoomLevel } from "db";
+import Checkbox from "@/components/ui/Checkbox";
+import Input from "@/components/ui/Input";
+import Modal from "@/components/ui/Modal";
+import { ClientToServerEvents } from "@/constants/socket/client-to-server";
+import { useSocket } from "@/context/SocketContext";
+import { SocketCallback } from "@/interfaces/socket";
+import { TableInvitationPlainObject } from "@/server/towers/classes/TableInvitation";
 
 type TableInvitationModalProps = {
   tableInvitation: TableInvitationPlainObject
   onAcceptInvitation: (roomId: string, tableId: string) => void
   onCancel: () => void
-}
+};
 
 export default function TableInvitationModal({
   tableInvitation,
   onAcceptInvitation,
   onCancel,
 }: TableInvitationModalProps): ReactNode {
-  const { socketRef } = useSocket()
-  const { t } = useLingui()
-  const [reason, setReason] = useState<string | undefined>(undefined)
-  const [declineAll, setDeclineAll] = useState<boolean>(false)
-  const username: string | undefined = tableInvitation.inviterUsername
-  const userRating: number = tableInvitation.inviterRating
-  const tableNumber: number = tableInvitation.tableNumber
-  const ratedOption: string = tableInvitation.tableIsRated ? t({ message: "Rated" }) : t({ message: "Not Rated" })
+  const { socketRef } = useSocket();
+  const { t } = useLingui();
+  const [reason, setReason] = useState<string>("");
+  const [isDeclineAll, setIsDeclineAll] = useState<boolean>(false);
+  const username: string | undefined = tableInvitation.inviterPlayer.user.username;
+  const rating: number | undefined = tableInvitation.inviterPlayer.stats?.rating;
+  const isRatingVisible: boolean = tableInvitation.room.level !== RoomLevel.SOCIAL;
+  const inviterInfo: string = isRatingVisible ? `${username} (${rating})` : username;
+  const tableNumber: number = tableInvitation.table.tableNumber;
+  const ratedOption: string = tableInvitation.table.isRated ? t({ message: "Rated" }) : t({ message: "Not Rated" });
 
   const handleAcceptInvitation = (): void => {
-    socketRef.current?.emit(SocketEvents.TABLE_INVITATION_ACCEPTED, {
-      roomId: tableInvitation.roomId,
-      tableId: tableInvitation.tableId,
-      inviteeUserId: tableInvitation.inviteeUserId,
-    })
-    onAcceptInvitation(tableInvitation.roomId, tableInvitation.tableId)
-    onCancel?.()
-  }
+    socketRef.current?.emit(
+      ClientToServerEvents.TABLE_INVITATION_ACCEPTED,
+      { invitationId: tableInvitation.id },
+      (response: SocketCallback<void>) => {
+        if (response.success) {
+          onAcceptInvitation(tableInvitation.roomId, tableInvitation.tableId);
+          onCancel?.();
+        }
+      },
+    );
+  };
 
   const handleDeclineInvitation = (): void => {
-    socketRef.current?.emit(SocketEvents.TABLE_INVITATION_DECLINED, {
-      roomId: tableInvitation.roomId,
-      tableId: tableInvitation.tableId,
-      inviteeUserId: tableInvitation.inviteeUserId,
-      reason,
-    })
-    onCancel?.()
-  }
+    socketRef.current?.emit(
+      ClientToServerEvents.TABLE_INVITATION_DECLINED,
+      {
+        invitationId: tableInvitation.id,
+        reason,
+        isDeclineAll: isDeclineAll,
+      },
+      (response: SocketCallback<void>) => {
+        if (response.success) {
+          onCancel?.();
+        }
+      },
+    );
+  };
 
   return (
     <Modal
@@ -61,7 +74,7 @@ export default function TableInvitationModal({
       <div className="flex flex-col gap-4">
         <div>
           <Trans>
-            {username} ({userRating}) has invited you to table #{tableNumber}.
+            {inviterInfo} has invited you to table #{tableNumber}.
           </Trans>
         </div>
         <div>
@@ -81,12 +94,12 @@ export default function TableInvitationModal({
           <Checkbox
             id="declineAll"
             label={t({ message: "Decline All Invitations" })}
-            defaultChecked={declineAll}
+            defaultChecked={isDeclineAll}
             disabled
-            onChange={(event: ChangeEvent<HTMLInputElement>) => setDeclineAll(event.target.checked)}
+            onChange={(event: ChangeEvent<HTMLInputElement>) => setIsDeclineAll(event.target.checked)}
           />
         </div>
       </div>
     </Modal>
-  )
+  );
 }

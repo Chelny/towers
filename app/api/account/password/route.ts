@@ -1,12 +1,12 @@
-import { headers } from "next/headers"
-import { NextRequest, NextResponse } from "next/server"
-import { t } from "@lingui/core/macro"
-import { APIError } from "better-auth/api"
-import { Status } from "better-status-codes"
-import { auth } from "@/lib/auth"
+import { headers } from "next/headers";
+import { NextRequest, NextResponse } from "next/server";
+import { t } from "@lingui/core/macro";
+import { APIError } from "better-auth/api";
+import { Status } from "better-status-codes";
+import { auth } from "@/lib/auth";
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
-  const body = await request.json()
+  const body = await request.json();
 
   try {
     await auth.api.setPassword({
@@ -14,7 +14,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       body: {
         newPassword: body.password,
       },
-    })
+    });
   } catch (error) {
     if (error instanceof APIError) {
       return NextResponse.json(
@@ -24,7 +24,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         },
         // @ts-ignore
         { status: Status[error.status] },
-      )
+      );
     }
   }
 
@@ -34,5 +34,5 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       message: t({ message: "The password has been set!" }),
     },
     { status: 200 },
-  )
+  );
 }

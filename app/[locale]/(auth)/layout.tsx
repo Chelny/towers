@@ -1,12 +1,12 @@
-import { PropsWithChildren, ReactNode } from "react"
-import Image from "next/image"
-import clsx from "clsx/lite"
-import LocaleSwitcher from "@/components/LanguageSwitcher"
-import { APP_CONFIG } from "@/constants/app"
+import { PropsWithChildren, ReactNode } from "react";
+import Image from "next/image";
+import clsx from "clsx/lite";
+import LocaleSwitcher from "@/components/LanguageSwitcher";
+import { APP_CONFIG } from "@/constants/app";
 
 type AuthLayoutProps = PropsWithChildren<{
   breadcrumb: ReactNode
-}>
+}>;
 
 export default function AuthLayout({ children, breadcrumb }: AuthLayoutProps): ReactNode {
   return (
@@ -47,5 +47,5 @@ export default function AuthLayout({ children, breadcrumb }: AuthLayoutProps): R
         </div>
       </div>
     </div>
-  )
+  );
 }

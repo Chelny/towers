@@ -1,17 +1,17 @@
-"use client"
+"use client";
 
-import { ReactNode, useEffect, useRef, useState } from "react"
-import { Trans, useLingui } from "@lingui/react/macro"
-import clsx from "clsx/lite"
-import { format } from "date-fns"
+import { ReactNode, useEffect, useRef, useState } from "react";
+import { Trans, useLingui } from "@lingui/react/macro";
+import clsx from "clsx/lite";
+import { format } from "date-fns";
 import {
   PiCaretDoubleLeftDuotone,
   PiCaretDoubleRightDuotone,
   PiCaretLeftDuotone,
   PiCaretRightDuotone,
-} from "react-icons/pi"
-import Button from "@/components/ui/Button"
-import { getDateFnsLocale } from "@/translations/languages"
+} from "react-icons/pi";
+import Button from "@/components/ui/Button";
+import { getDateFnsLocale } from "@/translations/languages";
 
 type CalendarProps = {
   id: string
@@ -26,7 +26,7 @@ type CalendarProps = {
   description?: string
   errorMessage?: string
   onChange?: (date: string) => void
-}
+};
 
 export default function Calendar({
   id,
@@ -42,16 +42,16 @@ export default function Calendar({
   errorMessage = "",
   onChange,
 }: CalendarProps): ReactNode {
-  const { i18n, t } = useLingui()
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(defaultValue ? new Date(defaultValue) : undefined)
+  const { i18n, t } = useLingui();
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(defaultValue ? new Date(defaultValue) : undefined);
   const [browsingDate, setBrowsingDate] = useState<Date>(
     maxDate ? new Date(Math.min(maxDate.getTime(), new Date().getTime())) : new Date(),
-  )
-  const [daysInMonth, setDaysInMonth] = useState<number[]>([])
-  const [isCalendarVisible, setCalendarVisible] = useState<boolean>(false)
-  const [view, setView] = useState<"month" | "year">("month")
-  const [currentDecade, setCurrentDecade] = useState<number>(Math.floor(browsingDate.getUTCFullYear() / 10) * 10)
-  const calendarRef = useRef<HTMLDivElement>(null)
+  );
+  const [daysInMonth, setDaysInMonth] = useState<number[]>([]);
+  const [isCalendarVisible, setCalendarVisible] = useState<boolean>(false);
+  const [view, setView] = useState<"month" | "year">("month");
+  const [currentDecade, setCurrentDecade] = useState<number>(Math.floor(browsingDate.getUTCFullYear() / 10) * 10);
+  const calendarRef = useRef<HTMLDivElement>(null);
   const monthNames: string[] = [
     t({ message: "January" }),
     t({ message: "February" }),
@@ -65,7 +65,7 @@ export default function Calendar({
     t({ message: "October" }),
     t({ message: "November" }),
     t({ message: "December" }),
-  ]
+  ];
   const fullWeekDays: string[] = [
     t({ message: "Sunday" }),
     t({ message: "Monday" }),
@@ -74,56 +74,56 @@ export default function Calendar({
     t({ message: "Thursday" }),
     t({ message: "Friday" }),
     t({ message: "Saturday" }),
-  ]
-  const daysOfWeek: string[] = fullWeekDays.map((day: string) => day.charAt(0).toUpperCase())
+  ];
+  const daysOfWeek: string[] = fullWeekDays.map((day: string) => day.charAt(0).toUpperCase());
 
   useEffect(() => {
-    const year: number = browsingDate.getUTCFullYear()
-    const month: number = browsingDate.getUTCMonth()
-    const daysInMonthCount: number = new Date(year, month + 1, 0).getUTCDate()
+    const year: number = browsingDate.getUTCFullYear();
+    const month: number = browsingDate.getUTCMonth();
+    const daysInMonthCount: number = new Date(year, month + 1, 0).getUTCDate();
 
-    setDaysInMonth(Array.from({ length: daysInMonthCount }, (_, index: number) => index + 1))
-  }, [browsingDate])
+    setDaysInMonth(Array.from({ length: daysInMonthCount }, (_, index: number) => index + 1));
+  }, [browsingDate]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent): void => {
       if (calendarRef.current && !calendarRef.current.contains(event.target as Node)) {
-        handleCloseCalendar()
+        handleCloseCalendar();
       }
-    }
+    };
 
-    document.addEventListener("mousedown", handleClickOutside)
+    document.addEventListener("mousedown", handleClickOutside);
 
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside)
-    }
-  }, [])
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const handleOpenCalendar = (): void => {
     const initialBrowsingDate: Date =
-      (defaultValue && new Date(defaultValue).getTime() && new Date(defaultValue)) || new Date(maxDate) || new Date()
+      (defaultValue && new Date(defaultValue).getTime() && new Date(defaultValue)) || new Date(maxDate) || new Date();
 
-    setBrowsingDate(initialBrowsingDate)
-    setCalendarVisible(true)
-  }
+    setBrowsingDate(initialBrowsingDate);
+    setCalendarVisible(true);
+  };
 
   const handleCloseCalendar = (): void => {
-    setView("month")
-    setCalendarVisible(false)
-  }
+    setView("month");
+    setCalendarVisible(false);
+  };
 
   const handleSelectDay = (day: number): void => {
-    if (disabled) return
+    if (disabled) return;
 
-    const newDate: Date = new Date(browsingDate.getUTCFullYear(), browsingDate.getUTCMonth(), day, 12, 0, 0, 0)
+    const newDate: Date = new Date(browsingDate.getUTCFullYear(), browsingDate.getUTCMonth(), day, 12, 0, 0, 0);
 
-    setSelectedDate(newDate)
-    onChange?.(newDate.toISOString().split("T")[0])
-    handleCloseCalendar()
-  }
+    setSelectedDate(newDate);
+    onChange?.(newDate.toISOString().split("T")[0]);
+    handleCloseCalendar();
+  };
 
   const handleYearChange = (direction: number): void => {
-    const newYear: number = browsingDate.getUTCFullYear() + direction
+    const newYear: number = browsingDate.getUTCFullYear() + direction;
     const newBrowsingDate: Date = new Date(
       newYear,
       browsingDate.getUTCMonth(),
@@ -131,37 +131,37 @@ export default function Calendar({
         selectedDate ? selectedDate.getUTCDate() : new Date().getUTCDate(),
         new Date(newYear, browsingDate.getUTCMonth() + 1, 0).getUTCDate(),
       ),
-    )
+    );
 
     if (newBrowsingDate >= minDate && newBrowsingDate <= maxDate) {
-      setBrowsingDate(newBrowsingDate)
+      setBrowsingDate(newBrowsingDate);
     }
-  }
+  };
 
   const handleMonthChange = (direction: number): void => {
-    const newMonth: number = browsingDate.getUTCMonth() + direction
-    const newYear: number = browsingDate.getUTCFullYear() + Math.floor(newMonth / 12)
-    const adjustedMonth: number = (newMonth + 12) % 12
-    const newBrowsingDate: Date = new Date(newYear, adjustedMonth)
+    const newMonth: number = browsingDate.getUTCMonth() + direction;
+    const newYear: number = browsingDate.getUTCFullYear() + Math.floor(newMonth / 12);
+    const adjustedMonth: number = (newMonth + 12) % 12;
+    const newBrowsingDate: Date = new Date(newYear, adjustedMonth);
 
     if (newBrowsingDate >= minDate && newBrowsingDate <= maxDate) {
-      setBrowsingDate(newBrowsingDate)
+      setBrowsingDate(newBrowsingDate);
     }
-  }
+  };
 
   const renderDayPicker = (): ReactNode => {
-    const firstDayOfMonth: number = new Date(browsingDate.getUTCFullYear(), browsingDate.getUTCMonth(), 1).getDay()
-    const daysArray: (number | null)[] = new Array(firstDayOfMonth).fill(null).concat(daysInMonth)
-    const rows: (number | null)[][] = []
-    const currentYear: number = browsingDate.getUTCFullYear()
-    const currentMonth: number = browsingDate.getUTCMonth()
+    const firstDayOfMonth: number = new Date(browsingDate.getUTCFullYear(), browsingDate.getUTCMonth(), 1).getDay();
+    const daysArray: (number | null)[] = new Array(firstDayOfMonth).fill(null).concat(daysInMonth);
+    const rows: (number | null)[][] = [];
+    const currentYear: number = browsingDate.getUTCFullYear();
+    const currentMonth: number = browsingDate.getUTCMonth();
     const isCurrentMonthMinYear: boolean =
-      currentYear === minDate.getUTCFullYear() && currentMonth === minDate.getUTCMonth()
+      currentYear === minDate.getUTCFullYear() && currentMonth === minDate.getUTCMonth();
     const isCurrentMonthMaxYear: boolean =
-      currentYear === maxDate.getUTCFullYear() && currentMonth === maxDate.getUTCMonth()
+      currentYear === maxDate.getUTCFullYear() && currentMonth === maxDate.getUTCMonth();
 
     for (let i = 0; i < daysArray.length; i += 7) {
-      rows.push(daysArray.slice(i, i + 7))
+      rows.push(daysArray.slice(i, i + 7));
     }
 
     return (
@@ -177,16 +177,16 @@ export default function Calendar({
           <div key={weekIndex} role="row">
             <div className="grid grid-cols-7 gap-1">
               {week.map((day: number | null, dayIndex: number) => {
-                const displayDay: number | string = day !== null ? day : ""
+                const displayDay: number | string = day !== null ? day : "";
                 const defaultSelectedDate: Date =
-                  (selectedDate && selectedDate.getTime() && selectedDate) || maxDate || new Date()
+                  (selectedDate && selectedDate.getTime() && selectedDate) || maxDate || new Date();
                 const isSelectedDay: boolean =
                   day === defaultSelectedDate?.getUTCDate() &&
                   browsingDate.getUTCMonth() === defaultSelectedDate?.getUTCMonth() &&
-                  browsingDate.getUTCFullYear() === defaultSelectedDate?.getUTCFullYear()
+                  browsingDate.getUTCFullYear() === defaultSelectedDate?.getUTCFullYear();
                 const isDisabledDay: boolean =
                   (isCurrentMonthMinYear && day !== null && day <= maxDate.getUTCDate()) ||
-                  (isCurrentMonthMaxYear && day !== null && day > maxDate.getUTCDate())
+                  (isCurrentMonthMaxYear && day !== null && day > maxDate.getUTCDate());
 
                 return (
                   <button
@@ -210,17 +210,17 @@ export default function Calendar({
                   >
                     {displayDay}
                   </button>
-                )
+                );
               })}
             </div>
           </div>
         ))}
       </div>
-    )
-  }
+    );
+  };
 
   const renderYearPicker = (): ReactNode => {
-    const yearsInDecade: number[] = Array.from({ length: 10 }, (_, index: number) => currentDecade + index)
+    const yearsInDecade: number[] = Array.from({ length: 10 }, (_, index: number) => currentDecade + index);
 
     return (
       <div>
@@ -253,8 +253,8 @@ export default function Calendar({
                   className="text-center border border-gray-200 rounded-xs hover:bg-gray-200 dark:hover:bg-gray-600"
                   disabled={year > maxDate.getUTCFullYear() || year < minDate.getUTCFullYear()}
                   onClick={() => {
-                    setBrowsingDate(new Date(year, browsingDate.getUTCMonth()))
-                    setView("month")
+                    setBrowsingDate(new Date(year, browsingDate.getUTCMonth()));
+                    setView("month");
                   }}
                 >
                   {year}
@@ -263,16 +263,16 @@ export default function Calendar({
           )}
         </div>
       </div>
-    )
-  }
+    );
+  };
 
-  const isPreviousYearDisabled: boolean = browsingDate.getUTCFullYear() <= minDate.getUTCFullYear()
+  const isPreviousYearDisabled: boolean = browsingDate.getUTCFullYear() <= minDate.getUTCFullYear();
   const isNextYearDisabled: boolean =
-    new Date(browsingDate.getUTCFullYear() + 1, browsingDate.getUTCMonth(), browsingDate.getUTCDate()) > maxDate
+    new Date(browsingDate.getUTCFullYear() + 1, browsingDate.getUTCMonth(), browsingDate.getUTCDate()) > maxDate;
   const isPreviousMonthDisabled: boolean =
-    browsingDate.getUTCFullYear() === minDate.getUTCFullYear() && browsingDate.getUTCMonth() <= minDate.getUTCMonth()
+    browsingDate.getUTCFullYear() === minDate.getUTCFullYear() && browsingDate.getUTCMonth() <= minDate.getUTCMonth();
   const isNextMonthDisabled: boolean =
-    browsingDate.getUTCFullYear() === maxDate.getUTCFullYear() && browsingDate.getUTCMonth() >= maxDate.getUTCMonth()
+    browsingDate.getUTCFullYear() === maxDate.getUTCFullYear() && browsingDate.getUTCMonth() >= maxDate.getUTCMonth();
 
   return (
     <div className="relative mb-4">
@@ -390,5 +390,5 @@ export default function Calendar({
         </div>
       )}
     </div>
-  )
+  );
 }

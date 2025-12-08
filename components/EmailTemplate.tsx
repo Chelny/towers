@@ -1,21 +1,21 @@
-import { ReactNode } from "react"
-import { I18n } from "@lingui/core"
-import { initLingui } from "@/app/init-lingui"
-import { APP_CONFIG } from "@/constants/app"
-import { BODY_STYLE, EMAIL_COLORS } from "@/constants/email"
-import { defaultLocale } from "@/translations/languages"
+import { ReactNode } from "react";
+import { I18n } from "@lingui/core";
+import { initLingui } from "@/app/init-lingui";
+import { APP_CONFIG } from "@/constants/app";
+import { BODY_STYLE, EMAIL_COLORS } from "@/constants/email";
+import { defaultLocale } from "@/translations/languages";
 
 type EmailTemplateProps = {
   html: string
   locale: string
-}
+};
 
 export default function EmailTemplate({ html, locale = defaultLocale }: EmailTemplateProps): ReactNode {
-  const appName: string = APP_CONFIG.NAME
-  const startingYear: number = 2024
-  const currentYear: number = new Date().getFullYear()
-  const copyrightYear: string = startingYear === currentYear ? `${startingYear}` : `${startingYear}–${currentYear}`
-  const i18n: I18n = initLingui(locale)
+  const appName: string = APP_CONFIG.NAME;
+  const startingYear: number = 2024;
+  const currentYear: number = new Date().getFullYear();
+  const copyrightYear: string = startingYear === currentYear ? `${startingYear}` : `${startingYear}–${currentYear}`;
+  const i18n: I18n = initLingui(locale);
 
   return (
     <body style={{ paddingBottom: "32px", background: EMAIL_COLORS.background }}>
@@ -72,5 +72,5 @@ export default function EmailTemplate({ html, locale = defaultLocale }: EmailTem
         </tbody>
       </table>
     </body>
-  )
+  );
 }

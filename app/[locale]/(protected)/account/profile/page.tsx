@@ -1,40 +1,40 @@
-import { ReactNode, Suspense } from "react"
-import { Metadata } from "next"
-import { headers } from "next/headers"
-import { I18n } from "@lingui/core"
-import clsx from "clsx/lite"
-import { ChangeEmailForm } from "@/app/[locale]/(protected)/account/profile/change-email.form"
-import { ChangePasswordForm } from "@/app/[locale]/(protected)/account/profile/change-password.form"
-import { LinkedSocialAccountsForm } from "@/app/[locale]/(protected)/account/profile/linked-social-accounts.form"
-import { PasskeysForm } from "@/app/[locale]/(protected)/account/profile/passkeys.form"
-import { ProfileForm } from "@/app/[locale]/(protected)/account/profile/profile.form"
-import { initLingui } from "@/app/init-lingui"
-import ChangeEmailFormSkeleton from "@/components/skeleton/ChangeEmailFormSkeleton"
-import ChangePasswordFormSkeleton from "@/components/skeleton/ChangePasswordFormSkeleton"
-import LinkedSocialAccountsFormSkeleton from "@/components/skeleton/LinkedSocialAccountsFormSkeleton"
-import PasskeysFormSkeleton from "@/components/skeleton/PasskeysFormSkeleton"
-import ProfileFormSkeleton from "@/components/skeleton/ProfileFormSkeleton"
-import { ROUTE_PROFILE } from "@/constants/routes"
-import { auth } from "@/lib/auth"
-import { Session } from "@/lib/auth-client"
+import { ReactNode, Suspense } from "react";
+import { Metadata } from "next";
+import { headers } from "next/headers";
+import { I18n } from "@lingui/core";
+import clsx from "clsx/lite";
+import { ChangeEmailForm } from "@/app/[locale]/(protected)/account/profile/change-email.form";
+import { ChangePasswordForm } from "@/app/[locale]/(protected)/account/profile/change-password.form";
+import { LinkedSocialAccountsForm } from "@/app/[locale]/(protected)/account/profile/linked-social-accounts.form";
+import { PasskeysForm } from "@/app/[locale]/(protected)/account/profile/passkeys.form";
+import { ProfileForm } from "@/app/[locale]/(protected)/account/profile/profile.form";
+import { initLingui } from "@/app/init-lingui";
+import ChangeEmailFormSkeleton from "@/components/skeleton/ChangeEmailFormSkeleton";
+import ChangePasswordFormSkeleton from "@/components/skeleton/ChangePasswordFormSkeleton";
+import LinkedSocialAccountsFormSkeleton from "@/components/skeleton/LinkedSocialAccountsFormSkeleton";
+import PasskeysFormSkeleton from "@/components/skeleton/PasskeysFormSkeleton";
+import ProfileFormSkeleton from "@/components/skeleton/ProfileFormSkeleton";
+import { ROUTE_PROFILE } from "@/constants/routes";
+import { auth } from "@/lib/auth";
+import { Session } from "@/lib/auth-client";
 
 type ProfileProps = {
   params: Promise<Params>
-}
+};
 
 export async function generateMetadata({ params }: ProfileProps): Promise<Metadata> {
-  const routeParams: Params = await params
-  const i18n: I18n = initLingui(routeParams.locale)
+  const routeParams: Params = await params;
+  const i18n: I18n = initLingui(routeParams.locale);
 
   return {
     title: i18n._(ROUTE_PROFILE.TITLE),
-  }
+  };
 }
 
 export default async function Profile({ params }: ProfileProps): Promise<ReactNode> {
-  const routeParams: Params = await params
-  const i18n: I18n = initLingui(routeParams.locale)
-  const session: Session | null = await auth.api.getSession({ headers: await headers() })
+  const routeParams: Params = await params;
+  const i18n: I18n = initLingui(routeParams.locale);
+  const session: Session | null = await auth.api.getSession({ headers: await headers() });
 
   return (
     <>
@@ -117,5 +117,5 @@ export default async function Profile({ params }: ProfileProps): Promise<ReactNo
         </section>
       </div>
     </>
-  )
+  );
 }

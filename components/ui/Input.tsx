@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
   ClipboardEvent,
@@ -11,11 +11,11 @@ import {
   useImperativeHandle,
   useRef,
   useState,
-} from "react"
-import { Trans, useLingui } from "@lingui/react/macro"
-import clsx from "clsx/lite"
-import { FaEye, FaEyeSlash } from "react-icons/fa6"
-import Button from "@/components/ui/Button"
+} from "react";
+import { Trans, useLingui } from "@lingui/react/macro";
+import clsx from "clsx/lite";
+import { FaEye, FaEyeSlash } from "react-icons/fa6";
+import Button from "@/components/ui/Button";
 
 export interface InputImperativeHandle {
   value: string | null | undefined
@@ -43,7 +43,7 @@ type InputProps = {
   onPaste?: (_: ClipboardEvent<HTMLInputElement>) => void
   onKeyDown?: (_: KeyboardEvent<HTMLInputElement>) => void
   onInlineButtonClick?: () => void
-}
+};
 
 export default forwardRef<InputImperativeHandle, InputProps>(function Input(
   {
@@ -69,40 +69,40 @@ export default forwardRef<InputImperativeHandle, InputProps>(function Input(
   }: InputProps,
   ref: ForwardedRef<InputImperativeHandle>,
 ): ReactNode {
-  const { t } = useLingui()
-  const inputRef = useRef<HTMLInputElement>(null)
-  const [value, setValue] = useState<string | null | undefined>(defaultValue)
-  const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false)
-  const inputType: string = type === "password" && isPasswordVisible ? "text" : type
+  const { t } = useLingui();
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [value, setValue] = useState<string | null | undefined>(defaultValue);
+  const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
+  const inputType: string = type === "password" && isPasswordVisible ? "text" : type;
 
   const handleInput = (event: InputEvent<HTMLInputElement>): void => {
-    setValue((event.target as HTMLInputElement).value)
-    onInput?.(event)
-  }
+    setValue((event.target as HTMLInputElement).value);
+    onInput?.(event);
+  };
 
   const handlePaste = (event: ClipboardEvent<HTMLInputElement>): void => {
-    onPaste?.(event)
-  }
+    onPaste?.(event);
+  };
 
   const handleKeydown = (event: KeyboardEvent<HTMLInputElement>): void => {
     if (event.key === "Enter") {
       if (typeof inlineButtonText !== "undefined") {
-        onInlineButtonClick?.()
+        onInlineButtonClick?.();
       }
     }
 
-    onKeyDown?.(event)
-  }
+    onKeyDown?.(event);
+  };
 
   const handleTogglePasswordVisibility = (): void => {
-    setIsPasswordVisible((isPasswordVisible: boolean) => !isPasswordVisible)
-  }
+    setIsPasswordVisible((isPasswordVisible: boolean) => !isPasswordVisible);
+  };
 
   useImperativeHandle(ref, () => ({
     value,
     focus: () => inputRef.current?.focus(),
     clear: () => setValue(""),
-  }))
+  }));
 
   return (
     <div className="flex flex-col mb-4">
@@ -184,5 +184,5 @@ export default forwardRef<InputImperativeHandle, InputProps>(function Input(
         </span>
       )}
     </div>
-  )
-})
+  );
+});

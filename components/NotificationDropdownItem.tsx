@@ -1,49 +1,134 @@
-"use client"
+"use client";
 
-import { useEffect } from "react"
-import { useLingui } from "@lingui/react/macro"
-import clsx from "clsx/lite"
-import { MdOutlineDelete } from "react-icons/md"
-import { useGame } from "@/context/GameContext"
-import { useOnScreen } from "@/hooks/useOnScreen"
-import { SidebarMenuDropdownItem } from "@/interfaces/sidebar-menu"
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useLingui } from "@lingui/react/macro";
+import clsx from "clsx/lite";
+import { NotificationType } from "db";
+import { MdOutlineDelete } from "react-icons/md";
+import AlertModal from "@/components/game/AlertModal";
+import TableInvitationModal from "@/components/game/TableInvitationModal";
+import { ROUTE_TOWERS } from "@/constants/routes";
+import { ClientToServerEvents } from "@/constants/socket/client-to-server";
+import { useModal } from "@/context/ModalContext";
+import { useSocket } from "@/context/SocketContext";
+import { useOnScreen } from "@/hooks/useOnScreen";
+import { NotificationPlainObject } from "@/server/towers/classes/Notification";
 
 type NotificationDropdownItemProps = {
-  item: SidebarMenuDropdownItem
-}
+  notification: NotificationPlainObject
+};
 
-export const NotificationDropdownItem = ({ item }: NotificationDropdownItemProps) => {
-  const { t } = useLingui()
-  const { removeNotification, markNotificationRead } = useGame()
-  const [ref, isInView] = useOnScreen<HTMLLIElement>()
+export const NotificationDropdownItem = ({ notification }: NotificationDropdownItemProps) => {
+  const router = useRouter();
+  const { i18n, t } = useLingui();
+  const { openModal, closeModal } = useModal();
+  const { socketRef } = useSocket();
+  const [ref, isInView] = useOnScreen<HTMLLIElement>();
+
+  const setNotificationLabel = (notification: NotificationPlainObject): string => {
+    switch (notification.type) {
+      case NotificationType.TABLE_INVITE:
+        return i18n._("Invitation to table #{tableNumber}", {
+          tableNumber: notification.tableInvitation?.table.tableNumber,
+        });
+
+      case NotificationType.TABLE_INVITE_DECLINED:
+        return notification.tableInvitation?.declinedReason
+          ? i18n._("{username} declined your invitation. Reason: {reason}", {
+              username: notification.tableInvitation?.inviteePlayer.user.username,
+              reason: notification.tableInvitation?.declinedReason,
+            })
+          : i18n._("{username} declined your invitation.", {
+              username: notification.tableInvitation?.inviteePlayer.user.username,
+            });
+
+      case NotificationType.TABLE_BOOTED:
+        return i18n._("You have been booted from table #{tableNumber} by {host}.", {
+          tableNumber: notification.bootedFromTable?.table.tableNumber,
+          host: notification.bootedFromTable?.table.hostPlayer.user.username,
+        });
+
+      default:
+        return "";
+    }
+  };
+
+  const openNotificationModal = async (notification: NotificationPlainObject): Promise<void> => {
+    switch (notification.type) {
+      case NotificationType.TABLE_INVITE:
+        if (!notification.tableInvitation) return;
+        openModal(TableInvitationModal, {
+          tableInvitation: notification.tableInvitation,
+          onAcceptInvitation: (roomId: string, tableId: string) => {
+            router.push(`${ROUTE_TOWERS.PATH}?room=${roomId}&table=${tableId}`);
+            closeModal();
+          },
+        });
+        break;
+
+      case NotificationType.TABLE_INVITE_DECLINED:
+        if (!notification.tableInvitation) return;
+        openModal(AlertModal, {
+          title: t({ message: "Invitation Declined" }),
+          message: notification.tableInvitation.declinedReason
+            ? i18n._("{username} declined your invitation. Reason: {reason}", {
+                username: notification.tableInvitation.inviteePlayer.user.username,
+                reason: notification.tableInvitation.declinedReason,
+              })
+            : i18n._("{username} declined your invitation.", {
+                username: notification.tableInvitation.inviteePlayer.user.username,
+              }),
+          testId: "table-invite-declined",
+        });
+        break;
+
+      case NotificationType.TABLE_BOOTED:
+        if (!notification.bootedFromTable) return;
+        openModal(AlertModal, {
+          title: t({ message: "Booted from table" }),
+          message: i18n._("You have been booted from table #{tableNumber} by {host}.", {
+            tableNumber: notification.bootedFromTable.table.tableNumber,
+            host: notification.bootedFromTable.table.hostPlayer.user.username,
+          }),
+          testId: "booted-user",
+        });
+        break;
+    }
+  };
+
+  const handleMarkNotificationAsRead = async (): Promise<void> => {
+    socketRef.current?.emit(ClientToServerEvents.NOTIFICATION_MARK_AS_READ, { notificationId: notification.id });
+  };
+
+  const handleRemoveNotification = async (): Promise<void> => {
+    socketRef.current?.emit(ClientToServerEvents.NOTIFICATION_DELETE, { notificationId: notification.id });
+  };
 
   useEffect(() => {
-    if (isInView && item.notification.status === "unread") {
-      markNotificationRead(item.roomId, item.notification.id)
+    if (isInView && !notification.readAt) {
+      handleMarkNotificationAsRead();
     }
-  }, [isInView, item.notification.id, item.notification.status, item.roomId, markNotificationRead])
+  }, [isInView, notification]);
 
   return (
-    <li ref={ref} className={clsx("flex justify-between items-start gap-1 w-full", "hover:bg-slate-700")}>
+    <li ref={ref} className={clsx("flex justify-between items-center gap-2 w-full", "hover:bg-slate-700")}>
       <button
         type="button"
-        className={clsx(
-          "flex-1 px-3 py-1 text-start",
-          item.notification.status === "read" ? "text-white/50" : "text-white/80",
-        )}
-        onClick={item.onClick}
+        className={clsx("flex-1 px-2 py-1 text-start", notification.readAt ? "font-normal" : "font-semibold")}
+        onClick={() => openNotificationModal(notification)}
       >
-        {item.label}
+        {setNotificationLabel(notification)}
       </button>
 
       <button
         type="button"
-        className="p-2 text-red-500"
+        className="p-2 text-red-500 cursor-pointer"
         aria-label={t({ message: "Delete notification" })}
-        onClick={() => removeNotification(item.roomId, item.notification.id)}
+        onClick={handleRemoveNotification}
       >
         <MdOutlineDelete aria-hidden="true" />
       </button>
     </li>
-  )
-}
+  );
+};

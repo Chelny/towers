@@ -1,7 +1,7 @@
-import { ReactNode } from "react"
-import { Trans } from "@lingui/react/macro"
-import clsx from "clsx/lite"
-import GoToHomepageLink from "@/components/GoToHomepageLink"
+import { ReactNode } from "react";
+import { Trans } from "@lingui/react/macro";
+import clsx from "clsx/lite";
+import GoToHomepageLink from "@/components/GoToHomepageLink";
 
 export default function NotFound(): ReactNode {
   return (
@@ -22,5 +22,5 @@ export default function NotFound(): ReactNode {
         <GoToHomepageLink />
       </div>
     </div>
-  )
+  );
 }

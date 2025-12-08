@@ -12,4 +12,4 @@ export type TowersControlKeys = {
   USE_ITEM_ON_PLAYER_6: string
   USE_ITEM_ON_PLAYER_7: string
   USE_ITEM_ON_PLAYER_8: string
-}
+};

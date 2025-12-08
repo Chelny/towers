@@ -1,6 +1,12 @@
-import { NextConfig } from "next"
+import { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  allowedDevOrigins: process.env.ALLOWED_DEV_ORIGINS?.split(";") || [],
+  // compiler: {
+  //   removeConsole: {
+  //     exclude: ["warn"],
+  //   },
+  // },
   env: {
     PROTOCOL: process.env.PROTOCOL,
     HOSTNAME: process.env.HOSTNAME,
@@ -16,6 +22,7 @@ const nextConfig: NextConfig = {
     EMAIL_SENDER: process.env.EMAIL_SENDER,
     EMAIL_RECIPIENT: process.env.EMAIL_RECIPIENT,
     GOOGLE_ANALYTICS: process.env.GOOGLE_ANALYTICS,
+    TEST_MODE: process.env.TEST_MODE,
   },
   eslint: {
     ignoreDuringBuilds: true,
@@ -35,6 +42,7 @@ const nextConfig: NextConfig = {
     ],
   },
   experimental: {
+    serverSourceMaps: false,
     swcPlugins: [["@lingui/swc-plugin", {}]],
   },
   images: {
@@ -68,6 +76,7 @@ const nextConfig: NextConfig = {
     },
   },
   poweredByHeader: false,
+  productionBrowserSourceMaps: false,
   reactStrictMode: true,
   redirects: async () => {
     return [
@@ -86,7 +95,7 @@ const nextConfig: NextConfig = {
         destination: "/games/towers",
         permanent: false,
       },
-    ]
+    ];
   },
   serverExternalPackages: ["pino", "pino-pretty"],
   turbopack: {
@@ -97,14 +106,20 @@ const nextConfig: NextConfig = {
       },
     },
   },
-  webpack: (config) => {
-    config.cache = false
+  webpack: (config, { isServer }) => {
+    config.cache = false;
     config.module.rules.push({
       test: /\.po$/,
       use: ["@lingui/loader"],
-    })
-    return config
-  },
-}
+    });
 
-export default nextConfig
+    // Don’t bundle "socket.io-client" into the server build, just require it at runtime
+    if (isServer) {
+      config.externals = [...config.externals, "socket.io-client"];
+    }
+
+    return config;
+  },
+};
+
+export default nextConfig;

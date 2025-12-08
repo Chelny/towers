@@ -1,7 +1,7 @@
-import { PropsWithChildren, ReactNode } from "react"
+import { PropsWithChildren, ReactNode } from "react";
 
-type BreadcrumbLayoutProps = PropsWithChildren<{}>
+type BreadcrumbLayoutProps = PropsWithChildren<{}>;
 
 export default function BreadcrumbLayout({ children }: BreadcrumbLayoutProps): ReactNode {
-  return <>{children}</>
+  return <>{children}</>;
 }

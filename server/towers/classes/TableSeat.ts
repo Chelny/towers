@@ -1,91 +1,104 @@
-import { Board, BoardPlainObject } from "@/server/towers/classes/Board"
-import { NextPieces, NextPiecesPlainObject } from "@/server/towers/classes/NextPieces"
-import { PieceBlock } from "@/server/towers/classes/PieceBlock"
-import { PowerBar, PowerBarPlainObject } from "@/server/towers/classes/PowerBar"
-import { TowersPieceBlockPowerManager } from "@/server/towers/classes/TowersPieceBlockPowerManager"
-import { User, UserPlainObject } from "@/server/towers/classes/User"
-import { isPowerBarItem } from "@/server/towers/utils/piece-type-check"
+import { Player, PlayerPlainObject } from "@/server/towers/classes/Player";
+import { Board, BoardPlainObject } from "@/server/towers/game/Board";
+import { NextPieces, NextPiecesPlainObject } from "@/server/towers/game/NextPieces";
+import { PieceBlock } from "@/server/towers/game/PieceBlock";
+import { PowerBar, PowerBarPlainObject } from "@/server/towers/game/PowerBar";
+import { TowersPieceBlockPowerManager } from "@/server/towers/game/TowersPieceBlockPowerManager";
+import { isPowerBarItem } from "@/server/towers/utils/piece-type-check";
 
-export interface TableSeatPlainObject {
+export interface TableSeatProps {
+  id: string
+  tableId: string
   seatNumber: number
-  targetNumber: number
-  teamNumber: number
-  occupiedBy?: UserPlainObject
-  board?: BoardPlainObject
-  nextPieces?: NextPiecesPlainObject
-  powerBar?: PowerBarPlainObject
+  occupiedByPlayer: Player | null
 }
 
-/**
- * Represents an individual seat at a table.
- *
- * Each seat can be assigned to a player, and contains gameplay state like the board and power bar.
- */
+export interface TableSeatPlainObject {
+  readonly id: string
+  readonly tableId: string
+  readonly seatNumber: number
+  readonly targetNumber: number
+  readonly teamNumber: number
+  readonly occupiedByPlayerId: string | null
+  readonly occupiedByPlayer: PlayerPlainObject | null
+  readonly board: BoardPlainObject | null
+  readonly nextPieces: NextPiecesPlainObject | null
+  readonly powerBar: PowerBarPlainObject | null
+}
+
 export class TableSeat {
-  public tableId: string
-  public seatNumber: number
-  public targetNumber: number
-  public teamNumber: number
-  public occupiedBy: User | null = null
-  public towersPieceBlockPowerManager: TowersPieceBlockPowerManager | null = null
-  public nextPieces: NextPieces | null = null
-  public powerBar: PowerBar | null = null
-  public board: Board | null = null
+  public readonly id: string;
+  public readonly tableId: string;
+  public readonly seatNumber: number;
+  public readonly targetNumber: number;
+  public readonly teamNumber: number;
+  public occupiedByPlayerId: string | null = null;
+  private _occupiedByPlayer: Player | null = null;
+  public towersPieceBlockPowerManager: TowersPieceBlockPowerManager | null = null;
+  public nextPieces: NextPieces | null = null;
+  public powerBar: PowerBar | null = null;
+  public board: Board | null = null;
 
-  constructor(tableId: string, seatNumber: number) {
-    this.tableId = tableId
-    this.seatNumber = seatNumber
-    this.targetNumber = seatNumber
-    this.teamNumber = Math.ceil(seatNumber / 2)
+  constructor(props: TableSeatProps) {
+    this.id = props.id;
+    this.tableId = props.tableId;
+    this.seatNumber = props.seatNumber;
+    this.targetNumber = props.seatNumber;
+    this.teamNumber = Math.ceil(props.seatNumber / 2);
+
+    if ("occupiedByPlayer" in props && props.occupiedByPlayer) {
+      this.occupiedByPlayerId = props.occupiedByPlayer.id;
+      this._occupiedByPlayer = props.occupiedByPlayer;
+    }
   }
 
-  public setUser(user: User): void {
-    this.occupiedBy = user
+  public get occupiedByPlayer(): Player | null {
+    return this._occupiedByPlayer;
   }
 
-  public removeUser(): void {
-    this.occupiedBy = null
+  public set occupiedByPlayer(player: Player | null) {
+    this._occupiedByPlayer = player;
+    this.occupiedByPlayerId = player?.id ?? null;
   }
 
-  /**
-   * Set up the seat for a player.
-   * Initializes game-related objects for the player sitting.
-   */
+  public sit(player: Player): void {
+    this.occupiedByPlayer = player;
+  }
+
+  public stand(): void {
+    this.occupiedByPlayer = null;
+  }
+
   public initialize(): void {
-    this.towersPieceBlockPowerManager = new TowersPieceBlockPowerManager()
-    this.nextPieces = new NextPieces(this.towersPieceBlockPowerManager)
-    this.powerBar = new PowerBar()
+    this.towersPieceBlockPowerManager = new TowersPieceBlockPowerManager();
+    this.nextPieces = new NextPieces(this.towersPieceBlockPowerManager);
+    this.powerBar = new PowerBar();
     this.board = new Board(this.towersPieceBlockPowerManager, (block: PieceBlock) => {
       if (this.powerBar && isPowerBarItem(block)) {
-        this.powerBar.addItem(block)
+        this.powerBar.addItem(block);
       }
-    })
+    });
   }
 
-  public clearSeatUser(): void {
-    this.occupiedBy = null
-  }
-
-  /**
-   * Clear the seat board, next pieces and power bar.
-   * Resets game-related objects when game starts.
-   */
   public clearSeatGame(): void {
-    this.towersPieceBlockPowerManager = null
-    this.nextPieces = null
-    this.powerBar = null
-    this.board = null
+    this.towersPieceBlockPowerManager = null;
+    this.nextPieces = null;
+    this.powerBar = null;
+    this.board = null;
   }
 
   public toPlainObject(): TableSeatPlainObject {
     return {
+      id: this.id,
+      tableId: this.tableId,
       seatNumber: this.seatNumber,
       targetNumber: this.targetNumber,
       teamNumber: this.teamNumber,
-      occupiedBy: this.occupiedBy?.toPlainObject(),
-      board: this.board?.toPlainObject(),
-      nextPieces: this.nextPieces?.toPlainObject(),
-      powerBar: this.powerBar?.toPlainObject(),
-    }
+      occupiedByPlayerId: this.occupiedByPlayerId ?? null,
+      occupiedByPlayer: this.occupiedByPlayer?.toPlainObject() ?? null,
+      board: this.board?.toPlainObject() ?? null,
+      nextPieces: this.nextPieces?.toPlainObject() ?? null,
+      powerBar: this.powerBar?.toPlainObject() ?? null,
+    };
   }
 }

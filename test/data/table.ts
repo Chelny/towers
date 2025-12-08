@@ -1,4 +1,4 @@
-import { TableType } from "@/enums/table-type"
+import { TableType } from "db";
 
 export const mockJoinedTables1 = {
   "mock-table-1": {
@@ -23,7 +23,7 @@ export const mockJoinedTables1 = {
     isPlaying: false,
     createdAt: Date.now(),
   },
-}
+};
 
 export const mockLastJoinedTable1 = {
   id: "mock-table-1",
@@ -35,7 +35,7 @@ export const mockLastJoinedTable1 = {
   isReady: false,
   isPlaying: false,
   createdAt: Date.now(),
-}
+};
 
 export const mockJoinedTables2 = {
   "mock-table-1": {
@@ -49,7 +49,7 @@ export const mockJoinedTables2 = {
     isPlaying: false,
     createdAt: Date.now(),
   },
-}
+};
 
 export const mockLastJoinedTable2 = {
   id: "mock-table-1",
@@ -61,7 +61,7 @@ export const mockLastJoinedTable2 = {
   isReady: true,
   isPlaying: false,
   createdAt: Date.now(),
-}
+};
 
 export const mockJoinedTables3 = {
   "mock-table-1": {
@@ -75,7 +75,7 @@ export const mockJoinedTables3 = {
     isPlaying: false,
     createdAt: Date.now(),
   },
-}
+};
 
 export const mockLastJoinedTable3 = {
   id: "mock-table-1",
@@ -87,4 +87,4 @@ export const mockLastJoinedTable3 = {
   isReady: false,
   isPlaying: false,
   createdAt: Date.now(),
-}
+};

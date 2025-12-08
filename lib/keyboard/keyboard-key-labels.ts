@@ -1,7 +1,7 @@
-import { MessageDescriptor } from "@lingui/core"
-import { msg } from "@lingui/core/macro"
+import { MessageDescriptor } from "@lingui/core";
+import { msg } from "@lingui/core/macro";
 
-type ControlKeyLabels = Record<string, string | MessageDescriptor>
+type ControlKeyLabels = Record<string, string | MessageDescriptor>;
 
 export const keyboardKeyLabels: ControlKeyLabels = {
   ArrowLeft: msg`Left Arrow`,
@@ -86,4 +86,4 @@ export const keyboardKeyLabels: ControlKeyLabels = {
   Backquote: "`",
   Comma: ",",
   Period: ".",
-}
+};

@@ -12,7 +12,7 @@ export const mockUserControlKeys1 = {
   USE_ITEM_ON_PLAYER_6: "6",
   USE_ITEM_ON_PLAYER_7: "7",
   USE_ITEM_ON_PLAYER_8: "8",
-}
+};
 
 export const mockUserControlKeys2 = {
   MOVE_LEFT: "A",
@@ -28,7 +28,7 @@ export const mockUserControlKeys2 = {
   USE_ITEM_ON_PLAYER_6: "6",
   USE_ITEM_ON_PLAYER_7: "7",
   USE_ITEM_ON_PLAYER_8: "8",
-}
+};
 
 export const mockUserControlKeys3 = {
   MOVE_LEFT: "J",
@@ -44,4 +44,4 @@ export const mockUserControlKeys3 = {
   USE_ITEM_ON_PLAYER_6: "6",
   USE_ITEM_ON_PLAYER_7: "7",
   USE_ITEM_ON_PLAYER_8: "8",
-}
+};

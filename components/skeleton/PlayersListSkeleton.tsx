@@ -1,10 +1,10 @@
-import { ReactNode } from "react"
-import clsx from "clsx/lite"
+import { ReactNode } from "react";
+import clsx from "clsx/lite";
 
 type PlayersListSkeletonProps = {
   isRatingsVisible?: boolean | null
   isTableNumberVisible?: boolean
-}
+};
 
 export default function PlayersListSkeleton({
   isRatingsVisible = true,
@@ -69,5 +69,5 @@ export default function PlayersListSkeleton({
         ))}
       </div>
     </div>
-  )
+  );
 }

@@ -1,49 +1,104 @@
-"use client"
+"use client";
 
-import { ReactNode, useState } from "react"
-import dynamic from "next/dynamic"
-import { useLingui } from "@lingui/react/macro"
-import PlayersListSkeleton from "@/components/skeleton/PlayersListSkeleton"
-import Modal from "@/components/ui/Modal"
-import { SocketEvents } from "@/constants/socket-events"
-import { useSocket } from "@/context/SocketContext"
-import { UserPlainObject } from "@/server/towers/classes/User"
+import { ReactNode, useEffect, useState } from "react";
+import dynamic from "next/dynamic";
+import { useLingui } from "@lingui/react/macro";
+import { Socket } from "socket.io-client";
+import PlayersListSkeleton from "@/components/skeleton/PlayersListSkeleton";
+import Modal from "@/components/ui/Modal";
+import { ClientToServerEvents } from "@/constants/socket/client-to-server";
+import { ServerToClientEvents } from "@/constants/socket/server-to-client";
+import { useSocket } from "@/context/SocketContext";
+import { SocketCallback } from "@/interfaces/socket";
+import { TablePlayerPlainObject } from "@/server/towers/classes/TablePlayer";
 
 const PlayersList = dynamic(() => import("@/components/game/PlayersList"), {
   loading: () => <PlayersListSkeleton />,
-})
+});
 
 type TableBootUserModalProps = {
   roomId: string
   tableId: string
   hostId?: string
-  usersToBoot?: UserPlainObject[]
   isRatingsVisible?: boolean
   onCancel: () => void
-}
+};
 
 export default function TableBootUserModal({
   roomId,
   tableId,
   hostId,
-  usersToBoot,
   isRatingsVisible,
   onCancel,
 }: TableBootUserModalProps): ReactNode {
-  const { socketRef } = useSocket()
-  const { t } = useLingui()
-  const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null)
+  const { socketRef, isConnected } = useSocket();
+  const { t } = useLingui();
+  const [playersToBoot, setPlayersToBoot] = useState<TablePlayerPlainObject[] | undefined>(undefined);
+  const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!isConnected || !socketRef.current) return;
+
+    const socket: Socket | null = socketRef.current;
+
+    const handleUpdatePlayersList = (): void => {
+      socket.emit(
+        ClientToServerEvents.TABLE_PLAYERS_TO_BOOT,
+        { tableId },
+        (response: SocketCallback<TablePlayerPlainObject[]>) => {
+          if (response.success) {
+            setPlayersToBoot(response.data);
+          }
+        },
+      );
+    };
+
+    const emitInitialData = (): void => {
+      handleUpdatePlayersList();
+    };
+
+    const attachListeners = (): void => {
+      socket.on(ServerToClientEvents.TABLE_PLAYER_JOINED, handleUpdatePlayersList);
+      socket.on(ServerToClientEvents.TABLE_PLAYER_LEFT, handleUpdatePlayersList);
+    };
+
+    if (socket.connected) {
+      attachListeners();
+      emitInitialData();
+    } else {
+      socket.once("connect", () => {
+        attachListeners();
+        emitInitialData();
+      });
+    }
+
+    socket.on("reconnect", () => emitInitialData());
+
+    return () => {
+      socket.off(ServerToClientEvents.TABLE_PLAYER_JOINED, handleUpdatePlayersList);
+      socket.off(ServerToClientEvents.TABLE_PLAYER_LEFT, handleUpdatePlayersList);
+      socket.off("connect");
+      socket.off("reconnect", emitInitialData);
+    };
+  }, [isConnected, socketRef, tableId]);
 
   const handleSelectedPlayer = (): void => {
-    socketRef.current?.emit(SocketEvents.TABLE_BOOT_USER, { roomId, tableId, hostId, userToBootId: selectedPlayerId })
-    onCancel?.()
-  }
+    socketRef.current?.emit(
+      ClientToServerEvents.TABLE_BOOT_USER,
+      { tableId, hostId, playerToBootId: selectedPlayerId },
+      (response: SocketCallback<void>) => {
+        if (response.success) {
+          onCancel?.();
+        }
+      },
+    );
+  };
 
   return (
     <Modal
       title={t({ message: "Boot User" })}
       confirmText={t({ message: "Boot" })}
-      isConfirmButtonDisabled={usersToBoot?.length === 0}
+      isConfirmButtonDisabled={playersToBoot?.length === 0}
       dataTestId="table-boot-user"
       onConfirm={handleSelectedPlayer}
       onCancel={onCancel}
@@ -51,11 +106,11 @@ export default function TableBootUserModal({
       <div className="overflow-y-auto h-52">
         <PlayersList
           roomId={roomId}
-          users={usersToBoot}
+          players={playersToBoot}
           isRatingsVisible={isRatingsVisible}
           onSelectedPlayer={setSelectedPlayerId}
         />
       </div>
     </Modal>
-  )
+  );
 }

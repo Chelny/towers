@@ -1,10 +1,10 @@
-import pkg from "@next/env"
-import react from "@vitejs/plugin-react"
-import { defineConfig } from "vitest/config"
+import pkg from "@next/env";
+import react from "@vitejs/plugin-react";
+import { defineConfig } from "vitest/config";
 
-const { loadEnvConfig } = pkg
+const { loadEnvConfig } = pkg;
 
-loadEnvConfig(process.cwd())
+loadEnvConfig(process.cwd());
 
 export default defineConfig({
   assetsInclude: ["**/*.po"],
@@ -25,4 +25,4 @@ export default defineConfig({
     setupFiles: ["vitest.setup.ts", "test/utils/lingui.tsx"],
     include: ["**/*.test.ts", "**/*.test.tsx"],
   },
-})
+});

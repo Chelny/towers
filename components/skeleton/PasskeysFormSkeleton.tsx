@@ -1,5 +1,5 @@
-import { ReactNode } from "react"
-import clsx from "clsx/lite"
+import { ReactNode } from "react";
+import clsx from "clsx/lite";
 
 export default function PasskeysFormSkeleton(): ReactNode {
   return (
@@ -23,5 +23,5 @@ export default function PasskeysFormSkeleton(): ReactNode {
       ))}
       <div className={clsx("h-8 rounded-sm bg-gray-200", "dark:bg-dark-skeleton-content-background")} />
     </div>
-  )
+  );
 }

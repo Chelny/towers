@@ -1,18 +1,18 @@
-import { ReactNode } from "react"
-import clsx from "clsx/lite"
-import GridCell from "@/components/towers/GridCell"
-import { EMPTY_CELL, HIDDEN_ROWS_COUNT } from "@/constants/game"
-import { BoardBlock, BoardRow, PieceBlock } from "@/interfaces/towers"
-import { BlockToRemove } from "@/server/towers/classes/Board"
-import { PiecePlainObject } from "@/server/towers/classes/Piece"
+import { ReactNode } from "react";
+import clsx from "clsx/lite";
+import GridCell from "@/components/towers/GridCell";
+import { EMPTY_CELL, HIDDEN_ROWS_COUNT } from "@/constants/game";
+import { BoardBlock, BoardRow, PieceBlock } from "@/interfaces/towers";
+import { BlockToRemove } from "@/server/towers/game/Board";
+import { PiecePlainObject } from "@/server/towers/game/Piece";
 
 type GridRowProps = {
   rowIndex: number
   row: BoardRow
   isOpponentBoard?: boolean
-  currentPiece?: PiecePlainObject
+  currentPiece: PiecePlainObject | null
   blocksToRemove?: BlockToRemove[]
-}
+};
 
 export default function GridRow({
   rowIndex,
@@ -33,11 +33,11 @@ export default function GridRow({
       {row.map((boardBlock: BoardBlock, colIndex: number) => {
         const currentPieceBlock: BoardBlock | undefined = currentPiece?.blocks.find(
           (pieceBlock: PieceBlock) => pieceBlock.position.row === rowIndex && pieceBlock.position.col === colIndex,
-        )
-        const block: BoardBlock = boardBlock === EMPTY_CELL && currentPieceBlock ? currentPieceBlock : boardBlock
+        );
+        const block: BoardBlock = boardBlock === EMPTY_CELL && currentPieceBlock ? currentPieceBlock : boardBlock;
         const blockToRemove: BlockToRemove | undefined = blocksToRemove?.find(
           (block: BlockToRemove) => block.row === rowIndex && block.col === colIndex,
-        )
+        );
         const enhancedBlock: BoardBlock = blockToRemove
           ? {
               // @ts-ignore
@@ -45,10 +45,10 @@ export default function GridRow({
               isToBeRemoved: true,
               removedByOrigin: blockToRemove.removedByOrigin,
             }
-          : block
+          : block;
 
-        return <GridCell key={colIndex} block={enhancedBlock} isOpponentBoard={isOpponentBoard} />
+        return <GridCell key={colIndex} block={enhancedBlock} isOpponentBoard={isOpponentBoard} />;
       })}
     </div>
-  )
+  );
 }

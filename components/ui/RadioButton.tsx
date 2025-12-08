@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { ChangeEvent, ReactNode } from "react"
-import clsx from "clsx/lite"
+import { ChangeEvent, ReactNode } from "react";
+import clsx from "clsx/lite";
 
 type RadioButtonProps = {
   id: string
@@ -12,7 +12,7 @@ type RadioButtonProps = {
   disabled?: boolean
   dataTestId?: string
   onChange?: (_: ChangeEvent<HTMLInputElement>) => void
-}
+};
 
 export default function RadioButton({
   id,
@@ -25,8 +25,8 @@ export default function RadioButton({
   onChange,
 }: RadioButtonProps): ReactNode {
   const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
-    onChange?.(event)
-  }
+    onChange?.(event);
+  };
 
   return (
     <div className="flex items-center gap-2">
@@ -63,5 +63,5 @@ export default function RadioButton({
         {label}
       </label>
     </div>
-  )
+  );
 }

@@ -1,5 +1,5 @@
-import { ReactNode } from "react"
-import clsx from "clsx/lite"
+import { ReactNode } from "react";
+import clsx from "clsx/lite";
 
 export default function ChatSkeleton(): ReactNode {
   return (
@@ -14,5 +14,5 @@ export default function ChatSkeleton(): ReactNode {
         ))}
       </div>
     </div>
-  )
+  );
 }

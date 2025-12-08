@@ -1,61 +1,61 @@
-"use client"
+"use client";
 
-import { FormEvent, ReactNode, useEffect, useState } from "react"
-import { usePathname, useRouter } from "next/navigation"
-import { Trans, useLingui } from "@lingui/react/macro"
-import { Value, ValueError } from "@sinclair/typebox/value"
-import clsx from "clsx/lite"
-import { WebsiteTheme } from "db"
-import { useTheme } from "next-themes"
+import { FormEvent, ReactNode, useEffect, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { Trans, useLingui } from "@lingui/react/macro";
+import { Value, ValueError } from "@sinclair/typebox/value";
+import clsx from "clsx/lite";
+import { WebsiteTheme } from "db";
+import { useTheme } from "next-themes";
 import {
   SettingsFormValidationErrors,
   SettingsPayload,
   settingsSchema,
-} from "@/app/[locale]/(protected)/account/settings/settings.schema"
-import AlertMessage from "@/components/ui/AlertMessage"
-import Button from "@/components/ui/Button"
-import Select from "@/components/ui/Select"
-import { INITIAL_FORM_STATE } from "@/constants/api"
-import { APP_COOKIES } from "@/constants/app"
-import { Session } from "@/lib/auth-client"
-import { logger } from "@/lib/logger"
-import { defaultLocale, Language, languages, SupportedLocales } from "@/translations/languages"
+} from "@/app/[locale]/(protected)/account/settings/settings.schema";
+import AlertMessage from "@/components/ui/AlertMessage";
+import Button from "@/components/ui/Button";
+import Select from "@/components/ui/Select";
+import { INITIAL_FORM_STATE } from "@/constants/api";
+import { APP_STORAGE_KEYS } from "@/constants/app";
+import { Session } from "@/lib/auth-client";
+import { logger } from "@/lib/logger";
+import { defaultLocale, Language, languages, SupportedLocales } from "@/translations/languages";
 
 type SettingsFormProps = {
   session: Session | null
-}
+};
 
 export function SettingsForm({ session }: SettingsFormProps): ReactNode {
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [formState, setFormState] = useState<ApiResponse>(INITIAL_FORM_STATE)
-  const { i18n, t } = useLingui()
-  const router = useRouter()
-  const pathname: string = usePathname()
-  const { setTheme } = useTheme()
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [formState, setFormState] = useState<ApiResponse>(INITIAL_FORM_STATE);
+  const { i18n, t } = useLingui();
+  const router = useRouter();
+  const pathname: string = usePathname();
+  const { setTheme } = useTheme();
 
   const handleUpdateUser = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
-    event.preventDefault()
+    event.preventDefault();
 
-    const formData: FormData = new FormData(event.currentTarget)
+    const formData: FormData = new FormData(event.currentTarget);
     const payload: SettingsPayload = {
       language: formData.get("language") as SupportedLocales,
       theme: formData.get("theme") as WebsiteTheme,
-    }
+    };
 
-    const errors: ValueError[] = Array.from(Value.Errors(settingsSchema, payload))
-    const errorMessages: SettingsFormValidationErrors = {}
+    const errors: ValueError[] = Array.from(Value.Errors(settingsSchema, payload));
+    const errorMessages: SettingsFormValidationErrors = {};
 
     for (const error of errors) {
       switch (error.path.replace("/", "")) {
         case "language":
-          errorMessages.language = t({ message: "The language is invalid." })
-          break
+          errorMessages.language = t({ message: "The language is invalid." });
+          break;
         case "theme":
-          errorMessages.theme = t({ message: "The theme is invalid." })
-          break
+          errorMessages.theme = t({ message: "The theme is invalid." });
+          break;
         default:
-          logger.warn(`Settings Validation: Unknown error at ${error.path}`)
-          break
+          logger.warn(`Settings Validation: Unknown error at ${error.path}`);
+          break;
       }
     }
 
@@ -64,9 +64,9 @@ export function SettingsForm({ session }: SettingsFormProps): ReactNode {
         success: false,
         message: t({ message: "Validation errors occurred." }),
         error: errorMessages,
-      })
+      });
     } else {
-      setIsLoading(true)
+      setIsLoading(true);
 
       await fetch("/api/account/settings", {
         method: "POST",
@@ -76,39 +76,39 @@ export function SettingsForm({ session }: SettingsFormProps): ReactNode {
         }),
       })
         .then(async (response) => {
-          const data: ApiResponse = await response.json()
-          setIsLoading(false)
-          setFormState(data)
+          const data: ApiResponse = await response.json();
+          setIsLoading(false);
+          setFormState(data);
 
           // Set theme dynamically
-          setTheme(payload.theme.toLowerCase())
+          setTheme(payload.theme.toLowerCase());
 
           if (payload.language !== session?.user.language) {
             // Show form success message after page reload from language change
-            localStorage.setItem(APP_COOKIES.SETTINGS_FORM_STATE, JSON.stringify(data))
+            localStorage.setItem(APP_STORAGE_KEYS.SETTINGS_FORM_STATE, JSON.stringify(data));
 
             // Dynamically change language
-            const pathNameWithoutLocale: string[] = pathname?.split("/")?.slice(2) ?? []
-            const newPath: string = `/${payload.language}/${pathNameWithoutLocale.join("/")}`
-            router.push(newPath)
+            const pathNameWithoutLocale: string[] = pathname?.split("/")?.slice(2) ?? [];
+            const newPath: string = `/${payload.language}/${pathNameWithoutLocale.join("/")}`;
+            router.push(newPath);
           }
         })
         .catch(async (error) => {
-          const data: ApiResponse = await error.json()
-          setIsLoading(false)
-          setFormState(data)
-        })
+          const data: ApiResponse = await error.json();
+          setIsLoading(false);
+          setFormState(data);
+        });
     }
-  }
+  };
 
   useEffect(() => {
-    const savedState: string | null = localStorage.getItem(APP_COOKIES.SETTINGS_FORM_STATE)
+    const savedState: string | null = localStorage.getItem(APP_STORAGE_KEYS.SETTINGS_FORM_STATE);
 
     if (savedState) {
-      setFormState(JSON.parse(savedState))
-      localStorage.removeItem(APP_COOKIES.SETTINGS_FORM_STATE)
+      setFormState(JSON.parse(savedState));
+      localStorage.removeItem(APP_STORAGE_KEYS.SETTINGS_FORM_STATE);
     }
-  }, [])
+  }, []);
 
   return (
     <div
@@ -133,7 +133,7 @@ export function SettingsForm({ session }: SettingsFormProps): ReactNode {
             <Select.Option key={language.locale} value={language.locale}>
               <div className="flex gap-2">
                 <div>{language.flag}</div>
-                <div>{i18n._(language.label)}</div>
+                <div>{i18n._(language.getLabel())}</div>
               </div>
             </Select.Option>
           ))}
@@ -160,5 +160,5 @@ export function SettingsForm({ session }: SettingsFormProps): ReactNode {
         </Button>
       </form>
     </div>
-  )
+  );
 }

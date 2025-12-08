@@ -1,20 +1,20 @@
-"use client" // Error components must be Client Components
+"use client"; // Error components must be Client Components
 
-import { ReactNode, useEffect } from "react"
-import { Trans } from "@lingui/react/macro"
-import Button from "@/components/ui/Button"
-import { logger } from "@/lib/logger"
+import { ReactNode, useEffect } from "react";
+import { Trans } from "@lingui/react/macro";
+import Button from "@/components/ui/Button";
+import { logger } from "@/lib/logger";
 
 type RootErrorProps = {
   error: Error & { digest?: string }
   reset: () => void
-}
+};
 
 export default function Error({ error, reset }: RootErrorProps): ReactNode {
   useEffect(() => {
     // Log the error to an error reporting service
-    logger.error(error)
-  }, [error])
+    logger.error(error);
+  }, [error]);
 
   return (
     <div className="flex flex-col items-center justify-center w-full h-screen">
@@ -33,5 +33,5 @@ export default function Error({ error, reset }: RootErrorProps): ReactNode {
         </Button>
       </div>
     </div>
-  )
+  );
 }

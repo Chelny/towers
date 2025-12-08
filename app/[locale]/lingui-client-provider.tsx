@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import { ReactNode, useState } from "react"
-import { I18n, type Messages, setupI18n } from "@lingui/core"
-import { I18nProvider } from "@lingui/react"
+import { ReactNode, useState } from "react";
+import { I18n, type Messages, setupI18n } from "@lingui/core";
+import { I18nProvider } from "@lingui/react";
 
 export function LinguiClientProvider({
   children,
@@ -17,8 +17,8 @@ export function LinguiClientProvider({
     return setupI18n({
       locale: initialLocale,
       messages: { [initialLocale]: initialMessages },
-    })
-  })
+    });
+  });
 
-  return <I18nProvider i18n={i18n}>{children}</I18nProvider>
+  return <I18nProvider i18n={i18n}>{children}</I18nProvider>;
 }

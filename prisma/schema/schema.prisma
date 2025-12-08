@@ -9,60 +9,69 @@ datasource db {
 }
 
 model User {
-  id               String            @id @default(cuid(2))
-  name             String
-  birthdate        DateTime?
-  email            String            @unique
-  emailVerified    Boolean           @default(false)
-  username         String            @unique
-  displayUsername  String?
-  image            String?
-  language         String            @default("en")
-  role             String?
-  isOnline         Boolean           @default(false)
-  theme            WebsiteTheme      @default(SYSTEM)
-  banned           Boolean?
-  banReason        String?
-  banExpires       DateTime?
-  accounts         Account[]
-  passkeys         Passkey[]
-  sessions         Session[]
-  towersGamePlayer TowersGamePlayer?
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
+  id                       String                    @id @default(cuid(2))
+  name                     String
+  birthdate                DateTime?
+  email                    String                    @unique
+  emailVerified            Boolean                   @default(false) @map("email_verified")
+  username                 String                    @unique
+  displayUsername          String?                   @map("display_username")
+  image                    String?
+  language                 String                    @default("en")
+  role                     UserRole                  @default(USER)
+  theme                    WebsiteTheme              @default(SYSTEM)
+  banned                   Boolean?
+  banReason                String?                   @map("ban_reason")
+  banExpires               DateTime?                 @map("ban_expires_at")
+  accounts                 Account[]
+  passkeys                 Passkey[]
+  sessions                 Session[]
+  mutedUsers               UserMute[]                @relation("UserMuteMuter")
+  mutedByUsers             UserMute[]                @relation("UserMuteMuted")
+  conversationParticipants ConversationParticipant[]
+  sentInstantMessages      InstantMessage[]          @relation("InstantMessageSender")
+  towersPlayer             TowersPlayer?
+  createdAt                DateTime                  @default(now()) @map("created_at")
+  updatedAt                DateTime                  @updatedAt @map("updated_at")
+
+  @@map("users")
 }
 
 model Account {
   id                    String    @id @default(cuid(2))
   userId                String
   user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  accountId             String
-  providerId            String
-  accessToken           String?
-  refreshToken          String?
-  accessTokenExpiresAt  DateTime?
-  refreshTokenExpiresAt DateTime?
-  idToken               String?
+  accountId             String    @map("account_id")
+  providerId            String    @map("provider_id")
+  accessToken           String?   @map("access_token")
+  refreshToken          String?   @map("refresh_token")
+  accessTokenExpiresAt  DateTime? @map("access_token_expires_at")
+  refreshTokenExpiresAt DateTime? @map("refresh_token_expires_at")
+  idToken               String?   @map("id_token")
   scope                 String?
   password              String?
-  createdAt             DateTime  @default(now())
-  updatedAt             DateTime  @updatedAt
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @updatedAt @map("updated_at")
+
+  @@map("accounts")
 }
 
 model Passkey {
   id           String   @id @default(cuid(2))
   name         String?
-  publicKey    String
-  userId       String
+  publicKey    String   @map("public_key")
+  userId       String   @map("user_id")
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  credentialID String
+  credentialID String   @map("credential_id")
   counter      Int
-  deviceType   String
-  backedUp     Boolean
+  deviceType   String   @map("device_type")
+  backedUp     Boolean  @map("backed_up")
   transports   String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
   aaguid       String?
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@map("passkeys")
 }
 
 model Session {
@@ -70,34 +79,113 @@ model Session {
   userId         String
   user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   token          String   @unique
-  expiresAt      DateTime
-  ipAddress      String?
-  userAgent      String?
-  impersonatedBy String?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  expiresAt      DateTime @map("expires_at")
+  ipAddress      String?  @map("ip_address")
+  userAgent      String?  @map("user_agent")
+  impersonatedBy String?  @map("impersonated_by")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  @@map("sessions")
 }
 
 model Verification {
   id         String   @id @default(cuid(2))
   identifier String
   value      String
-  expiresAt  DateTime
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  expiresAt  DateTime @map("expires_at")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@map("verifications")
 }
 
 model RateLimit {
   id          String   @id @default(cuid(2))
   key         String?
   count       Int?
-  lastRequest Int?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  lastRequest Int?     @map("last_request")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("rate_limits")
+}
+
+model UserMute {
+  id          String   @id @default(cuid(2))
+  muterUserId String   @map("muter_user_id")
+  muterUser   User     @relation("UserMuteMuter", fields: [muterUserId], references: [id], onDelete: Cascade)
+  mutedUserId String   @map("muted_user_id")
+  mutedUser   User     @relation("UserMuteMuted", fields: [mutedUserId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@unique([muterUserId, mutedUserId])
+  @@map("user_mutes")
+}
+
+model Conversation {
+  id           String                    @id @default(cuid(2))
+  participants ConversationParticipant[]
+  messages     InstantMessage[]
+  createdAt    DateTime                  @default(now()) @map("created_at")
+  updatedAt    DateTime                  @updatedAt @map("updated_at")
+
+  @@map("conversations")
+}
+
+model ConversationParticipant {
+  id             String       @id @default(cuid(2))
+  conversationId String       @map("conversation_id")
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  userId         String       @map("user_id")
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  readAt         DateTime?    @map("read_at")
+  mutedAt        DateTime?    @map("muted_at")
+  removedAt      DateTime?    @map("removed_at")
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+
+  @@unique([conversationId, userId])
+  @@map("conversation_participants")
+}
+
+model InstantMessage {
+  id              String             @id @default(cuid(2))
+  conversationId  String             @map("conversation_id")
+  conversation    Conversation       @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  userId          String             @map("user_id")
+  user            User               @relation("InstantMessageSender", fields: [userId], references: [id], onDelete: Cascade)
+  text            String?
+  type            InstantMessageType @default(CHAT)
+  textVariables   Json?              @map("text_variables")
+  visibleToUserId String?            @map("visible_to_user_id")
+  createdAt       DateTime           @default(now()) @map("created_at")
+  updatedAt       DateTime           @updatedAt @map("updated_at")
+
+  @@map("conversation_messages")
+}
+
+enum UserRole {
+  SUPERADMIN @map("superadmin")
+  ADMIN      @map("admin")
+  USER       @map("user")
+
+  @@map("user_role")
 }
 
 enum WebsiteTheme {
-  SYSTEM
-  LIGHT
-  DARK
+  SYSTEM @map("system")
+  LIGHT  @map("light")
+  DARK   @map("dark")
+
+  @@map("website_theme")
+}
+
+enum InstantMessageType {
+  CHAT         @map("chat")
+  USER_ONLINE  @map("user_online")
+  USER_OFFLINE @map("user_offline")
+
+  @@map("instant_message_type")
 }

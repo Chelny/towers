@@ -1,10 +1,10 @@
-import { i18n, I18n } from "@lingui/core"
-import { User as BetterAuthUser } from "better-auth"
-import { initLingui } from "@/app/init-lingui"
-import { APP_CONFIG } from "@/constants/app"
-import { EMAIL_COLORS } from "@/constants/email"
+import { i18n, I18n } from "@lingui/core";
+import { User as BetterAuthUser } from "better-auth";
+import { initLingui } from "@/app/init-lingui";
+import { APP_CONFIG } from "@/constants/app";
+import { EMAIL_COLORS } from "@/constants/email";
 
-const ctaStyle: string = `display: block; padding: 10px 20px; border: 1px solid ${EMAIL_COLORS.buttonBorder}; border-radius: 8px; background-color: ${EMAIL_COLORS.buttonBackground}; font-size: 18px; font-family: Helvetica, Arial, sans-serif; color: ${EMAIL_COLORS.buttonText}; font-weight: 500; text-align: center; text-decoration: none;`
+const ctaStyle: string = `display: block; padding: 10px 20px; border: 1px solid ${EMAIL_COLORS.buttonBorder}; border-radius: 8px; background-color: ${EMAIL_COLORS.buttonBackground}; font-size: 18px; font-family: Helvetica, Arial, sans-serif; color: ${EMAIL_COLORS.buttonText}; font-weight: 500; text-align: center; text-decoration: none;`;
 
 export const sendEmailVerificationEmail = async (data: {
   user: BetterAuthUser
@@ -12,7 +12,7 @@ export const sendEmailVerificationEmail = async (data: {
   token: string
 }): Promise<void> => {
   // @ts-ignore
-  const i18n: I18n = initLingui(data.user.language)
+  const i18n: I18n = initLingui(data.user.language);
 
   await fetch(`${process.env.BASE_URL}/api/send`, {
     method: "POST",
@@ -33,8 +33,8 @@ export const sendEmailVerificationEmail = async (data: {
       // @ts-ignore
       locale: data.user.language,
     }),
-  })
-}
+  });
+};
 
 export const sendMagicLinkEmail = async (data: { email: string; token: string; url: string }): Promise<void> => {
   await fetch(`${process.env.BASE_URL}/api/send`, {
@@ -52,8 +52,8 @@ export const sendMagicLinkEmail = async (data: { email: string; token: string; u
         { appName: APP_CONFIG.NAME, url: data.url },
       ),
     }),
-  })
-}
+  });
+};
 
 export const sendPasswordResetEmail = async (data: {
   user: BetterAuthUser
@@ -61,7 +61,7 @@ export const sendPasswordResetEmail = async (data: {
   token: string
 }): Promise<void> => {
   // @ts-ignore
-  const i18n: I18n = initLingui(data.user.language)
+  const i18n: I18n = initLingui(data.user.language);
 
   await fetch(`${process.env.BASE_URL}/api/send`, {
     method: "POST",
@@ -80,8 +80,8 @@ export const sendPasswordResetEmail = async (data: {
       // @ts-ignore
       locale: data.user.language,
     }),
-  })
-}
+  });
+};
 
 export const sendEmailChangeEmail = async (data: {
   user: BetterAuthUser
@@ -90,7 +90,7 @@ export const sendEmailChangeEmail = async (data: {
   token: string
 }): Promise<void> => {
   // @ts-ignore
-  const i18n: I18n = initLingui(data.user.language)
+  const i18n: I18n = initLingui(data.user.language);
 
   await fetch(`${process.env.BASE_URL}/api/send`, {
     method: "POST",
@@ -107,8 +107,8 @@ export const sendEmailChangeEmail = async (data: {
         { name: data.user.name, newEmail: data.newEmail, url: data.url },
       ),
     }),
-  })
-}
+  });
+};
 
 export const sendDeleteUserEmail = async (data: {
   user: BetterAuthUser
@@ -116,7 +116,7 @@ export const sendDeleteUserEmail = async (data: {
   token: string
 }): Promise<void> => {
   // @ts-ignore
-  const i18n: I18n = initLingui(data.user.language)
+  const i18n: I18n = initLingui(data.user.language);
 
   await fetch(`${process.env.BASE_URL}/api/send`, {
     method: "POST",
@@ -133,5 +133,5 @@ export const sendDeleteUserEmail = async (data: {
         { name: data.user.name, email: data.user.email, url: data.url },
       ),
     }),
-  })
-}
+  });
+};

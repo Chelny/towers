@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import { ChangeEvent, PropsWithChildren, ReactElement, ReactNode, useState } from "react"
-import React from "react"
-import { Trans } from "@lingui/react/macro"
-import clsx from "clsx/lite"
-import RadioButton from "./RadioButton"
+import { ChangeEvent, PropsWithChildren, ReactElement, ReactNode, useState } from "react";
+import React from "react";
+import { Trans } from "@lingui/react/macro";
+import clsx from "clsx/lite";
+import RadioButton from "./RadioButton";
 
 type RadioButtonGroupProps = PropsWithChildren<{
   id: string
@@ -17,7 +17,7 @@ type RadioButtonGroupProps = PropsWithChildren<{
   description?: string
   errorMessage?: string
   onChange?: (_: ChangeEvent<HTMLInputElement>) => void
-}>
+}>;
 
 export default function RadioButtonGroup({
   children,
@@ -32,13 +32,13 @@ export default function RadioButtonGroup({
   errorMessage = "",
   onChange,
 }: RadioButtonGroupProps): ReactNode {
-  const [selectedValue, setSelectedValue] = useState<string>(defaultValue)
-  const options = React.Children.toArray(children) as ReactElement<RadioButtonOptionProps>[]
+  const [selectedValue, setSelectedValue] = useState<string>(defaultValue);
+  const options = React.Children.toArray(children) as ReactElement<RadioButtonOptionProps>[];
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
-    setSelectedValue(event.target.value)
-    onChange?.(event)
-  }
+    setSelectedValue(event.target.value);
+    onChange?.(event);
+  };
 
   return (
     <fieldset
@@ -86,7 +86,7 @@ export default function RadioButtonGroup({
         </span>
       )}
     </fieldset>
-  )
+  );
 }
 
 type RadioButtonOptionProps = {
@@ -94,8 +94,8 @@ type RadioButtonOptionProps = {
   label: string
   value: string
   disabled?: boolean
-}
+};
 
-const Option = ({}: RadioButtonOptionProps): ReactNode => null
+const Option = ({}: RadioButtonOptionProps): ReactNode => null;
 
-RadioButtonGroup.Option = Option
+RadioButtonGroup.Option = Option;

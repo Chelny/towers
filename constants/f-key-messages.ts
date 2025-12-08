@@ -1,4 +1,4 @@
-import { msg } from "@lingui/core/macro"
+import { msg } from "@lingui/core/macro";
 
 export const fKeyMessages = {
   F1: msg`Help!`,
@@ -13,6 +13,6 @@ export const fKeyMessages = {
   F10: msg`Need help partner?`,
   F11: msg`I can't talk until the game is over.`,
   F12: msg`Work as a team, partner.`,
-}
+};
 
-export type FKey = keyof typeof fKeyMessages
+export type FKey = keyof typeof fKeyMessages;

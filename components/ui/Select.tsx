@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import { KeyboardEvent, PropsWithChildren, ReactElement, ReactNode, useEffect, useRef, useState } from "react"
-import React from "react"
-import { Trans } from "@lingui/react/macro"
-import clsx from "clsx/lite"
-import { PiCaretDownDuotone, PiCaretDownFill } from "react-icons/pi"
+import { KeyboardEvent, PropsWithChildren, ReactElement, ReactNode, useEffect, useRef, useState } from "react";
+import React from "react";
+import { Trans } from "@lingui/react/macro";
+import clsx from "clsx/lite";
+import { PiCaretDownDuotone, PiCaretDownFill } from "react-icons/pi";
 
 type SelectProps = PropsWithChildren<{
   id: string
@@ -19,7 +19,7 @@ type SelectProps = PropsWithChildren<{
   errorMessage?: string
   isNoBottomSpace?: boolean
   onChange?: (value: string) => void
-}>
+}>;
 
 export default function Select({
   children,
@@ -36,15 +36,15 @@ export default function Select({
   isNoBottomSpace = false,
   onChange,
 }: SelectProps): ReactNode {
-  const [selectedValue, setSelectedValue] = useState<string>(defaultValue)
-  const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false)
-  const dropdownRef = useRef<HTMLDivElement>(null)
-  const options = React.Children.toArray(children) as ReactElement<SelectOptionProps>[]
+  const [selectedValue, setSelectedValue] = useState<string>(defaultValue);
+  const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const options = React.Children.toArray(children) as ReactElement<SelectOptionProps>[];
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent): void => {
-      const selectBox: HTMLElement | null = document.getElementById(id)
-      const dropdown: HTMLElement | null = document.getElementById(`${id}Dropdown`)
+      const selectBox: HTMLElement | null = document.getElementById(id);
+      const dropdown: HTMLElement | null = document.getElementById(`${id}Dropdown`);
 
       if (
         selectBox &&
@@ -52,33 +52,33 @@ export default function Select({
         !selectBox.contains(event.target as Node) &&
         !dropdown.contains(event.target as Node)
       ) {
-        setIsDropdownOpen(false)
+        setIsDropdownOpen(false);
       }
-    }
+    };
 
-    document.addEventListener("mousedown", handleClickOutside)
+    document.addEventListener("mousedown", handleClickOutside);
 
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside)
-    }
-  }, [id])
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [id]);
 
   useEffect(() => {
     if (isDropdownOpen && dropdownRef.current) {
-      const selectedOption: Element | null = dropdownRef.current.querySelector(`[id="${id}-${selectedValue}"]`)
-      selectedOption?.scrollIntoView({ behavior: "auto", block: "nearest" })
+      const selectedOption: Element | null = dropdownRef.current.querySelector(`[id="${id}-${selectedValue}"]`);
+      selectedOption?.scrollIntoView({ behavior: "auto", block: "nearest" });
     }
-  }, [isDropdownOpen, selectedValue])
+  }, [isDropdownOpen, selectedValue]);
 
   useEffect(() => {
-    setSelectedValue(defaultValue)
-  }, [defaultValue])
+    setSelectedValue(defaultValue);
+  }, [defaultValue]);
 
   const handleSelectChange = (value: string): void => {
-    setSelectedValue(value)
-    onChange?.(value)
-    setIsDropdownOpen(false)
-  }
+    setSelectedValue(value);
+    onChange?.(value);
+    setIsDropdownOpen(false);
+  };
 
   return (
     <div className={clsx("relative w-full", isNoBottomSpace ? "mb-0" : "mb-4")}>
@@ -115,8 +115,8 @@ export default function Select({
         onClick={() => !disabled && setIsDropdownOpen(!isDropdownOpen)}
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault()
-            !disabled && setIsDropdownOpen(!isDropdownOpen)
+            e.preventDefault();
+            !disabled && setIsDropdownOpen(!isDropdownOpen);
           }
         }}
       >
@@ -153,8 +153,8 @@ export default function Select({
               onClick={() => !disabled && handleSelectChange(option.props.value)}
               onKeyDown={(event: KeyboardEvent<HTMLDivElement>) => {
                 if (event.code === "Enter" || event.code === "Space") {
-                  event.preventDefault()
-                  !disabled && handleSelectChange(option.props.value)
+                  event.preventDefault();
+                  !disabled && handleSelectChange(option.props.value);
                 }
               }}
             >
@@ -177,13 +177,13 @@ export default function Select({
       {/* Hidden input for form submission */}
       <input type="hidden" name={id} value={selectedValue} />
     </div>
-  )
+  );
 }
 
 type SelectOptionProps = PropsWithChildren<{
   value: string
-}>
+}>;
 
-const Option = ({}: SelectOptionProps): ReactNode => null
+const Option = ({}: SelectOptionProps): ReactNode => null;
 
-Select.Option = Option
+Select.Option = Option;

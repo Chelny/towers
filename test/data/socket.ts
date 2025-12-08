@@ -9,4 +9,4 @@ export const mockSocket = {
     connect: vi.fn(),
     disconnect: vi.fn(),
   },
-}
+};

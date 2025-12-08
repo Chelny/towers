@@ -1,22 +1,22 @@
-import { betterAuth, User as BetterAuthUser } from "better-auth"
-import { prismaAdapter } from "better-auth/adapters/prisma"
-import { nextCookies } from "better-auth/next-js"
-import { admin, customSession, magicLink, openAPI, username } from "better-auth/plugins"
-import { passkey } from "better-auth/plugins/passkey"
-import { Account, User, WebsiteTheme } from "db"
-import { APP_CONFIG, COOKIE_PREFIX } from "@/constants/app"
-import { getAccountsByUserId } from "@/data/account"
-import { getUserById } from "@/data/user"
+import { betterAuth, User as BetterAuthUser } from "better-auth";
+import { prismaAdapter } from "better-auth/adapters/prisma";
+import { nextCookies } from "better-auth/next-js";
+import { admin, customSession, magicLink, openAPI, username } from "better-auth/plugins";
+import { passkey } from "better-auth/plugins/passkey";
+import { Account, User, UserRole, WebsiteTheme } from "db";
+import { APP_CONFIG, APP_PREFIX } from "@/constants/app";
+import { getAccountsByUserId } from "@/data/account";
+import { getUserById } from "@/data/user";
 import {
   sendDeleteUserEmail,
   sendEmailChangeEmail,
   sendEmailVerificationEmail,
   sendMagicLinkEmail,
   sendPasswordResetEmail,
-} from "@/lib/email"
-import { logger } from "@/lib/logger"
-import prisma from "@/lib/prisma"
-import { generateRandomUsername } from "@/utils/user-utils"
+} from "@/lib/email";
+import { logger } from "@/lib/logger";
+import prisma from "@/lib/prisma";
+import { generateRandomUsername } from "@/utils/user";
 
 export const auth = betterAuth({
   appName: APP_CONFIG.NAME,
@@ -29,8 +29,8 @@ export const auth = betterAuth({
   plugins: [
     openAPI(), // http://localhost:3000/api/auth/reference
     customSession(async (session) => {
-      const user: User | null = await getUserById(session.user.id)
-      const accounts: Account[] = await getAccountsByUserId(session.user.id)
+      const user: User | null = await getUserById(session.user.id);
+      const accounts: Account[] = await getAccountsByUserId(session.user.id);
 
       return {
         user: {
@@ -39,22 +39,22 @@ export const auth = betterAuth({
         },
         session: session.session,
         accounts,
-      }
+      };
     }),
     username({
       minUsernameLength: 4,
       maxUsernameLength: 32,
       usernameValidator: (username: string) => {
         if (username === "admin") {
-          return false
+          return false;
         }
 
-        return true
+        return true;
       },
     }),
     magicLink({
       sendMagicLink: async (data: { email: string; url: string; token: string }) => {
-        await sendMagicLinkEmail(data)
+        await sendMagicLinkEmail(data);
       },
       expiresIn: 600, // 10 minutes
     }),
@@ -121,13 +121,13 @@ export const auth = betterAuth({
         url: string
         token: string
       }) => {
-        await sendEmailChangeEmail(data)
+        await sendEmailChangeEmail(data);
       },
     },
     deleteUser: {
       enabled: true,
       sendDeleteAccountVerification: async (data: { user: BetterAuthUser; url: string; token: string }) => {
-        await sendDeleteUserEmail(data)
+        await sendDeleteUserEmail(data);
       },
     },
   },
@@ -160,7 +160,7 @@ export const auth = betterAuth({
   emailVerification: {
     sendOnSignUp: true,
     sendVerificationEmail: async (data: { user: BetterAuthUser; url: string; token: string }) => {
-      await sendEmailVerificationEmail(data)
+      await sendEmailVerificationEmail(data);
     },
     expiresIn: 3600, // 1 hour
     autoSignInAfterVerification: true,
@@ -170,7 +170,7 @@ export const auth = betterAuth({
     autoSignIn: false,
     requireEmailVerification: true,
     sendResetPassword: async (data: { user: BetterAuthUser; url: string; token: string }) => {
-      await sendPasswordResetEmail(data)
+      await sendPasswordResetEmail(data);
     },
     resetPasswordTokenExpiresIn: 3600, // 1 hour
   },
@@ -188,22 +188,22 @@ export const auth = betterAuth({
     database: {
       generateId: false,
     },
-    cookiePrefix: COOKIE_PREFIX,
+    cookiePrefix: APP_PREFIX,
   },
   databaseHooks: {
     user: {
       create: {
         before: async (user) => {
-          const username: string = generateRandomUsername(user.email)
+          const username: string = generateRandomUsername(user.email);
 
           return {
             data: {
               ...user,
               // @ts-ignore
               ...(!user.username ? { username } : {}),
-              role: "user",
+              role: UserRole.USER,
             },
-          }
+          };
         },
       },
     },
@@ -211,7 +211,7 @@ export const auth = betterAuth({
   onAPIError: {
     throw: true,
     onError: (error: unknown) => {
-      logger.error(`Better-Auth API error: ${JSON.stringify(error)}`)
+      logger.error(`Better-Auth API error: ${JSON.stringify(error)}`);
     },
     errorURL: "/error",
   },
@@ -219,6 +219,6 @@ export const auth = betterAuth({
     disabled: process.env.NODE_ENV === "production",
     level: "debug",
   },
-})
+});
 
-export type Session = typeof auth.$Infer.Session
+export type Session = typeof auth.$Infer.Session;

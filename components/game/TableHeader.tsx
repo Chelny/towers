@@ -1,19 +1,19 @@
-"use client"
+"use client";
 
-import { ReactNode } from "react"
-import { Trans } from "@lingui/react/macro"
-import Banner from "@/components/Banner"
-import { RoomPlainObject } from "@/server/towers/classes/Room"
-import { TablePlainObject } from "@/server/towers/classes/Table"
+import { ReactNode } from "react";
+import { Trans } from "@lingui/react/macro";
+import Banner from "@/components/Banner";
+import { RoomLitePlainObject } from "@/server/towers/classes/Room";
+import { TablePlainObject } from "@/server/towers/classes/Table";
 
 type TableHeaderProps = {
-  room?: RoomPlainObject
+  room?: RoomLitePlainObject
   table?: TablePlainObject
-}
+};
 
 export default function TableHeader({ room, table }: TableHeaderProps): ReactNode {
-  const tableNumber: number | undefined = table?.tableNumber
-  const tableHostUsername: string | null | undefined = table?.host?.user?.username
+  const tableNumber: number | undefined = table?.tableNumber;
+  const tableHostUsername: string | null | undefined = table?.hostPlayer.user.username;
 
   return (
     <div className="[grid-area:banner] flex justify-between items-center gap-6">
@@ -27,5 +27,5 @@ export default function TableHeader({ room, table }: TableHeaderProps): ReactNod
       </div>
       <Banner />
     </div>
-  )
+  );
 }

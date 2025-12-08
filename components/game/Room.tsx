@@ -1,170 +1,333 @@
-"use client"
+"use client";
 
-import { KeyboardEvent, MouseEvent, ReactNode, useEffect, useRef, useState } from "react"
-import dynamic from "next/dynamic"
-import { useRouter, useSearchParams } from "next/navigation"
-import { Trans, useLingui } from "@lingui/react/macro"
-import clsx from "clsx/lite"
-import { RoomLevel } from "db"
-import CreateTableModal from "@/components/game/CreateTableModal"
-import JoiningScreen from "@/components/game/JoiningScreen"
-import ServerMessage from "@/components/game/ServerMessage"
-import ChatSkeleton from "@/components/skeleton/ChatSkeleton"
-import PlayersListSkeleton from "@/components/skeleton/PlayersListSkeleton"
-import RoomHeaderSkeleton from "@/components/skeleton/RoomHeaderSkeleton"
-import RoomTableSkeleton from "@/components/skeleton/RoomTableSkeleton"
-import Button from "@/components/ui/Button"
-import { InputImperativeHandle } from "@/components/ui/Input"
-import { RATING_DIAMOND, RATING_GOLD, RATING_MASTER, RATING_PLATINUM, RATING_SILVER } from "@/constants/game"
-import { ROUTE_TOWERS } from "@/constants/routes"
-import { SocketEvents } from "@/constants/socket-events"
-import { useGame } from "@/context/GameContext"
-import { useModal } from "@/context/ModalContext"
-import { useSocket } from "@/context/SocketContext"
-import { RoomPlainObject } from "@/server/towers/classes/Room"
-import { TablePlainObject } from "@/server/towers/classes/Table"
-import { UserPlainObject } from "@/server/towers/classes/User"
+import { KeyboardEvent, MouseEvent, ReactNode, useEffect, useRef, useState } from "react";
+import dynamic from "next/dynamic";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Trans } from "@lingui/react/macro";
+import clsx from "clsx/lite";
+import { RoomLevel } from "db";
+import { Socket } from "socket.io-client";
+import useSWR from "swr";
+import CreateTableModal from "@/components/game/CreateTableModal";
+import ChatSkeleton from "@/components/skeleton/ChatSkeleton";
+import PlayersListSkeleton from "@/components/skeleton/PlayersListSkeleton";
+import RoomHeaderSkeleton from "@/components/skeleton/RoomHeaderSkeleton";
+import RoomTableSkeleton from "@/components/skeleton/RoomTableSkeleton";
+import ServerMessageSkeleton from "@/components/skeleton/ServerMessageSkeleton";
+import Button from "@/components/ui/Button";
+import { InputImperativeHandle } from "@/components/ui/Input";
+import { RATING_DIAMOND, RATING_GOLD, RATING_MASTER, RATING_PLATINUM, RATING_SILVER } from "@/constants/game";
+import { ROUTE_TOWERS } from "@/constants/routes";
+import { ClientToServerEvents } from "@/constants/socket/client-to-server";
+import { ServerToClientEvents } from "@/constants/socket/server-to-client";
+import { useGame } from "@/context/GameContext";
+import { useModal } from "@/context/ModalContext";
+import { useSocket } from "@/context/SocketContext";
+import { SocketCallback } from "@/interfaces/socket";
+import { fetcher } from "@/lib/fetcher";
+import { RoomPlainObject } from "@/server/towers/classes/Room";
+import { RoomChatMessagePlainObject } from "@/server/towers/classes/RoomChatMessage";
+import { RoomPlayerPlainObject } from "@/server/towers/classes/RoomPlayer";
+import { TablePlainObject } from "@/server/towers/classes/Table";
+import { TablePlayerPlainObject } from "@/server/towers/classes/TablePlayer";
+import { TableSeatPlainObject } from "@/server/towers/classes/TableSeat";
 
 const RoomHeader = dynamic(() => import("@/components/game/RoomHeader"), {
   loading: () => <RoomHeaderSkeleton />,
-})
+});
+
+const ServerMessage = dynamic(() => import("@/components/game/ServerMessage"), {
+  ssr: false,
+  loading: () => <ServerMessageSkeleton />,
+});
 
 const RoomTable = dynamic(() => import("@/components/game/RoomTable"), {
   loading: () => <RoomTableSkeleton />,
-})
+});
 
 const Chat = dynamic(() => import("@/components/game/Chat"), {
   loading: () => <ChatSkeleton />,
-})
+});
 
 const PlayersList = dynamic(() => import("@/components/game/PlayersList"), {
   loading: () => <PlayersListSkeleton isTableNumberVisible />,
-})
+});
 
 export default function Room(): ReactNode {
-  const router = useRouter()
-  const searchParams = useSearchParams()
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const roomId: string | null = searchParams.get("room")
+  const roomId: string | null = searchParams.get("room");
 
   if (!roomId) {
-    throw new Error("Room ID is required")
+    throw new Error("Room ID is required");
   }
 
-  const { t } = useLingui()
-  const { socketRef, isConnected, session } = useSocket()
-  const { addJoinedRoom, removeJoinedRoom } = useGame()
-  const { openModal } = useModal()
-  const hasJoinedRef: React.RefObject<boolean> = useRef<boolean>(false)
-  const [hasJoined, setHasJoined] = useState<boolean>(false)
-  const joinedRoomSidebarRef = useRef<Set<string>>(new Set<string>())
-  const messageInputRef = useRef<InputImperativeHandle>(null)
-  const [room, setRoom] = useState<RoomPlainObject>()
-  const isDone: boolean = hasJoined && !!room
+  const { socketRef, isConnected, session } = useSocket();
+  const { addJoinedRoom, removeJoinedRoom } = useGame();
+  const { openModal } = useModal();
+  const joinedRoomSidebarRef = useRef<Set<string>>(new Set<string>());
+  const messageInputRef = useRef<InputImperativeHandle>(null);
+  const [isJoined, setIsJoined] = useState<boolean>(false);
+  const [room, setRoom] = useState<RoomPlainObject>();
 
-  useEffect(() => {
-    if (!roomId || hasJoinedRef.current) return
-
-    hasJoinedRef.current = true
-
-    socketRef.current?.emit(
-      SocketEvents.ROOM_JOIN,
-      { roomId },
-      (response: { success: boolean; message: string }): void => {
-        if (response.success) {
-          socketRef.current?.emit(SocketEvents.ROOM_GET, { roomId })
-          setHasJoined(true)
-        } else {
-          router.push(ROUTE_TOWERS.PATH)
-        }
-      },
-    )
-  }, [roomId])
-
-  useEffect(() => {
-    if (!roomId || !hasJoinedRef.current) return
-
-    const handleRoomData = ({ room }: { room: RoomPlainObject }): void => {
-      setRoom(room)
-    }
-
-    const handleRoomUpdate = (): void => {
-      socketRef.current?.emit(SocketEvents.ROOM_GET, { roomId })
-    }
-
-    socketRef.current?.on(SocketEvents.ROOM_DATA, handleRoomData)
-    socketRef.current?.on(SocketEvents.ROOM_DATA_UPDATED, handleRoomUpdate)
-    socketRef.current?.on(SocketEvents.ROOM_CHAT_UPDATED, handleRoomUpdate)
-    socketRef.current?.on(SocketEvents.ROOM_TABLE_ADDED, handleRoomUpdate)
-
-    return () => {
-      socketRef.current?.off(SocketEvents.ROOM_DATA, handleRoomData)
-      socketRef.current?.off(SocketEvents.ROOM_DATA_UPDATED, handleRoomUpdate)
-      socketRef.current?.off(SocketEvents.ROOM_CHAT_UPDATED, handleRoomUpdate)
-      socketRef.current?.off(SocketEvents.ROOM_TABLE_ADDED, handleRoomUpdate)
-    }
-  }, [roomId, hasJoinedRef.current])
+  const {
+    data: roomResponse,
+    error: roomError,
+    mutate: loadRoom,
+  } = useSWR<ApiResponse<RoomPlainObject>>(`/api/games/towers/rooms/${roomId}`, fetcher, {
+    shouldRetryOnError: false,
+    revalidateOnFocus: false,
+    revalidateOnMount: false,
+    revalidateOnReconnect: true,
+  });
 
   useEffect(() => {
     if (room && !joinedRoomSidebarRef.current.has(room.id)) {
-      addJoinedRoom({ id: room.id, name: room.name, basePath: ROUTE_TOWERS.PATH })
-      joinedRoomSidebarRef.current.add(room.id)
+      joinedRoomSidebarRef.current.add(room.id);
+      addJoinedRoom({ id: room.id, name: room.name, basePath: ROUTE_TOWERS.PATH });
     }
-  }, [room])
+  }, [room]);
+
+  useEffect(() => {
+    if (roomResponse?.success && roomResponse.data) {
+      setRoom(roomResponse.data);
+    }
+  }, [roomResponse]);
+
+  useEffect(() => {
+    if (!isConnected || !socketRef.current) return;
+
+    const socket: Socket | null = socketRef.current;
+
+    const emitInitialData = (): void => {
+      socket.emit(ClientToServerEvents.ROOM_JOIN, { roomId }, (response: SocketCallback<RoomPlainObject>) => {
+        if (response.success && response.data) {
+          setIsJoined(true);
+          setRoom(response.data); // await loadRoom(); // TODO: Switch to loadRoom when db logic will be implemented
+        } else {
+          router.push(ROUTE_TOWERS.PATH);
+        }
+      });
+    };
+
+    const handlePlayerJoinRoom = ({ roomPlayer }: { roomPlayer: RoomPlayerPlainObject }): void => {
+      setRoom((prev: RoomPlainObject | undefined) => {
+        if (!prev) return prev;
+
+        const isPlayerExists: boolean = prev.players.some(
+          (rp: RoomPlayerPlainObject) => rp.playerId === roomPlayer.playerId,
+        );
+        if (isPlayerExists) return prev;
+
+        return { ...prev, players: [...prev.players, roomPlayer] };
+      });
+    };
+
+    const handlePlayerLeaveRoom = ({ roomPlayer }: { roomPlayer: RoomPlayerPlainObject }): void => {
+      setRoom((prev: RoomPlainObject | undefined) => {
+        if (!prev) return prev;
+
+        return {
+          ...prev,
+          players: prev.players.filter((rp: RoomPlayerPlainObject) => rp.playerId !== roomPlayer.playerId),
+        };
+      });
+    };
+
+    const handleUpdateChatMessages = ({ chatMessage }: { chatMessage: RoomChatMessagePlainObject }): void => {
+      setRoom((prev: RoomPlainObject | undefined) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          chatMessages: [...(prev.chatMessages ?? []), chatMessage],
+        };
+      });
+    };
+
+    const handleUpdateTable = ({ table }: { table: TablePlainObject }): void => {
+      setRoom((prev: RoomPlainObject | undefined) => {
+        if (!prev) return prev;
+
+        const existingTableIndex: number = prev.tables.findIndex((t: TablePlainObject) => t.id === table.id);
+        if (existingTableIndex !== -1) {
+          const updatedTables: TablePlainObject[] = [...prev.tables];
+          updatedTables[existingTableIndex] = { ...prev.tables[existingTableIndex], ...table };
+          return { ...prev, tables: updatedTables };
+        }
+
+        // Add new table
+        return { ...prev, tables: [...prev.tables, table] };
+      });
+    };
+
+    const handleUpdateTableSeat = ({ tableSeat }: { tableSeat: TableSeatPlainObject }) => {
+      setRoom((prev: RoomPlainObject | undefined) => {
+        if (!prev) return prev;
+
+        const updatedTables: TablePlainObject[] = prev.tables.map((table: TablePlainObject) => {
+          if (table.id !== tableSeat.tableId) return table;
+
+          return {
+            ...table,
+            seats: table.seats.map((ts: TableSeatPlainObject) => (ts.id === tableSeat.id ? tableSeat : ts)),
+          };
+        });
+
+        return { ...prev, tables: updatedTables };
+      });
+    };
+
+    const handlePlayerJoinTable = ({ tablePlayer }: { tablePlayer: TablePlayerPlainObject }): void => {
+      setRoom((prev: RoomPlainObject | undefined) => {
+        if (!prev) return prev;
+
+        // Update the table’s players list
+        const tables: TablePlainObject[] = prev.tables.map((table: TablePlainObject) => {
+          if (table.id === tablePlayer.tableId) {
+            const isSeated: boolean = table.players.some(
+              (tp: TablePlayerPlainObject) => tp.playerId === tablePlayer.playerId,
+            );
+
+            if (!isSeated) {
+              return {
+                ...table,
+                players: [...table.players, tablePlayer],
+              };
+            }
+          }
+
+          return table;
+        });
+
+        return { ...prev, tables };
+      });
+    };
+
+    const handlePlayerLeaveTable = ({ tablePlayer }: { tablePlayer: TablePlayerPlainObject }): void => {
+      setRoom((prev: RoomPlainObject | undefined) => {
+        if (!prev) return prev;
+
+        // Remove the player from the table’s players list
+        const tables: TablePlainObject[] = prev.tables.map((table: TablePlainObject) => {
+          if (table.id === tablePlayer.tableId) {
+            return {
+              ...table,
+              players: table.players.filter((tp: TablePlayerPlainObject) => tp.playerId !== tablePlayer.playerId),
+            };
+          }
+          return table;
+        });
+
+        return { ...prev, tables };
+      });
+    };
+
+    const handleDeleteTable = ({ tableId }: { tableId: string }): void => {
+      setRoom((prev: RoomPlainObject | undefined) => {
+        if (!prev) return prev;
+
+        return {
+          ...prev,
+          tables: prev.tables.filter((t: TablePlainObject) => t.id !== tableId),
+        };
+      });
+    };
+
+    const attachListeners = (): void => {
+      socket.on(ServerToClientEvents.ROOM_PLAYER_JOINED, handlePlayerJoinRoom);
+      socket.on(ServerToClientEvents.ROOM_PLAYER_LEFT, handlePlayerLeaveRoom);
+      socket.on(ServerToClientEvents.ROOM_MESSAGE_SENT, handleUpdateChatMessages);
+      socket.on(ServerToClientEvents.TABLE_UPDATED, handleUpdateTable);
+      socket.on(ServerToClientEvents.TABLE_SEAT_UPDATED, handleUpdateTableSeat);
+      socket.on(ServerToClientEvents.TABLE_PLAYER_JOINED, handlePlayerJoinTable);
+      socket.on(ServerToClientEvents.TABLE_PLAYER_LEFT, handlePlayerLeaveTable);
+      socket.on(ServerToClientEvents.TABLE_DELETED, handleDeleteTable);
+    };
+
+    if (socket.connected) {
+      attachListeners();
+      if (!isJoined) {
+        emitInitialData();
+      }
+    } else {
+      socket.once("connect", () => {
+        attachListeners();
+        if (!isJoined) {
+          emitInitialData();
+        }
+      });
+    }
+
+    socket.on("reconnect", () => {
+      if (!isJoined) {
+        emitInitialData();
+      }
+    });
+
+    return () => {
+      socket.off(ServerToClientEvents.ROOM_PLAYER_JOINED, handlePlayerJoinRoom);
+      socket.off(ServerToClientEvents.ROOM_PLAYER_LEFT, handlePlayerLeaveRoom);
+      socket.off(ServerToClientEvents.ROOM_MESSAGE_SENT, handleUpdateChatMessages);
+      socket.off(ServerToClientEvents.TABLE_UPDATED, handleUpdateTable);
+      socket.off(ServerToClientEvents.TABLE_SEAT_UPDATED, handleUpdateTableSeat);
+      socket.off(ServerToClientEvents.TABLE_PLAYER_JOINED, handlePlayerJoinTable);
+      socket.off(ServerToClientEvents.TABLE_PLAYER_LEFT, handlePlayerLeaveTable);
+      socket.off(ServerToClientEvents.TABLE_DELETED, handleDeleteTable);
+      socket.off("connect");
+      socket.off("reconnect", emitInitialData);
+    };
+  }, [isConnected, socketRef, roomId, isJoined]);
 
   const handlePlayNow = (): void => {
     socketRef.current?.emit(
-      SocketEvents.TABLE_PLAY_NOW,
+      ClientToServerEvents.TABLE_PLAY_NOW,
       { roomId },
-      (response: { success: boolean; message: string; data: { tableId: string } }): void => {
+      (response: SocketCallback<{ tableId: string }>): void => {
         if (response.success) {
-          router.push(`${ROUTE_TOWERS.PATH}?room=${roomId}&table=${response.data.tableId}`)
+          router.push(`${ROUTE_TOWERS.PATH}?room=${roomId}&table=${response.data?.tableId}`);
         }
       },
-    )
-  }
+    );
+  };
 
   const handleOpenCreateTableModal = (): void => {
     openModal(CreateTableModal, {
       roomId,
-      onCreateTableSuccess: handleCreateTableSuccess,
-    })
-  }
-
-  const handleCreateTableSuccess = (tableId: string): void => {
-    router.push(`${ROUTE_TOWERS.PATH}?room=${roomId}&table=${tableId}`)
-  }
+      onCreateTableSuccess: (tableId: string): void => {
+        router.push(`${ROUTE_TOWERS.PATH}?room=${roomId}&table=${tableId}`);
+      },
+    });
+  };
 
   const handleSendMessage = (event: KeyboardEvent<HTMLInputElement>): void => {
     if (event.code === "Enter" && messageInputRef.current?.value) {
-      const text: string = messageInputRef.current.value.trim()
+      const text: string = messageInputRef.current.value.trim();
 
-      if (socketRef.current && text !== "") {
-        socketRef.current?.emit(SocketEvents.ROOM_MESSAGE_SEND, { roomId, text })
-        messageInputRef.current.clear()
+      if (text !== "") {
+        socketRef.current?.emit(
+          ClientToServerEvents.ROOM_MESSAGE_SEND,
+          { roomId, text },
+          (response: SocketCallback) => {
+            if (response.success) {
+              messageInputRef.current?.clear();
+            }
+          },
+        );
       }
     }
-  }
+  };
 
   const handleExitRoom = (): void => {
-    socketRef.current?.emit(SocketEvents.ROOM_LEAVE, { roomId }, (response: { success: boolean; message: string }) => {
+    socketRef.current?.emit(ClientToServerEvents.ROOM_LEAVE, { roomId }, (response: SocketCallback<void>) => {
       if (response.success) {
-        removeJoinedRoom(roomId)
-        router.push(ROUTE_TOWERS.PATH)
+        removeJoinedRoom(roomId);
+        router.push(ROUTE_TOWERS.PATH);
       }
-    })
-  }
+    });
+  };
 
-  if (!hasJoined || !room) {
-    return (
-      <JoiningScreen
-        title={t({ message: "Joining room" })}
-        subtitle={t({ message: "Please wait while we connect you to the room..." })}
-        isDone={isDone}
-        onCancel={() => router.push(ROUTE_TOWERS.PATH)}
-      />
-    )
-  }
+  if (roomError) return <div>Error: {roomError.message}</div>;
 
   return (
     <>
@@ -292,7 +455,7 @@ export default function Room(): ReactNode {
                   key={table.id}
                   roomId={roomId}
                   table={table}
-                  user={room?.users.find((u: UserPlainObject) => u.user?.id === session?.user.id)}
+                  roomPlayer={room?.players.find((rp: RoomPlayerPlainObject) => rp.playerId === session?.user.id)}
                 />
               ))}
             </div>
@@ -306,12 +469,12 @@ export default function Room(): ReactNode {
                 "dark:border-dark-game-content-border dark:bg-dark-game-chat-background",
               )}
             >
-              <ServerMessage roomId={roomId} />
+              <ServerMessage />
 
               {/* Chat */}
               <div className="overflow-hidden flex flex-col gap-1 h-full px-2">
                 <Chat
-                  chat={room?.chat}
+                  chatMessages={room?.chatMessages}
                   messageInputRef={messageInputRef}
                   isMessageInputDisabled={!isConnected}
                   onSendMessage={handleSendMessage}
@@ -322,7 +485,7 @@ export default function Room(): ReactNode {
             <div className="w-[385px]">
               <PlayersList
                 roomId={roomId}
-                users={room?.users}
+                players={room?.players}
                 isRatingsVisible={room && room?.level !== RoomLevel.SOCIAL}
                 isTableNumberVisible
               />
@@ -331,5 +494,5 @@ export default function Room(): ReactNode {
         </div>
       </div>
     </>
-  )
+  );
 }

@@ -1,5 +1,5 @@
-import { ReactNode } from "react"
-import clsx from "clsx/lite"
+import { ReactNode } from "react";
+import clsx from "clsx/lite";
 
 interface TimerProps {
   timer: number | null | undefined
@@ -7,12 +7,12 @@ interface TimerProps {
 
 export default function Timer({ timer }: TimerProps): ReactNode {
   const formatTime = (timeInSeconds: number | null | undefined): string => {
-    if (timeInSeconds === null || typeof timeInSeconds === "undefined") return "--:--"
+    if (timeInSeconds === null || typeof timeInSeconds === "undefined") return "--:--";
 
-    const minutes: number = Math.floor(timeInSeconds / 60)
-    const seconds: number = timeInSeconds % 60
-    return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`
-  }
+    const minutes: number = Math.floor(timeInSeconds / 60);
+    const seconds: number = timeInSeconds % 60;
+    return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+  };
 
   return (
     <div
@@ -23,5 +23,5 @@ export default function Timer({ timer }: TimerProps): ReactNode {
     >
       {formatTime(timer)}
     </div>
-  )
+  );
 }

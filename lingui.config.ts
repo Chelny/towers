@@ -1,4 +1,4 @@
-import { defineConfig } from "@lingui/cli"
+import { defineConfig } from "@lingui/cli";
 
 export default defineConfig({
   locales: ["en", "fr", "pseudo-LOCALE"],
@@ -24,4 +24,4 @@ export default defineConfig({
   ],
   format: "po",
   orderBy: "messageId",
-})
+});

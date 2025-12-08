@@ -1,60 +1,89 @@
-"use client"
+"use client";
 
-import { ReactNode, useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-import { Trans } from "@lingui/react/macro"
-import clsx from "clsx/lite"
-import Button from "@/components/ui/Button"
-import { ROUTE_TOWERS } from "@/constants/routes"
-import { SocketEvents } from "@/constants/socket-events"
-import { useSocket } from "@/context/SocketContext"
-import { TableType } from "@/enums/table-type"
-import { TablePlainObject } from "@/server/towers/classes/Table"
-import { TableInvitationPlainObject } from "@/server/towers/classes/TableInvitation"
-import { UserPlainObject } from "@/server/towers/classes/User"
+import { ReactNode, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Trans } from "@lingui/react/macro";
+import clsx from "clsx/lite";
+import { TableType } from "db";
+import { Socket } from "socket.io-client";
+import Button from "@/components/ui/Button";
+import { ROUTE_TOWERS } from "@/constants/routes";
+import { ClientToServerEvents } from "@/constants/socket/client-to-server";
+import { useSocket } from "@/context/SocketContext";
+import { SocketCallback } from "@/interfaces/socket";
+import { RoomPlayerPlainObject } from "@/server/towers/classes/RoomPlayer";
+import { TablePlainObject } from "@/server/towers/classes/Table";
+import { TablePlayerPlainObject } from "@/server/towers/classes/TablePlayer";
 
 type RoomTableProps = {
   roomId: string
   table: TablePlainObject
-  user?: UserPlainObject
-}
+  roomPlayer?: RoomPlayerPlainObject
+};
 
-export default function RoomTable({ roomId, table, user }: RoomTableProps): ReactNode {
-  const router = useRouter()
-  const { socketRef, isConnected } = useSocket()
+export default function RoomTable({ roomId, table, roomPlayer }: RoomTableProps): ReactNode {
+  const router = useRouter();
+  const { socketRef, isConnected } = useSocket();
   const seatMapping: number[][] = [
     [1, 3, 5, 7],
     [2, 4, 6, 8],
-  ]
-  const hostUsername: string | null | undefined = table.host?.user?.username
-  const [hasAccess, setHasAccess] = useState<boolean>(false)
-  const isPrivate: boolean = table.tableType === TableType.PRIVATE
-  const isProtected: boolean = table.tableType === TableType.PROTECTED
-  const isWatchAccessGranted: boolean = !isPrivate || hasAccess
-  const isSitAccessGranted: boolean = (!isPrivate && !isProtected) || hasAccess
+  ];
+  const hostUsername: string | null | undefined = table.hostPlayer.user.username;
+  const [hasAccess, setHasAccess] = useState<boolean>(false);
+  const isPrivate: boolean = table.tableType === TableType.PRIVATE;
+  const isProtected: boolean = table.tableType === TableType.PROTECTED;
+  const isWatchAccessGranted: boolean = !isPrivate || hasAccess;
+  const isSitAccessGranted: boolean = (!isPrivate && !isProtected) || hasAccess;
 
   useEffect(() => {
-    const isInvited: boolean = !!user?.tableInvitations.received.some(
-      (invitation: TableInvitationPlainObject) => invitation.inviteeUserId === user?.user?.id,
-    )
-    setHasAccess(isInvited)
-  }, [table.id, user?.tableInvitations])
+    if (!isConnected || !socketRef.current) return;
 
-  const handleJoinTable = (seatNumber?: number): void => {
-    if (seatNumber) {
-      socketRef.current?.emit(
-        SocketEvents.TABLE_JOIN,
-        { roomId, tableId: table.id, seatNumber },
-        (response: { success: boolean; message: string }) => {
-          if (response.success) {
-            socketRef.current?.emit(SocketEvents.TABLE_GET, { roomId, tableId: table.id })
+    const socket: Socket | null = socketRef.current;
+
+    const emitInitialData = (): void => {
+      socket.emit(
+        ClientToServerEvents.TABLE_INVITATION_ACCEPTED_CHECK,
+        { tableId: table.id, userId: roomPlayer?.playerId },
+        (response: SocketCallback<boolean>) => {
+          if (response.success && response.data) {
+            setHasAccess(response.data);
           }
         },
-      )
+      );
+    };
+    if (socket.connected) {
+      emitInitialData();
+    } else {
+      socket.once("connect", () => {
+        emitInitialData();
+      });
     }
 
-    router.push(`${ROUTE_TOWERS.PATH}?room=${roomId}&table=${table.id}`)
-  }
+    socket.on("reconnect", () => emitInitialData());
+
+    return () => {
+      socket.off("connect");
+      socket.off("reconnect", emitInitialData);
+    };
+  }, [isConnected]);
+
+  const handleJoinTable = (seatNumber: number | null = null): void => {
+    if (seatNumber) {
+      socketRef.current?.emit(
+        ClientToServerEvents.TABLE_JOIN,
+        { tableId: table.id, seatNumber },
+        (response: SocketCallback<void>) => {
+          if (response.success) {
+            router.push(`${ROUTE_TOWERS.PATH}?room=${roomId}&table=${table.id}`);
+          } else {
+            router.push(`${ROUTE_TOWERS.PATH}?room=${roomId}`);
+          }
+        },
+      );
+    } else {
+      router.push(`${ROUTE_TOWERS.PATH}?room=${roomId}&table=${table.id}`);
+    }
+  };
 
   return (
     <div className="flex flex-col">
@@ -87,9 +116,9 @@ export default function RoomTable({ roomId, table, user }: RoomTableProps): Reac
               {seatMapping.map((row: number[], rowIndex: number) => (
                 <div key={rowIndex} className="flex flex-row gap-1">
                   {row.map((seatNumber: number, colIndex: number) => {
-                    const seatedUser: UserPlainObject | undefined = table?.users.find(
-                      (user: UserPlainObject) => user.tables[table.id]?.seatNumber === seatNumber,
-                    )
+                    const seatedUser: TablePlayerPlainObject | undefined = table?.players.find(
+                      (tp: TablePlayerPlainObject) => tp.seatNumber === seatNumber,
+                    );
 
                     return seatedUser ? (
                       <div
@@ -99,7 +128,7 @@ export default function RoomTable({ roomId, table, user }: RoomTableProps): Reac
                           "dark:border-dark-game-border",
                         )}
                       >
-                        <span className="truncate">{seatedUser.user?.username}</span>
+                        <span className="truncate">{seatedUser.player.user.username}</span>
                       </div>
                     ) : (
                       <Button
@@ -110,16 +139,16 @@ export default function RoomTable({ roomId, table, user }: RoomTableProps): Reac
                       >
                         <Trans>Join</Trans>
                       </Button>
-                    )
+                    );
                   })}
                 </div>
               ))}
             </div>
             <div className="flex-1 px-2 line-clamp-3">
               {/* List non-seated players by username, separated by commas */}
-              {table?.users
-                .filter((user: UserPlainObject) => typeof user.tables[table.id]?.seatNumber === "undefined")
-                .map((user: UserPlainObject) => user.user?.username)
+              {table?.players
+                .filter((tp: TablePlayerPlainObject) => !tp.seatNumber)
+                .map((tp: TablePlayerPlainObject) => tp.player.user.username)
                 .join(", ")}
             </div>
           </div>
@@ -136,5 +165,5 @@ export default function RoomTable({ roomId, table, user }: RoomTableProps): Reac
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -1,9 +1,9 @@
-import { ReactNode } from "react"
-import { PieceBlockLetter } from "@/server/towers/classes/PieceBlock"
+import { ReactNode } from "react";
+import { PieceBlockLetter } from "@/server/towers/game/PieceBlock";
 
 type DefenseBlockProps = {
   letter?: PieceBlockLetter
-}
+};
 
 export default function DefenseBlock({ letter }: DefenseBlockProps): ReactNode {
   return (
@@ -21,5 +21,5 @@ export default function DefenseBlock({ letter }: DefenseBlockProps): ReactNode {
         <div className="w-full h-[inherit] bg-inherit text-inherit" />
       )}
     </>
-  )
+  );
 }

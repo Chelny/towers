@@ -1,37 +1,33 @@
-"use client"
+"use client";
 
-import { ReactNode, useState } from "react"
-import Link from "next/link"
-import { useLingui } from "@lingui/react/macro"
-import clsx from "clsx/lite"
-import { GoTriangleDown, GoTriangleLeft } from "react-icons/go"
-import { NotificationDropdownItem } from "@/components/NotificationDropdownItem"
-import {
-  MenuItem,
-  SidebarMenuActionItem,
-  SidebarMenuDropdownItem,
-  SidebarMenuLinkItem,
-} from "@/interfaces/sidebar-menu"
-import { isActionItem, isLinkItem } from "@/utils/sidebar-menu"
+import { ReactNode, useState } from "react";
+import Link from "next/link";
+import { useLingui } from "@lingui/react/macro";
+import clsx from "clsx/lite";
+import { GoTriangleDown, GoTriangleLeft } from "react-icons/go";
+import { NotificationDropdownItem } from "@/components/NotificationDropdownItem";
+import { MenuItem, SidebarMenuActionItem, SidebarMenuLinkItem } from "@/interfaces/sidebar-menu";
+import { NotificationPlainObject } from "@/server/towers/classes/Notification";
+import { isLinkItem, isNotificationItem } from "@/utils/sidebar-menu";
 
 type SidebarMenuSubItemProps = {
   item: MenuItem
   isActiveHref: (path: string) => boolean
   isLast: boolean
   level: number
-}
+};
 
 export function SidebarMenuSubItem({ item, isActiveHref, isLast, level }: SidebarMenuSubItemProps): ReactNode {
-  const { i18n, t } = useLingui()
+  const { i18n, t } = useLingui();
   const isTreeActive: boolean | undefined =
     (isLinkItem(item) && isActiveHref(item.href)) ||
-    ("children" in item && item.children?.some((c: MenuItem) => isLinkItem(c) && isActiveHref(c.href)))
-  const [isOpen, setIsOpen] = useState<boolean>(!!isTreeActive)
-  const [isDropdownVisible, setIsDropdownVisible] = useState<boolean>(true)
+    ("children" in item && item.children?.some((mi: MenuItem) => isLinkItem(mi) && isActiveHref(mi.href)));
+  const [isOpen, setIsOpen] = useState<boolean>(!!isTreeActive);
+  const [isDropdownVisible, setIsDropdownVisible] = useState<boolean>(false);
 
   // Link: Rooms and Tables
   if (isLinkItem(item)) {
-    const hasChildren: boolean = !!item.children?.length
+    const hasChildren: boolean = !!item.children?.length;
 
     return (
       <li>
@@ -80,31 +76,42 @@ export function SidebarMenuSubItem({ item, isActiveHref, isLast, level }: Sideba
 
         {hasChildren && isOpen && (
           <ul id={`link-item-${item.id}-list`}>
-            {item.children!.map((child: SidebarMenuLinkItem | SidebarMenuActionItem, index, arr) => (
-              <SidebarMenuSubItem
-                key={child.id}
-                item={child}
-                isActiveHref={isActiveHref}
-                isLast={index === arr.length - 1}
-                level={level + 1}
-              />
-            ))}
+            {item.children!.map(
+              (
+                child: SidebarMenuLinkItem | SidebarMenuActionItem,
+                index: number,
+                arr: (SidebarMenuLinkItem | SidebarMenuActionItem)[],
+              ) => (
+                <SidebarMenuSubItem
+                  key={child.id}
+                  item={child}
+                  isActiveHref={isActiveHref}
+                  isLast={index === arr.length - 1}
+                  level={level + 1}
+                />
+              ),
+            )}
           </ul>
         )}
       </li>
-    )
+    );
   }
 
-  // Action: IMs and Table Invitations
-  if (isActionItem(item)) {
-    const unreadCount: number = item.unreadCount ?? 0
+  // Notification: Table Invitations, Table Declines and Table Boots
+  if (isNotificationItem(item)) {
+    const unreadCount: number = item.unreadCount ?? 0;
 
     return (
       <li
         className={clsx(
-          "relative ms-7 ps-6",
+          "relative ps-6 ms-7",
           // Vertical line (notifications)
-          "before:content-[''] before:absolute before:block before:top-0 before:start-0 before:w-px before:h-full",
+          "before:content-[''] before:absolute before:block before:top-0 before:start-0 before:w-px",
+          // T shape
+          level > 0 &&
+            "after:content-[''] after:block after:absolute after:top-1/2 after:start-0 after:-translate-y-1/2 after:w-4 after:h-px",
+          // L shape
+          level > 0 && isLast ? "before:h-5" : "before:h-full",
           "before:bg-white/15 after:bg-white/15",
         )}
       >
@@ -124,7 +131,7 @@ export function SidebarMenuSubItem({ item, isActiveHref, isLast, level }: Sideba
             {item.label}
 
             {unreadCount > 0 && (
-              <span className="inline-flex justify-center min-w-[1.5rem] px-1.5 py-0.5 rounded-full bg-red-600 text-white text-xs font-semibold leading-none">
+              <span className="inline-flex justify-center min-w-[1.5rem] px-1.5 py-0.5 rounded-full bg-sky-600 text-white text-xs font-semibold leading-none">
                 {unreadCount > 99 ? "99+" : unreadCount}
               </span>
             )}
@@ -137,14 +144,15 @@ export function SidebarMenuSubItem({ item, isActiveHref, isLast, level }: Sideba
         {isDropdownVisible && (
           <ul
             id={`action-item-${item.id}-menu`}
-            className="overflow-y-auto absolute top-0 start-full z-40 w-72 max-h-96 p-2 divide-y divide-white/10 border border-slate-700 rounded-sm shadow-lg bg-slate-800"
+            className="overflow-y-auto absolute top-0 start-full z-40 w-[350px] max-h-96 p-2 divide-y divide-white/10 border border-slate-700 rounded-sm shadow-lg bg-slate-800 cursor-pointer"
             role="menu"
+            tabIndex={0}
             onMouseEnter={() => setIsDropdownVisible(true)}
             onMouseLeave={() => setIsDropdownVisible(false)}
           >
-            {item.children.length > 0 ? (
-              item.children.map((child: SidebarMenuDropdownItem) => (
-                <NotificationDropdownItem key={child.id} item={child} />
+            {item.children && item.children.length > 0 ? (
+              item.children?.map((notification: NotificationPlainObject) => (
+                <NotificationDropdownItem key={notification.id} notification={notification} />
               ))
             ) : (
               <li role="presentation" className="px-3 py-1 text-white/70 text-center">
@@ -154,8 +162,8 @@ export function SidebarMenuSubItem({ item, isActiveHref, isLast, level }: Sideba
           </ul>
         )}
       </li>
-    )
+    );
   }
 
-  return null
+  return null;
 }

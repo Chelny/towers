@@ -1,18 +1,13 @@
-"use client"
+"use client";
 
-import { ReactNode } from "react"
-import { Trans } from "@lingui/react/macro"
-import AlertMessage from "@/components/ui/AlertMessage"
-import { useSocket } from "@/context/SocketContext"
+import { ReactNode } from "react";
+import { Trans } from "@lingui/react/macro";
+import AlertMessage from "@/components/ui/AlertMessage";
+import { useSocket } from "@/context/SocketContext";
 
-type ServerMessageProps = {
-  roomId: string
-  tableId?: string
-}
-
-export default function ServerMessage({ roomId, tableId }: ServerMessageProps): ReactNode {
-  const { isConnected, session } = useSocket()
-  const username: string | null | undefined = session?.user.username
+export default function ServerMessage(): ReactNode {
+  const { isConnected, session } = useSocket();
+  const username: string | null | undefined = session?.user.username;
 
   if (isConnected) {
     if (!session) {
@@ -20,7 +15,7 @@ export default function ServerMessage({ roomId, tableId }: ServerMessageProps): 
         <AlertMessage type="error">
           <Trans>You are not logged in</Trans>
         </AlertMessage>
-      )
+      );
     }
 
     if (session) {
@@ -28,15 +23,15 @@ export default function ServerMessage({ roomId, tableId }: ServerMessageProps): 
         <AlertMessage type="info">
           <Trans>Connected to the game as {username}</Trans>
         </AlertMessage>
-      )
+      );
     }
   } else {
     return (
       <AlertMessage type="error">
         <Trans>Disconnected from server</Trans>
       </AlertMessage>
-    )
+    );
   }
 
-  return null
+  return null;
 }

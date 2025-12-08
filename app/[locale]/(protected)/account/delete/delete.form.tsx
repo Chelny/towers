@@ -1,47 +1,47 @@
-"use client"
+"use client";
 
-import { ClipboardEvent, FormEvent, ReactNode, useState } from "react"
-import { ErrorContext } from "@better-fetch/fetch"
-import { Trans, useLingui } from "@lingui/react/macro"
-import { Value, ValueError } from "@sinclair/typebox/value"
-import clsx from "clsx/lite"
+import { ClipboardEvent, FormEvent, ReactNode, useState } from "react";
+import { ErrorContext } from "@better-fetch/fetch";
+import { Trans, useLingui } from "@lingui/react/macro";
+import { Value, ValueError } from "@sinclair/typebox/value";
+import clsx from "clsx/lite";
 import {
   DeleteAccountFormValidationErrors,
   DeleteAccountPayload,
   deleteAccountSchema,
-} from "@/app/[locale]/(protected)/account/delete/delete.schema"
-import AlertMessage from "@/components/ui/AlertMessage"
-import Button from "@/components/ui/Button"
-import Input from "@/components/ui/Input"
-import { INITIAL_FORM_STATE } from "@/constants/api"
-import { ROUTE_HOME } from "@/constants/routes"
-import { authClient } from "@/lib/auth-client"
-import { logger } from "@/lib/logger"
+} from "@/app/[locale]/(protected)/account/delete/delete.schema";
+import AlertMessage from "@/components/ui/AlertMessage";
+import Button from "@/components/ui/Button";
+import Input from "@/components/ui/Input";
+import { INITIAL_FORM_STATE } from "@/constants/api";
+import { ROUTE_HOME } from "@/constants/routes";
+import { authClient } from "@/lib/auth-client";
+import { logger } from "@/lib/logger";
 
 export function DeleteAccountForm(): ReactNode {
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [formState, setFormState] = useState<ApiResponse>(INITIAL_FORM_STATE)
-  const { t } = useLingui()
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [formState, setFormState] = useState<ApiResponse>(INITIAL_FORM_STATE);
+  const { t } = useLingui();
 
   const handleDeleteUser = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
-    event.preventDefault()
+    event.preventDefault();
 
-    const formData: FormData = new FormData(event.currentTarget)
+    const formData: FormData = new FormData(event.currentTarget);
     const payload: DeleteAccountPayload = {
       email: formData.get("email") as string,
-    }
+    };
 
-    const errors: ValueError[] = Array.from(Value.Errors(deleteAccountSchema, payload))
-    const errorMessages: DeleteAccountFormValidationErrors = {}
+    const errors: ValueError[] = Array.from(Value.Errors(deleteAccountSchema, payload));
+    const errorMessages: DeleteAccountFormValidationErrors = {};
 
     for (const error of errors) {
       switch (error.path.replace("/", "")) {
         case "email":
-          errorMessages.email = t({ message: "The email is invalid." })
-          break
+          errorMessages.email = t({ message: "The email is invalid." });
+          break;
         default:
-          logger.warn(`Delete User Validation: Unknown error at ${error.path}`)
-          break
+          logger.warn(`Delete User Validation: Unknown error at ${error.path}`);
+          break;
       }
     }
 
@@ -50,7 +50,7 @@ export function DeleteAccountForm(): ReactNode {
         success: false,
         message: t({ message: "Validation errors occurred." }),
         error: errorMessages,
-      })
+      });
     } else {
       await authClient.deleteUser(
         {
@@ -58,17 +58,17 @@ export function DeleteAccountForm(): ReactNode {
         },
         {
           onRequest: () => {
-            setIsLoading(true)
-            setFormState(INITIAL_FORM_STATE)
+            setIsLoading(true);
+            setFormState(INITIAL_FORM_STATE);
           },
           onResponse: () => {
-            setIsLoading(false)
+            setIsLoading(false);
           },
           onError: (ctx: ErrorContext) => {
             setFormState({
               success: false,
               message: ctx.error.message,
-            })
+            });
           },
           onSuccess: () => {
             setFormState({
@@ -77,12 +77,12 @@ export function DeleteAccountForm(): ReactNode {
                 message:
                   "Your account deletion request has been accepted. To complete the process, please confirm by clicking the link sent to your email.",
               }),
-            })
+            });
           },
         },
-      )
+      );
     }
-  }
+  };
 
   return (
     <form
@@ -128,5 +128,5 @@ export function DeleteAccountForm(): ReactNode {
         <Trans>Confirm Deletion</Trans>
       </Button>
     </form>
-  )
+  );
 }

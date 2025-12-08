@@ -1,4 +1,4 @@
-import type { MetadataRoute } from "next"
+import type { MetadataRoute } from "next";
 import {
   ROUTE_ACCOUNT,
   ROUTE_FORGOT_PASSWORD,
@@ -11,10 +11,10 @@ import {
   ROUTE_SIGN_UP,
   ROUTE_TERMS_OF_SERVICE,
   ROUTE_TOWERS,
-} from "@/constants/routes"
-import { Language, languages } from "@/translations/languages"
+} from "@/constants/routes";
+import { Language, languages } from "@/translations/languages";
 
-const BASE_URL = process.env.BASE_URL!
+const BASE_URL = process.env.BASE_URL!;
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const getLanguagesPaths = (path: string): Record<string, string> => {
@@ -22,12 +22,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       .filter((languages: Language) => languages.locale !== "pseudo-LOCALE")
       .reduce(
         (acc: Record<string, string>, languages: Language) => {
-          acc[languages.locale] = `${BASE_URL}/${languages.locale}${path}`
-          return acc
+          acc[languages.locale] = `${BASE_URL}/${languages.locale}${path}`;
+          return acc;
         },
         {} as Record<string, string>,
-      )
-  }
+      );
+  };
 
   return [
     // High-priority routes
@@ -137,5 +137,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
         languages: getLanguagesPaths(ROUTE_RESET_PASSWORD.PATH),
       },
     },
-  ]
+  ];
 }

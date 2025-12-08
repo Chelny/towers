@@ -1,54 +1,151 @@
+import { Prisma } from "db";
 import {
-  TowersGamePlayer,
-  TowersPlayerControlKeys,
-  TowersPlayerStats,
-  TowersRoom,
-  TowersRoomChatMessage,
-  TowersTable,
-  TowersTableChatMessage,
-  User,
-} from "db"
+  getConversationIncludes,
+  getConversationParticipantIncludes,
+  getInstantMessageIncludes,
+  getTowersPlayerLiteIncludes,
+  getTowersRoomChatMessageIncludes,
+  getTowersRoomIncludes,
+  getTowersRoomPlayerIncludes,
+  getTowersTableChatMessageIncludes,
+  getTowersTableIncludes,
+  getTowersTablePlayerIncludes,
+  getTowersTableSeatIncludes,
+  getUserMinimalSelect,
+  getUserMuteIncludes,
+  towersRoomsListIncludes,
+} from "@/prisma/prisma-includes";
 
-declare module "@prisma/client" {
-  // **************************************************
-  // * Room
-  // **************************************************
+declare module "db" {
+  // ======================================
+  // USER
+  // ======================================
 
-  interface ITowersRoom extends TowersRoom {
-    tables: ITowersTable[]
-    chatMessages: TowersRoomChatMessage[]
-  }
+  export type UserLite = Prisma.UserGetPayload<{
+    select: ReturnType<typeof getUserMinimalSelect>
+  }>;
 
-  interface ITowersRoomWithUsersCount extends TowersRoom {
-    usersCount: number
-  }
+  // ======================================
+  // USER MUTE
+  // ======================================
 
-  interface ITowersRoomChatMessage extends TowersRoomChatMessage {
-    room: TowersRoom
-    gamePlayer: ITowersGamePlayer
-  }
+  type UserMuteWithRelations = Prisma.UserMuteGetPayload<{
+    include: ReturnType<typeof getUserMuteIncludes>
+  }>;
 
-  // **************************************************
-  // * Table
-  // **************************************************
+  // ======================================
+  // CONVERSATION + IM
+  // ======================================
 
-  interface ITowersTable extends TowersTable {
-    room: TowersRoom
-    host: ITowersGamePlayer
-  }
+  type ConversationWithRelations = Prisma.ConversationGetPayload<{
+    include: ReturnType<typeof getConversationIncludes>
+  }>;
 
-  interface ITowersTableChatMessage extends TowersTableChatMessage {
-    table: TowersTable
-    gamePlayer: ITowersGamePlayer
-  }
+  type ConversationParticipantWithRelations = Prisma.ConversationParticipantGetPayload<{
+    include: ReturnType<typeof getConversationParticipantIncludes>
+  }>;
 
-  // **************************************************
-  // * Game Player
-  // **************************************************
+  type InstantMessageWithRelations = Prisma.InstantMessageGetPayload<{
+    include: ReturnType<typeof getInstantMessageIncludes>
+  }>;
 
-  interface ITowersGamePlayer extends TowersGamePlayer {
-    user: User
-    controlKeys: TowersPlayerControlKeys
-    stats: TowersPlayerStats
-  }
+  // ======================================
+  // PLAYER
+  // ======================================
+
+  type TowersPlayerLite = Prisma.TowersPlayerGetPayload<{
+    include: ReturnType<typeof getTowersPlayerLiteIncludes>
+  }>;
+
+  // ======================================
+  // ROOM
+  // ======================================
+
+  type TowersRoomsListWithCount = Prisma.TowersRoomGetPayload<{
+    include: typeof towersRoomsListIncludes
+  }>;
+
+  type TowersRoomWithRelations = Prisma.TowersRoomGetPayload<{
+    include: ReturnType<typeof getTowersRoomIncludes>
+  }>;
+
+  // ======================================
+  // ROOM PLAYER
+  // ======================================
+
+  type TowersRoomPlayerWithRelations = Prisma.TowersRoomPlayerGetPayload<{
+    include: ReturnType<typeof getTowersRoomPlayerIncludes>
+  }>;
+
+  // ======================================
+  // ROOM CHAT MESSAGE
+  // ======================================
+
+  type TowersRoomChatMessageWithRelations = Prisma.TowersRoomChatMessageGetPayload<{
+    include: ReturnType<typeof getTowersRoomChatMessageIncludes>
+  }>;
+
+  // ======================================
+  // TABLE
+  // ======================================
+
+  type TowersTableWithRelations = Prisma.TowersTableGetPayload<{
+    include: ReturnType<typeof getTowersTableIncludes>
+  }>;
+
+  // type TowersTableLiteWithRelations = Prisma.TowersTableGetPayload<{
+  //   include: ReturnType<typeof getTowersTableLiteIncludes>
+  // }>
+
+  // ======================================
+  // TABLE SEAT
+  // ======================================
+
+  type TowersTableSeatWithRelations = Prisma.TowersTableSeatGetPayload<{
+    include: ReturnType<typeof getTowersTableSeatIncludes>
+  }>;
+
+  // ======================================
+  // TABLE PLAYER
+  // ======================================
+
+  type TowersTablePlayerWithRelations = Prisma.TowersTablePlayerGetPayload<{
+    include: ReturnType<typeof getTowersTablePlayerIncludes>
+  }>;
+
+  // type TowersTablePlayerLiteWithRelations = Prisma.TowersTablePlayerGetPayload<{
+  //   include: ReturnType<typeof getTowersTablePlayerLiteIncludes>
+  // }>
+
+  // ======================================
+  // TABLE CHAT MESSAGE
+  // ======================================
+
+  type TowersTableChatMessageWithRelations = Prisma.TowersTableChatMessageGetPayload<{
+    include: ReturnType<typeof getTowersTableChatMessageIncludes>
+  }>;
+
+  // ======================================
+  // TABLE INVITATION
+  // ======================================
+
+  // type TowersTableInvitationWithRelations = Prisma.TowersTableInvitationGetPayload<{
+  //   include: ReturnType<typeof getTowersTableInvitationIncludes>
+  // }>
+
+  // ======================================
+  // TABLE BOOT
+  // ======================================
+
+  // type TowersTableBootWithRelations = Prisma.TowersTableBootGetPayload<{
+  //   include: ReturnType<typeof getTowersTableBootIncludes>
+  // }>
+
+  // ======================================
+  // NOTIFICATION
+  // ======================================
+
+  // type TowersNotificationWithRelations = Prisma.TowersNotificationGetPayload<{
+  //   include: ReturnType<typeof getTowersNotificationIncludes>
+  // }>
 }

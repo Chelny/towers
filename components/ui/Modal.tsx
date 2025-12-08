@@ -1,84 +1,113 @@
-"use client"
+"use client";
 
-import { FormEvent, PropsWithChildren, ReactNode, useEffect, useRef } from "react"
-import { useLingui } from "@lingui/react/macro"
-import clsx from "clsx/lite"
-import Button from "@/components/ui/Button"
+import { FormEvent, PropsWithChildren, ReactNode, Ref, useEffect, useRef } from "react";
+import { forwardRef } from "react";
+import { useLingui } from "@lingui/react/macro";
+import clsx from "clsx/lite";
+import Button from "@/components/ui/Button";
+import { useModal } from "@/context/ModalContext";
 
 type ModalProps = PropsWithChildren<{
   title: string
+  customDialogSize?: string
   confirmText?: string
   cancelText?: string
   isConfirmButtonDisabled?: boolean
   dataTestId?: string
   onConfirm?: (event: FormEvent<HTMLFormElement>) => void
   onCancel?: () => void
-}>
+  onClose?: () => void
+}>;
 
-export default function Modal({
-  children,
-  title,
-  cancelText,
-  confirmText,
-  isConfirmButtonDisabled = false,
-  dataTestId = undefined,
-  onConfirm,
-  onCancel,
-}: ModalProps): ReactNode {
-  const dialogRef = useRef<HTMLDialogElement>(null)
-  const { t } = useLingui()
+const Modal = forwardRef(function Modal(
+  {
+    children,
+    title,
+    customDialogSize,
+    cancelText,
+    confirmText,
+    isConfirmButtonDisabled = false,
+    dataTestId = undefined,
+    onConfirm,
+    onCancel,
+    onClose,
+  }: ModalProps,
+  ref: Ref<HTMLDialogElement>,
+): ReactNode {
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const { t } = useLingui();
+  const { closeModal } = useModal();
 
   useEffect(() => {
-    const dialog: HTMLDialogElement | null = dialogRef.current
-    if (!dialog) return
+    if (ref && typeof ref === "object") {
+      ref.current = dialogRef.current;
+    } else if (typeof ref === "function") {
+      ref(dialogRef.current);
+    }
+  }, [ref]);
 
-    dialog.showModal()
+  useEffect(() => {
+    const dialog: HTMLDialogElement | null = dialogRef.current;
+    if (!dialog) return;
+
+    dialog.showModal();
+
+    const handleDialogClose = (): void => {
+      closeModal();
+      onClose?.();
+    };
 
     const handleKeyDown = (event: KeyboardEvent): void => {
       if (event.code === "Escape") {
-        event.preventDefault()
-        handleCancel()
+        event.preventDefault();
+        dialog.close();
       }
-    }
+    };
 
-    dialog.addEventListener("keydown", handleKeyDown)
+    dialog.addEventListener("close", handleDialogClose);
+    dialog.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      dialog.removeEventListener("keydown", handleKeyDown)
-      dialog.close()
-    }
-  }, [])
+      dialog.removeEventListener("close", handleDialogClose);
+      dialog.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
 
   const handleConfirm = (event: FormEvent<HTMLFormElement>): void => {
-    event.preventDefault()
-    onConfirm?.(event)
-  }
+    event.preventDefault();
+    onConfirm?.(event);
+  };
 
   const handleCancel = (): void => {
-    onCancel?.()
-    dialogRef.current?.close()
-  }
+    onCancel?.();
+  };
+
+  const handleClose = (): void => {
+    dialogRef.current?.close();
+    onClose?.();
+  };
 
   return (
     <dialog
       ref={dialogRef}
       className={clsx(
-        "fixed top-1/2 start-1/2 z-40 w-full max-w-md border-t-4 border-t-gray-200 border-r-4 border-e-gray-400 border-b-4 border-b-gray-400 border-l-4 border-s-gray-200 rounded-xs ring-1 ring-black shadow-lg -translate-x-1/2 -translate-y-1/2",
+        "relative top-1/2 start-1/2 z-40 border-t-4 border-t-gray-200 border-r-4 border-e-gray-400 border-b-4 border-b-gray-400 border-l-4 border-s-gray-200 rounded-xs ring-1 ring-black shadow-lg bg-gray-200 -translate-x-1/2 -translate-y-1/2",
         "rtl:translate-x-1/2",
         "dark:border-t-dark-modal-border-top dark:border-e-dark-modal-border-end dark:border-b-dark-modal-border-bottom dark:border-s-dark-modal-border-start dark:bg-dark-modal-background",
+        customDialogSize ? customDialogSize : "w-full max-w-md",
       )}
       data-testid={`dialog_${dataTestId}`}
-      onCancel={handleCancel}
     >
-      <form noValidate onSubmit={handleConfirm}>
-        <div className={clsx("flex justify-between items-center gap-2 p-2 bg-gray-200", "dark:bg-slate-700")}>
+      <form className="grid grid-rows-[max-content_1fr_max-content] h-full" noValidate onSubmit={handleConfirm}>
+        <div className={clsx("flex justify-between items-center gap-2 p-2 bg-gray-300", "dark:bg-slate-700")}>
           <h3 className={clsx("flex-1 text-base font-medium truncate", "dark:text-dark-modal-heading-text")}>
             {title}
           </h3>
           <button
+            type="button"
             className="self-start text-gray-400 hover:text-gray-500"
             aria-label={t({ message: "Close" })}
-            onClick={handleCancel}
+            onClick={handleClose}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -92,24 +121,26 @@ export default function Modal({
           </button>
         </div>
 
-        <div className={clsx("p-4", "dark:text-dark-modal-body-text")}>{children}</div>
+        <div className={clsx("flex-1 overflow-y-auto px-2 py-4", "dark:text-dark-modal-body-text")}>{children}</div>
 
         <div
           className={clsx(
-            "flex justify-end gap-2 p-4 border-t border-gray-300",
+            "flex justify-end gap-2 p-2 border-t border-gray-300",
             "dark:border-t-dark-modal-border dark:border-dark-modal-border",
           )}
         >
           {onConfirm && (
-            <Button type="submit" className="w-full" disabled={isConfirmButtonDisabled}>
+            <Button type="submit" className="w-fit" disabled={isConfirmButtonDisabled}>
               {confirmText ?? t({ message: "Confirm" })}
             </Button>
           )}
-          <Button type="button" className="w-full !ring-0" onClick={handleCancel}>
+          <Button type="button" className="w-fit" onClick={handleCancel}>
             {cancelText ?? t({ message: "Cancel" })}
           </Button>
         </div>
       </form>
     </dialog>
-  )
-}
+  );
+});
+
+export default Modal;

@@ -1,7 +1,7 @@
-import { ComponentProps, ComponentPropsWithoutRef, forwardRef, ReactNode } from "react"
-import { useLingui } from "@lingui/react/macro"
-import { clsx } from "clsx/lite"
-import Anchor from "@/components/ui/Anchor"
+import { ComponentProps, ComponentPropsWithoutRef, forwardRef, ReactNode } from "react";
+import { useLingui } from "@lingui/react/macro";
+import { clsx } from "clsx/lite";
+import Anchor from "@/components/ui/Anchor";
 
 const Breadcrumb = forwardRef<
   HTMLElement,
@@ -9,21 +9,21 @@ const Breadcrumb = forwardRef<
     separator?: ReactNode
   }
 >(({ ...props }, ref) => {
-  const { t } = useLingui()
+  const { t } = useLingui();
 
-  return <nav ref={ref} aria-label={t({ message: "breadcrumb" })} {...props} />
-})
-Breadcrumb.displayName = "Breadcrumb"
+  return <nav ref={ref} aria-label={t({ message: "breadcrumb" })} {...props} />;
+});
+Breadcrumb.displayName = "Breadcrumb";
 
 const BreadcrumbList = forwardRef<HTMLOListElement, ComponentPropsWithoutRef<"ol">>(({ className, ...props }, ref) => (
   <ol ref={ref} className={clsx("flex flex-wrap items-center gap-1.5 break-words sm:gap-2.5", className)} {...props} />
-))
-BreadcrumbList.displayName = "BreadcrumbList"
+));
+BreadcrumbList.displayName = "BreadcrumbList";
 
 const BreadcrumbItem = forwardRef<HTMLLIElement, ComponentPropsWithoutRef<"li">>(({ className, ...props }, ref) => (
   <li ref={ref} className={clsx("inline-flex items-center gap-1.5", className)} {...props} />
-))
-BreadcrumbItem.displayName = "BreadcrumbItem"
+));
+BreadcrumbItem.displayName = "BreadcrumbItem";
 
 const BreadcrumbLink = forwardRef<
   HTMLAnchorElement,
@@ -31,11 +31,11 @@ const BreadcrumbLink = forwardRef<
     asChild?: boolean
   }
 >(({ asChild, className, ...props }, ref) => {
-  const Comp = asChild ? "span" : Anchor
+  const Comp = asChild ? "span" : Anchor;
 
-  return <Comp ref={ref} className={className} href={props.href as string} {...props} />
-})
-BreadcrumbLink.displayName = "BreadcrumbLink"
+  return <Comp ref={ref} className={className} href={props.href as string} {...props} />;
+});
+BreadcrumbLink.displayName = "BreadcrumbLink";
 
 const BreadcrumbPage = forwardRef<HTMLSpanElement, ComponentPropsWithoutRef<"span">>(({ className, ...props }, ref) => (
   <span
@@ -46,8 +46,8 @@ const BreadcrumbPage = forwardRef<HTMLSpanElement, ComponentPropsWithoutRef<"spa
     aria-disabled="true"
     {...props}
   />
-))
-BreadcrumbPage.displayName = "BreadcrumbPage"
+));
+BreadcrumbPage.displayName = "BreadcrumbPage";
 
 const BreadcrumbSeparator = ({ children, className, ...props }: ComponentProps<"li">) => (
   <li
@@ -58,11 +58,11 @@ const BreadcrumbSeparator = ({ children, className, ...props }: ComponentProps<"
   >
     {children ?? <span className="text-gray-400 rtl:rotate-180">/</span>}
   </li>
-)
-BreadcrumbSeparator.displayName = "BreadcrumbSeparator"
+);
+BreadcrumbSeparator.displayName = "BreadcrumbSeparator";
 
 const BreadcrumbEllipsis = ({ className, ...props }: ComponentProps<"span">) => {
-  const { t } = useLingui()
+  const { t } = useLingui();
 
   return (
     <span
@@ -74,9 +74,9 @@ const BreadcrumbEllipsis = ({ className, ...props }: ComponentProps<"span">) => 
       <span className="text-gray-400">...</span>
       <span className="sr-only">{t({ message: "More" })}</span>
     </span>
-  )
-}
-BreadcrumbEllipsis.displayName = "BreadcrumbEllipsis"
+  );
+};
+BreadcrumbEllipsis.displayName = "BreadcrumbEllipsis";
 
 export {
   Breadcrumb,
@@ -86,4 +86,4 @@ export {
   BreadcrumbPage,
   BreadcrumbSeparator,
   BreadcrumbEllipsis,
-}
+};

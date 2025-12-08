@@ -1,3 +1,3 @@
 export const isTestMode = (): boolean => {
-  return process.env.TEST_MODE === "true" && process.env.NODE_ENV === "development"
-}
+  return process.env.NODE_ENV === "development" && process.env.TEST_MODE === "true";
+};

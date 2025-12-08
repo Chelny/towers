@@ -1,51 +1,82 @@
-"use client"
+"use client";
 
-import { ReactNode, useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-import { Plural, Trans, useLingui } from "@lingui/react/macro"
-import clsx from "clsx/lite"
-import Button from "@/components/ui/Button"
-import { ROUTE_TOWERS } from "@/constants/routes"
-import { SocketEvents } from "@/constants/socket-events"
-import { useSocket } from "@/context/SocketContext"
-import { RoomLevel, RoomPlainObject } from "@/server/towers/classes/Room"
-import { UserPlainObject } from "@/server/towers/classes/User"
+import { ReactNode, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Plural, Trans, useLingui } from "@lingui/react/macro";
+import clsx from "clsx/lite";
+import { RoomLevel } from "db";
+import { Socket } from "socket.io-client";
+import useSWR from "swr";
+import Button from "@/components/ui/Button";
+import { ROUTE_TOWERS } from "@/constants/routes";
+import { ServerToClientEvents } from "@/constants/socket/server-to-client";
+import { useSocket } from "@/context/SocketContext";
+import { fetcher } from "@/lib/fetcher";
+import { RoomPlainObject } from "@/server/towers/classes/Room";
+import { RoomPlayerPlainObject } from "@/server/towers/classes/RoomPlayer";
 
 export default function RoomsList(): ReactNode {
-  const router = useRouter()
-  const { socketRef, session } = useSocket()
-  const { t } = useLingui()
-  const [rooms, setRooms] = useState<RoomPlainObject[]>([])
+  const router = useRouter();
+  const { t } = useLingui();
+  const { socketRef, isConnected, session } = useSocket();
+  const [rooms, setRooms] = useState<RoomPlainObject[]>([]);
+
+  const {
+    data: roomsResponse,
+    error: roomsError,
+    mutate: loadRooms,
+  } = useSWR<ApiResponse<RoomPlainObject[]>>("/api/games/towers/rooms", fetcher, {
+    shouldRetryOnError: false,
+    revalidateOnFocus: false,
+    revalidateOnReconnect: true,
+  });
 
   useEffect(() => {
-    socketRef.current?.emit(SocketEvents.ROOMS_GET)
-
-    const handleRoomsList = ({ rooms }: { rooms: RoomPlainObject[] }): void => {
-      setRooms(rooms)
+    if (roomsResponse?.success && roomsResponse.data) {
+      setRooms(roomsResponse.data);
     }
+  }, [roomsResponse]);
 
-    const handleRoomsListUpdated = (): void => {
-      socketRef.current?.emit(SocketEvents.ROOMS_GET)
+  useEffect(() => {
+    if (!isConnected || !socketRef.current) return;
+
+    const socket: Socket | null = socketRef.current;
+
+    const handleUpdateRoomslist = async (): Promise<void> => {
+      await loadRooms();
+    };
+
+    const attachListeners = (): void => {
+      socket.on(ServerToClientEvents.ROOMS_LIST_UPDATED, handleUpdateRoomslist);
+    };
+
+    if (socket.connected) {
+      attachListeners();
+    } else {
+      socket.once("connect", () => {
+        attachListeners();
+      });
     }
-
-    socketRef.current?.on(SocketEvents.ROOMS_LIST, handleRoomsList)
-    socketRef.current?.on(SocketEvents.ROOMS_LIST_UPDATED, handleRoomsListUpdated)
 
     return () => {
-      socketRef.current?.off(SocketEvents.ROOMS_LIST, handleRoomsList)
-      socketRef.current?.off(SocketEvents.ROOMS_LIST_UPDATED, handleRoomsListUpdated)
-    }
-  }, [socketRef.current])
+      socket.off(ServerToClientEvents.ROOMS_LIST_UPDATED, handleUpdateRoomslist);
+      socket.off("connect");
+    };
+  }, [isConnected, socketRef]);
 
   const handleJoinRoom = (roomId: string): void => {
-    router.push(`${ROUTE_TOWERS.PATH}?room=${roomId}`)
-  }
+    router.push(`${ROUTE_TOWERS.PATH}?room=${roomId}`);
+  };
+
+  if (roomsError) return <div>Error: {roomsError.message}</div>;
 
   return (
     <ul className="grid grid-cols-[repeat(auto-fill,_minmax(14rem,_1fr))] gap-8">
       {rooms?.map((room: RoomPlainObject) => {
-        const usersCount: number = room.users?.length
-        const isUserInRoom: boolean = room.users?.some((user: UserPlainObject) => user.user?.id === session?.user?.id)
+        const usersCount: number = room.playersCount;
+        const isUserInRoom: boolean = room.players?.some(
+          (roomPlayer: RoomPlayerPlainObject) => roomPlayer.playerId === session?.user?.id,
+        );
 
         return (
           <li
@@ -86,8 +117,8 @@ export default function RoomsList(): ReactNode {
               </Button>
             </div>
           </li>
-        )
+        );
       })}
     </ul>
-  )
+  );
 }

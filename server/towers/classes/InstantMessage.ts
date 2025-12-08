@@ -1,70 +1,80 @@
-import { createId } from "@paralleldrive/cuid2"
-import { SocketEvents } from "@/constants/socket-events"
-import { logger } from "@/lib/logger"
-import { Room } from "@/server/towers/classes/Room"
-import { User, UserPlainObject } from "./User"
+import { InstantMessageType } from "db";
+import { JsonValue } from "@/prisma/app/generated/prisma/client/runtime/library";
+import { User, UserPlainObject } from "@/server/towers/classes/User";
 
-export interface InstantMessagePlainObject {
+export interface InstantMessageProps {
   id: string
-  roomId: string
-  sender: UserPlainObject
-  recipient: UserPlainObject
-  message: string
-  createdAt: number
+  conversationId: string
+  user: User
+  text: string | null
+  type: InstantMessageType
+  textVariables: JsonValue | null
+  visibleToUserId: string | null
 }
 
-const MAX_INSTANT_MESSAGE_LENGTH = 300
+export interface InstantMessageVariables {
+  username?: string
+}
 
-/**
- * Manages direct messages within a room.
- * Handles delivery, validation, and block checks between users.
- */
+export interface InstantMessagePlainObject {
+  readonly id: string
+  readonly conversationId: string
+  readonly userId: string
+  readonly user: UserPlainObject
+  readonly text: string | null
+  readonly type: InstantMessageType
+  readonly textVariables: JsonValue | null
+  readonly visibleToUserId: string | null
+  readonly createdAt: string
+  readonly updatedAt: string
+}
+
 export class InstantMessage {
-  public readonly id: string = createId()
-  public room: Room
-  public readonly sender: User
-  public readonly recipient: User
+  public readonly id: string;
+  public readonly conversationId: string;
+  public userId: string;
+  private _user: User;
+  public text: string | null;
+  public type: InstantMessageType;
+  public textVariables: JsonValue | null;
+  public visibleToUserId: string | null;
+  public readonly createdAt: Date;
+  public updatedAt: Date;
 
-  constructor(room: Room, sender: User, recipient: User) {
-    this.room = room
-    this.sender = sender
-    this.recipient = recipient
+  constructor(props: InstantMessageProps) {
+    this.id = props.id;
+    this.conversationId = props.conversationId;
+    this.userId = props.user.id;
+    this._user = props.user;
+    this.text = props.text;
+    this.type = props.type;
+    this.textVariables = props.textVariables;
+    this.visibleToUserId = props.visibleToUserId;
+    this.createdAt = new Date();
+    this.updatedAt = this.createdAt;
   }
 
-  /**
-   * Sends a direct message from one user to another within the same room.
-   *
-   * @param sender - The user sending the message.
-   * @param recipient - The user receiving the message.
-   * @param content - The message content.
-   *
-   * @throws If the message is too long or the recipient has blocked the sender.
-   */
-  public sendInstantMessage(sender: User, recipient: User, content: string): void {
-    const trimmedContent: string = content?.trim()
+  public get user(): User {
+    return this._user;
+  }
 
-    if (trimmedContent?.length === 0) {
-      throw new Error("Cannot send an empty message.")
-    }
+  public set user(user: User) {
+    this._user = user;
+    this.userId = user.id;
+  }
 
-    if (trimmedContent.length > MAX_INSTANT_MESSAGE_LENGTH) {
-      throw new Error(`Direct message exceeds maximum length of ${MAX_INSTANT_MESSAGE_LENGTH} characters.`)
-    }
-
-    if (recipient.muteManager.isMuted(sender.user.id)) {
-      throw new Error("Recipient has blocked this user.")
-    }
-
-    const instantMessage: InstantMessagePlainObject = {
+  public toPlainObject(): InstantMessagePlainObject {
+    return {
       id: this.id,
-      roomId: this.room.id,
-      sender: sender.toPlainObject(),
-      recipient: recipient.toPlainObject(),
-      message: trimmedContent,
-      createdAt: Date.now(),
-    }
-
-    recipient.socket.emit(SocketEvents.INSTANT_MESSAGE_RECEIVED, instantMessage)
-    logger.debug(`Instant Message ${sender.user.username} → ${recipient.user.username}: ${trimmedContent}`)
+      conversationId: this.conversationId,
+      userId: this.userId,
+      user: this.user.toPlainObject(),
+      text: this.text,
+      type: this.type,
+      textVariables: this.textVariables,
+      visibleToUserId: this.visibleToUserId,
+      createdAt: this.createdAt.toISOString(),
+      updatedAt: this.updatedAt.toISOString(),
+    };
   }
 }

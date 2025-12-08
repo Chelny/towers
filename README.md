@@ -150,11 +150,15 @@ _TODO_
 - [ ] Fix passkeys (sign-in and profile)
 - [ ] Add OTP (email and phone)
 - [ ] Add tooltip component (?)
+- [ ] User changing username while in room(s) and table(s)
+  - [ ] Prevent user from accessing the profile page while in a game room (show prompt on click)
+  - [ ] Send websocket event to all rooms and tables to update the username if changed
 - [ ] Add avatars
-- [ ] Prevent user from accessing the profile page while in a game room (show prompt on click)
-- [ ] Double-check "Ping" logic
-- [ ] Implement Options modal
-- [ ] Implement Chat modal
+- [ ] Implement Options modal in room
+- [x] Finish Conversation modal
+- [ ] Create muted users list page in Account
+- [ ] Implement friendships + friends page in Account
+- [ ] Implement block logic + blocked users page in Account
 
 See the [open issues](https://github.com/Chelny/towers/issues) for a full list of proposed features (and known issues).
 

@@ -1,18 +1,19 @@
-"use client"
+"use client";
 
-import { ReactNode, useEffect, useState } from "react"
-import Image from "next/image"
-import { useLingui } from "@lingui/react/macro"
-import clsx from "clsx/lite"
-import { Session } from "@/lib/auth-client"
+import { ReactNode, useEffect, useState } from "react";
+import Image from "next/image";
+import { useLingui } from "@lingui/react/macro";
+import clsx from "clsx/lite";
+import { Session } from "@/lib/auth-client";
+import { UserPlainObject } from "@/server/towers/classes/User";
 
 type UserAvatarProps = {
-  user: Session["user"] | undefined | null
+  user?: Session["user"] | UserPlainObject
   isLoading?: boolean
   className?: string
   dimensions?: string
   size?: number
-}
+};
 
 export default function UserAvatar({
   user,
@@ -21,14 +22,14 @@ export default function UserAvatar({
   dimensions = "w-10 h-10",
   size = 40,
 }: UserAvatarProps): ReactNode {
-  const { t } = useLingui()
-  const [isMounted, setIsMounted] = useState<boolean>(false)
-  const placeholderSrc: string = "https://placehold.co/40x40.png?text=?"
-  const placeholderAlt: string = t({ message: "Avatar placeholder" })
+  const { t } = useLingui();
+  const [isMounted, setIsMounted] = useState<boolean>(false);
+  const placeholderSrc: string = "https://placehold.co/40x40.png?text=?";
+  const placeholderAlt: string = t({ message: "Avatar placeholder" });
 
   useEffect(() => {
-    setIsMounted(true)
-  }, [])
+    setIsMounted(true);
+  }, []);
 
   if (!isMounted) {
     return (
@@ -42,12 +43,12 @@ export default function UserAvatar({
           alt={placeholderAlt}
         />
       </div>
-    )
+    );
   }
 
-  const username: string | null | undefined = user?.username
-  const imageSrc: string = user?.image || placeholderSrc
-  const imageAlt: string = user?.image ? t({ message: `${username}’s avatar` }) : placeholderAlt
+  const username: string | null | undefined = user?.username;
+  const imageSrc: string = user?.image || placeholderSrc;
+  const imageAlt: string = user?.image ? t({ message: `${username}’s avatar` }) : placeholderAlt;
 
   if (isLoading || !user) {
     return (
@@ -61,7 +62,7 @@ export default function UserAvatar({
           alt={placeholderAlt}
         />
       </div>
-    )
+    );
   }
 
   return (
@@ -76,5 +77,5 @@ export default function UserAvatar({
         data-testid="user-avatar_image"
       />
     </div>
-  )
+  );
 }

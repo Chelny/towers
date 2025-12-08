@@ -1,13 +1,13 @@
-"use client"
+"use client";
 
-import { ReactNode } from "react"
-import clsx from "clsx/lite"
-import Banner from "@/components/Banner"
-import { RoomPlainObject } from "@/server/towers/classes/Room"
+import { ReactNode } from "react";
+import clsx from "clsx/lite";
+import Banner from "@/components/Banner";
+import { RoomPlainObject } from "@/server/towers/classes/Room";
 
 type RoomHeaderProps = {
   room?: RoomPlainObject
-}
+};
 
 export default function RoomHeader({ room }: RoomHeaderProps): ReactNode {
   return (
@@ -23,5 +23,5 @@ export default function RoomHeader({ room }: RoomHeaderProps): ReactNode {
         &nbsp;
       </div>
     </div>
-  )
+  );
 }

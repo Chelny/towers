@@ -1,5 +1,5 @@
-import { ReactNode } from "react"
-import clsx from "clsx/lite"
+import { ReactNode } from "react";
+import clsx from "clsx/lite";
 
 export default function RoomsListSkeleton(): ReactNode {
   return (
@@ -21,5 +21,5 @@ export default function RoomsListSkeleton(): ReactNode {
         </li>
       ))}
     </ul>
-  )
+  );
 }
