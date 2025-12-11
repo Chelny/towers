@@ -1,5 +1,4 @@
-import { TableChatMessageType } from "db";
-import { TableType } from "db";
+import { TableChatMessageType, TableType } from "db/client";
 import { DisconnectReason, Server, Socket } from "socket.io";
 import { ClientToServerEvents } from "@/constants/socket/client-to-server";
 import { ServerToClientEvents } from "@/constants/socket/server-to-client";

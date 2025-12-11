@@ -3,8 +3,8 @@
 import { KeyboardEvent, ReactNode, Ref, useEffect, useMemo, useRef } from "react";
 import { useLingui } from "@lingui/react/macro";
 import clsx from "clsx/lite";
-import { TableChatMessageType } from "db";
-import { TableType } from "db";
+import { TableChatMessageType } from "db/browser";
+import { TableType } from "db/browser";
 import Input, { InputImperativeHandle } from "@/components/ui/Input";
 import { APP_CONFIG } from "@/constants/app";
 import { FKey, fKeyMessages } from "@/constants/f-key-messages";

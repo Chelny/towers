@@ -1,5 +1,5 @@
-import { TableChatMessageType } from "db";
-import { TableType } from "db";
+import { TableChatMessageType } from "db/client";
+import { TableType } from "db/client";
 import { FKey } from "@/constants/f-key-messages";
 import { ChatMessage, ChatMessagePlainObject, ChatMessageProps } from "@/server/towers/classes/ChatMessage";
 

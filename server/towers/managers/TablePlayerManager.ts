@@ -1,5 +1,5 @@
 import { createId } from "@paralleldrive/cuid2";
-import { TableType } from "db";
+import { TableType } from "db/client";
 import { ServerInternalEvents } from "@/constants/socket/server-internal";
 import { publishRedisEvent } from "@/server/redis/publish";
 import { Player } from "@/server/towers/classes/Player";

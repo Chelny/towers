@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { i18n } from "@lingui/core";
-import { Prisma } from "db";
+import { Prisma } from "db/client";
 import { prismaError } from "prisma-better-errors";
 import { logger } from "@/lib/logger";
 

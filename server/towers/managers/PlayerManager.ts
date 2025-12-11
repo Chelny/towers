@@ -1,9 +1,9 @@
-import { TowersPlayerLite } from "db";
 import { Player, PlayerProps } from "@/server/towers/classes/Player";
 import { PlayerControlKeysManager } from "@/server/towers/managers/PlayerControlKeysManager";
 import { PlayerStatsManager } from "@/server/towers/managers/PlayerStatsManager";
 import { UserManager } from "@/server/towers/managers/UserManager";
 import { PlayerService } from "@/server/towers/services/PlayerService";
+import { TowersPlayerLite } from "@/types/prisma";
 
 export class PlayerManager {
   private static players: Map<string, Player> = new Map<string, Player>();

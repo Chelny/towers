@@ -1,4 +1,4 @@
-import { User, UserRole, WebsiteTheme } from "db";
+import { User, UserRole, WebsiteTheme } from "db/browser";
 
 const commonUserProperties = {
   displayUsername: null,

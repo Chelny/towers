@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Trans } from "@lingui/react/macro";
 import clsx from "clsx/lite";
-import { RoomLevel } from "db";
+import { RoomLevel } from "db/browser";
 import { Socket } from "socket.io-client";
 import useSWR from "swr";
 import CreateTableModal from "@/components/game/CreateTableModal";

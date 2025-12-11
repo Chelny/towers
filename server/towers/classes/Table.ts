@@ -1,4 +1,4 @@
-import { GameState, TableType } from "db";
+import { GameState, TableType } from "db/client";
 import type { Room, RoomLitePlainObject } from "@/server/towers/classes/Room";
 import type { TableInvitation, TableInvitationPlainObject } from "@/server/towers/classes/TableInvitation";
 import { ServerTowersSeat, ServerTowersTeam } from "@/interfaces/table-seats";

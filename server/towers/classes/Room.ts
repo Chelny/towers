@@ -1,4 +1,4 @@
-import { RoomLevel } from "db";
+import { RoomLevel } from "db/client";
 import { ROOM_MAX_USERS_CAPACITY } from "@/constants/game";
 import { RoomChatMessage, RoomChatMessagePlainObject } from "@/server/towers/classes/RoomChatMessage";
 import { RoomPlayer, RoomPlayerPlainObject } from "@/server/towers/classes/RoomPlayer";

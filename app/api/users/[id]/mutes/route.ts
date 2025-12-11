@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { UserMuteWithRelations } from "db";
 import { handleApiError } from "@/lib/api-error";
 import prisma from "@/lib/prisma";
-import { getUserMuteIncludes } from "@/prisma/prisma-includes";
 import { UserMuteFactory } from "@/server/towers/factories/UserMuteFactory";
+import { getUserMuteIncludes, UserMuteWithRelations } from "@/types/prisma";
 
 export async function GET(
   _: NextRequest,

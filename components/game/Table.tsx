@@ -7,10 +7,10 @@ import { Plural, Trans, Select as TransSelect, useLingui } from "@lingui/react/m
 import { Type } from "@sinclair/typebox";
 import { Value, ValueError } from "@sinclair/typebox/value";
 import clsx from "clsx/lite";
-import { RoomLevel, TableInvitationStatus } from "db";
-import { TableChatMessageType } from "db";
-import { TableType } from "db";
-import { GameState } from "db";
+import { RoomLevel, TableInvitationStatus } from "db/browser";
+import { TableChatMessageType } from "db/browser";
+import { TableType } from "db/browser";
+import { GameState } from "db/browser";
 import { Socket } from "socket.io-client";
 import useSWR from "swr";
 import TableBootUserModal from "@/components/game/TableBootUserModal";

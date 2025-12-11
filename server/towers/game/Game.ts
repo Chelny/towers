@@ -1,6 +1,6 @@
 import { createId } from "@paralleldrive/cuid2";
-import { TableChatMessageType } from "db";
-import { GameState } from "db";
+import { TableChatMessageType } from "db/client";
+import { GameState } from "db/client";
 import type { Table } from "@/server/towers/classes/Table";
 import {
   COUNTDOWN_START_NUMBER,

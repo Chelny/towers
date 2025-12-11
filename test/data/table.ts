@@ -1,4 +1,4 @@
-import { TableType } from "db";
+import { TableType } from "db/browser";
 
 export const mockJoinedTables1 = {
   "mock-table-1": {

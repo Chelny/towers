@@ -1,5 +1,5 @@
-import { TowersPlayerStats } from "db";
-import { JsonValue } from "@/prisma/app/generated/prisma/client/runtime/library";
+import { JsonValue } from "@prisma/client/runtime/client";
+import { TowersPlayerStats } from "db/client";
 import { PlayerStats, PlayerStatsPlainObject } from "@/server/towers/classes/PlayerStats";
 
 export class PlayerStatsFactory {

@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { TowersPlayerLite } from "db";
 import { handleApiError } from "@/lib/api-error";
 import prisma from "@/lib/prisma";
-import { getTowersPlayerLiteIncludes } from "@/prisma/prisma-includes";
+import { getTowersPlayerLiteIncludes, TowersPlayerLite } from "@/types/prisma";
 
 export async function POST(request: NextRequest): Promise<NextResponse<ApiResponse>> {
   const { userId } = await request.json();

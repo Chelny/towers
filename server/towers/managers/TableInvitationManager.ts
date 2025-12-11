@@ -1,5 +1,5 @@
 import { createId } from "@paralleldrive/cuid2";
-import { NotificationType, TableChatMessageType, TableInvitationStatus, TableType } from "db";
+import { NotificationType, TableChatMessageType, TableInvitationStatus, TableType } from "db/client";
 import { ServerInternalEvents } from "@/constants/socket/server-internal";
 import { logger } from "@/lib/logger";
 import { publishRedisEvent } from "@/server/redis/publish";

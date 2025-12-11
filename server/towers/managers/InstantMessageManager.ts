@@ -1,9 +1,9 @@
 import { createId } from "@paralleldrive/cuid2";
+import { JsonValue } from "@prisma/client/runtime/client";
 import { logger } from "better-auth";
-import { InstantMessageType } from "db";
+import { InstantMessageType } from "db/client";
 import { INSTANT_MESSAGE_MAX_LENGTH } from "@/constants/game";
 import { ServerInternalEvents } from "@/constants/socket/server-internal";
-import { JsonValue } from "@/prisma/app/generated/prisma/client/runtime/library";
 import { publishRedisEvent } from "@/server/redis/publish";
 import { Conversation } from "@/server/towers/classes/Conversation";
 import { InstantMessage, InstantMessageProps, InstantMessageVariables } from "@/server/towers/classes/InstantMessage";

@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Value, ValueError } from "@sinclair/typebox/value";
 import clsx from "clsx/lite";
-import { WebsiteTheme } from "db";
+import { WebsiteTheme } from "db/browser";
 import { useTheme } from "next-themes";
 import {
   SettingsFormValidationErrors,
@@ -147,9 +147,9 @@ export function SettingsForm({ session }: SettingsFormProps): ReactNode {
         >
           {Object.values(WebsiteTheme).map((theme: WebsiteTheme) => (
             <Select.Option key={theme} value={theme}>
-              {theme === "LIGHT"
+              {theme === WebsiteTheme.LIGHT
                 ? t({ message: "Light" })
-                : theme === "DARK"
+                : theme === WebsiteTheme.DARK
                   ? t({ message: "Dark" })
                   : t({ message: "System" })}
             </Select.Option>

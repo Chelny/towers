@@ -3,7 +3,7 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { nextCookies } from "better-auth/next-js";
 import { admin, customSession, magicLink, openAPI, username } from "better-auth/plugins";
 import { passkey } from "better-auth/plugins/passkey";
-import { Account, User, UserRole, WebsiteTheme } from "db";
+import { Account, User, UserRole, WebsiteTheme } from "db/browser";
 import { APP_CONFIG, APP_PREFIX } from "@/constants/app";
 import { getAccountsByUserId } from "@/data/account";
 import { getUserById } from "@/data/user";

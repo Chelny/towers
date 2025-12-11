@@ -2,9 +2,10 @@
 
 import { KeyboardEvent, MouseEvent, ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { useLingui } from "@lingui/react/macro";
+import { JsonValue } from "@prisma/client/runtime/client";
 import clsx from "clsx/lite";
 import { format } from "date-fns";
-import { InstantMessageType, TableChatMessageType } from "db";
+import { InstantMessageType, TableChatMessageType } from "db/browser";
 import { VscBellSlashDot } from "react-icons/vsc";
 import { Socket } from "socket.io-client";
 import Checkbox from "@/components/ui/Checkbox";
@@ -17,7 +18,6 @@ import { useConversations } from "@/context/ConversationsContext";
 import { useSocket } from "@/context/SocketContext";
 import { useContextMenu } from "@/hooks/useContextMenu";
 import { SocketCallback } from "@/interfaces/socket";
-import { JsonValue } from "@/prisma/app/generated/prisma/client/runtime/library";
 import { ConversationPlainObject } from "@/server/towers/classes/Conversation";
 import { ConversationParticipantPlainObject } from "@/server/towers/classes/ConversationParticipant";
 import { InstantMessagePlainObject } from "@/server/towers/classes/InstantMessage";

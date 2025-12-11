@@ -1,10 +1,3 @@
-import {
-  TowersPlayerLite,
-  TowersTableChatMessageWithRelations,
-  TowersTablePlayerWithRelations,
-  TowersTableSeatWithRelations,
-  TowersTableWithRelations,
-} from "db";
 import { Player } from "@/server/towers/classes/Player";
 import { Room } from "@/server/towers/classes/Room";
 import { Table, TablePlainObject } from "@/server/towers/classes/Table";
@@ -14,6 +7,13 @@ import { TableSeat } from "@/server/towers/classes/TableSeat";
 import { PlayerFactory } from "@/server/towers/factories/PlayerFactory";
 import { RoomFactory } from "@/server/towers/factories/RoomFactory";
 import { TableManager } from "@/server/towers/managers/TableManager";
+import {
+  TowersPlayerLite,
+  TowersTableChatMessageWithRelations,
+  TowersTablePlayerWithRelations,
+  TowersTableSeatWithRelations,
+  TowersTableWithRelations,
+} from "@/types/prisma";
 import { isObject } from "@/utils/object";
 
 export class TableFactory {

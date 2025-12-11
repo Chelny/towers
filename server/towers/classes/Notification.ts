@@ -1,6 +1,6 @@
 import type { TableInvitation, TableInvitationPlainObject } from "@/server/towers/classes/TableInvitation";
 import { TableBoot, TableBootPlainObject } from "@/server/towers/classes/TableBoot";
-import type { NotificationType } from "db";
+import type { NotificationType } from "db/client";
 
 export type NotificationCreateProps =
   | { playerId: string; roomId: string; type: NotificationType; tableInvitation: TableInvitation }

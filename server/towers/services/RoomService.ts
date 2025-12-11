@@ -1,6 +1,5 @@
-import { TowersRoomWithRelations } from "db";
 import prisma from "@/lib/prisma";
-import { getTowersRoomIncludes } from "@/prisma/prisma-includes";
+import { getTowersRoomIncludes, TowersRoomWithRelations } from "@/types/prisma";
 
 export class RoomService {
   public static async getRoomsWithRelations(): Promise<TowersRoomWithRelations[]> {

@@ -1,5 +1,6 @@
 import pkg from "@next/env";
 import react from "@vitejs/plugin-react";
+import path from "path";
 import { defineConfig } from "vitest/config";
 
 const { loadEnvConfig } = pkg;
@@ -12,7 +13,9 @@ export default defineConfig({
   resolve: {
     alias: {
       "@/": new URL("./", import.meta.url).pathname,
+      db: path.resolve(__dirname, "app/generated/prisma"),
     },
+    preserveSymlinks: true,
   },
   test: {
     environment: "jsdom",

@@ -5,7 +5,7 @@
     "esModuleInterop": true,
     "isolatedModules": true,
     "resolveJsonModule": true,
-    "target": "ES2017",
+    "target": "ES2023",
 
     /* Strictness */
     "skipLibCheck": true,
@@ -20,7 +20,7 @@
       "dom.iterable",
       "esnext"
     ],
-    "module": "esnext",
+    "module": "ESNext",
     "moduleResolution": "bundler",
     "noEmit": true,
     "plugins": [

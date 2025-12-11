@@ -3,7 +3,7 @@
 import { MouseEvent, ReactNode, useEffect, useRef, useState } from "react";
 import { Trans } from "@lingui/react/macro";
 import clsx from "clsx/lite";
-import { GameState } from "db";
+import { GameState } from "db/browser";
 import { Socket } from "socket.io-client";
 import PlayerInformationModal from "@/components/game/PlayerInformationModal";
 import Grid from "@/components/towers/Grid";

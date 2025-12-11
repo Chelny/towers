@@ -1,3 +1,209 @@
+generator client {
+  provider   = "prisma-client"
+  output     = "../app/generated/prisma"
+  engineType = "client"
+}
+
+datasource db {
+  provider = "postgresql"
+  schemas  = ["public", "towers"]
+}
+
+model User {
+  id                       String                    @id @default(cuid(2))
+  name                     String
+  birthdate                DateTime?
+  email                    String                    @unique
+  emailVerified            Boolean                   @default(false) @map("email_verified")
+  username                 String                    @unique
+  displayUsername          String?                   @map("display_username")
+  image                    String?
+  language                 String                    @default("en")
+  role                     UserRole                  @default(USER)
+  theme                    WebsiteTheme              @default(SYSTEM)
+  banned                   Boolean?
+  banReason                String?                   @map("ban_reason")
+  banExpires               DateTime?                 @map("ban_expires_at")
+  accounts                 Account[]
+  passkeys                 Passkey[]
+  sessions                 Session[]
+  mutedUsers               UserMute[]                @relation("UserMuteMuter")
+  mutedByUsers             UserMute[]                @relation("UserMuteMuted")
+  conversationParticipants ConversationParticipant[]
+  sentInstantMessages      InstantMessage[]          @relation("InstantMessageSender")
+  towersPlayer             TowersPlayer?
+  createdAt                DateTime                  @default(now()) @map("created_at")
+  updatedAt                DateTime                  @updatedAt @map("updated_at")
+
+  @@map("users")
+  @@schema("public")
+}
+
+model Account {
+  id                    String    @id @default(cuid(2))
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accountId             String    @map("account_id")
+  providerId            String    @map("provider_id")
+  accessToken           String?   @map("access_token")
+  refreshToken          String?   @map("refresh_token")
+  accessTokenExpiresAt  DateTime? @map("access_token_expires_at")
+  refreshTokenExpiresAt DateTime? @map("refresh_token_expires_at")
+  idToken               String?   @map("id_token")
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @updatedAt @map("updated_at")
+
+  @@map("accounts")
+  @@schema("public")
+}
+
+model Passkey {
+  id           String   @id @default(cuid(2))
+  name         String?
+  publicKey    String   @map("public_key")
+  userId       String   @map("user_id")
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  credentialID String   @map("credential_id")
+  counter      Int
+  deviceType   String   @map("device_type")
+  backedUp     Boolean  @map("backed_up")
+  transports   String?
+  aaguid       String?
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@map("passkeys")
+  @@schema("public")
+}
+
+model Session {
+  id             String   @id @default(cuid(2))
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token          String   @unique
+  expiresAt      DateTime @map("expires_at")
+  ipAddress      String?  @map("ip_address")
+  userAgent      String?  @map("user_agent")
+  impersonatedBy String?  @map("impersonated_by")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  @@map("sessions")
+  @@schema("public")
+}
+
+model Verification {
+  id         String   @id @default(cuid(2))
+  identifier String
+  value      String
+  expiresAt  DateTime @map("expires_at")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@map("verifications")
+  @@schema("public")
+}
+
+model RateLimit {
+  id          String   @id @default(cuid(2))
+  key         String?
+  count       Int?
+  lastRequest Int?     @map("last_request")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("rate_limits")
+  @@schema("public")
+}
+
+model UserMute {
+  id          String   @id @default(cuid(2))
+  muterUserId String   @map("muter_user_id")
+  muterUser   User     @relation("UserMuteMuter", fields: [muterUserId], references: [id], onDelete: Cascade)
+  mutedUserId String   @map("muted_user_id")
+  mutedUser   User     @relation("UserMuteMuted", fields: [mutedUserId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@unique([muterUserId, mutedUserId])
+  @@map("user_mutes")
+  @@schema("public")
+}
+
+model Conversation {
+  id           String                    @id @default(cuid(2))
+  participants ConversationParticipant[]
+  messages     InstantMessage[]
+  createdAt    DateTime                  @default(now()) @map("created_at")
+  updatedAt    DateTime                  @updatedAt @map("updated_at")
+
+  @@map("conversations")
+  @@schema("public")
+}
+
+model ConversationParticipant {
+  id             String       @id @default(cuid(2))
+  conversationId String       @map("conversation_id")
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  userId         String       @map("user_id")
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  readAt         DateTime?    @map("read_at")
+  mutedAt        DateTime?    @map("muted_at")
+  removedAt      DateTime?    @map("removed_at")
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+
+  @@unique([conversationId, userId])
+  @@map("conversation_participants")
+  @@schema("public")
+}
+
+model InstantMessage {
+  id              String             @id @default(cuid(2))
+  conversationId  String             @map("conversation_id")
+  conversation    Conversation       @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  userId          String             @map("user_id")
+  user            User               @relation("InstantMessageSender", fields: [userId], references: [id], onDelete: Cascade)
+  text            String?
+  type            InstantMessageType @default(CHAT)
+  textVariables   Json?              @map("text_variables")
+  visibleToUserId String?            @map("visible_to_user_id")
+  createdAt       DateTime           @default(now()) @map("created_at")
+  updatedAt       DateTime           @updatedAt @map("updated_at")
+
+  @@map("conversation_messages")
+  @@schema("public")
+}
+
+enum UserRole {
+  SUPERADMIN @map("SUPERADMIN")
+  ADMIN      @map("ADMIN")
+  USER       @map("USER")
+
+  @@map("user_role")
+  @@schema("public")
+}
+
+enum WebsiteTheme {
+  SYSTEM @map("SYSTEM")
+  LIGHT  @map("LIGHT")
+  DARK   @map("DARK")
+
+  @@map("website_theme")
+  @@schema("public")
+}
+
+enum InstantMessageType {
+  CHAT         @map("CHAT")
+  USER_ONLINE  @map("USER_ONLINE")
+  USER_OFFLINE @map("USER_OFFLINE")
+
+  @@map("instant_message_type")
+  @@schema("public")
+}
+
 model TowersPlayer {
   id                       String                   @id @map("user_id")
   user                     User                     @relation(fields: [id], references: [id], onDelete: Cascade)
@@ -19,6 +225,7 @@ model TowersPlayer {
   updatedAt                DateTime                 @updatedAt @map("updated_at")
 
   @@map("towers_players")
+  @@schema("towers")
 }
 
 model TowersPlayerControlKeys {
@@ -42,6 +249,7 @@ model TowersPlayerControlKeys {
   updatedAt        DateTime     @updatedAt @map("updated_at")
 
   @@map("towers_player_control_keys")
+  @@schema("towers")
 }
 
 model TowersPlayerStats {
@@ -58,6 +266,7 @@ model TowersPlayerStats {
   updatedAt      DateTime     @updatedAt @map("updated_at")
 
   @@map("towers_player_stats")
+  @@schema("towers")
 }
 
 model TowersRoom {
@@ -74,6 +283,7 @@ model TowersRoom {
   updatedAt        DateTime                @updatedAt @map("updated_at")
 
   @@map("towers_rooms")
+  @@schema("towers")
 }
 
 model TowersRoomPlayer {
@@ -87,6 +297,7 @@ model TowersRoomPlayer {
 
   @@unique([roomId, playerId])
   @@map("towers_room_players")
+  @@schema("towers")
 }
 
 model TowersRoomChatMessage {
@@ -100,6 +311,7 @@ model TowersRoomChatMessage {
   updatedAt DateTime     @updatedAt @map("updated_at")
 
   @@map("towers_room_chat_messages")
+  @@schema("towers")
 }
 
 model TowersTable {
@@ -122,6 +334,7 @@ model TowersTable {
 
   @@unique([roomId, tableNumber])
   @@map("towers_tables")
+  @@schema("towers")
 }
 
 model TowersTableSeat {
@@ -137,6 +350,7 @@ model TowersTableSeat {
 
   @@unique([tableId, seatNumber])
   @@map("towers_table_seats")
+  @@schema("towers")
 }
 
 model TowersTablePlayer {
@@ -150,6 +364,7 @@ model TowersTablePlayer {
 
   @@unique([tableId, playerId])
   @@map("towers_table_players")
+  @@schema("towers")
 }
 
 model TowersTableChatMessage {
@@ -166,6 +381,7 @@ model TowersTableChatMessage {
   updatedAt       DateTime             @updatedAt @map("updated_at")
 
   @@map("towers_table_chat_messages")
+  @@schema("towers")
 }
 
 model TowersTableInvitation {
@@ -185,6 +401,7 @@ model TowersTableInvitation {
   updatedAt       DateTime              @updatedAt @map("updated_at")
 
   @@map("towers_table_invitations")
+  @@schema("towers")
 }
 
 model TowersTableBoot {
@@ -200,6 +417,7 @@ model TowersTableBoot {
   updatedAt      DateTime            @updatedAt @map("updated_at")
 
   @@map("towers_table_boots")
+  @@schema("towers")
 }
 
 model TowersNotification {
@@ -217,6 +435,7 @@ model TowersNotification {
   updatedAt         DateTime               @updatedAt @map("updated_at")
 
   @@map("towers_notifications")
+  @@schema("towers")
 }
 
 model TowersGame {
@@ -230,65 +449,72 @@ model TowersGame {
   updatedAt DateTime    @updatedAt @map("updated_at")
 
   @@map("towers_games")
+  @@schema("towers")
 }
 
 enum RoomLevel {
-  SOCIAL       @map("social")
-  BEGINNER     @map("beginner")
-  INTERMEDIATE @map("intermediate")
-  ADVANCED     @map("advanced")
+  SOCIAL       @map("SOCIAL")
+  BEGINNER     @map("BEGINNER")
+  INTERMEDIATE @map("INTERMEDIATE")
+  ADVANCED     @map("ADVANCED")
 
   @@map("room_level")
+  @@schema("towers")
 }
 
 enum TableType {
-  PUBLIC    @map("public")
-  PROTECTED @map("protected")
-  PRIVATE   @map("private")
+  PUBLIC    @map("PUBLIC")
+  PROTECTED @map("PROTECTED")
+  PRIVATE   @map("PRIVATE")
 
   @@map("table_type")
+  @@schema("towers")
 }
 
 enum TableChatMessageType {
-  CHAT                             @map("chat")
-  CIPHER_KEY                       @map("cipher_key")
-  F_KEY                            @map("f_key")
-  GAME_RATING                      @map("game_rating")
-  HERO_CODE                        @map("hero_code")
-  HERO_MESSAGE                     @map("hero_message")
-  TABLE_HOST                       @map("table_host")
-  TABLE_TYPE                       @map("table_type")
-  USER_BOOTED_FROM_TABLE           @map("user_booted_from_table")
-  USER_GRANTED_SEAT_ACCESS_INVITEE @map("user_granted_seat_access_invitee")
-  USER_GRANTED_SEAT_ACCESS_INVITER @map("user_granted_seat_access_inviter")
-  USER_JOINED_TABLE                @map("user_joined_table")
-  USER_INVITED_TO_TABLE            @map("user_invited_to_table")
-  USER_LEFT_TABLE                  @map("user_left_table")
+  CHAT                             @map("CHAT")
+  CIPHER_KEY                       @map("CIPHER_KEY")
+  F_KEY                            @map("F_KEY")
+  GAME_RATING                      @map("GAME_RATING")
+  HERO_CODE                        @map("HERO_CODE")
+  HERO_MESSAGE                     @map("HERO_MESSAGE")
+  TABLE_HOST                       @map("TABLE_HOST")
+  TABLE_TYPE                       @map("TABLE_TYPE")
+  USER_BOOTED_FROM_TABLE           @map("USER_BOOTED_FROM_TABLE")
+  USER_GRANTED_SEAT_ACCESS_INVITEE @map("USER_GRANTED_SEAT_ACCESS_INVITEE")
+  USER_GRANTED_SEAT_ACCESS_INVITER @map("USER_GRANTED_SEAT_ACCESS_INVITER")
+  USER_JOINED_TABLE                @map("USER_JOINED_TABLE")
+  USER_INVITED_TO_TABLE            @map("USER_INVITED_TO_TABLE")
+  USER_LEFT_TABLE                  @map("USER_LEFT_TABLE")
 
   @@map("table_chat_message_type")
+  @@schema("towers")
 }
 
 enum TableInvitationStatus {
-  PENDING  @map("pending")
-  ACCEPTED @map("accepted")
-  DECLINED @map("declined")
+  PENDING  @map("PENDING")
+  ACCEPTED @map("ACCEPTED")
+  DECLINED @map("DECLINED")
 
   @@map("table_invitation_status")
+  @@schema("towers")
 }
 
 enum GameState {
-  WAITING   @map("waiting")
-  COUNTDOWN @map("countdown")
-  PLAYING   @map("playing")
-  GAME_OVER @map("game_over")
+  WAITING   @map("WAITING")
+  COUNTDOWN @map("COUNTDOWN")
+  PLAYING   @map("PLAYING")
+  GAME_OVER @map("GAME_OVER")
 
   @@map("game_status")
+  @@schema("towers")
 }
 
 enum NotificationType {
-  TABLE_INVITE          @map("table_invite")
-  TABLE_INVITE_DECLINED @map("table_invite_declined")
-  TABLE_BOOTED          @map("table_booted")
+  TABLE_INVITE          @map("TABLE_INVITE")
+  TABLE_INVITE_DECLINED @map("TABLE_INVITE_DECLINED")
+  TABLE_BOOTED          @map("TABLE_BOOTED")
 
   @@map("notification_type")
+  @@schema("towers")
 }

@@ -4,7 +4,7 @@ import { ReactNode, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import clsx from "clsx/lite";
-import { RoomLevel } from "db";
+import { RoomLevel } from "db/browser";
 import { Socket } from "socket.io-client";
 import useSWR from "swr";
 import Button from "@/components/ui/Button";

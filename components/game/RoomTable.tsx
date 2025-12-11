@@ -4,7 +4,7 @@ import { ReactNode, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Trans } from "@lingui/react/macro";
 import clsx from "clsx/lite";
-import { TableType } from "db";
+import { TableType } from "db/browser";
 import { Socket } from "socket.io-client";
 import Button from "@/components/ui/Button";
 import { ROUTE_TOWERS } from "@/constants/routes";

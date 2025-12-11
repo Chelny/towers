@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { WebsiteTheme } from "db";
+import { WebsiteTheme } from "db/browser";
 import { vi } from "vitest";
 import { SettingsForm } from "@/app/[locale]/(protected)/account/settings/settings.form";
 import { mockSession } from "@/test/data/session";

@@ -1,4 +1,4 @@
-import { User } from "db";
+import { User } from "db/browser";
 import prisma from "@/lib/prisma";
 
 export const getUserById = async (id: string | undefined): Promise<User | null> => {

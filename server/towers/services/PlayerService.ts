@@ -1,6 +1,5 @@
-import { TowersPlayerLite } from "db";
 import prisma from "@/lib/prisma";
-import { getTowersPlayerLiteIncludes } from "@/prisma/prisma-includes";
+import { getTowersPlayerLiteIncludes, TowersPlayerLite } from "@/types/prisma";
 
 export class PlayerService {
   public static async getPlayerById(id: string): Promise<TowersPlayerLite> {

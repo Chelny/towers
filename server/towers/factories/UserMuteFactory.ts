@@ -1,7 +1,7 @@
-import { UserMuteWithRelations } from "db";
 import { User } from "@/server/towers/classes/User";
 import { UserMute, UserMutePlainObject } from "@/server/towers/classes/UserMute";
 import { UserFactory } from "@/server/towers/factories/UserFactory";
+import { UserMuteWithRelations } from "@/types/prisma";
 
 export class UserMuteFactory {
   public static convertManyToPlainObject(dbMutes: UserMuteWithRelations[]): UserMutePlainObject[] {

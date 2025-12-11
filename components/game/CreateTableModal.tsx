@@ -4,7 +4,7 @@ import { FormEvent, ReactNode, useState } from "react";
 import { useLingui } from "@lingui/react/macro";
 import { Type } from "@sinclair/typebox";
 import { Value, ValueError } from "@sinclair/typebox/value";
-import { TableType } from "db";
+import { TableType } from "db/browser";
 import Checkbox from "@/components/ui/Checkbox";
 import Modal from "@/components/ui/Modal";
 import Select from "@/components/ui/Select";

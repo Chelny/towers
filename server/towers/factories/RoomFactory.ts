@@ -1,3 +1,12 @@
+import { TowersRoom } from "db/browser";
+import type {
+  TowersPlayerLite,
+  TowersRoomChatMessageWithRelations,
+  TowersRoomPlayerWithRelations,
+  TowersRoomsListWithCount,
+  TowersRoomWithRelations,
+  TowersTableWithRelations,
+} from "@/types/prisma";
 import { Player } from "@/server/towers/classes/Player";
 import { Room, RoomPlainObject } from "@/server/towers/classes/Room";
 import { RoomChatMessage } from "@/server/towers/classes/RoomChatMessage";
@@ -5,15 +14,6 @@ import { RoomPlayer } from "@/server/towers/classes/RoomPlayer";
 import { Table } from "@/server/towers/classes/Table";
 import { PlayerFactory } from "@/server/towers/factories/PlayerFactory";
 import { RoomManager } from "@/server/towers/managers/RoomManager";
-import type {
-  TowersPlayerLite,
-  TowersRoom,
-  TowersRoomChatMessageWithRelations,
-  TowersRoomPlayerWithRelations,
-  TowersRoomsListWithCount,
-  TowersRoomWithRelations,
-  TowersTableWithRelations,
-} from "db";
 
 export class RoomFactory {
   public static createRoom(dbRoom: TowersRoom): Room {

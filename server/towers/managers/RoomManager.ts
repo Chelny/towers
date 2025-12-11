@@ -1,5 +1,5 @@
 import { logger } from "better-auth";
-import { GameState, TableType, TowersRoomWithRelations } from "db";
+import { GameState, TableType } from "db/client";
 import { ServerInternalEvents } from "@/constants/socket/server-internal";
 import { ServerTowersSeat, ServerTowersTeam } from "@/interfaces/table-seats";
 import { publishRedisEvent } from "@/server/redis/publish";
@@ -17,6 +17,7 @@ import { RoomPlayerManager } from "@/server/towers/managers/RoomPlayerManager";
 import { TableManager } from "@/server/towers/managers/TableManager";
 import { UserMuteManager } from "@/server/towers/managers/UserMuteManager";
 import { RoomService } from "@/server/towers/services/RoomService";
+import { TowersRoomWithRelations } from "@/types/prisma";
 
 export class RoomManager {
   private static rooms: Map<string, Room> = new Map<string, Room>();

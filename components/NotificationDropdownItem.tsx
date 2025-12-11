@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useLingui } from "@lingui/react/macro";
 import clsx from "clsx/lite";
-import { NotificationType } from "db";
+import { NotificationType } from "db/browser";
 import { MdOutlineDelete } from "react-icons/md";
 import AlertModal from "@/components/game/AlertModal";
 import TableInvitationModal from "@/components/game/TableInvitationModal";

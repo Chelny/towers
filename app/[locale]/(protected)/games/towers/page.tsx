@@ -2,13 +2,13 @@ import { ReactNode } from "react";
 import type { Metadata } from "next";
 import dynamic from "next/dynamic";
 import { I18n } from "@lingui/core";
-import { TowersPlayerLite, TowersRoom, TowersTable } from "db";
+import { TowersRoom, TowersTable } from "db/browser";
 import { initLingui } from "@/app/init-lingui";
 import TowersPageContent from "@/components/game/TowersPageContent";
 import RoomsListSkeleton from "@/components/skeleton/RoomsListSkeleton";
 import { ROUTE_TOWERS } from "@/constants/routes";
 import prisma from "@/lib/prisma";
-import { getTowersPlayerLiteIncludes } from "@/prisma/prisma-includes";
+import { getTowersPlayerLiteIncludes, TowersPlayerLite } from "@/types/prisma";
 
 const RoomsList = dynamic(() => import("@/components/game/RoomsList"), {
   loading: () => <RoomsListSkeleton />,

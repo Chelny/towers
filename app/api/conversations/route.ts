@@ -1,13 +1,12 @@
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-import { ConversationWithRelations } from "db";
 import { handleApiError, handleUnauthorizedApiError } from "@/lib/api-error";
 import { auth, Session } from "@/lib/auth";
 import { getCurrentLocale } from "@/lib/locale";
 import prisma from "@/lib/prisma";
-import { getConversationIncludes } from "@/prisma/prisma-includes";
 import { ConversationFactory } from "@/server/towers/factories/ConversationFactory";
 import { dynamicActivate } from "@/translations/languages";
+import { ConversationWithRelations, getConversationIncludes } from "@/types/prisma";
 
 export async function GET(request: NextRequest): Promise<NextResponse<ApiResponse>> {
   // @ts-ignore

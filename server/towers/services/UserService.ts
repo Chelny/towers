@@ -1,4 +1,4 @@
-import { User } from "db";
+import { User } from "db/client";
 import prisma from "@/lib/prisma";
 
 export class UserService {

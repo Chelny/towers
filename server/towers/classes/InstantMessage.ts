@@ -1,5 +1,5 @@
-import { InstantMessageType } from "db";
-import { JsonValue } from "@/prisma/app/generated/prisma/client/runtime/library";
+import { JsonValue } from "@prisma/client/runtime/client";
+import { InstantMessageType } from "db/client";
 import { User, UserPlainObject } from "@/server/towers/classes/User";
 
 export interface InstantMessageProps {

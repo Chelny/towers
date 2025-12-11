@@ -1,4 +1,4 @@
-import { TableInvitationStatus } from "db";
+import { TableInvitationStatus } from "db/client";
 import { Player, PlayerPlainObject } from "@/server/towers/classes/Player";
 import { Room, RoomLitePlainObject } from "@/server/towers/classes/Room";
 import { Table, TableLitePlainObject } from "@/server/towers/classes/Table";

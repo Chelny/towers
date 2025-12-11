@@ -1,6 +1,6 @@
 import { createId } from "@paralleldrive/cuid2";
 import { logger } from "better-auth";
-import { NotificationType, TableChatMessageType, TableType } from "db";
+import { NotificationType, TableChatMessageType, TableType } from "db/client";
 import { NUM_TABLE_SEATS } from "@/constants/game";
 import { ServerInternalEvents } from "@/constants/socket/server-internal";
 import { publishRedisEvent } from "@/server/redis/publish";

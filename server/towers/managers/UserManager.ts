@@ -1,4 +1,4 @@
-import { User as UserModel } from "db";
+import { User as UserModel } from "db/client";
 import { Socket } from "socket.io";
 import { User, UserProps } from "@/server/towers/classes/User";
 import { UserService } from "@/server/towers/services/UserService";

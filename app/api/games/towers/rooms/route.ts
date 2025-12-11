@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
-import { TowersRoomsListWithCount } from "db";
 import { handleApiError } from "@/lib/api-error";
 import prisma from "@/lib/prisma";
-import { towersRoomsListIncludes } from "@/prisma/prisma-includes";
 import { RoomFactory } from "@/server/towers/factories/RoomFactory";
+import { towersRoomsListIncludes, TowersRoomsListWithCount } from "@/types/prisma";
 
 export async function GET(): Promise<NextResponse<ApiResponse>> {
   try {

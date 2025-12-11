@@ -1,11 +1,10 @@
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-import { TowersTableWithRelations } from "db";
 import { handleApiError, handleUnauthorizedApiError } from "@/lib/api-error";
 import { auth, Session } from "@/lib/auth";
 import prisma from "@/lib/prisma";
-import { getTowersTableIncludes } from "@/prisma/prisma-includes";
 import { TableFactory } from "@/server/towers/factories/TableFactory";
+import { getTowersTableIncludes, TowersTableWithRelations } from "@/types/prisma";
 
 export async function GET(
   _: NextRequest,

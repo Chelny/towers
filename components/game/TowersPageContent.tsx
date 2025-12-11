@@ -3,7 +3,7 @@
 import { ReactNode, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { useRouter, useSearchParams } from "next/navigation";
-import { NotificationType } from "db";
+import { NotificationType } from "db/browser";
 import { Socket } from "socket.io-client";
 import { ROUTE_TOWERS } from "@/constants/routes";
 import { ServerToClientEvents } from "@/constants/socket/server-to-client";

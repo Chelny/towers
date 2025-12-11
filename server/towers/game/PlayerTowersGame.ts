@@ -1,4 +1,4 @@
-import { TableChatMessageType } from "db";
+import { TableChatMessageType } from "db/client";
 import { DisconnectReason, Socket } from "socket.io";
 import {
   BLOCK_BREAK_ANIMATION_DURATION_MS,

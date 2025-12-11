@@ -1,5 +1,5 @@
 import { Type } from "@sinclair/typebox";
-import { WebsiteTheme } from "db";
+import { WebsiteTheme } from "db/browser";
 import { Language, languages } from "@/translations/languages";
 
 export const settingsSchema = Type.Object({

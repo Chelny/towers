@@ -1,4 +1,4 @@
-import { Account } from "db";
+import { Account } from "db/browser";
 import prisma from "@/lib/prisma";
 
 /**

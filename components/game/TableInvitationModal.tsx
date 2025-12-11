@@ -2,7 +2,7 @@
 
 import { ChangeEvent, InputEvent, ReactNode, useState } from "react";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { RoomLevel } from "db";
+import { RoomLevel } from "db/browser";
 import Checkbox from "@/components/ui/Checkbox";
 import Input from "@/components/ui/Input";
 import Modal from "@/components/ui/Modal";

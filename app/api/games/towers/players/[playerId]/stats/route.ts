@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { TowersPlayerStats } from "db";
+import { TowersPlayerStats } from "db/client";
 import { handleApiError } from "@/lib/api-error";
 import prisma from "@/lib/prisma";
 import { PlayerStatsFactory } from "@/server/towers/factories/PlayerStatsFactory";
