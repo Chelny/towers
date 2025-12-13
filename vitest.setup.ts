@@ -1,3 +1,4 @@
+import { i18n } from "@lingui/core";
 import "@testing-library/jest-dom";
 import { screen } from "@testing-library/react";
 import { mockSession } from "@/test/data/session";
@@ -73,3 +74,9 @@ export const customScreen = {
   getByNormalizedText,
   getAllByNormalizedText,
 };
+
+export async function dynamicActivate(locale: string): Promise<void> {
+  const { messages } = await import(`@/translations/locales/${locale}/messages.po`);
+  i18n.load(locale, messages);
+  i18n.activate(locale);
+}

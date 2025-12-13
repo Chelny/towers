@@ -1,7 +1,7 @@
-import { PropsWithChildren, ReactNode } from "react";
+import { ReactNode } from "react";
 import SmallScreenWarning from "@/components/SmallScreenWarning";
 
-type GamesLayoutProps = PropsWithChildren<{}>;
+type GamesLayoutProps = LayoutProps<"/[locale]/games">;
 
 export default function GamesLayout({ children }: GamesLayoutProps): ReactNode {
   return (

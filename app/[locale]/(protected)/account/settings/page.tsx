@@ -8,13 +8,11 @@ import { ROUTE_SETTINGS } from "@/constants/routes";
 import { auth } from "@/lib/auth";
 import { Session } from "@/lib/auth-client";
 
-type SettingsProps = {
-  params: Promise<Params>
-};
+type SettingsProps = PageProps<"/[locale]/account/settings">;
 
 export async function generateMetadata({ params }: SettingsProps): Promise<Metadata> {
-  const routeParams: Params = await params;
-  const i18n: I18n = initLingui(routeParams.locale);
+  const { locale } = await params;
+  const i18n: I18n = initLingui(locale);
 
   return {
     title: i18n._(ROUTE_SETTINGS.TITLE),
@@ -22,8 +20,8 @@ export async function generateMetadata({ params }: SettingsProps): Promise<Metad
 }
 
 export default async function Settings({ params }: SettingsProps): Promise<ReactNode> {
-  const routeParams: Params = await params;
-  const i18n: I18n = initLingui(routeParams.locale);
+  const { locale } = await params;
+  const i18n: I18n = initLingui(locale);
   const session: Session | null = await auth.api.getSession({ headers: await headers() });
 
   return (

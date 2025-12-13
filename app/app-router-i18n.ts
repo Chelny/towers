@@ -1,32 +1,22 @@
 import { AllMessages, I18n, Messages, setupI18n } from "@lingui/core";
 import { logger } from "@/lib/logger";
 import linguiConfig from "@/lingui.config";
+import { messages as enMessages } from "@/translations/locales/en/messages";
+import { messages as frMessages } from "@/translations/locales/fr/messages";
+import { messages as pseudoLocaleMessages } from "@/translations/locales/pseudo-LOCALE/messages";
 
 const { locales } = linguiConfig;
-// Optionally use a stricter union type
-type SupportedLocales = string;
 
-const loadCatalog = async (locale: SupportedLocales): Promise<Record<string, Messages>> => {
-  try {
-    const { messages } = await import(`@lingui/loader!@/translations/locales/${locale}/messages.po`);
-    return { [locale]: messages };
-  } catch (error) {
-    logger.error(`Failed to load locale ${locale}: ${error}`);
-    return { [locale]: {} };
-  }
+const catalogs: Record<string, Messages> = {
+  en: enMessages,
+  fr: frMessages,
+  "pseudo-LOCALE": pseudoLocaleMessages,
 };
 
-const catalogs: Record<string, Messages>[] = await Promise.all(locales.map(loadCatalog));
-
-// Transform array of catalogs into a single object
-export const allMessages: AllMessages = catalogs.reduce(
-  (acc: Record<string, Messages>, oneCatalog: Record<string, Messages>) => {
-    return { ...acc, ...oneCatalog };
-  },
-  {},
-);
-
+type SupportedLocales = keyof typeof catalogs;
 type AllI18nInstances = { [K in SupportedLocales]: I18n };
+
+export const allMessages: AllMessages = catalogs;
 
 export const allI18nInstances: AllI18nInstances = locales.reduce((acc: {}, locale: string) => {
   const messages: Messages = allMessages[locale] ?? {};

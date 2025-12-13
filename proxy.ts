@@ -4,13 +4,17 @@ import { APP_COOKIE_KEYS } from "@/constants/app";
 import { PROTECTED_ROUTES, PUBLIC_ROUTES, ROUTE_GAMES, ROUTE_SIGN_IN } from "@/constants/routes";
 import { Session } from "@/lib/auth";
 import { getCurrentLocale } from "@/lib/locale";
-import { Language, languages } from "@/translations/languages";
+import linguiConfig from "@/lingui.config";
 
-export default async function middleware(request: NextRequest) {
+export default async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const host: string | null = request.headers.get("host");
   const protocol: string = request.headers.get("x-forwarded-proto") || "http";
   const origin: string = `${protocol}://${host}`;
+
+  if (pathname.startsWith("/.well-known")) {
+    return NextResponse.next();
+  }
 
   // Fetch session
   const { data: session } = await betterFetch<Session>("/api/auth/get-session", {
@@ -91,12 +95,9 @@ export default async function middleware(request: NextRequest) {
   // Localization
   const cookieLocale: string | undefined = request.cookies.get(APP_COOKIE_KEYS.LOCALE)?.value;
   const locale: string = getCurrentLocale(request, session);
-
   const pathnameLocale: string = pathname.split("/")[1];
-  const locales: string[] = languages.map((language: Language) => language.locale);
-  const isValidLocale: boolean = locales.includes(pathnameLocale);
 
-  if (!isValidLocale) {
+  if (!linguiConfig.locales.includes(pathnameLocale)) {
     // Redirect if there is no locale
     request.nextUrl.pathname = `/${locale}${pathname}`;
     // e.g. incoming request is /sign-in
@@ -125,12 +126,13 @@ export const config = {
        * Match all request paths except for the ones starting with:
        * - api (API routes)
        * - _next (Next.js internal files, including static, image, and data routes)
+       * - .well-known (ACME challenges, security.txt, etc.)
        * - favicon.ico, sitemap.xml, robots.txt, manifest.webmanifest (metadata files)
        * - images (.svg, .png, .jpg, .jpeg, .gif, .webp)
        * - videos (.webm)
        */
       source:
-        "/((?!api|_next|favicon.ico|sitemap.xml|robots.txt|manifest.webmanifest|.*\\.(?:svg|png|jpg|jpeg|gif|webp|webm)$).*)",
+        "/((?!api|_next|\\.well-known|favicon.ico|sitemap.xml|robots.txt|manifest.webmanifest|.*\\.(?:svg|png|jpg|jpeg|gif|webp|webm)$).*)",
       missing: [
         { type: "header", key: "next-router-prefetch" },
         { type: "header", key: "purpose", value: "prefetch" },

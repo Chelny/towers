@@ -1,8 +1,8 @@
-import { PropsWithChildren, ReactNode } from "react";
+import { ReactNode } from "react";
 import Image from "next/image";
 import { APP_CONFIG } from "@/constants/app";
 
-type LegalLayoutProps = PropsWithChildren<{}>;
+type LegalLayoutProps = LayoutProps<"/[locale]">;
 
 export default function LegalLayout({ children }: LegalLayoutProps): ReactNode {
   return (

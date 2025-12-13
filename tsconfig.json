@@ -1,20 +1,18 @@
 {
   "compilerOptions": {
-    /* Base Options: */
+    // Base Options
     "allowJs": true,
     "esModuleInterop": true,
     "isolatedModules": true,
     "resolveJsonModule": true,
     "target": "ES2023",
-
-    /* Strictness */
+    // Strictness
     "skipLibCheck": true,
     "strict": true,
-
-    /* Bundled projects */
+    // Bundled projects
     "declaration": false,
     "incremental": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "lib": [
       "dom",
       "dom.iterable",
@@ -29,25 +27,24 @@
       }
     ],
     "allowImportingTsExtensions": true,
-
-    /* Path Aliases */
+    // Path Aliases
     "baseUrl": ".",
     "paths": {
       "@/*": [
         "./*"
       ]
     },
-
-    /* Types & Plugins */
+    // Types & Plugins
     "types": [
       "vitest/globals"
-    ],
+    ]
   },
   "include": [
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts"
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"

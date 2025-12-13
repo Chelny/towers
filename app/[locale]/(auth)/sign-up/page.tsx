@@ -5,13 +5,11 @@ import { SignUpForm } from "@/app/[locale]/(auth)/sign-up/sign-up.form";
 import { initLingui } from "@/app/init-lingui";
 import { ROUTE_SIGN_UP } from "@/constants/routes";
 
-type SignUpProps = {
-  params: Promise<Params>
-};
+type SignUpProps = PageProps<"/[locale]/sign-up">;
 
 export async function generateMetadata({ params }: SignUpProps): Promise<Metadata> {
-  const routeParams: Params = await params;
-  const i18n: I18n = initLingui(routeParams.locale);
+  const { locale } = await params;
+  const i18n: I18n = initLingui(locale);
 
   return {
     title: i18n._(ROUTE_SIGN_UP.TITLE),
@@ -19,13 +17,13 @@ export async function generateMetadata({ params }: SignUpProps): Promise<Metadat
 }
 
 export default async function SignUp({ params }: SignUpProps): Promise<ReactNode> {
-  const routeParams: Params = await params;
-  const i18n: I18n = initLingui(routeParams.locale);
+  const { locale } = await params;
+  const i18n: I18n = initLingui(locale);
 
   return (
     <>
       <h1 className="mb-4 text-3xl">{i18n._(ROUTE_SIGN_UP.TITLE)}</h1>
-      <SignUpForm locale={routeParams.locale} />
+      <SignUpForm locale={locale} />
     </>
   );
 }

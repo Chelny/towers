@@ -1,5 +1,4 @@
 import { usePathname } from "next/navigation";
-import { i18n } from "@lingui/core";
 import { render, screen } from "@testing-library/react";
 import {
   Breadcrumb,
@@ -10,6 +9,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/Breadcrumb";
+import { dynamicActivate } from "@/vitest.setup";
 
 vi.mock("next/navigation", () => ({
   usePathname: vi.fn(),
@@ -17,7 +17,7 @@ vi.mock("next/navigation", () => ({
 
 describe("Breadcrumb", () => {
   beforeAll(() => {
-    i18n.activate("en");
+    dynamicActivate("en");
   });
 
   it("should render breadcrumb structure correctly", () => {

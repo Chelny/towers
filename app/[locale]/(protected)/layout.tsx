@@ -1,4 +1,4 @@
-import { PropsWithChildren, ReactNode } from "react";
+import { ReactNode } from "react";
 import { Metadata } from "next";
 import Sidebar from "@/components/Sidebar";
 
@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   },
 };
 
-type ProtectedLayoutProps = PropsWithChildren<{}>;
+type ProtectedLayoutProps = LayoutProps<"/[locale]">;
 
 export default function ProtectedLayout({ children }: ProtectedLayoutProps): ReactNode {
   return (

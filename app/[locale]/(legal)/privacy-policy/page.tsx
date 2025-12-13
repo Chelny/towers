@@ -7,13 +7,11 @@ import Anchor from "@/components/ui/Anchor";
 import { APP_CONFIG } from "@/constants/app";
 import { ROUTE_DELETE_ACCOUNT, ROUTE_PRIVACY_POLICY } from "@/constants/routes";
 
-type PrivacyPolicyProps = {
-  params: Promise<Params>
-};
+type PrivacyPolicyProps = PageProps<"/[locale]/privacy-policy">;
 
 export async function generateMetadata({ params }: PrivacyPolicyProps): Promise<Metadata> {
-  const routeParams: Params = await params;
-  const i18n: I18n = initLingui(routeParams.locale);
+  const { locale } = await params;
+  const i18n: I18n = initLingui(locale);
 
   return {
     title: i18n._(ROUTE_PRIVACY_POLICY.TITLE),
@@ -21,8 +19,8 @@ export async function generateMetadata({ params }: PrivacyPolicyProps): Promise<
 }
 
 export default async function PrivacyPolicy({ params }: PrivacyPolicyProps): Promise<ReactNode> {
-  const routeParams: Params = await params;
-  const i18n: I18n = initLingui(routeParams.locale);
+  const { locale } = await params;
+  const i18n: I18n = initLingui(locale);
   const name: string = APP_CONFIG.NAME;
   const supportEmail: string = APP_CONFIG.EMAIL.SUPPORT;
 

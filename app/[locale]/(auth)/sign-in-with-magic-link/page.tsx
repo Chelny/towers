@@ -5,13 +5,11 @@ import { SignInWithMagicLinkForm } from "@/app/[locale]/(auth)/sign-in-with-magi
 import { initLingui } from "@/app/init-lingui";
 import { ROUTE_SIGN_IN_WITH_MAGIC_LINK } from "@/constants/routes";
 
-type SignInWithMagicLinkProps = {
-  params: Promise<Params>
-};
+type SignInWithMagicLinkProps = PageProps<"/[locale]/sign-in-with-magic-link">;
 
 export async function generateMetadata({ params }: SignInWithMagicLinkProps): Promise<Metadata> {
-  const routeParams: Params = await params;
-  const i18n: I18n = initLingui(routeParams.locale);
+  const { locale } = await params;
+  const i18n: I18n = initLingui(locale);
 
   return {
     title: i18n._(ROUTE_SIGN_IN_WITH_MAGIC_LINK.TITLE),
@@ -19,8 +17,8 @@ export async function generateMetadata({ params }: SignInWithMagicLinkProps): Pr
 }
 
 export default async function SignInWithMagicLink({ params }: SignInWithMagicLinkProps): Promise<ReactNode> {
-  const routeParams: Params = await params;
-  const i18n: I18n = initLingui(routeParams.locale);
+  const { locale } = await params;
+  const i18n: I18n = initLingui(locale);
 
   return (
     <>

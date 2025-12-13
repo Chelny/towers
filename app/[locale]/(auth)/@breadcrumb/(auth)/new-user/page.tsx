@@ -10,13 +10,11 @@ import {
 } from "@/components/ui/Breadcrumb";
 import { ROUTE_HOME, ROUTE_NEW_USER } from "@/constants/routes";
 
-type BreadcrumbSlotProps = {
-  params: Promise<Params>
-};
+type BreadcrumbSlotProps = PageProps<"/[locale]/new-user">;
 
 export default async function BreadcrumbSlot({ params }: BreadcrumbSlotProps): Promise<ReactNode> {
-  const routeParams: Params = await params;
-  const i18n: I18n = initLingui(routeParams.locale);
+  const { locale } = await params;
+  const i18n: I18n = initLingui(locale);
 
   return (
     <BreadcrumbList>

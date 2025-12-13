@@ -5,13 +5,11 @@ import { ResetPasswordForm } from "@/app/[locale]/(auth)/reset-password/reset-pa
 import { initLingui } from "@/app/init-lingui";
 import { ROUTE_RESET_PASSWORD } from "@/constants/routes";
 
-type ResetPasswordProps = {
-  params: Promise<Params>
-};
+type ResetPasswordProps = PageProps<"/[locale]/reset-password">;
 
 export async function generateMetadata({ params }: ResetPasswordProps): Promise<Metadata> {
-  const routeParams: Params = await params;
-  const i18n: I18n = initLingui(routeParams.locale);
+  const { locale } = await params;
+  const i18n: I18n = initLingui(locale);
 
   return {
     title: i18n._(ROUTE_RESET_PASSWORD.TITLE),
@@ -19,8 +17,8 @@ export async function generateMetadata({ params }: ResetPasswordProps): Promise<
 }
 
 export default async function ResetPassword({ params }: ResetPasswordProps): Promise<ReactNode> {
-  const routeParams: Params = await params;
-  const i18n: I18n = initLingui(routeParams.locale);
+  const { locale } = await params;
+  const i18n: I18n = initLingui(locale);
 
   return (
     <>

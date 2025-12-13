@@ -5,13 +5,11 @@ import { ForgotPasswordForm } from "@/app/[locale]/(auth)/forgot-password/forgot
 import { initLingui } from "@/app/init-lingui";
 import { ROUTE_FORGOT_PASSWORD } from "@/constants/routes";
 
-type ForgotPasswordProps = {
-  params: Promise<Params>
-};
+type ForgotPasswordProps = PageProps<"/[locale]/forgot-password">;
 
 export async function generateMetadata({ params }: ForgotPasswordProps): Promise<Metadata> {
-  const routeParams: Params = await params;
-  const i18n: I18n = initLingui(routeParams.locale);
+  const { locale } = await params;
+  const i18n: I18n = initLingui(locale);
 
   return {
     title: i18n._(ROUTE_FORGOT_PASSWORD.TITLE),
@@ -19,8 +17,8 @@ export async function generateMetadata({ params }: ForgotPasswordProps): Promise
 }
 
 export default async function ForgotPassword({ params }: ForgotPasswordProps): Promise<ReactNode> {
-  const routeParams: Params = await params;
-  const i18n: I18n = initLingui(routeParams.locale);
+  const { locale } = await params;
+  const i18n: I18n = initLingui(locale);
 
   return (
     <>

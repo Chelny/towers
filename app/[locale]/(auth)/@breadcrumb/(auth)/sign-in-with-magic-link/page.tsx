@@ -10,13 +10,11 @@ import {
 } from "@/components/ui/Breadcrumb";
 import { ROUTE_HOME, ROUTE_SIGN_IN_WITH_MAGIC_LINK } from "@/constants/routes";
 
-type BreadcrumbSlotProps = {
-  params: Promise<Params>
-};
+type BreadcrumbSlotProps = PageProps<"/[locale]/sign-in-with-magic-link">;
 
 export default async function BreadcrumbSlot({ params }: BreadcrumbSlotProps): Promise<ReactNode> {
-  const routeParams: Params = await params;
-  const i18n: I18n = initLingui(routeParams.locale);
+  const { locale } = await params;
+  const i18n: I18n = initLingui(locale);
 
   return (
     <BreadcrumbList>

@@ -1,5 +1,4 @@
 import { Static, TSchema } from "@sinclair/typebox";
-import { SupportedLocales } from "@/translations/languages";
 
 declare global {
   type ApiResponse<T = unknown> = {
@@ -18,9 +17,6 @@ declare global {
   type NonNullableObject<T> = {
     [K in keyof T as T[K] extends null | undefined ? never : K]: T[K]
   };
-
-  type Params = { locale: SupportedLocales; not_found: string[] };
-  type SearchParams = { [key: string]: string | string[] | undefined };
 }
 
 export {};

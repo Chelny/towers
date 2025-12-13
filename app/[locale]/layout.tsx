@@ -1,10 +1,10 @@
-import { PropsWithChildren, ReactNode } from "react";
+import { ReactNode } from "react";
 import type { Metadata, Viewport } from "next";
 import { ReadonlyHeaders } from "next/dist/server/web/spec-extension/adapters/headers";
 import { Inter } from "next/font/google";
 import { headers } from "next/headers";
 import { I18n } from "@lingui/core";
-import { setI18n } from "@lingui/react/server";
+import { msg } from "@lingui/core/macro";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { ThemeProvider } from "next-themes";
 import { LinguiClientProvider } from "@/app/[locale]/lingui-client-provider";
@@ -18,6 +18,7 @@ import { SocketProvider } from "@/context/SocketContext";
 import { ToastProvider } from "@/context/ToastContext";
 import { auth } from "@/lib/auth";
 import { Session } from "@/lib/auth-client";
+import linguiConfig from "@/lingui.config";
 import { Language, languages } from "@/translations/languages";
 import "../globals.css";
 
@@ -28,23 +29,22 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-type RootLayoutProps = PropsWithChildren<{
-  params: Promise<Params>
-  breadcrumb: ReactNode
-}>;
+type RootLayoutProps = LayoutProps<"/[locale]">;
+
+export async function generateStaticParams(): Promise<{ locale: string }[]> {
+  return linguiConfig.locales.map((locale: string) => ({ locale }));
+}
 
 export async function generateMetadata({ params }: RootLayoutProps): Promise<Metadata> {
-  const routeParams: Params = await params;
-  const i18n: I18n = getI18nInstance(routeParams.locale);
-
-  setI18n(i18n);
+  const { locale } = await params;
+  const i18n: I18n = getI18nInstance(locale);
 
   return {
     title: {
       template: `%s | ${APP_CONFIG.NAME}`,
       default: APP_CONFIG.NAME,
     },
-    description: i18n._("Arcade game based on Yahoo! Towers"),
+    description: i18n._(msg`Arcade game based on Yahoo! Towers`),
     applicationName: APP_CONFIG.NAME,
     keywords: ["Yahoo Towers", "Yahoo! Towers", "game", "Tetris", "arcade"],
     creator: "Chelny Duplan",
@@ -56,18 +56,16 @@ export async function generateMetadata({ params }: RootLayoutProps): Promise<Met
 }
 
 export default async function RootLayout({ children, params }: Readonly<RootLayoutProps>): Promise<ReactNode> {
-  const routeParams: Params = await params;
-  const currentLanguage: Language | undefined = languages.find(
-    (language: Language) => language.locale === routeParams.locale,
-  );
+  const { locale } = await params;
+  const currentLanguage: Language | undefined = languages.find((language: Language) => language.locale === locale);
   const headersList: ReadonlyHeaders = await headers();
   const nonce: string | undefined = headersList.get("x-nonce") || undefined;
   const session: Session | null = await auth.api.getSession({ headers: headersList });
 
-  initLingui(routeParams.locale);
+  initLingui(locale);
 
   return (
-    <html lang={routeParams.locale} dir={currentLanguage?.rtl ? "rtl" : "ltr"} suppressHydrationWarning>
+    <html lang={locale} dir={currentLanguage?.rtl ? "rtl" : "ltr"} suppressHydrationWarning>
       <body className={inter.className}>
         <ThemeProvider
           attribute="class"
@@ -77,7 +75,7 @@ export default async function RootLayout({ children, params }: Readonly<RootLayo
           nonce={nonce}
           disableTransitionOnChange
         >
-          <LinguiClientProvider initialLocale={routeParams.locale} initialMessages={allMessages[routeParams.locale]}>
+          <LinguiClientProvider initialLocale={locale} initialMessages={allMessages[locale]}>
             <SocketProvider session={session}>
               <GameProvider>
                 <ToastProvider>

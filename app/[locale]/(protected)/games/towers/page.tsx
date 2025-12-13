@@ -14,15 +14,12 @@ const RoomsList = dynamic(() => import("@/components/game/RoomsList"), {
   loading: () => <RoomsListSkeleton />,
 });
 
-type TowersProps = {
-  params: Promise<Params>
-  searchParams: Promise<SearchParams>
-};
+type TowersProps = PageProps<"/[locale]/games/towers">;
 
 export async function generateMetadata({ params, searchParams }: TowersProps): Promise<Metadata> {
-  const routeParams: Params = await params;
-  const routeSearchParams: SearchParams = await searchParams;
-  const i18n: I18n = initLingui(routeParams.locale);
+  const { locale } = await params;
+  const routeSearchParams = await searchParams;
+  const i18n: I18n = initLingui(locale);
   let title: string = i18n._(ROUTE_TOWERS.TITLE);
 
   if (routeSearchParams.room) {
@@ -64,9 +61,9 @@ export async function generateMetadata({ params, searchParams }: TowersProps): P
 }
 
 export default async function Towers({ params, searchParams }: TowersProps): Promise<ReactNode> {
-  const routeParams: Params = await params;
-  const routeSearchParams: SearchParams = await searchParams;
-  const i18n: I18n = initLingui(routeParams.locale);
+  const { locale } = await params;
+  const routeSearchParams = await searchParams;
+  const i18n: I18n = initLingui(locale);
   const roomId: string = routeSearchParams.room as string;
   const tableId: string = routeSearchParams.table as string;
 

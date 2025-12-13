@@ -10,13 +10,11 @@ import {
 } from "@/components/ui/Breadcrumb";
 import { ROUTE_FORGOT_PASSWORD, ROUTE_HOME, ROUTE_RESET_PASSWORD } from "@/constants/routes";
 
-type BreadcrumbSlotProps = {
-  params: Promise<Params>
-};
+type BreadcrumbSlotProps = PageProps<"/[locale]/reset-password">;
 
 export default async function BreadcrumbSlot({ params }: BreadcrumbSlotProps): Promise<ReactNode> {
-  const routeParams: Params = await params;
-  const i18n: I18n = initLingui(routeParams.locale);
+  const { locale } = await params;
+  const i18n: I18n = initLingui(locale);
 
   return (
     <BreadcrumbList>

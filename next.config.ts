@@ -2,11 +2,6 @@ import { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   allowedDevOrigins: process.env.ALLOWED_DEV_ORIGINS?.split(";") || [],
-  // compiler: {
-  //   removeConsole: {
-  //     exclude: ["warn"],
-  //   },
-  // },
   env: {
     PROTOCOL: process.env.PROTOCOL,
     HOSTNAME: process.env.HOSTNAME,
@@ -24,26 +19,11 @@ const nextConfig: NextConfig = {
     GOOGLE_ANALYTICS: process.env.GOOGLE_ANALYTICS,
     TEST_MODE: process.env.TEST_MODE,
   },
-  eslint: {
-    ignoreDuringBuilds: true,
-    dirs: [
-      "app",
-      "components",
-      "constants",
-      "context",
-      "data",
-      "enums",
-      "hooks",
-      "interfaces",
-      "lib",
-      "test",
-      "translations",
-      "utils",
-    ],
-  },
   experimental: {
+    globalNotFound: true,
     serverSourceMaps: false,
     swcPlugins: [["@lingui/swc-plugin", {}]],
+    turbopackFileSystemCacheForDev: true,
   },
   images: {
     remotePatterns: [

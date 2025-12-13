@@ -3,14 +3,14 @@ import { I18n } from "@lingui/core";
 import { initLingui } from "@/app/init-lingui";
 import { APP_CONFIG } from "@/constants/app";
 import { BODY_STYLE, EMAIL_COLORS } from "@/constants/email";
-import { defaultLocale } from "@/translations/languages";
+import { DEFAULT_LOCALE } from "@/translations/languages";
 
 type EmailTemplateProps = {
   html: string
   locale: string
 };
 
-export default function EmailTemplate({ html, locale = defaultLocale }: EmailTemplateProps): ReactNode {
+export default function EmailTemplate({ html, locale = DEFAULT_LOCALE }: EmailTemplateProps): ReactNode {
   const appName: string = APP_CONFIG.NAME;
   const startingYear: number = 2024;
   const currentYear: number = new Date().getFullYear();

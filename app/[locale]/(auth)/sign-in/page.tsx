@@ -5,13 +5,11 @@ import { SignInForm } from "@/app/[locale]/(auth)/sign-in/sign-in.form";
 import { initLingui } from "@/app/init-lingui";
 import { ROUTE_SIGN_IN } from "@/constants/routes";
 
-type SignInProps = {
-  params: Promise<Params>
-};
+type SignInProps = PageProps<"/[locale]/sign-in">;
 
 export async function generateMetadata({ params }: SignInProps): Promise<Metadata> {
-  const routeParams: Params = await params;
-  const i18n: I18n = initLingui(routeParams.locale);
+  const { locale } = await params;
+  const i18n: I18n = initLingui(locale);
 
   return {
     title: i18n._(ROUTE_SIGN_IN.TITLE),
@@ -19,8 +17,8 @@ export async function generateMetadata({ params }: SignInProps): Promise<Metadat
 }
 
 export default async function SignIn({ params }: SignInProps): Promise<ReactNode> {
-  const routeParams: Params = await params;
-  const i18n: I18n = initLingui(routeParams.locale);
+  const { locale } = await params;
+  const i18n: I18n = initLingui(locale);
 
   return (
     <>

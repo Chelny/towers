@@ -10,13 +10,11 @@ import { ROUTE_GAMES, ROUTE_NEW_USER } from "@/constants/routes";
 import { auth } from "@/lib/auth";
 import { Session } from "@/lib/auth-client";
 
-type NewUserProps = {
-  params: Promise<Params>
-};
+type NewUserProps = PageProps<"/[locale]/new-user">;
 
 export async function generateMetadata({ params }: NewUserProps): Promise<Metadata> {
-  const routeParams: Params = await params;
-  const i18n: I18n = initLingui(routeParams.locale);
+  const { locale } = await params;
+  const i18n: I18n = initLingui(locale);
 
   return {
     title: i18n._(ROUTE_NEW_USER.TITLE),
@@ -24,8 +22,8 @@ export async function generateMetadata({ params }: NewUserProps): Promise<Metada
 }
 
 export default async function NewUser({ params }: NewUserProps): Promise<ReactNode> {
-  const routeParams: Params = await params;
-  const i18n: I18n = initLingui(routeParams.locale);
+  const { locale } = await params;
+  const i18n: I18n = initLingui(locale);
   const session: Session | null = await auth.api.getSession({ headers: await headers() });
 
   return (

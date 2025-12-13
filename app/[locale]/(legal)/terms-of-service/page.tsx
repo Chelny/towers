@@ -7,13 +7,11 @@ import Anchor from "@/components/ui/Anchor";
 import { APP_CONFIG } from "@/constants/app";
 import { ROUTE_TERMS_OF_SERVICE } from "@/constants/routes";
 
-type TermsOfServiceProps = {
-  params: Promise<Params>
-};
+type TermsOfServiceProps = PageProps<"/[locale]/terms-of-service">;
 
 export async function generateMetadata({ params }: TermsOfServiceProps): Promise<Metadata> {
-  const routeParams: Params = await params;
-  const i18n: I18n = initLingui(routeParams.locale);
+  const { locale } = await params;
+  const i18n: I18n = initLingui(locale);
 
   return {
     title: i18n._(ROUTE_TERMS_OF_SERVICE.TITLE),
@@ -21,11 +19,10 @@ export async function generateMetadata({ params }: TermsOfServiceProps): Promise
 }
 
 export default async function TermsOfService({ params }: TermsOfServiceProps): Promise<ReactNode> {
-  const routeParams: Params = await params;
-  const i18n: I18n = initLingui(routeParams.locale);
+  const { locale } = await params;
+  const i18n: I18n = initLingui(locale);
   const name: string = APP_CONFIG.NAME;
   const supportEmail: string = APP_CONFIG.EMAIL.SUPPORT;
-
   const date: string = i18n.date(new Date("2024/01/01"));
 
   return (

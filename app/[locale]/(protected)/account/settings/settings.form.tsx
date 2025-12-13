@@ -19,7 +19,7 @@ import { INITIAL_FORM_STATE } from "@/constants/api";
 import { APP_STORAGE_KEYS } from "@/constants/app";
 import { Session } from "@/lib/auth-client";
 import { logger } from "@/lib/logger";
-import { defaultLocale, Language, languages, SupportedLocales } from "@/translations/languages";
+import { DEFAULT_LOCALE, Language, languages, SupportedLocales } from "@/translations/languages";
 
 type SettingsFormProps = {
   session: Session | null
@@ -125,7 +125,7 @@ export function SettingsForm({ session }: SettingsFormProps): ReactNode {
         <Select
           id="language"
           label={t({ message: "Language" })}
-          defaultValue={session?.user.language ?? defaultLocale}
+          defaultValue={session?.user.language ?? DEFAULT_LOCALE}
           required
           dataTestId="settings_select_language"
         >

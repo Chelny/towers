@@ -17,10 +17,9 @@ import { INITIAL_FORM_STATE } from "@/constants/api";
 import { CALLBACK_URL, ROUTE_PRIVACY_POLICY, ROUTE_SIGN_IN, ROUTE_TERMS_OF_SERVICE } from "@/constants/routes";
 import { authClient } from "@/lib/auth-client";
 import { logger } from "@/lib/logger";
-import { SupportedLocales } from "@/translations/languages";
 
 type SignUpFormProps = {
-  locale: SupportedLocales
+  locale: string
 };
 
 export function SignUpForm({ locale }: SignUpFormProps): ReactNode {

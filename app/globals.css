@@ -204,6 +204,18 @@
   .towers-link:visited {
     color: theme("color.purple.600");
   }
+
+  .dark .towers-link {
+    color: theme("color.blue.500");
+  }
+
+  .dark .towers-link:hover {
+    color: theme("color.blue.600");
+  }
+
+  .dark .towers-link:visited {
+    color: theme("color.purple.400");
+  }
 }
 
 *,

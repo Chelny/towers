@@ -13,7 +13,7 @@ export interface Language {
 }
 
 export type SupportedLocales = "en" | "fr" | "pseudo-LOCALE";
-export const defaultLocale: SupportedLocales = "en";
+export const DEFAULT_LOCALE = "en";
 
 export const languages: Language[] = [
   {

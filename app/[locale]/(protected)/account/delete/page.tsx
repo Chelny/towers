@@ -5,13 +5,11 @@ import { DeleteAccountForm } from "@/app/[locale]/(protected)/account/delete/del
 import { initLingui } from "@/app/init-lingui";
 import { ROUTE_DELETE_ACCOUNT } from "@/constants/routes";
 
-type DeleteAccountProps = {
-  params: Promise<Params>
-};
+type DeleteAccountProps = PageProps<"/[locale]/account/delete">;
 
 export async function generateMetadata({ params }: DeleteAccountProps): Promise<Metadata> {
-  const routeParams: Params = await params;
-  const i18n: I18n = initLingui(routeParams.locale);
+  const { locale } = await params;
+  const i18n: I18n = initLingui(locale);
 
   return {
     title: i18n._(ROUTE_DELETE_ACCOUNT.TITLE),
@@ -19,8 +17,8 @@ export async function generateMetadata({ params }: DeleteAccountProps): Promise<
 }
 
 export default async function DeleteAccount({ params }: DeleteAccountProps): Promise<ReactNode> {
-  const routeParams: Params = await params;
-  const i18n: I18n = initLingui(routeParams.locale);
+  const { locale } = await params;
+  const i18n: I18n = initLingui(locale);
 
   return (
     <>
