@@ -13,7 +13,7 @@ const commonUserProperties = {
 };
 
 export const mockUser1: User = {
-  id: "user1",
+  id: "user-one-id",
   name: "John Doe",
   birthdate: new Date("2000-01-01"),
   email: "john.doe@example.com",
@@ -24,20 +24,20 @@ export const mockUser1: User = {
 };
 
 export const mockUser2: User = {
-  id: "user2",
+  id: "user-two-id",
   name: "Jane Smith",
-  birthdate: new Date("1985-05-15"),
-  email: "test_jane@example.dev",
+  birthdate: new Date("1935-12-31"),
+  email: "test_jane@example.com",
   emailVerified: true,
-  username: "janesmith",
+  username: "jane_smith",
   image: null,
   ...commonUserProperties,
 };
 
 export const mockUser3: User = {
-  id: "user3",
+  id: "user-three-id",
   name: "Sam Lee",
-  birthdate: new Date("2000-07-21"),
+  birthdate: null,
   email: "test_sam@example.com",
   emailVerified: true,
   username: "samlee",
@@ -46,7 +46,7 @@ export const mockUser3: User = {
 };
 
 export const mockUser4: User = {
-  id: "user4",
+  id: "user-four-id",
   name: "Chris Green",
   birthdate: null,
   email: "test_chris@example.com",
@@ -57,7 +57,7 @@ export const mockUser4: User = {
 };
 
 export const mockUser5: User = {
-  id: "user5",
+  id: "user-five-id",
   name: "Patricia White",
   birthdate: new Date("1992-02-28"),
   email: "test_patricia@example.com",

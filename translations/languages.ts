@@ -46,7 +46,7 @@ export const languages: Language[] = [
 ];
 
 export const dynamicActivate = async (locale: string): Promise<void> => {
-  const { messages } = await import(`@/translations/locales/${locale}/messages`);
+  const { messages } = await import(`@/translations/locales/${locale}/messages.po`);
   i18n.load(locale, messages);
   i18n.activate(locale);
 };

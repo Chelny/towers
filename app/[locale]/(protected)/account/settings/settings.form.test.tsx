@@ -2,8 +2,9 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { WebsiteTheme } from "db/browser";
 import { vi } from "vitest";
 import { SettingsForm } from "@/app/[locale]/(protected)/account/settings/settings.form";
-import { mockSession } from "@/test/data/session";
-import { mockFetch, mockFetchResponse, mockUseRouter } from "@/vitest.setup";
+import { mockFetch, mockFetchResponse } from "@/test/mocks/fetch";
+import { mockUseRouter } from "@/test/mocks/router";
+import { mockSession } from "@/test/mocks/session";
 
 vi.mock("next/navigation", () => ({
   usePathname: vi.fn(() => "/en/account/settings"),

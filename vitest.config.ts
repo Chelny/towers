@@ -18,14 +18,14 @@ export default defineConfig({
     preserveSymlinks: true,
   },
   test: {
-    environment: "jsdom",
     globals: true,
+    environment: "jsdom",
     server: {
       deps: {
         inline: ["next"],
       },
     },
-    setupFiles: ["vitest.setup.ts", "test/utils/lingui.tsx"],
+    setupFiles: ["vitest.setup.ts", "test/mocks/lingui.tsx"],
     include: ["**/*.test.ts", "**/*.test.tsx"],
   },
 });

@@ -1,8 +1,8 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { Mock } from "vitest";
 import { ProfileForm } from "@/app/[locale]/(protected)/account/profile/profile.form";
-import { mockSession } from "@/test/data/session";
-import { mockUseRouter } from "@/vitest.setup";
+import { mockUseRouter } from "@/test/mocks/router";
+import { mockSession } from "@/test/mocks/session";
 
 vi.mock("next/navigation", () => ({
   useRouter: vi.fn(() => mockUseRouter),

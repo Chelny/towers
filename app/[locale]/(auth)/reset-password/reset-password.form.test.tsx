@@ -1,12 +1,7 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { Mock } from "vitest";
 import { ResetPasswordForm } from "@/app/[locale]/(auth)/reset-password/reset-password.form";
-import { mockUseRouter, mockUseSearchParams } from "@/vitest.setup";
-
-vi.mock("next/navigation", () => ({
-  useRouter: vi.fn(() => mockUseRouter),
-  useSearchParams: vi.fn(() => mockUseSearchParams),
-}));
+import { mockUseSearchParams } from "@/test/mocks/router";
 
 vi.mock("@/lib/auth-client", () => ({
   authClient: {

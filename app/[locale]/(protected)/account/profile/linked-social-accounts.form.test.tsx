@@ -3,7 +3,7 @@ import { Mock } from "vitest";
 import { LinkedSocialAccountsForm } from "@/app/[locale]/(protected)/account/profile/linked-social-accounts.form";
 import { AUTH_PROVIDERS } from "@/constants/auth-providers";
 import { AuthProviderDetails } from "@/lib/providers";
-import { mockUseSearchParams } from "@/vitest.setup";
+import { mockUseSearchParams } from "@/test/mocks/router";
 
 vi.mock("next/navigation", () => ({
   useSearchParams: vi.fn(() => mockUseSearchParams),

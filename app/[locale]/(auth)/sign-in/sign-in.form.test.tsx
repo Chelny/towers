@@ -2,7 +2,7 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { Mock } from "vitest";
 import { SignInForm } from "@/app/[locale]/(auth)/sign-in/sign-in.form";
 import { ROUTE_FORGOT_PASSWORD, ROUTE_SIGN_IN_WITH_MAGIC_LINK, ROUTE_SIGN_UP } from "@/constants/routes";
-import { mockUseRouter } from "@/vitest.setup";
+import { mockUseRouter } from "@/test/mocks/router";
 
 vi.mock("next/navigation", () => ({
   useRouter: vi.fn(() => mockUseRouter),

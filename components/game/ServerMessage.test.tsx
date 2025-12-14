@@ -1,7 +1,7 @@
 import { act } from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import ServerMessage from "@/components/game/ServerMessage";
-import { mockSession } from "@/test/data/session";
+import { mockSession } from "@/test/mocks/session";
 
 export const mockUseSocket = vi.fn();
 

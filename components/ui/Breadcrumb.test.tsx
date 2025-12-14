@@ -9,17 +9,12 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/Breadcrumb";
-import { dynamicActivate } from "@/vitest.setup";
 
 vi.mock("next/navigation", () => ({
   usePathname: vi.fn(),
 }));
 
 describe("Breadcrumb", () => {
-  beforeAll(() => {
-    dynamicActivate("en");
-  });
-
   it("should render breadcrumb structure correctly", () => {
     vi.mocked(usePathname).mockReturnValue("/home");
 

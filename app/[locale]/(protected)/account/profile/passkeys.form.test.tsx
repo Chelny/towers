@@ -3,7 +3,7 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { Mock } from "vitest";
 import { PasskeysForm } from "@/app/[locale]/(protected)/account/profile/passkeys.form";
 import { authClient } from "@/lib/auth-client";
-import { mockSession } from "@/test/data/session";
+import { mockSession } from "@/test/mocks/session";
 
 vi.mock("@/lib/auth-client", () => ({
   authClient: {

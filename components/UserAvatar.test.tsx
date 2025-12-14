@@ -1,7 +1,7 @@
 import { ImgHTMLAttributes } from "react";
 import { render, screen } from "@testing-library/react";
 import UserAvatar from "@/components/UserAvatar";
-import { mockUser1 } from "@/test/data/user";
+import { mockUser1 } from "@/test/mocks/user";
 
 export const mockUseSocket = vi.fn();
 

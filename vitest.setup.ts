@@ -1,9 +1,12 @@
-import { i18n } from "@lingui/core";
 import "@testing-library/jest-dom";
-import { screen } from "@testing-library/react";
-import { mockSession } from "@/test/data/session";
-import { mockSocket } from "@/test/data/socket";
-import { getAllByNormalizedText, getByNormalizedText } from "@/test/utils/getByNormalizedText";
+import { mockUseRouter, mockUseSearchParams } from "@/test/mocks/router";
+import { mockSession } from "@/test/mocks/session";
+import { mockSocket } from "@/test/mocks/socket";
+
+vi.mock("next/navigation", () => ({
+  useRouter: vi.fn(() => mockUseRouter),
+  useSearchParams: vi.fn(() => mockUseSearchParams),
+}));
 
 vi.mock("pino", () => ({
   default: () => ({
@@ -35,48 +38,3 @@ Object.defineProperty(window, "matchMedia", {
     dispatchEvent: vi.fn(),
   })),
 });
-
-export const mockUseRouter = {
-  back: vi.fn(),
-  forward: vi.fn(),
-  refresh: vi.fn(),
-  push: vi.fn(),
-  replace: vi.fn(),
-  prefetch: vi.fn(),
-};
-
-export const mockUseSearchParams = {
-  get: vi.fn(),
-  getAll: vi.fn(),
-  has: vi.fn(),
-  toString: vi.fn(),
-  keys: vi.fn(),
-  values: vi.fn(),
-  entries: vi.fn(),
-  forEach: vi.fn(),
-  append: vi.fn(),
-  delete: vi.fn(),
-  set: vi.fn(),
-  sort: vi.fn(),
-  [Symbol.iterator]: vi.fn(),
-};
-
-export const mockFetch = (global.fetch = vi.fn());
-
-export const mockFetchResponse = (data: ApiResponse) => {
-  return {
-    json: () => new Promise((resolve: (value: unknown) => void) => resolve(data)),
-  };
-};
-
-export const customScreen = {
-  ...screen,
-  getByNormalizedText,
-  getAllByNormalizedText,
-};
-
-export async function dynamicActivate(locale: string): Promise<void> {
-  const { messages } = await import(`@/translations/locales/${locale}/messages.po`);
-  i18n.load(locale, messages);
-  i18n.activate(locale);
-}

@@ -1,4 +1,4 @@
-import { mockUser1 } from "@/test/data/user";
+import { mockUser1 } from "@/test/mocks/user";
 
 export const mockSession = {
   user: mockUser1,

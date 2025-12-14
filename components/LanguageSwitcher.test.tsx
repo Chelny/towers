@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { Mock, vi } from "vitest";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
-import { mockUseRouter } from "@/vitest.setup";
+import { mockUseRouter } from "@/test/mocks/router";
 
 vi.mock("next/navigation", () => ({
   usePathname: vi.fn(() => "/en/sign-in"),

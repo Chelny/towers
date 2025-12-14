@@ -1,8 +1,8 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { Mock } from "vitest";
 import { ChangePasswordForm } from "@/app/[locale]/(protected)/account/profile/change-password.form";
-import { mockSession, mockSessionCredentialAccount, mockSessionGitHubAccount } from "@/test/data/session";
-import { mockFetch, mockFetchResponse } from "@/vitest.setup";
+import { mockFetch, mockFetchResponse } from "@/test/mocks/fetch";
+import { mockSession, mockSessionCredentialAccount, mockSessionGitHubAccount } from "@/test/mocks/session";
 
 vi.mock("@/lib/auth-client", () => ({
   authClient: {
