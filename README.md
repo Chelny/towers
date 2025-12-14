@@ -109,25 +109,13 @@ This project is inspired by Yahoo! Towers but is an independent work. It is not 
 
 1. Start Postgres server
 
-1. Generate Prisma schema
+1. Setup the database
 
    ```sh
-   pnpm prisma:generate
+   pnpm db:setup
    ```
 
-1. Push Prisma schema to database
-
-   ```sh
-   pnpm prisma:push
-   ```
-
-1. Seed the database
-
-   ```sh
-   pnpm prisma:seed:dev
-   ```
-
-   Initial data will be added in the database such as rooms.
+   This will create the tables in database and add initial data such as rooms.
 
 1. Run the client
 
