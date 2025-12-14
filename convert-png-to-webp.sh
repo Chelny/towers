@@ -8,8 +8,8 @@ find "$IMG_DIR" -type f -iname "*.png" ! -name "logo.png" | while read -r img; d
   # Output file path with .webp extension
   out="${img%.*}.webp"
 
-  # Convert to webp with width 800px, keep aspect ratio, quality 80
-  cwebp "$img" -resize 800 0 -q 80 -o "$out"
+  # Convert to webp with width 1440px, keep aspect ratio, quality 80
+  cwebp "$img" -resize 1440 0 -q 80 -o "$out"
 
   echo "Converted: $img -> $out"
 done
