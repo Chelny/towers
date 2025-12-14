@@ -9,11 +9,13 @@
 <br />
 
 <div align="center">
-  <div style="background-color: #00635E;">
-    <a href="https://github.com/Chelny/towers">
-      <img src="public/images/logo.png" alt="Logo" width="96" height="96">
-    </a>
-  </div>
+  <table width="100%" bgcolor="#00635E">
+    <tr>
+      <td align="center">
+        <img src="public/images/logo.png" alt="Logo" width="96" height="96">
+      </td>
+    </tr>
+  </table>
 
   <br />
 
@@ -47,6 +49,7 @@
       </ul>
     </li>
     <li><a href="#usage">Usage</a></li>
+    <li><a href="#screenshots">Screenshots</a></li>
     <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
@@ -56,7 +59,7 @@
 
 ## About The Project
 
-This project is inspired by Yahoo! Towers but is an independent work. It is not affiliated with or endorsed by Yahoo! or its entities.
+This project is inspired by Yahoo! Towers but is an independent work. It is not affiliated with or endorsed by Yahoo! or its entities. |
 
 ### Built With
 
@@ -129,7 +132,30 @@ This project is inspired by Yahoo! Towers but is an independent work. It is not 
 
 ## Usage
 
-_TODO_
+1. Open your browser and go to [http://localhost:3000](http://localhost:3000).
+
+2. Sign in with an existing account or create a new one.
+
+3. Browse the rooms and tables:
+   - Click on a room to join it.
+   - Inside a room, you can interact with other players and see available tables.
+
+4. Playing the game:
+   - Join a table to start a game.
+   - Use the control keys (check the Control Keys screenshot) to play.
+   - Watch the countdown and get ready to play.
+
+<p align="end">(<a href="#readme-top">back to top</a>)</p>
+
+## Screenshots
+
+|                                                                                                                                                                   |                                                                                                                                                          |                                                                                                                                                           |
+| :---------------------------------------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------------------------------------------------: | :-------------------------------------------------------------------------------------------------------------------------------------------------------: |
+|                           [<img src="public/images/readme/sign-in.webp" alt="Sign In" width="800">](public/images/readme/sign-in.webp)                            |               [<img src="public/images/readme/towers-rooms.webp" alt="Towers Rooms" width="800">](public/images/readme/towers-rooms.webp)                |          [<img src="public/images/readme/towers-room-social.webp" alt="Social Room" width="800">](public/images/readme/towers-room-social.webp)           |
+|           [<img src="public/images/readme/towers-room-advanced.webp" alt="Advanced Room" width="800">](public/images/readme/towers-room-advanced.webp)            |   [<img src="public/images/readme/towers-room-social-table.webp" alt="Social Table" width="800">](public/images/readme/towers-room-social-table.webp)    | [<img src="public/images/readme/towers-room-advanced-table.webp" alt="Advanced Table" width="800">](public/images/readme/towers-room-advanced-table.webp) |
+| [<img src="public/images/readme/towers-room-social-control-keys.webp" alt="Control Keys" width="800">](public/images/readme/towers-room-social-control-keys.webp) | [<img src="public/images/readme/towers-room-social-game-demo.webp" alt="Game Demo" width="800">](public/images/readme/towers-room-social-game-demo.webp) |            [<img src="public/images/readme/towers-game-ready.webp" alt="Game Ready" width="800">](public/images/readme/towers-game-ready.webp)            |
+|            [<img src="public/images/readme/towers-game-countdown.webp" alt="Countdown" width="800">](public/images/readme/towers-game-countdown.webp)             |              [<img src="public/images/readme/towers-game-hoo-1.webp" alt="Hoo 1" width="800">](public/images/readme/towers-game-hoo-1.webp)              |              [<img src="public/images/readme/towers-game-hoo-2.webp" alt="Hoo 2" width="800">](public/images/readme/towers-game-hoo-2.webp)               |
+|                  [<img src="public/images/readme/towers-game-hoo-3.webp" alt="Hoo 3" width="800">](public/images/readme/towers-game-hoo-3.webp)                   |             [<img src="public/images/readme/towers-game-over.webp" alt="Game Over" width="800">](public/images/readme/towers-game-over.webp)             |
 
 <p align="end">(<a href="#readme-top">back to top</a>)</p>
 

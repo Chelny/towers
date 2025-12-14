@@ -19,6 +19,7 @@ const nextConfig: NextConfig = {
     GOOGLE_ANALYTICS: process.env.GOOGLE_ANALYTICS,
     TEST_MODE: process.env.TEST_MODE,
   },
+  devIndicators: false,
   experimental: {
     globalNotFound: true,
     serverSourceMaps: false,
