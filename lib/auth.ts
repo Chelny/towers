@@ -1,8 +1,8 @@
+import { passkey } from "@better-auth/passkey";
 import { betterAuth, User as BetterAuthUser } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { nextCookies } from "better-auth/next-js";
 import { admin, customSession, magicLink, openAPI, username } from "better-auth/plugins";
-import { passkey } from "better-auth/plugins/passkey";
 import { Account, User, UserRole, WebsiteTheme } from "db/browser";
 import { APP_CONFIG, APP_PREFIX } from "@/constants/app";
 import { getAccountsByUserId } from "@/data/account";
@@ -92,10 +92,6 @@ export const auth = betterAuth({
         type: "string",
         required: false,
       },
-      isOnline: {
-        type: "boolean",
-        defaultValue: false,
-      },
       theme: {
         type: "string",
         defaultValue: WebsiteTheme.SYSTEM,
@@ -113,14 +109,9 @@ export const auth = betterAuth({
         required: false,
       },
     },
-    changeEmail: {
+    emailVerification: {
       enabled: true,
-      sendChangeEmailVerification: async (data: {
-        user: BetterAuthUser
-        newEmail: string
-        url: string
-        token: string
-      }) => {
+      sendVerificationEmail: async (data: { user: BetterAuthUser; newEmail: string; url: string; token: string }) => {
         await sendEmailChangeEmail(data);
       },
     },

@@ -110,7 +110,7 @@ model RateLimit {
   id          String   @id @default(cuid(2))
   key         String?
   count       Int?
-  lastRequest Int?     @map("last_request")
+  lastRequest BigInt?  @map("last_request")
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 

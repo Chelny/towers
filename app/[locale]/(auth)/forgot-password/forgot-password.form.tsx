@@ -51,7 +51,7 @@ export function ForgotPasswordForm(): ReactNode {
         error: errorMessages,
       });
     } else {
-      await authClient.forgetPassword(
+      await authClient.requestPasswordReset(
         {
           email: payload.email,
           redirectTo: `${process.env.BASE_URL}${ROUTE_RESET_PASSWORD.PATH}`,

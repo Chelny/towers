@@ -4,7 +4,7 @@ import { ForgotPasswordForm } from "@/app/[locale]/(auth)/forgot-password/forgot
 
 vi.mock("@/lib/auth-client", () => ({
   authClient: {
-    forgetPassword: vi.fn(),
+    requestPasswordReset: vi.fn(),
   },
 }));
 
@@ -32,7 +32,7 @@ describe("Forgot Password Form", () => {
 
   it("should disable the submit button during form submission and show a success message on successful submission", async () => {
     const { authClient } = await import("@/lib/auth-client");
-    const mockForgotPassword: Mock = authClient.forgetPassword as Mock;
+    const mockForgotPassword: Mock = authClient.requestPasswordReset as Mock;
 
     mockForgotPassword.mockImplementation(async (_, callbacks) => {
       callbacks.onRequest();

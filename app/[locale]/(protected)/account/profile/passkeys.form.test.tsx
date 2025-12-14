@@ -1,5 +1,5 @@
+import { Passkey } from "@better-auth/passkey";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { Passkey } from "better-auth/plugins/passkey";
 import { Mock } from "vitest";
 import { PasskeysForm } from "@/app/[locale]/(protected)/account/profile/passkeys.form";
 import { authClient } from "@/lib/auth-client";

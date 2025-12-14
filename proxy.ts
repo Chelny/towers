@@ -12,11 +12,10 @@ export default async function proxy(request: NextRequest) {
   const protocol: string = request.headers.get("x-forwarded-proto") || "http";
   const origin: string = `${protocol}://${host}`;
 
-  if (pathname.startsWith("/.well-known")) {
-    return NextResponse.next();
-  }
-
+  // ---------------------------------------------
   // Fetch session
+  // ---------------------------------------------
+
   const { data: session } = await betterFetch<Session>("/api/auth/get-session", {
     baseURL: request.nextUrl.origin,
     headers: {
@@ -24,7 +23,10 @@ export default async function proxy(request: NextRequest) {
     },
   });
 
+  // ---------------------------------------------
   // Access control
+  // ---------------------------------------------
+
   if (session) {
     if (PUBLIC_ROUTES.includes(pathname)) {
       return NextResponse.redirect(new URL(ROUTE_GAMES.PATH, origin));
@@ -35,7 +37,10 @@ export default async function proxy(request: NextRequest) {
     }
   }
 
+  // ---------------------------------------------
   // Content Security Policy (CSP)
+  // ---------------------------------------------
+
   const nonce: string = Buffer.from(crypto.randomUUID()).toString("base64");
   const devCspHeader: string = `
     default-src * 'unsafe-inline' 'unsafe-eval' data: blob:;
@@ -75,7 +80,10 @@ export default async function proxy(request: NextRequest) {
 
   response.headers.set("Content-Security-Policy", contentSecurityPolicyHeader);
 
+  // ---------------------------------------------
   // CORS
+  // ---------------------------------------------
+
   response.headers.set("Access-Control-Allow-Credentials", "true");
   response.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
   response.headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
@@ -88,11 +96,10 @@ export default async function proxy(request: NextRequest) {
     response.headers.set("Access-Control-Allow-Origin", trustedOrigins[0] || "*");
   }
 
-  if (pathname.startsWith("/api/")) {
-    response.headers.set("Content-Type", "application/json");
-  }
-
+  // ---------------------------------------------
   // Localization
+  // ---------------------------------------------
+
   const cookieLocale: string | undefined = request.cookies.get(APP_COOKIE_KEYS.LOCALE)?.value;
   const locale: string = getCurrentLocale(request, session);
   const pathnameLocale: string = pathname.split("/")[1];
@@ -125,14 +132,12 @@ export const config = {
       /*
        * Match all request paths except for the ones starting with:
        * - api (API routes)
-       * - _next (Next.js internal files, including static, image, and data routes)
-       * - .well-known (ACME challenges, security.txt, etc.)
+       * - _next/static (static files)
+       * - _next/image (image optimization files)
        * - favicon.ico, sitemap.xml, robots.txt, manifest.webmanifest (metadata files)
-       * - images (.svg, .png, .jpg, .jpeg, .gif, .webp)
-       * - videos (.webm)
+       * - media files (svg, png, jpg, jpeg, gif, webp, webm)
        */
-      source:
-        "/((?!api|_next|\\.well-known|favicon.ico|sitemap.xml|robots.txt|manifest.webmanifest|.*\\.(?:svg|png|jpg|jpeg|gif|webp|webm)$).*)",
+      source: "/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|manifest.webmanifest|.*\\..*).*)",
       missing: [
         { type: "header", key: "next-router-prefetch" },
         { type: "header", key: "purpose", value: "prefetch" },

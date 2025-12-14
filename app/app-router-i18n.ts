@@ -7,18 +7,16 @@ import { messages as pseudoLocaleMessages } from "@/translations/locales/pseudo-
 
 const { locales } = linguiConfig;
 
-const catalogs: Record<string, Messages> = {
+export const allMessages: AllMessages = {
   en: enMessages,
   fr: frMessages,
   "pseudo-LOCALE": pseudoLocaleMessages,
 };
 
-type SupportedLocales = keyof typeof catalogs;
+type SupportedLocales = keyof typeof allMessages;
 type AllI18nInstances = { [K in SupportedLocales]: I18n };
 
-export const allMessages: AllMessages = catalogs;
-
-export const allI18nInstances: AllI18nInstances = locales.reduce((acc: {}, locale: string) => {
+const allI18nInstances: AllI18nInstances = locales.reduce((acc: {}, locale: string) => {
   const messages: Messages = allMessages[locale] ?? {};
   const i18n: I18n = setupI18n({
     locale,
@@ -33,5 +31,5 @@ export const getI18nInstance = (locale: SupportedLocales): I18n => {
     logger.warn(`No i18n instance found for locale "${locale}"`);
   }
 
-  return allI18nInstances[locale]! || allI18nInstances["en"]!;
+  return allI18nInstances[locale] || allI18nInstances["en"];
 };

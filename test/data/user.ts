@@ -4,7 +4,6 @@ const commonUserProperties = {
   displayUsername: null,
   language: "en",
   role: UserRole.USER,
-  isOnline: true,
   theme: WebsiteTheme.SYSTEM,
   banned: false,
   banReason: null,

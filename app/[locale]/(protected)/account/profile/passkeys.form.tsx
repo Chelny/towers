@@ -1,11 +1,11 @@
 "use client";
 
 import { FormEvent, InputEvent, ReactNode, useRef, useState } from "react";
+import { Passkey } from "@better-auth/passkey";
 import { ErrorContext } from "@better-fetch/fetch";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { ValueError } from "@sinclair/typebox/errors";
 import { Value } from "@sinclair/typebox/value";
-import { Passkey } from "better-auth/plugins/passkey";
 import clsx from "clsx/lite";
 import { LuPencilLine, LuSave } from "react-icons/lu";
 import { LuTrash2 } from "react-icons/lu";
