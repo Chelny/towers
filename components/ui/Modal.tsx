@@ -106,6 +106,7 @@ const Modal = forwardRef(function Modal(
           <button
             type="button"
             className="text-gray-400 hover:text-gray-500"
+            title={t({ message: "Close" })}
             aria-label={t({ message: "Close" })}
             onClick={handleClose}
           >

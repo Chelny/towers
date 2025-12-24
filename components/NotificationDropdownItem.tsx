@@ -51,7 +51,7 @@ export const NotificationDropdownItem = ({ notification }: NotificationDropdownI
     }
   };
 
-  const openNotificationModal = (): void => {
+  const handleOpenNotificationModal = (): void => {
     switch (notification.type) {
       case NotificationType.TABLE_INVITE:
         if (!notification.tableInvitation) return;
@@ -121,14 +121,14 @@ export const NotificationDropdownItem = ({ notification }: NotificationDropdownI
       <button
         type="button"
         className={clsx("flex-1 px-2 py-1 text-start", notification.readAt ? "font-normal" : "font-semibold")}
-        onClick={() => openNotificationModal()}
+        onClick={handleOpenNotificationModal}
       >
         {setNotificationLabel()}
       </button>
 
       <button
         type="button"
-        className="p-2 text-red-500 cursor-pointer"
+        className="p-2 text-red-500"
         aria-label={t({ message: "Delete notification" })}
         onClick={handleRemoveNotification}
       >

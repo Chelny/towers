@@ -11,6 +11,7 @@ import { UserMuteManager } from "@/server/towers/managers/UserMuteManager";
 
 export function serverToClientEvents(redisSub: Redis, io: IoServer): void {
   const channels: string[] = [
+    ServerInternalEvents.USER_SETTINGS_AVATAR,
     ServerInternalEvents.USER_MUTE_CHECK,
     ServerInternalEvents.USER_MUTE,
     ServerInternalEvents.USER_UNMUTE,
@@ -58,6 +59,11 @@ export function serverToClientEvents(redisSub: Redis, io: IoServer): void {
     const data = JSON.parse(message);
 
     switch (channel) {
+      case ServerInternalEvents.USER_SETTINGS_AVATAR: {
+        const { userId, avatarId } = data;
+        io.emit(ServerToClientEvents.USER_SETTINGS_AVATAR, { userId, avatarId });
+        break;
+      }
       case ServerInternalEvents.USER_MUTE_CHECK: {
         const { muterUserId, isMuted } = data;
         io.to(muterUserId).emit(ServerToClientEvents.USER_MUTE_CHECK, { isMuted });

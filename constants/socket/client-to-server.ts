@@ -1,5 +1,6 @@
 export const ClientToServerEvents = {
   // User
+  USER_SETTINGS_AVATAR: "cts:user-settings:avatar",
   USER_MUTES: "cts:user-mute:all",
   USER_MUTE_CHECK: "cts:user-mute:check",
   USER_MUTE: "cts:user-mute:mute",

@@ -8,12 +8,28 @@ export const getUserMinimalSelect = () => ({
   id: true,
   username: true,
   image: true,
+  userSettings: {
+    select: {
+      id: true,
+      avatarId: true,
+      theme: true,
+      profanityFilter: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  },
   createdAt: true,
   updatedAt: true,
 });
 
 export type UserLite = Prisma.UserGetPayload<{
   select: ReturnType<typeof getUserMinimalSelect>
+}>;
+
+export type UserWithRelations = Prisma.UserGetPayload<{
+  include: {
+    userSettings: true
+  }
 }>;
 
 // ======================================

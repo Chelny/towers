@@ -1,8 +1,9 @@
 import { User } from "db/browser";
 import prisma from "@/lib/prisma";
+import { UserWithRelations } from "@/types/prisma";
 
-export const getUserById = async (id: string | undefined): Promise<User | null> => {
-  return prisma.user.findUnique({ where: { id } });
+export const getUserById = async (id: string | undefined): Promise<UserWithRelations | null> => {
+  return prisma.user.findUnique({ where: { id }, include: { userSettings: true } });
 };
 
 export const getUserByEmail = async (email: string): Promise<User | null> => {

@@ -71,6 +71,7 @@ export default function Room(): ReactNode {
   const messageInputRef = useRef<InputImperativeHandle>(null);
   const [isJoined, setIsJoined] = useState<boolean>(false);
   const [room, setRoom] = useState<RoomPlainObject>();
+  const [avatarId, setAvatarId] = useState<string>("001");
   const [profanityFilter, setProfanityFilter] = useState<ProfanityFilter>(ProfanityFilter.WEAK);
 
   const {
@@ -84,7 +85,7 @@ export default function Room(): ReactNode {
     revalidateOnReconnect: true,
   });
 
-  const { data: settingsResponse } = useSWR<ApiResponse<{ profanityFilter: ProfanityFilter }>>(
+  const { data: settingsResponse } = useSWR<ApiResponse<{ avatarId: string; profanityFilter: ProfanityFilter }>>(
     `/api/users/${session?.user.id}/settings`,
     fetcher,
     {
@@ -108,6 +109,7 @@ export default function Room(): ReactNode {
 
   useEffect(() => {
     if ((settingsResponse?.success, settingsResponse?.data)) {
+      setAvatarId(settingsResponse.data.avatarId);
       setProfanityFilter(settingsResponse.data.profanityFilter);
     }
   }, [settingsResponse?.data]);
@@ -337,6 +339,7 @@ export default function Room(): ReactNode {
 
   const handleOpenOptionsModal = () => {
     openModal(GameOptionsModal, {
+      avatarId,
       profanityFilter,
       onSetProfanityFilter: (value: ProfanityFilter) => setProfanityFilter(value),
     });

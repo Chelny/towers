@@ -14,6 +14,7 @@ import {
 } from "@/constants/game";
 import { useModal } from "@/context/ModalContext";
 import { useSocket } from "@/context/SocketContext";
+import { useKeyboardActions } from "@/hooks/useKeyboardActions";
 import { RoomPlayerPlainObject } from "@/server/towers/classes/RoomPlayer";
 import { TablePlayerPlainObject } from "@/server/towers/classes/TablePlayer";
 
@@ -53,7 +54,7 @@ export default function PlayersList({
   const { openModal } = useModal();
   const [sortKey, setSortKey] = useState<"name" | "rating" | "table">("name");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
-  const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
+  const [selectedPlayerId, setSelectedPlayerId] = useState<string | undefined>(undefined);
   const [isRTL, setIsRtl] = useState<boolean>(false);
   const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
   const dividerPosition: string = isRTL ? "calc(100% - 63.7%) 0" : "63.7% 0";
@@ -66,69 +67,53 @@ export default function PlayersList({
   const darkRepeatingLinear: string =
     "repeating-linear-gradient(0deg, #243342, #243342 50%, transparent 50%, transparent)";
 
-  const bgImages: string = [
-    isRatingsVisible && !isTableNumberVisible && (isDarkMode ? darkLinearGradient : lightLinearGradient),
-    !isRatingsVisible && isTableNumberVisible && (isDarkMode ? darkLinearGradient : lightLinearGradient),
-    isRatingsVisible && isTableNumberVisible && (isDarkMode ? darkLinearGradient : lightLinearGradient),
-    isRatingsVisible && isTableNumberVisible && (isDarkMode ? darkLinearGradient : lightLinearGradient),
-    isDarkMode ? darkRepeatingLinear : lightRepeatingLinear,
-  ]
-    .filter(Boolean)
-    .join(", ");
+  const bgImages = useMemo(() => {
+    return [
+      isRatingsVisible && !isTableNumberVisible && (isDarkMode ? darkLinearGradient : lightLinearGradient),
+      !isRatingsVisible && isTableNumberVisible && (isDarkMode ? darkLinearGradient : lightLinearGradient),
+      isRatingsVisible && isTableNumberVisible && (isDarkMode ? darkLinearGradient : lightLinearGradient),
+      isRatingsVisible && isTableNumberVisible && (isDarkMode ? darkLinearGradient : lightLinearGradient),
+      isDarkMode ? darkRepeatingLinear : lightRepeatingLinear,
+    ]
+      .filter(Boolean)
+      .join(", ");
+  }, [isDarkMode, isRatingsVisible, isTableNumberVisible]);
 
-  const bgPositions: string = [
-    isRatingsVisible && !isTableNumberVisible && dividerPosition,
-    !isRatingsVisible && isTableNumberVisible && dividerPosition,
-    isRatingsVisible && isTableNumberVisible && dividerPosition1,
-    isRatingsVisible && isTableNumberVisible && dividerPosition2,
-    "0 0",
-  ]
-    .filter(Boolean)
-    .join(", ");
+  const bgPositions = useMemo(() => {
+    return [
+      isRatingsVisible && !isTableNumberVisible && dividerPosition,
+      !isRatingsVisible && isTableNumberVisible && dividerPosition,
+      isRatingsVisible && isTableNumberVisible && dividerPosition1,
+      isRatingsVisible && isTableNumberVisible && dividerPosition2,
+      "0 0",
+    ]
+      .filter(Boolean)
+      .join(", ");
+  }, [isRatingsVisible, isTableNumberVisible, dividerPosition, dividerPosition1, dividerPosition2]);
 
-  const bgRepeats: string = [
-    isRatingsVisible && !isTableNumberVisible && "no-repeat",
-    !isRatingsVisible && isTableNumberVisible && "no-repeat",
-    isRatingsVisible && isTableNumberVisible && "no-repeat",
-    isRatingsVisible && isTableNumberVisible && "no-repeat",
-    "repeat-y",
-  ]
-    .filter(Boolean)
-    .join(", ");
+  const bgRepeats = useMemo(() => {
+    return [
+      isRatingsVisible && !isTableNumberVisible && "no-repeat",
+      !isRatingsVisible && isTableNumberVisible && "no-repeat",
+      isRatingsVisible && isTableNumberVisible && "no-repeat",
+      isRatingsVisible && isTableNumberVisible && "no-repeat",
+      "repeat-y",
+    ]
+      .filter(Boolean)
+      .join(", ");
+  }, [isRatingsVisible, isTableNumberVisible]);
 
-  const bgSizes: string = [
-    isRatingsVisible && !isTableNumberVisible && "2px 100%",
-    !isRatingsVisible && isTableNumberVisible && "2px 100%",
-    isRatingsVisible && isTableNumberVisible && "2px 100%",
-    isRatingsVisible && isTableNumberVisible && "2px 100%",
-    "100% 78px",
-  ]
-    .filter(Boolean)
-    .join(", ");
-
-  const handleSort = (key: "name" | "rating" | "table"): void => {
-    if (sortKey === key) {
-      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-    } else {
-      setSortKey(key);
-      setSortOrder("asc");
-    }
-  };
-
-  const handlePlayersRowClick = (playerId: string | undefined): void => {
-    if (playerId) {
-      setSelectedPlayerId(playerId);
-      onSelectedPlayer?.(playerId);
-    }
-  };
-
-  const handleOpenPlayerInfoModal = (): void => {
-    openModal(PlayerInformationModal, {
-      roomId,
-      selectedPlayer: sortedPlayersList?.find((pli: PlayerListItem) => pli.playerId === selectedPlayerId)?.player,
-      isRatingsVisible,
-    });
-  };
+  const bgSizes = useMemo(() => {
+    return [
+      isRatingsVisible && !isTableNumberVisible && "2px 100%",
+      !isRatingsVisible && isTableNumberVisible && "2px 100%",
+      isRatingsVisible && isTableNumberVisible && "2px 100%",
+      isRatingsVisible && isTableNumberVisible && "2px 100%",
+      "100% 78px",
+    ]
+      .filter(Boolean)
+      .join(", ");
+  }, [isRatingsVisible, isTableNumberVisible]);
 
   const sortedPlayersList = useMemo(() => {
     if (!players) return [];
@@ -168,9 +153,59 @@ export default function PlayersList({
   }, [players, sortKey, sortOrder]);
 
   useEffect(() => {
-    setIsRtl(document.documentElement.dir === "rtl");
-    setIsDarkMode(document.documentElement.classList.contains("dark"));
+    const checkTheme = (): void => {
+      setIsRtl(document.documentElement.dir === "rtl");
+      setIsDarkMode(document.documentElement.classList.contains("dark"));
+    };
+
+    checkTheme();
+
+    const observer: MutationObserver = new MutationObserver((mutations: MutationRecord[]) => {
+      mutations.forEach((mutation: MutationRecord) => {
+        if (mutation.attributeName === "class") {
+          checkTheme();
+        }
+      });
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    return () => observer.disconnect();
   }, []);
+
+  const handleSort = (key: "name" | "rating" | "table"): void => {
+    if (sortKey === key) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortKey(key);
+      setSortOrder("asc");
+    }
+  };
+
+  const handlePlayersRowClick = (playerId: string | undefined): void => {
+    if (playerId) {
+      setSelectedPlayerId(playerId);
+      onSelectedPlayer?.(playerId);
+    }
+  };
+
+  const handleOpenPlayerInfoModal = (): void => {
+    openModal(PlayerInformationModal, {
+      roomId,
+      selectedPlayer: sortedPlayersList?.find((pli: PlayerListItem) => pli.playerId === selectedPlayerId)?.player,
+      isRatingsVisible,
+    });
+  };
+
+  const handleRowKeyDown = useKeyboardActions({
+    onEnter: () => handlePlayersRowClick(selectedPlayerId),
+    onSpace: () => handlePlayersRowClick(selectedPlayerId),
+    onKeyI: () => handleOpenPlayerInfoModal(),
+    onCtrlEnter: () => handleOpenPlayerInfoModal(),
+  });
 
   return (
     <div
@@ -267,6 +302,7 @@ export default function PlayersList({
             tabIndex={0}
             onClick={() => handlePlayersRowClick(player.playerId)}
             onDoubleClick={handleOpenPlayerInfoModal}
+            onKeyDown={handleRowKeyDown}
           >
             <div className="p-2 truncate">
               <div className="flex items-center gap-1">

@@ -5,6 +5,7 @@ import React from "react";
 import { Trans } from "@lingui/react/macro";
 import clsx from "clsx/lite";
 import { PiCaretDownDuotone, PiCaretDownFill } from "react-icons/pi";
+import { useKeyboardActions } from "@/hooks/useKeyboardActions";
 
 type SelectProps = PropsWithChildren<{
   id: string
@@ -80,6 +81,12 @@ export default function Select({
     setIsDropdownOpen(false);
   };
 
+  const handleToggleVisibility = useKeyboardActions({
+    onEnter: () => setIsDropdownOpen(!isDropdownOpen),
+    onSpace: () => setIsDropdownOpen(!isDropdownOpen),
+    isDisabled: disabled,
+  });
+
   return (
     <div className={clsx("relative w-full", isNoBottomSpace ? "mb-0" : "mb-4")}>
       {label && (
@@ -95,7 +102,8 @@ export default function Select({
       <div
         id={id}
         className={clsx(
-          "flex justify-between items-center w-full h-8 px-1 py-4 overflow-hidden border-2 border-t-gray-200 border-e-gray-400 border-b-gray-400 border-s-gray-200 rounded-xs ring-1 ring-black bg-gray-300 text-black line-clamp-1 cursor-pointer",
+          "flex justify-between items-center w-full h-8 px-1 py-4 overflow-hidden border-2 border-t-gray-200 border-e-gray-400 border-b-gray-400 border-s-gray-200 rounded-xs ring-1 ring-black bg-gray-300 text-black line-clamp-1",
+          "hover:cursor-pointer",
           disabled && "bg-gray-200 opacity-50 cursor-not-allowed",
           "dark:border-t-dark-button-border-top dark:border-e-dark-button-border-end dark:border-b-dark-button-border-bottom dark:border-s-dark-button-border-start dark:bg-dark-button-background dark:text-dark-button-text",
           className,
@@ -113,12 +121,7 @@ export default function Select({
         aria-errormessage={errorMessage ? `${id}ErrorMessage` : undefined}
         data-testid={dataTestId}
         onClick={() => !disabled && setIsDropdownOpen(!isDropdownOpen)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            !disabled && setIsDropdownOpen(!isDropdownOpen);
-          }
-        }}
+        onKeyDown={handleToggleVisibility}
       >
         <span id={id} className="sr-only">
           {placeholder}

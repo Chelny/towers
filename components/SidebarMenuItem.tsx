@@ -120,7 +120,8 @@ export default function SidebarMenuItem({
             href && isActiveHref(href) && "text-white/90 font-medium",
           )}
           href={href}
-          aria-label={isExpanded ? undefined : ariaLabel}
+          title={ariaLabel}
+          aria-label={ariaLabel}
         >
           <span
             className={clsx(
@@ -146,6 +147,7 @@ export default function SidebarMenuItem({
             "disabled:opacity-50 disabled:cursor-not-allowed",
             isExpanded && isItemActive && "bg-slate-600 text-white/90 font-medium",
           )}
+          title={ariaLabel}
           disabled={isMounted ? disabled : false}
           aria-label={ariaLabel}
           aria-expanded={menuItems.length > 0 ? isAccordionOpen : undefined}

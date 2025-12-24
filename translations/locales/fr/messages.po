@@ -50,7 +50,7 @@ msgstr "Nous n'avons pas pu créer votre compte pour le moment."
 msgid "Game option: {ratedOption}"
 msgstr "Option de jeu : {ratedOption}"
 
-#: components/game/Room.tsx:470
+#: components/game/Room.tsx:473
 msgid "Team 7-8"
 msgstr "Équipe 7-8"
 
@@ -78,15 +78,15 @@ msgstr "Vous pouvez envoyer une peste de couleur"
 msgid "Linked Social Accounts"
 msgstr "Comptes liés"
 
-#: components/towers/PlayerBoard.tsx:451
+#: components/towers/PlayerBoard.tsx:458
 #: components/game/RoomsList.tsx:116
 #: components/game/RoomTable.tsx:140
 msgid "Join"
 msgstr "Joindre"
 
 #: components/game/Table.tsx:904
-#: components/game/Room.tsx:433
-#: components/game/GameOptionsModal.tsx:90
+#: components/game/Room.tsx:436
+#: components/game/GameOptionsModal.tsx:93
 msgid "Options"
 msgstr "Options"
 
@@ -176,7 +176,7 @@ msgstr "Vendredi"
 msgid "Table Type"
 msgstr "Type de table"
 
-#: components/game/Room.tsx:386
+#: components/game/Room.tsx:389
 msgid "Ratings"
 msgstr "Évaluations"
 
@@ -196,8 +196,8 @@ msgstr "Reprendre la démo"
 msgid "Attacks damage opponents' boards."
 msgstr "Les attaques endommagent les plateaux des adversaires."
 
-#: components/game/Room.tsx:457
-#: components/game/PlayersList.tsx:233
+#: components/game/Room.tsx:460
+#: components/game/PlayersList.tsx:241
 msgid "Table"
 msgstr "Table"
 
@@ -209,7 +209,7 @@ msgstr "Février"
 msgid "Booted from table"
 msgstr "Expulsé(e) de la table"
 
-#: components/towers/PlayerBoard.tsx:485
+#: components/towers/PlayerBoard.tsx:492
 msgid "Waiting for the next game"
 msgstr "En attente de la prochaine partie"
 
@@ -229,7 +229,7 @@ msgstr "Protégé"
 #: app/[locale]/(protected)/account/profile/personal-information.form.tsx:142
 #: app/[locale]/(protected)/account/profile/passkeys.form.tsx:175
 #: app/[locale]/(auth)/sign-up/sign-up.form.tsx:143
-#: components/game/PlayersList.tsx:198
+#: components/game/PlayersList.tsx:206
 msgid "Name"
 msgstr "Nom"
 
@@ -257,7 +257,7 @@ msgstr "Afficher le mot de passe"
 msgid "{message} Please try again or <0>contact our support team</0> if the issue persists."
 msgstr "{message} Veuillez réessayer ou <0>contactez notre équipe de soutien</0> si le problème persiste."
 
-#: components/Sidebar.tsx:205
+#: components/Sidebar.tsx:208
 msgid "User"
 msgstr "Utilisateur"
 
@@ -310,7 +310,7 @@ msgstr "Retirer cette conversation"
 msgid "<0>Email not verified.</0> Please verify your email to continue. <1>Resend verification</1>"
 msgstr "<0>Courriel non vérifié.</0> Veuillez vérifier votre courriel pour continuer. <1>Renvoyer la vérification</1>"
 
-#: components/game/GameOptionsModal.tsx:113
+#: components/game/GameOptionsModal.tsx:118
 msgid "Weak"
 msgstr "Faible"
 
@@ -326,7 +326,7 @@ msgstr "Pavé numérique *"
 msgid "You can color blast"
 msgstr "Vous pouvez déclencher une explosion de couleur"
 
-#: components/ui/Select.tsx:90
+#: components/ui/Select.tsx:97
 #: components/ui/RadioButtonGroup.tsx:59
 #: components/ui/Input.tsx:116
 #: components/ui/Calendar.tsx:283
@@ -338,8 +338,8 @@ msgstr "facultatif"
 msgid "Account deletion request received"
 msgstr "Demande de suppression de compte reçue"
 
-#: components/Sidebar.tsx:209
-#: components/Sidebar.tsx:214
+#: components/Sidebar.tsx:212
+#: components/Sidebar.tsx:217
 #: constants/routes.ts:14
 msgid "Account"
 msgstr "Compte"
@@ -392,7 +392,7 @@ msgstr "Entrez votre courriel"
 msgid "The current password is invalid."
 msgstr "Le mot de passe actuel est invalide."
 
-#: components/game/Room.tsx:461
+#: components/game/Room.tsx:464
 msgid "Team 1-2"
 msgstr "Équipe 1-2"
 
@@ -400,7 +400,7 @@ msgstr "Équipe 1-2"
 msgid "Numpad ="
 msgstr "Pavé numérique ="
 
-#: components/game/Room.tsx:464
+#: components/game/Room.tsx:467
 msgid "Team 3-4"
 msgstr "Équipe 3-4"
 
@@ -436,7 +436,7 @@ msgstr "Août"
 msgid "Current Password"
 msgstr "Mot de passe actuel"
 
-#: components/game/GameOptionsModal.tsx:91
+#: components/game/GameOptionsModal.tsx:94
 msgid "Done"
 msgstr "Terminé"
 
@@ -461,7 +461,7 @@ msgstr "Réactiver cette conversation"
 msgid "Numpad /"
 msgstr "Pavé numérique /"
 
-#: components/game/GameOptionsModal.tsx:112
+#: components/game/GameOptionsModal.tsx:117
 msgid "None"
 msgstr "Aucun"
 
@@ -470,8 +470,8 @@ msgstr "Aucun"
 msgid "Email change request"
 msgstr "Demande de changement de courriel"
 
-#: components/Sidebar.tsx:219
-#: components/Sidebar.tsx:225
+#: components/Sidebar.tsx:222
+#: components/Sidebar.tsx:228
 #: components/ConversationsModal.tsx:434
 msgid "Conversations"
 msgstr "Conversations"
@@ -493,8 +493,12 @@ msgstr "Clé d'accès"
 msgid "Please note that deleting your account is a permanent action and cannot be undone. All your data, including your profile, settings, and any associated information, will be deleted immediately once you confirm your request through the link sent to your email. If you did not request account deletion, please contact our support team right away for assistance."
 msgstr "Veuillez noter que la suppression de votre compte est une action permanente et ne peut pas être annulée. Toutes vos données, y compris votre profil, vos paramètres et toute information associée, seront immédiatement supprimées une fois votre demande confirmée via le lien envoyé à votre courriel. Si vous n'avez pas demandé la suppression de votre compte, veuillez contacter notre équipe de soutien immédiatement pour obtenir de l'aide."
 
-#: components/Sidebar.tsx:230
-#: components/Sidebar.tsx:234
+#: components/AvatarListbox.tsx:50
+msgid "Avatars"
+msgstr "Avatars"
+
+#: components/Sidebar.tsx:233
+#: components/Sidebar.tsx:237
 msgid "Rooms"
 msgstr "Salles"
 
@@ -716,7 +720,7 @@ msgstr "Pavé numérique 0"
 msgid "{inviterInfo} has invited you to table #{tableNumber}."
 msgstr "{inviterInfo} vous a invité à la table n°{tableNumber}."
 
-#: components/game/Room.tsx:436
+#: components/game/Room.tsx:439
 msgid "Exit Room"
 msgstr "Quitter la salle"
 
@@ -770,7 +774,7 @@ msgstr "Mettez à jour vos informations personnelles ici."
 msgid "I can't talk until the game is over."
 msgstr "Je ne peux pas parler avant la fin de la partie."
 
-#: components/game/GameOptionsModal.tsx:114
+#: components/game/GameOptionsModal.tsx:119
 msgid "Strong"
 msgstr "Fort"
 
@@ -805,13 +809,13 @@ msgstr "Connexion avec {provider}"
 msgid "<0>Don’t have an account?</0> <1>Sign Up</1>"
 msgstr "<0>Vous n'avez pas de compte ?</0> <1>Inscrivez-vous</1>"
 
-#: components/game/Room.tsx:473
+#: components/game/Room.tsx:476
 msgid "Who is Watching"
 msgstr "Qui regarde"
 
-#: components/game/PlayersList.tsx:202
-#: components/game/PlayersList.tsx:219
-#: components/game/PlayersList.tsx:237
+#: components/game/PlayersList.tsx:210
+#: components/game/PlayersList.tsx:227
+#: components/game/PlayersList.tsx:245
 msgid "Sort ascending"
 msgstr "Trier par ordre croissant"
 
@@ -881,7 +885,7 @@ msgstr "Aucune notification"
 msgid "Invitation Declined"
 msgstr "Invitation refusée"
 
-#: components/towers/PlayerBoard.tsx:484
+#: components/towers/PlayerBoard.tsx:491
 msgid "Waiting for more players"
 msgstr "En attendant plus de joueurs"
 
@@ -1052,12 +1056,12 @@ msgstr "Ce lien magique expirera dans 10 minutes."
 msgid "Change Keys"
 msgstr "Changer les touches"
 
-#: components/Sidebar.tsx:259
+#: components/Sidebar.tsx:262
 #: constants/routes.ts:16
 msgid "Settings"
 msgstr "Paramètres"
 
-#: components/game/Room.tsx:467
+#: components/game/Room.tsx:470
 msgid "Team 5-6"
 msgstr "Équipe 5-6"
 
@@ -1095,10 +1099,6 @@ msgstr "Supprimer la notification"
 msgid "Wednesday"
 msgstr "Mercredi"
 
-#: components/UserAvatar.tsx:28
-msgid "Avatar placeholder"
-msgstr "Espace réservé pour l'avatar"
-
 #: components/game/TableInvitationModal.tsx:92
 msgid "Reason"
 msgstr "Raison"
@@ -1117,7 +1117,7 @@ msgstr "Vérifiez votre adresse électronique"
 msgid "Change Password"
 msgstr "Modifier le mot de passe"
 
-#: components/Sidebar.tsx:241
+#: components/Sidebar.tsx:244
 #: constants/routes.ts:22
 msgid "Games"
 msgstr "Jeux"
@@ -1297,7 +1297,7 @@ msgstr "La clé d'accès « {name} » a été ajoutée!"
 msgid "{powerLevel, select, minor {{sourceUsername} minorly defused {targetUsername}} mega {{sourceUsername} mega defused {targetUsername}} other {{sourceUsername} defused {targetUsername}}}"
 msgstr "{powerLevel, select, minor {{sourceUsername} a légèrement désamorcé {targetUsername}} mega {{sourceUsername} a puissamment désamorcé {targetUsername}} other {{sourceUsername} a désamorcé {targetUsername}}}"
 
-#: components/towers/PlayerBoard.tsx:483
+#: components/towers/PlayerBoard.tsx:490
 msgid "Ready"
 msgstr "Prêt"
 
@@ -1305,9 +1305,9 @@ msgstr "Prêt"
 msgid "Delete"
 msgstr "Supprimer"
 
-#: components/game/PlayersList.tsx:204
-#: components/game/PlayersList.tsx:221
-#: components/game/PlayersList.tsx:239
+#: components/game/PlayersList.tsx:212
+#: components/game/PlayersList.tsx:229
+#: components/game/PlayersList.tsx:247
 msgid "Sort descending"
 msgstr "Trier par ordre décroissant"
 
@@ -1319,6 +1319,10 @@ msgstr "Annuler"
 #: components/game/TableGameDemoPanel.tsx:143
 msgid "Remove Row"
 msgstr "Supprimer une rangée"
+
+#: components/AvatarCycler.tsx:90
+msgid "Double-click to change avatar"
+msgstr "Double-cliquez pour changer d'avatar"
 
 #: components/game/PlayerInformationModal.tsx:234
 msgid "Ping"
@@ -1379,8 +1383,8 @@ msgstr "Vous devez évaluer ce jeu."
 msgid "You can add a row"
 msgstr "Vous pouvez ajouter une rangée"
 
-#: components/Sidebar.tsx:264
-#: components/Sidebar.tsx:268
+#: components/Sidebar.tsx:267
+#: components/Sidebar.tsx:271
 msgid "Sign out"
 msgstr "Se déconnecter"
 
@@ -1420,7 +1424,7 @@ msgstr "Ignorer"
 msgid "Dither"
 msgstr "Tramer"
 
-#: components/towers/PlayerBoard.tsx:457
+#: components/towers/PlayerBoard.tsx:464
 #: components/game/Table.tsx:862
 msgid "Stand"
 msgstr "Se lever"
@@ -1497,7 +1501,7 @@ msgstr "Désamorcer"
 msgid "Numpad 5"
 msgstr "Pavé numérique 5"
 
-#: components/game/Room.tsx:426
+#: components/game/Room.tsx:429
 msgid "provisional"
 msgstr "provisoire"
 
@@ -1562,6 +1566,10 @@ msgstr "Jeudi"
 msgid "{powerLevel, select, minor {You can minorly defuse} mega {You can mega defuse} other {You can defuse}}"
 msgstr "{powerLevel, select, minor {Vous pouvez désamorcer légèrement} mega {Vous pouvez désamorcer fortement} other {Vous pouvez désamorcer}}"
 
+#: components/AvatarListbox.tsx:42
+msgid "Avatars:"
+msgstr "Avatars :"
+
 #: app/[locale]/(auth)/sign-up/sign-up.form.tsx:209
 msgid "I agree to the <0>Terms of Service</0> and <1>Privacy Policy</1>."
 msgstr "J'accepte les <0>Conditions d'utilisation</0> et la <1>Politique de confidentialité</1>."
@@ -1591,7 +1599,7 @@ msgstr "Inscription"
 msgid "Midas Piece"
 msgstr "Pièce de Midas"
 
-#: components/Sidebar.tsx:189
+#: components/Sidebar.tsx:192
 msgid "Collapse sidebar"
 msgstr "Réduire la barre latérale"
 
@@ -1745,6 +1753,10 @@ msgstr "Flèche bas"
 msgid "The email or the password is invalid."
 msgstr "Le courriel ou le mot de passe est invalide."
 
+#: components/towers/PlayerBoard.tsx:379
+msgid "Double-click to view player information"
+msgstr "Double-cliquez pour voir les informations du joueur"
+
 #: components/game/Table.tsx:933
 msgid "Quit"
 msgstr "Quitter"
@@ -1770,7 +1782,7 @@ msgstr "Novembre"
 msgid "A verification email has been sent to your new email address. Please check your inbox or your spam folder."
 msgstr "Un courriel de vérification a été envoyé à votre nouvelle adresse électronique. Veuillez vérifier votre boîte de réception ou votre dossier de courriers indésirables."
 
-#: components/towers/PlayerBoard.tsx:467
+#: components/towers/PlayerBoard.tsx:474
 #: components/game/Table.tsx:843
 msgid "Start"
 msgstr "Commencer"
@@ -1795,7 +1807,7 @@ msgstr "Les touches de contrôle ont été enregistrées avec succès !"
 msgid "Numpad 9"
 msgstr "Pavé numérique 9"
 
-#: components/Sidebar.tsx:197
+#: components/Sidebar.tsx:200
 msgid "Expand sidebar"
 msgstr "Élargir la barre latérale"
 
@@ -1803,7 +1815,7 @@ msgstr "Élargir la barre latérale"
 msgid "July"
 msgstr "Juillet"
 
-#: components/game/GameOptionsModal.tsx:102
+#: components/game/GameOptionsModal.tsx:107
 msgid "Profanity Filter"
 msgstr "Filtre de vulgarités"
 
@@ -1815,7 +1827,7 @@ msgstr "Gauche :"
 msgid "Opponent"
 msgstr "Adversaire"
 
-#: components/game/Room.tsx:375
+#: components/game/Room.tsx:378
 msgid "Play Now"
 msgstr "Jouer maintenant"
 
@@ -1850,10 +1862,6 @@ msgstr "Confirmer la suppression"
 #: components/game/Table.tsx:672
 msgid "You can remove a row"
 msgstr "Vous pouvez supprimer une rangée"
-
-#: components/UserAvatar.tsx:51
-msgid "{username}’s avatar"
-msgstr "Avatar de {username}"
 
 #: app/[locale]/(auth)/sign-in-with-magic-link/sign-in-with-magic-link.form.tsx:100
 msgid "Email Me A Sign In Link"
@@ -1907,7 +1915,7 @@ msgstr "Votre demande de suppression de compte a été acceptée. Pour finaliser
 msgid "Confirm New Password"
 msgstr "Confirmer le nouveau mot de passe"
 
-#: components/game/Room.tsx:378
+#: components/game/Room.tsx:381
 #: components/game/CreateTableModal.tsx:92
 msgid "Create Table"
 msgstr "Créer une table"
@@ -1928,7 +1936,7 @@ msgstr "Lier"
 msgid "Clump"
 msgstr "Grappe"
 
-#: components/game/PlayersList.tsx:215
+#: components/game/PlayersList.tsx:223
 msgid "Rating"
 msgstr "Évaluation"
 

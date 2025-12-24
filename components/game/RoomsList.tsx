@@ -105,7 +105,7 @@ export default function RoomsList(): ReactNode {
             <div>
               <Button
                 type="button"
-                className={clsx("w-full", room.isFull && "cursor-not-allowed")}
+                className={clsx("w-full", room.isFull && "hover:cursor-not-allowed")}
                 disabled={room.isFull || isUserInRoom}
                 onClick={() => !room.isFull && handleJoinRoom(room.id)}
               >

@@ -5,6 +5,7 @@ import { useLingui } from "@lingui/react/macro";
 import { ProfanityFilter } from "db/enums";
 import { Socket } from "socket.io-client";
 import useSWRMutation from "swr/mutation";
+import { AvatarListbox } from "@/components/AvatarListbox";
 import DeclineAllInvitationsCheckbox from "@/components/game/DeclineAllInvitationsCheckbox";
 import Modal from "@/components/ui/Modal";
 import RadioButtonGroup from "@/components/ui/RadioButtonGroup";
@@ -14,12 +15,14 @@ import { SocketCallback } from "@/interfaces/socket";
 import { fetcher } from "@/lib/fetcher";
 
 interface GameOptionsModalProps {
+  avatarId: string
   profanityFilter: ProfanityFilter
   onSetProfanityFilter: (value: ProfanityFilter) => void
   onCancel: () => void
 }
 
 export default function GameOptionsModal({
+  avatarId,
   profanityFilter,
   onSetProfanityFilter,
   onCancel,
@@ -92,27 +95,34 @@ export default function GameOptionsModal({
       dataTestId="game-options"
       onCancel={onCancel}
     >
-      <DeclineAllInvitationsCheckbox
-        isDeclineAll={isDeclineAll}
-        isDisabled={!isConnected}
-        onToggleDeclineAll={handleToggleDeclineAll}
-      />
-      <RadioButtonGroup
-        id="profanity-filter"
-        label={t({ message: "Profanity Filter" })}
-        inline
-        defaultValue={profanityFilter}
-        required
-        disabled={!isConnected || isMutating}
-        onChange={(event: ChangeEvent<HTMLInputElement>) => {
-          const value: ProfanityFilter = event.target.value as ProfanityFilter;
-          handleUpdateProfanityFilter(value);
-        }}
-      >
-        <RadioButtonGroup.Option id="none" label={t({ message: "None" })} value={ProfanityFilter.NONE} />
-        <RadioButtonGroup.Option id="weak" label={t({ message: "Weak" })} value={ProfanityFilter.WEAK} />
-        <RadioButtonGroup.Option id="strong" label={t({ message: "Strong" })} value={ProfanityFilter.STRONG} />
-      </RadioButtonGroup>
+      <div className="flex gap-4">
+        <div className="flex-1">
+          <DeclineAllInvitationsCheckbox
+            isDeclineAll={isDeclineAll}
+            isDisabled={!isConnected}
+            onToggleDeclineAll={handleToggleDeclineAll}
+          />
+          <RadioButtonGroup
+            id="profanity-filter"
+            label={t({ message: "Profanity Filter" })}
+            inline
+            defaultValue={profanityFilter}
+            required
+            disabled={!isConnected || isMutating}
+            onChange={(event: ChangeEvent<HTMLInputElement>) => {
+              const value: ProfanityFilter = event.target.value as ProfanityFilter;
+              handleUpdateProfanityFilter(value);
+            }}
+          >
+            <RadioButtonGroup.Option id="none" label={t({ message: "None" })} value={ProfanityFilter.NONE} />
+            <RadioButtonGroup.Option id="weak" label={t({ message: "Weak" })} value={ProfanityFilter.WEAK} />
+            <RadioButtonGroup.Option id="strong" label={t({ message: "Strong" })} value={ProfanityFilter.STRONG} />
+          </RadioButtonGroup>
+        </div>
+        <div>
+          <AvatarListbox initialAvatarId={avatarId} />
+        </div>
+      </div>
     </Modal>
   );
 }

@@ -194,13 +194,10 @@ export default function Calendar({
                     type="button"
                     className={clsx(
                       "flex-1 p-2 text-center border border-gray-200 rounded-xs dark:border-neutral-900",
-                      !disabled &&
-                        day !== null &&
-                        !isDisabledDay &&
-                        "cursor-pointer hover:bg-gray-200 dark:hover:bg-slate-600",
+                      !disabled && day !== null && !isDisabledDay && "hover:bg-gray-200 dark:hover:bg-slate-600",
                       day === null && "opacity-50 cursor-default",
                       isSelectedDay && "bg-blue-100 dark:bg-blue-900",
-                      isDisabledDay && "opacity-50 cursor-not-allowed",
+                      isDisabledDay && "opacity-50 hover:cursor-not-allowed",
                     )}
                     disabled={isDisabledDay}
                     role="gridcell"

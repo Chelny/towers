@@ -1,4 +1,6 @@
 import { UserSettings as UserSettingsModel } from "db/client";
+import { ServerInternalEvents } from "@/constants/socket/server-internal";
+import { publishRedisEvent } from "@/server/redis/publish";
 import { UserSettings, UserSettingsProps } from "@/server/towers/classes/UserSettings";
 import { UserSettingsService } from "@/server/towers/services/UserSettingsService";
 
@@ -7,11 +9,27 @@ export class UserSettingsManager {
 
   // ---------- Database Load ------------------------------
 
-  public static async loadUserFromDb(id: string): Promise<UserSettings> {
+  public static async loadUserSettingsFromDb(id: string): Promise<UserSettings> {
     const db: UserSettingsModel | null = await UserSettingsService.getUserSettingsById(id);
     if (!db) throw new Error(`UserSettings ${id} not found`);
     return this.upsert(db);
   }
+
+  public static async updateUserAvatar(id: string, avatarId: string): Promise<UserSettings> {
+    const db: UserSettingsModel = await UserSettingsService.updateAvatar(id, avatarId);
+    await publishRedisEvent(ServerInternalEvents.USER_SETTINGS_AVATAR, { userId: id, avatarId });
+    return this.upsert(db);
+  }
+
+  // public async updateTheme(id: string, theme: string): Promise<UserSettings> {
+  //   const db: UserSettingsModel = await UserSettingsService.updateTheme(id, theme);
+  //   return this.upsert(db);
+  // }
+
+  // public async updateProfanityFilter(id: string, filter: string): Promise<UserSettings> {
+  //   const db: UserSettingsModel = await UserSettingsService.updateProfanityFilter(id, filter);
+  //   return this.upsert(db);
+  // }
 
   // ---------- Basic CRUD ------------------------------
 
@@ -24,7 +42,7 @@ export class UserSettingsManager {
   }
 
   public static create(props: UserSettingsProps): UserSettings {
-    let userSetting: UserSettings | undefined = this.userSettings.get(props.id);
+    let userSetting: UserSettings | undefined = this.get(props.id);
     if (userSetting) return userSetting;
 
     userSetting = new UserSettings(props);
@@ -34,12 +52,10 @@ export class UserSettingsManager {
   }
 
   public static upsert(props: UserSettingsProps): UserSettings {
-    const userSetting: UserSettings | undefined = this.userSettings.get(props.id);
+    const userSetting: UserSettings | undefined = this.get(props.id);
 
     if (userSetting) {
-      userSetting.theme = props.theme;
-      userSetting.profanityFilter = props.profanityFilter;
-
+      Object.assign(userSetting, props);
       return userSetting;
     }
 

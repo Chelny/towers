@@ -43,6 +43,7 @@
   --spacing-power-bar-width: calc(var(--grid-cell-size) * 1px + 16px);
   --spacing-power-bar-height: calc(var(--grid-cell-size) * 8px + 16px);
   --spacing-player-board-username-width: calc(var(--grid-cols) * var(--grid-cell-size) * 1px);
+  --spacing-player-board-username-opponent-width: calc(var(--grid-cols) * var(--grid-cell-size-opponent) * 1px);
   --spacing-player-board-username-empty-space-width: calc(var(--grid-cell-size) * 1px + 16px);
   --spacing-demo-block: 28px;
 
@@ -315,6 +316,20 @@ dialog::backdrop {
 
 html.dark dialog::backdrop {
   opacity: 40%;
+}
+
+label:not(:disabled):hover,
+input[type="checkbox"]:not(:disabled):hover,
+input[type="radio"]:not(:disabled):hover,
+button:not(:disabled):hover {
+  cursor: pointer;
+}
+
+label:disabled:hover,
+input[type="checkbox"]:disabled:hover,
+input[type="radio"]:disabled:hover,
+button:disabled:hover {
+  cursor: not-allowed;
 }
 
 .small-screen-warning {

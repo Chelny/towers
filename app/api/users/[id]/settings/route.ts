@@ -5,6 +5,7 @@ import { handleApiError, handleUnauthorizedApiError } from "@/lib/api-error";
 import { auth, Session } from "@/lib/auth";
 import { getCurrentLocale } from "@/lib/locale";
 import prisma from "@/lib/prisma";
+import { UserSettingsManager } from "@/server/towers/managers/UserSettingsManager";
 import { dynamicActivate } from "@/translations/languages";
 
 export async function GET(
@@ -14,7 +15,7 @@ export async function GET(
   const { id } = await params;
 
   try {
-    const userSettings: UserSettings = await prisma.userSettings.findUniqueOrThrow({ where: { id } });
+    const userSettings: UserSettings = await UserSettingsManager.loadUserSettingsFromDb(id);
 
     return NextResponse.json(
       {
@@ -34,11 +35,13 @@ export async function PATCH(
 ): Promise<NextResponse<ApiResponse>> {
   const { id } = await params;
 
+  let avatarId: string | undefined = undefined;
   let theme: WebsiteTheme | undefined = undefined;
   let profanityFilter: ProfanityFilter | undefined = undefined;
 
   try {
     const body = await request.json();
+    avatarId = body.avatarId;
     theme = body.theme;
     profanityFilter = body.profanityFilter;
   } catch {
@@ -55,6 +58,7 @@ export async function PATCH(
     const userSettings: UserSettings = await prisma.userSettings.update({
       where: { id },
       data: {
+        avatarId,
         theme,
         profanityFilter,
       },

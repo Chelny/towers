@@ -96,7 +96,7 @@ export default forwardRef<InputImperativeHandle, InputProps>(function Input(
     onPaste?.(event);
   };
 
-  const handleKeydown = (event: KeyboardEvent<HTMLInputElement>): void => {
+  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>): void => {
     if (event.key === "Enter") {
       if (typeof inlineButtonText !== "undefined") {
         onInlineButtonClick?.();
@@ -153,13 +153,14 @@ export default forwardRef<InputImperativeHandle, InputProps>(function Input(
             data-testid={dataTestId}
             onInput={handleInput}
             onPaste={handlePaste}
-            onKeyDown={handleKeydown}
+            onKeyDown={handleKeyDown}
             onFocus={(event: FocusEvent<HTMLInputElement>) => event.stopPropagation()}
           />
           {type === "password" && (
             <button
               type="button"
               className={clsx("absolute inset-y-0 end-2 flex items-center text-gray-800", "dark:text-dark-input-text")}
+              title={isPasswordVisible ? t({ message: "Hide password" }) : t({ message: "Show password" })}
               aria-label={isPasswordVisible ? t({ message: "Hide password" }) : t({ message: "Show password" })}
               dir="ltr"
               onClick={handleTogglePasswordVisibility}

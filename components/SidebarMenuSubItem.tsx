@@ -59,6 +59,11 @@ export function SidebarMenuSubItem({ item, isActiveHref, isLast, level }: Sideba
             <button
               type="button"
               className={clsx("p-2 rounded-md text-white/70", "hover:bg-slate-700")}
+              title={
+                isOpen
+                  ? i18n._("Collapse {label}", { label: item.label })
+                  : i18n._("Expand {label}", { label: item.label })
+              }
               aria-label={
                 isOpen
                   ? i18n._("Collapse {label}", { label: item.label })

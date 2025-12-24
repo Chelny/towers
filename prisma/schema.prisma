@@ -41,7 +41,7 @@ model User {
 
 model Account {
   id                    String    @id @default(cuid(2))
-  userId                String
+  userId                String    @map("user_id")
   user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   accountId             String    @map("account_id")
   providerId            String    @map("provider_id")
@@ -80,7 +80,7 @@ model Passkey {
 
 model Session {
   id             String   @id @default(cuid(2))
-  userId         String
+  userId         String   @map("user_id")
   user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   token          String   @unique
   expiresAt      DateTime @map("expires_at")
@@ -121,8 +121,9 @@ model RateLimit {
 model UserSettings {
   id              String          @id @map("user_id")
   user            User            @relation(fields: [id], references: [id], onDelete: Cascade)
+  avatarId        String          @default("001") @map("avatar_id")
   theme           WebsiteTheme    @default(SYSTEM)
-  profanityFilter ProfanityFilter @default(WEAK)
+  profanityFilter ProfanityFilter @default(WEAK) @map("profanity_filter")
   createdAt       DateTime        @default(now()) @map("created_at")
   updatedAt       DateTime        @updatedAt @map("updated_at")
 
@@ -294,7 +295,7 @@ model TowersRoom {
   id               String                  @id @default(cuid(2))
   name             String                  @unique
   level            RoomLevel               @default(SOCIAL)
-  sortOrder        Int
+  sortOrder        Int                     @map("sort_order")
   isFull           Boolean                 @default(false) @map("full")
   players          TowersRoomPlayer[]
   chatMessages     TowersRoomChatMessage[]
@@ -337,7 +338,7 @@ model TowersRoomChatMessage {
 
 model TowersTable {
   id           String                   @id @default(cuid(2))
-  roomId       String
+  roomId       String                   @map("room_id")
   room         TowersRoom               @relation(fields: [roomId], references: [id], onDelete: Cascade)
   tableNumber  Int                      @map("table_number")
   hostPlayerId String                   @map("host_player_id")
@@ -360,7 +361,7 @@ model TowersTable {
 
 model TowersTableSeat {
   id                 String        @id @default(cuid(2))
-  tableId            String
+  tableId            String        @map("table_id")
   table              TowersTable   @relation(fields: [tableId], references: [id], onDelete: Cascade)
   seatNumber         Int           @map("seat_number")
   teamNumber         Int           @map("team_number")

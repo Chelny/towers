@@ -3,7 +3,7 @@ import { betterAuth, User as BetterAuthUser } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { nextCookies } from "better-auth/next-js";
 import { admin, customSession, magicLink, openAPI, username } from "better-auth/plugins";
-import { Account, User, UserRole } from "db/browser";
+import { Account, UserRole } from "db/browser";
 import { APP_CONFIG, APP_PREFIX } from "@/constants/app";
 import { getAccountsByUserId } from "@/data/account";
 import { getUserById } from "@/data/user";
@@ -16,6 +16,7 @@ import {
 } from "@/lib/email";
 import { logger } from "@/lib/logger";
 import prisma from "@/lib/prisma";
+import { UserWithRelations } from "@/types/prisma";
 import { generateRandomUsername } from "@/utils/user";
 
 export const auth = betterAuth({
@@ -29,7 +30,7 @@ export const auth = betterAuth({
   plugins: [
     openAPI(), // http://localhost:3000/api/auth/reference
     customSession(async (session) => {
-      const user: User | null = await getUserById(session.user.id);
+      const user: UserWithRelations | null = await getUserById(session.user.id);
       const accounts: Account[] = await getAccountsByUserId(session.user.id);
 
       return {

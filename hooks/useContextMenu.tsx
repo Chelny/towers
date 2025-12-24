@@ -1,7 +1,13 @@
 import { MouseEvent, RefObject, useCallback, useState } from "react";
 import { ContextMenuState } from "@/components/ui/ContextMenu";
 
-export function useContextMenu<T>(containerRef?: RefObject<HTMLElement | null>) {
+interface ContextMenu<T> {
+  menu: ContextMenuState<T>
+  openMenu: (event: MouseEvent, data: T) => void
+  closeMenu: () => void
+}
+
+export function useContextMenu<T>(containerRef?: RefObject<HTMLElement | null>): ContextMenu<T> {
   const [menu, setMenu] = useState<ContextMenuState<T>>(null);
 
   const openMenu = useCallback(

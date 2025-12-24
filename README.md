@@ -167,7 +167,7 @@ This project is inspired by Yahoo! Towers but is an independent work. It is not 
 - [ ] User changing username while in room(s) and table(s)
   - [ ] Prevent user from accessing the profile page while in a game room (show prompt on click)
   - [ ] Send websocket event to all rooms and tables to update the username if changed
-- [ ] Add avatars
+- [x] Add avatars
 - [x] Implement Options modal in room
 - [x] Finish Conversation modal
 - [ ] Create muted users list page in Account

@@ -1,16 +1,16 @@
 "use client";
 
-import { MouseEvent, ReactNode, useEffect, useRef, useState } from "react";
-import { Trans } from "@lingui/react/macro";
+import { ReactNode, useEffect, useRef, useState } from "react";
+import { Trans, useLingui } from "@lingui/react/macro";
 import clsx from "clsx/lite";
 import { GameState } from "db/browser";
 import { Socket } from "socket.io-client";
+import { AvatarCycler } from "@/components/AvatarCycler";
 import PlayerInformationModal from "@/components/game/PlayerInformationModal";
 import Grid from "@/components/towers/Grid";
 import NextPiece from "@/components/towers/NextPiece";
 import PowerBar from "@/components/towers/PowerBar";
 import Button from "@/components/ui/Button";
-import UserAvatar from "@/components/UserAvatar";
 import {
   BLOCK_BREAK_ANIMATION_DURATION_MS,
   MIN_ACTIVE_TEAMS_REQUIRED,
@@ -20,6 +20,7 @@ import { ClientToServerEvents } from "@/constants/socket/client-to-server";
 import { ServerToClientEvents } from "@/constants/socket/server-to-client";
 import { useModal } from "@/context/ModalContext";
 import { useSocket } from "@/context/SocketContext";
+import { useKeyboardActions } from "@/hooks/useKeyboardActions";
 import { ServerTowersSeat } from "@/interfaces/table-seats";
 import { PlayerPlainObject } from "@/server/towers/classes/Player";
 import { PlayerControlKeysPlainObject } from "@/server/towers/classes/PlayerControlKeys";
@@ -68,6 +69,7 @@ export default function PlayerBoard({
   onNextPowerBarItem,
 }: PlayerBoardProps): ReactNode {
   const { socketRef, isConnected, session } = useSocket();
+  const { t } = useLingui();
   const { openModal } = useModal();
   const boardRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const controlKeys: PlayerControlKeysPlainObject | undefined = seat.occupiedByPlayer?.controlKeys;
@@ -301,6 +303,12 @@ export default function PlayerBoard({
     openModal(PlayerInformationModal, { roomId, selectedPlayer, isRatingsVisible });
   };
 
+  const handlePlayerUsernameKeyDown = useKeyboardActions({
+    onEnter: () => seat.occupiedByPlayer && handleOpenPlayerInfoModal(seat.occupiedByPlayer),
+    onSpace: () => seat.occupiedByPlayer && handleOpenPlayerInfoModal(seat.occupiedByPlayer),
+    onKeyI: () => seat.occupiedByPlayer && handleOpenPlayerInfoModal(seat.occupiedByPlayer),
+  });
+
   const handleMovePiece = (direction: "left" | "right"): void => {
     socketRef.current?.emit(ClientToServerEvents.PIECE_MOVE, { direction });
   };
@@ -348,32 +356,33 @@ export default function PlayerBoard({
         />
         <div
           className={clsx(
-            "flex items-center w-player-board-username-width truncate cursor-pointer",
-            isOpponentBoard ? "gap-1" : "gap-2",
+            "flex items-center truncate",
+            isOpponentBoard ? "gap-1 w-player-board-username-opponent-width" : "gap-2 w-player-board-username-width",
             isReversed ? "order-1 ms-1 me-0.5 rtl:order-2" : "order-2 ms-0.5 me-1 rtl:order-1",
           )}
-          role="button"
-          tabIndex={0}
-          onDoubleClick={() => (seat.occupiedByPlayer ? handleOpenPlayerInfoModal(seat.occupiedByPlayer) : undefined)}
         >
           {seat.occupiedByPlayerId && (
             <>
-              <div
-                className={clsx("shrink-0", isOpponentBoard ? "w-4 h-4" : "w-6 h-6")}
-                onDoubleClick={(event: MouseEvent) => event.stopPropagation()}
-              >
-                <UserAvatar
-                  user={seat.occupiedByPlayer?.user}
-                  dimensions={isOpponentBoard ? "w-4 h-4" : "w-6 h-6"}
+              <div className={clsx("shrink-0", isOpponentBoard ? "w-4 h-5" : "w-6 h-6")}>
+                <AvatarCycler
+                  userId={seat.occupiedByPlayer?.userId}
+                  initialAvatarId={seat.occupiedByPlayer?.user.userSettings?.avatarId}
                   size={isOpponentBoard ? 16 : 24}
                 />
               </div>
               <div
                 className={clsx(
-                  "truncate select-none",
+                  "truncate select-none cursor-pointer",
                   isOpponentBoard ? "text-sm" : "text-base",
                   board?.isHooDetected && "text-red-500 dark:text-red-400",
                 )}
+                title={t({ message: "Double-click to view player information" })}
+                role="button"
+                tabIndex={0}
+                onDoubleClick={() =>
+                  seat.occupiedByPlayer ? handleOpenPlayerInfoModal(seat.occupiedByPlayer) : undefined
+                }
+                onKeyDown={handlePlayerUsernameKeyDown}
               >
                 {seat.occupiedByPlayer?.user.username}
               </div>

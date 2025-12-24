@@ -45,7 +45,7 @@ export function ContextMenu<T>({
                     <li
                       key={idx}
                       className={clsx(
-                        "px-3 py-2 cursor-pointer hover:bg-slate-200",
+                        "px-3 py-2 hover:cursor-pointer hover:bg-slate-200",
                         "dark:hover:bg-slate-700",
                         item.disabled && "opacity-50 cursor-not-allowed",
                       )}

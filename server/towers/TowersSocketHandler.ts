@@ -25,6 +25,7 @@ import { TableManager } from "@/server/towers/managers/TableManager";
 import { TablePlayerManager } from "@/server/towers/managers/TablePlayerManager";
 import { UserManager } from "@/server/towers/managers/UserManager";
 import { UserMuteManager } from "@/server/towers/managers/UserMuteManager";
+import { UserSettingsManager } from "@/server/towers/managers/UserSettingsManager";
 
 export class TowersSocketHandler {
   constructor(
@@ -34,6 +35,7 @@ export class TowersSocketHandler {
   ) {}
 
   public registerSocketListeners(): void {
+    this.socket.on(ClientToServerEvents.USER_SETTINGS_AVATAR, this.handleSetUserAvatar);
     this.socket.on(ClientToServerEvents.USER_MUTES, this.handleGetMutedUsers);
     this.socket.on(ClientToServerEvents.USER_MUTE_CHECK, this.handleCheckUserMuted);
     this.socket.on(ClientToServerEvents.USER_MUTE, this.handleMuteUser);
@@ -98,6 +100,7 @@ export class TowersSocketHandler {
   }
 
   private cleanupSocketListeners(): void {
+    this.socket.off(ClientToServerEvents.USER_SETTINGS_AVATAR, this.handleSetUserAvatar);
     this.socket.off(ClientToServerEvents.USER_MUTES, this.handleGetMutedUsers);
     this.socket.off(ClientToServerEvents.USER_MUTE_CHECK, this.handleCheckUserMuted);
     this.socket.off(ClientToServerEvents.USER_MUTE, this.handleMuteUser);
@@ -147,6 +150,10 @@ export class TowersSocketHandler {
     this.socket.off(ClientToServerEvents.NOTIFICATION_MARK_AS_READ, this.handleMarkNotificationAsRead);
     this.socket.off(ClientToServerEvents.NOTIFICATION_DELETE, this.handleDeleteNotification);
   }
+
+  private handleSetUserAvatar = async ({ avatarId }: { avatarId: string }): Promise<void> => {
+    await UserSettingsManager.updateUserAvatar(this.user.id, avatarId);
+  };
 
   private handleGetMutedUsers = ({}, callback: <T>({ success, message, data }: SocketCallback<T>) => void): void => {
     try {

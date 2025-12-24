@@ -3,7 +3,7 @@ import { getTowersPlayerLiteIncludes, TowersPlayerLite } from "@/types/prisma";
 
 export class PlayerService {
   public static async getPlayerById(id: string): Promise<TowersPlayerLite> {
-    return await prisma.towersPlayer.upsert({
+    return prisma.towersPlayer.upsert({
       where: { id },
       update: {},
       create: {

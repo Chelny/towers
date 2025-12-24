@@ -10,10 +10,10 @@ import { RiUserLine } from "react-icons/ri";
 import { RiSidebarFoldFill, RiSidebarUnfoldFill } from "react-icons/ri";
 import { TbTower } from "react-icons/tb";
 import { Socket } from "socket.io-client";
+import { AvatarCycler } from "@/components/AvatarCycler";
 import ConversationsModal from "@/components/ConversationsModal";
 import SidebarMenuItem from "@/components/SidebarMenuItem";
 import ThemeToggleButton from "@/components/ThemeToggleButton";
-import UserAvatar from "@/components/UserAvatar";
 import { ROUTE_DELETE_ACCOUNT, ROUTE_PROFILE, ROUTE_SETTINGS, ROUTE_TOWERS } from "@/constants/routes";
 import { ClientToServerEvents } from "@/constants/socket/client-to-server";
 import { ServerToClientEvents } from "@/constants/socket/server-to-client";
@@ -178,15 +178,20 @@ export default function Sidebar(): ReactNode {
         isExpanded ? "w-72 items-start" : "w-24 items-center",
       )}
     >
-      <div>
+      <div className="flex flex-col gap-2">
         {/* User image and collapse icon */}
         <div className={clsx("flex items-center gap-2", isExpanded ? "w-full" : "w-auto")}>
           <div className={clsx("flex-1 flex items-center gap-4", isExpanded && "ps-2")}>
-            <UserAvatar user={session?.user} />
+            <AvatarCycler userId={session?.user.id} initialAvatarId={session?.user.userSettings?.avatarId} />
             {isExpanded && <span className="font-medium">{session?.user.name}</span>}
           </div>
           <div className={isExpanded ? "flex" : "hidden"}>
-            <button type="button" aria-label={t({ message: "Collapse sidebar" })} onClick={() => setIsExpanded(false)}>
+            <button
+              type="button"
+              title={t({ message: "Collapse sidebar" })}
+              aria-label={t({ message: "Collapse sidebar" })}
+              onClick={() => setIsExpanded(false)}
+            >
               <RiSidebarFoldFill className={clsx("w-8 h-8 text-white/70", "rtl:-scale-x-100")} aria-hidden="true" />
             </button>
           </div>
@@ -194,7 +199,12 @@ export default function Sidebar(): ReactNode {
 
         {/* Expand icon */}
         <div className={isExpanded ? "hidden" : "flex justify-center items-center w-full h-8"}>
-          <button type="button" aria-label={t({ message: "Expand sidebar" })} onClick={() => setIsExpanded(true)}>
+          <button
+            type="button"
+            title={t({ message: "Expand sidebar" })}
+            aria-label={t({ message: "Expand sidebar" })}
+            onClick={() => setIsExpanded(true)}
+          >
             <RiSidebarUnfoldFill className={clsx("w-8 h-8 text-white/70", "rtl:-scale-x-100")} aria-hidden="true" />
           </button>
         </div>

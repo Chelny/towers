@@ -1,7 +1,8 @@
-import { User as UserModel } from "db/client";
+import { User as UserModel, UserSettings as UserSettingsModel } from "db/client";
 import { Socket } from "socket.io";
 import { logger } from "@/lib/logger";
 import { User, UserProps } from "@/server/towers/classes/User";
+import { UserSettings } from "@/server/towers/classes/UserSettings";
 import { UserService } from "@/server/towers/services/UserService";
 
 export class UserManager {
@@ -10,7 +11,7 @@ export class UserManager {
   // ---------- Database Load ------------------------------
 
   public static async loadUserFromDb(id: string): Promise<User> {
-    const db: UserModel | null = await UserService.getUserById(id);
+    const db: (UserModel & { userSettings: UserSettingsModel | null }) | null = await UserService.getUserById(id);
     if (!db) throw new Error(`User ${id} not found`);
     return this.upsert(db);
   }
@@ -41,6 +42,14 @@ export class UserManager {
     if (user) {
       user.username = props.username;
       user.image = props.image;
+      user.userSettings = props.userSettings
+        ? new UserSettings({
+            id: props.userSettings.id,
+            avatarId: props.userSettings.avatarId,
+            theme: props.userSettings.theme,
+            profanityFilter: props.userSettings.profanityFilter,
+          })
+        : null;
 
       return user;
     }
