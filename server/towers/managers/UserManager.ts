@@ -1,5 +1,6 @@
 import { User as UserModel } from "db/client";
 import { Socket } from "socket.io";
+import { logger } from "@/lib/logger";
 import { User, UserProps } from "@/server/towers/classes/User";
 import { UserService } from "@/server/towers/services/UserService";
 
@@ -14,7 +15,7 @@ export class UserManager {
     return this.upsert(db);
   }
 
-  // ---------- Basic CRUD ------------------------------
+  // ---------- Basic CRUD ---------------------------------
 
   public static get(id: string): User | undefined {
     return this.users.get(id);
@@ -49,6 +50,26 @@ export class UserManager {
 
   public static delete(id: string): void {
     this.users.delete(id);
+  }
+
+  // ---------- User Actions --------------------------------
+
+  public static blockTableInvitations(userId: string): void {
+    const user: User | undefined = this.get(userId);
+
+    if (user) {
+      user.blockTableInvitations();
+      logger.debug(`${user.username} blocked invitations.`);
+    }
+  }
+
+  public static allowTableInvitations(userId: string): void {
+    const user: User | undefined = this.get(userId);
+
+    if (user) {
+      user.allowTableInvitations();
+      logger.debug(`${user.username} allow invitations.`);
+    }
   }
 
   // ---------- Socket Actions ------------------------------

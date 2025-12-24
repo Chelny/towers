@@ -129,6 +129,8 @@ export class Game {
       this.countdown = isTestMode() ? COUNTDOWN_START_NUMBER_TEST : COUNTDOWN_START_NUMBER;
     }
 
+    this.clearGameTimer(true);
+
     this.state = GameState.COUNTDOWN;
 
     this.emitCountdownToAll();
@@ -157,10 +159,10 @@ export class Game {
   private clearCountdown(): void {
     if (this.countdownIntervalId !== null) {
       clearInterval(this.countdownIntervalId);
+      this.countdownIntervalId = null;
     }
 
     this.countdown = null;
-    this.countdownIntervalId = null;
     this.emitCountdownToAll();
   }
 
@@ -275,15 +277,15 @@ export class Game {
     }, 1000);
   }
 
-  private clearGameTimer(isEmit: boolean = false): void {
+  private clearGameTimer(shouldEmit: boolean = false): void {
     if (this.gameTimerIntervalId !== null) {
       clearInterval(this.gameTimerIntervalId);
+      this.gameTimerIntervalId = null;
     }
 
     this.timer = null;
-    this.gameTimerIntervalId = null;
 
-    if (isEmit) {
+    if (shouldEmit) {
       this.emitTimerToAll();
     }
   }
@@ -547,9 +549,7 @@ export class Game {
   }
 
   private async emitTimerToAll(): Promise<void> {
-    if (this.state === GameState.PLAYING && this.timer !== null) {
-      await publishRedisEvent(ServerInternalEvents.GAME_TIMER, { tableId: this.table.id, timer: this.timer });
-    }
+    await publishRedisEvent(ServerInternalEvents.GAME_TIMER, { tableId: this.table.id, timer: this.timer });
   }
 
   public toPlainObject(): GamePlainObject {

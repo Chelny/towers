@@ -171,10 +171,11 @@ export function SignUpForm({ locale }: SignUpFormProps): ReactNode {
         placeholder={t({ message: "Enter your username" })}
         autoComplete="off"
         required
+        dir="ltr"
         dataTestId="sign-up_input-text_username"
         description={t({
           message:
-            "Username must be between 5 and 16 characters long and can contain digits, periods, and underscores.",
+            "Username must be between 4 and 32 characters long and can contain digits, periods, and underscores.",
         })}
         errorMessage={formState?.error?.username}
       />

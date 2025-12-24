@@ -7,7 +7,7 @@ const renderAlertModal = (props?: Partial<AlertModalProps>) => {
     title: "Test Alert",
     message: "This is a test alert message.",
     testId: "test-alert",
-    onCancel: vi.fn(),
+    onClose: vi.fn(),
   };
 
   render(
@@ -17,7 +17,7 @@ const renderAlertModal = (props?: Partial<AlertModalProps>) => {
   );
 
   return {
-    onCancel: defaultProps.onCancel,
+    onCancel: defaultProps.onClose,
   };
 };
 

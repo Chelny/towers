@@ -169,6 +169,7 @@ export function SignInForm(): ReactNode {
     <form className="w-full" noValidate onSubmit={handleSignIn}>
       {!formState.success && formState.message && <AlertMessage type="error">{formState.message}</AlertMessage>}
       <Input
+        type="email"
         id="email"
         label={t({ message: "Email" })}
         autoComplete="username webauthn"

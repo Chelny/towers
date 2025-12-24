@@ -32,7 +32,7 @@ export class Room {
   public readonly level: RoomLevel;
   public readonly sortOrder: number;
   public isFull: boolean;
-  public _players: RoomPlayer[] = [];
+  private _players: RoomPlayer[] = [];
   public chatMessages: RoomChatMessage[] = [];
   public tables: Table[] = [];
 

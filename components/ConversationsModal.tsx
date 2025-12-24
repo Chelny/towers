@@ -137,8 +137,29 @@ export default function ConversationsModal({ conversationId, onClose }: Conversa
   useEffect(() => {
     if (!currentConversation) return;
     scrollToBottom();
-    markConversationAsRead(currentConversation.id);
   }, [currentConversation?.messages.length]);
+
+  useEffect(() => {
+    if (!currentConversation) return;
+
+    const handleVisibilityChange = (): void => {
+      if (document.visibilityState === "visible") {
+        markConversationAsRead(currentConversation.id);
+      }
+    };
+
+    const handleFocus = (): void => {
+      markConversationAsRead(currentConversation.id);
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("focus", handleFocus);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("focus", handleFocus);
+    };
+  }, [currentConversation]);
 
   useEffect(() => {
     if (!isConnected || !socketRef.current) return;
@@ -154,6 +175,7 @@ export default function ConversationsModal({ conversationId, onClose }: Conversa
             const conversation: ConversationPlainObject | undefined = response.data.find(
               (c: ConversationPlainObject) => c.id === conversationId,
             );
+
             if (conversation) {
               setCurrentConversation(conversation);
             }
@@ -191,7 +213,6 @@ export default function ConversationsModal({ conversationId, onClose }: Conversa
         ),
       );
 
-      // If the user is currently viewing this conversation, update it
       setCurrentConversation((prev: ConversationPlainObject | undefined) =>
         prev?.id === conversationId
           ? {
@@ -218,7 +239,6 @@ export default function ConversationsModal({ conversationId, onClose }: Conversa
         ),
       );
 
-      // If the user is currently viewing this conversation, update it
       setCurrentConversation((prev: ConversationPlainObject | undefined) =>
         prev?.id === conversationId
           ? {
@@ -235,6 +255,7 @@ export default function ConversationsModal({ conversationId, onClose }: Conversa
       setConversations((prev: ConversationPlainObject[]) =>
         prev.filter((c: ConversationPlainObject) => c.id !== conversationId),
       );
+
       setCurrentConversation((prev: ConversationPlainObject | undefined) =>
         prev?.id === conversationId ? undefined : prev,
       );
@@ -275,23 +296,20 @@ export default function ConversationsModal({ conversationId, onClose }: Conversa
         return prev.map((c: ConversationPlainObject) => (c.id === conversation.id ? mergedConversation : c));
       });
 
-      // If the user is currently viewing this conversation, mark as read
-      if (currentConversationRef.current?.id === conversation.id) {
-        setCurrentConversation((prev: ConversationPlainObject | undefined) =>
-          prev?.id === conversation.id
-            ? {
-                ...prev,
-                messages: [
-                  ...prev.messages,
-                  ...conversation.messages.filter(
-                    (im: InstantMessagePlainObject) =>
-                      !prev.messages.some((m: InstantMessagePlainObject) => m.id === im.id),
-                  ),
-                ],
-              }
-            : prev,
-        );
-      }
+      setCurrentConversation((prev: ConversationPlainObject | undefined) =>
+        prev?.id === conversation.id
+          ? {
+              ...prev,
+              messages: [
+                ...prev.messages,
+                ...conversation.messages.filter(
+                  (im: InstantMessagePlainObject) =>
+                    !prev.messages.some((m: InstantMessagePlainObject) => m.id === im.id),
+                ),
+              ],
+            }
+          : prev,
+      );
     };
 
     const attachListeners = (): void => {
@@ -328,10 +346,12 @@ export default function ConversationsModal({ conversationId, onClose }: Conversa
   }, [isConnected, socketRef, session?.user.id]);
 
   const markConversationAsRead = (conversationId: string): void => {
-    socketRef.current?.emit(ClientToServerEvents.CONVERSATION_MARK_AS_READ, {
-      conversationId,
-      userId: session?.user.id,
-    });
+    if (currentConversation?.id === conversationId && document.visibilityState === "visible" && document.hasFocus()) {
+      socketRef.current?.emit(ClientToServerEvents.CONVERSATION_MARK_AS_READ, {
+        conversationId,
+        userId: session?.user.id,
+      });
+    }
   };
 
   const getLastMessageSnippet = (conversation: ConversationPlainObject): string => {
@@ -367,7 +387,7 @@ export default function ConversationsModal({ conversationId, onClose }: Conversa
   };
 
   const scrollToBottom = (): void => {
-    conversationEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+    conversationEndRef.current?.scrollIntoView({ behavior: "instant", block: "end" });
   };
 
   const handleSendMessage = async (): Promise<void> => {
@@ -403,171 +423,168 @@ export default function ConversationsModal({ conversationId, onClose }: Conversa
   };
 
   return (
-    <>
-      <Modal
-        ref={modalRef}
-        title={
-          currentConversation
-            ? i18n._("Instant message with {username} started {time}", {
-                username: otherParticipant?.user?.username,
-                time: conversationTime,
-              })
-            : t({ message: "Conversations" })
-        }
-        customDialogSize="w-[992px] h-[600px]"
-        cancelText={t({ message: "Close" })}
-        dataTestId={"conversations"}
-        onCancel={handleCloseModal}
-        onClose={handleCloseModal}
-      >
-        <div className="flex flex-col overflow-hidden w-full h-full" onClick={closeMenu}>
-          <div
-            className={clsx(
-              "flex overflow-hidden w-full h-full divide-x divide-slate-600 bg-white",
-              "dark:divide-dark-card-border dark:bg-dark-background",
-            )}
-          >
-            <aside className="overflow-y-auto w-60">
-              <ul className={clsx("divide-y divide-slate-600", "dark:divide-dark-card-border")}>
-                {conversations.map((conversation: ConversationPlainObject) => {
-                  const currentParticipant: ConversationParticipantPlainObject | undefined =
-                    conversation.participants.find(
-                      (cp: ConversationParticipantPlainObject) => cp.userId === session?.user.id,
-                    );
-                  const otherParticipant: ConversationParticipantPlainObject | undefined =
-                    conversation.participants.find(
-                      (cp: ConversationParticipantPlainObject) => cp.user.id !== session?.user.id,
-                    );
-                  const otherParticipantUsername: string | undefined = otherParticipant?.user.username;
-                  const snippet: string = getLastMessageSnippet(conversation);
-                  const unreadCount: number = getUnreadConversationsCount(conversation, session?.user.id);
+    <Modal
+      ref={modalRef}
+      title={
+        currentConversation
+          ? i18n._("Instant message with {username} started {time}", {
+              username: otherParticipant?.user?.username,
+              time: conversationTime,
+            })
+          : t({ message: "Conversations" })
+      }
+      customDialogSize="w-[992px] h-[600px]"
+      cancelText={t({ message: "Close" })}
+      dataTestId={"conversations"}
+      onCancel={handleCloseModal}
+      onClose={handleCloseModal}
+    >
+      <div className="flex flex-col overflow-hidden w-full h-full" onClick={closeMenu}>
+        <div
+          className={clsx(
+            "flex overflow-hidden w-full h-full divide-x divide-slate-600 bg-white",
+            "dark:divide-dark-card-border dark:bg-dark-background",
+          )}
+        >
+          <aside className="overflow-y-auto w-60">
+            <ul className={clsx("divide-y divide-slate-600", "dark:divide-dark-card-border")}>
+              {conversations.map((conversation: ConversationPlainObject) => {
+                const currentParticipant: ConversationParticipantPlainObject | undefined =
+                  conversation.participants.find(
+                    (cp: ConversationParticipantPlainObject) => cp.userId === session?.user.id,
+                  );
+                const otherParticipant: ConversationParticipantPlainObject | undefined = conversation.participants.find(
+                  (cp: ConversationParticipantPlainObject) => cp.user.id !== session?.user.id,
+                );
+                const otherParticipantUsername: string | undefined = otherParticipant?.user.username;
+                const snippet: string = getLastMessageSnippet(conversation);
+                const unreadCount: number = getUnreadConversationsCount(conversation, session?.user.id);
+                const isCurrentConversation: boolean = currentConversation?.id === conversation.id;
+                const isWindowActive: boolean = document.visibilityState === "visible" && document.hasFocus();
+                const isShowBadge: boolean = unreadCount > 0 && (!isCurrentConversation || !isWindowActive);
 
-                  return (
-                    <li
-                      key={conversation.id}
-                      className={clsx(
-                        "flex flex-col gap-2 w-full p-2 cursor-pointer",
-                        currentConversation?.id === conversation.id && "bg-slate-100 dark:bg-slate-700",
-                      )}
-                      onClick={() => setCurrentConversation(conversation)}
-                      onContextMenu={(event: MouseEvent) => handleContextMenu(event, conversation)}
-                    >
-                      <div className="flex justify-between items-center">
-                        <span className="font-medium truncate">{otherParticipantUsername}</span>
-                        {currentParticipant?.mutedAt ? (
-                          <span className="inline-flex items-center justify-center px-1.5 py-1 ms-2 text-gray-400 font-bold">
-                            <VscBellSlashDot />
+                return (
+                  <li
+                    key={conversation.id}
+                    className={clsx(
+                      "flex flex-col gap-2 w-full p-2 cursor-pointer",
+                      currentConversation?.id === conversation.id && "bg-slate-100 dark:bg-slate-700",
+                    )}
+                    onClick={() => setCurrentConversation(conversation)}
+                    onContextMenu={(event: MouseEvent) => handleContextMenu(event, conversation)}
+                  >
+                    <div className="flex justify-between items-center">
+                      <span className="font-medium truncate">{otherParticipantUsername}</span>
+                      {currentParticipant?.mutedAt ? (
+                        <span className="inline-flex items-center justify-center px-1.5 py-1 ms-2 text-gray-400 font-bold">
+                          <VscBellSlashDot />
+                        </span>
+                      ) : (
+                        isShowBadge && (
+                          <span className="inline-flex items-center justify-center px-1.5 py-0.5 ms-2 bg-red-600 text-white text-xs font-semibold rounded-full">
+                            {unreadCount}
                           </span>
-                        ) : (
-                          unreadCount > 0 && (
-                            <span className="inline-flex items-center justify-center px-1.5 py-0.5 ms-2 bg-red-600 text-white text-xs font-semibold rounded-full">
-                              {unreadCount}
-                            </span>
-                          )
-                        )}
-                      </div>
+                        )
+                      )}
+                    </div>
+                    <div
+                      className={clsx(
+                        "flex justify-between items-center gap-2 text-gray-500 text-sm",
+                        "dark:text-dark-text-muted",
+                      )}
+                    >
+                      <span className="truncate">{snippet}</span>
+                      <span className={clsx("text-gray-400 text-xs text-right", "dark:text-dark-text-muted")}>
+                        {format(conversation.messages[conversation.messages.length - 1].createdAt, "HH:mm", {
+                          locale: getDateFnsLocale(i18n.locale),
+                        })}
+                      </span>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          </aside>
+
+          <section className="flex-1 flex flex-col p-2 -mb-2">
+            {currentConversation ? (
+              <div
+                className={clsx("flex flex-col gap-4 h-full divide-y divide-slate-600", "dark:divide-dark-card-border")}
+              >
+                <div className="flex-1 overflow-y-auto pb-1">
+                  {translatedMessages?.map((instantMessage: InstantMessagePlainObject) => {
+                    const time: string = format(instantMessage.createdAt, "HH:mm", {
+                      locale: getDateFnsLocale(i18n.locale),
+                    });
+
+                    return (
                       <div
+                        key={instantMessage.id}
                         className={clsx(
-                          "flex justify-between items-center gap-2 text-gray-500 text-sm",
-                          "dark:text-dark-text-muted",
+                          "flex justify-between items-center gap-2 p-1",
+                          "hover:bg-slate-50",
+                          "dark:hover:bg-slate-700",
                         )}
                       >
-                        <span className="truncate">{snippet}</span>
-                        <span className={clsx("text-gray-400 text-xs text-right", "dark:text-dark-text-muted")}>
-                          {format(conversation.messages[conversation.messages.length - 1].createdAt, "HH:mm", {
-                            locale: getDateFnsLocale(i18n.locale),
-                          })}
-                        </span>
-                      </div>
-                    </li>
-                  );
-                })}
-              </ul>
-            </aside>
-
-            <section className="flex-1 flex flex-col p-2 -mb-2">
-              {currentConversation ? (
-                <div
-                  className={clsx(
-                    "flex flex-col gap-4 h-full divide-y divide-slate-600",
-                    "dark:divide-dark-card-border",
-                  )}
-                >
-                  <div className="flex-1 overflow-y-auto pb-1">
-                    {translatedMessages?.map((instantMessage: InstantMessagePlainObject) => {
-                      const time: string = format(instantMessage.createdAt, "HH:mm", {
-                        locale: getDateFnsLocale(i18n.locale),
-                      });
-
-                      return (
-                        <div
-                          key={instantMessage.id}
-                          className={clsx(
-                            "flex justify-between items-center gap-2 p-1",
-                            "hover:bg-slate-50",
-                            "dark:hover:bg-slate-700",
+                        <div className="flex flex-1">
+                          {instantMessage.type === TableChatMessageType.CHAT && (
+                            <span className="order-1">{instantMessage.user?.username}:&nbsp;</span>
                           )}
-                        >
-                          <div className="flex flex-1">
-                            {instantMessage.type === TableChatMessageType.CHAT && (
-                              <span className="order-1">{instantMessage.user?.username}:&nbsp;</span>
+                          <span
+                            className={clsx(
+                              instantMessage.type === TableChatMessageType.CHAT
+                                ? "order-2"
+                                : "text-slate-500 dark:text-dark-text-muted",
                             )}
-                            <span
-                              className={clsx(
-                                instantMessage.type === TableChatMessageType.CHAT
-                                  ? "order-2"
-                                  : "text-slate-500 dark:text-dark-text-muted",
-                              )}
-                            >
-                              {instantMessage.text}
-                            </span>
-                          </div>
-
-                          <span className={clsx("text-gray-400 text-xs", "dark:text-dark-text-muted")}>{time}</span>
+                          >
+                            {instantMessage.text}
+                          </span>
                         </div>
-                      );
-                    })}
-                    <div ref={conversationEndRef} />
-                  </div>
-                  <Input
-                    ref={messageInputRef}
-                    type="text"
-                    id="instantMessage"
-                    inlineButtonText={t({ message: "Send" })}
-                    dataTestId="instant-message_input-text_message"
-                    onKeyDown={(event: KeyboardEvent<HTMLInputElement>) => {
-                      if (event.key === "Enter") {
-                        // Prevent submitting modal form
-                        event.preventDefault();
-                      }
-                    }}
-                    onInlineButtonClick={handleSendMessage}
-                  />
-                </div>
-              ) : (
-                <div
-                  className={clsx("flex justify-center items-center h-full text-gray-500", "dark:text-dark-text-muted")}
-                >
-                  {conversations.length > 0
-                    ? t({ message: "Select a conversation" })
-                    : t({ message: "No conversations" })}
-                </div>
-              )}
-            </section>
-          </div>
 
-          <div className="flex items-center justify-between px-1 pt-2 -mb-4">
-            <Checkbox
-              id="friendsOnlyInstantMessages"
-              label={t({ message: "Allow instant messages from my friends only." })}
-              disabled
-              dataTestId="instant-message_input-checkbox_friends-only-instant-messages"
-            />
-          </div>
+                        <span className={clsx("text-gray-400 text-xs", "dark:text-dark-text-muted")}>{time}</span>
+                      </div>
+                    );
+                  })}
+                  <div ref={conversationEndRef} />
+                </div>
+                <Input
+                  ref={messageInputRef}
+                  type="text"
+                  id="instantMessage"
+                  inlineButtonText={t({ message: "Send" })}
+                  dataTestId="instant-message_input-text_message"
+                  onKeyDown={(event: KeyboardEvent<HTMLInputElement>) => {
+                    if (event.key === "Enter") {
+                      // Prevent submitting modal form
+                      event.preventDefault();
+                    }
+                  }}
+                  onInlineButtonClick={handleSendMessage}
+                />
+              </div>
+            ) : (
+              <div
+                className={clsx("flex justify-center items-center h-full text-gray-500", "dark:text-dark-text-muted")}
+              >
+                {conversations.length > 0
+                  ? t({ message: "Select a conversation" })
+                  : t({ message: "No conversations" })}
+              </div>
+            )}
+          </section>
         </div>
 
-        {renderContextMenu()}
-      </Modal>
-    </>
+        <div className="flex items-center justify-between px-1 pt-2 -mb-4">
+          <Checkbox
+            id="friendsOnlyInstantMessages"
+            label={t({ message: "Allow instant messages from my friends only." })}
+            disabled
+            dataTestId="instant-message_input-checkbox_friends-only-instant-messages"
+          />
+        </div>
+      </div>
+
+      {renderContextMenu()}
+    </Modal>
   );
 }

@@ -66,7 +66,7 @@ export default function Select({
   useEffect(() => {
     if (isDropdownOpen && dropdownRef.current) {
       const selectedOption: Element | null = dropdownRef.current.querySelector(`[id="${id}-${selectedValue}"]`);
-      selectedOption?.scrollIntoView({ behavior: "auto", block: "nearest" });
+      selectedOption?.scrollIntoView({ behavior: "instant", block: "nearest" });
     }
   }, [isDropdownOpen, selectedValue]);
 

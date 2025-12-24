@@ -46,7 +46,7 @@ export default function Checkbox({
           type="checkbox"
           id={id}
           className={clsx(
-            "peer shrink-0 appearance-none w-5 h-5 border-2 border-t-gray-600 border-e-gray-400 border-b-gray-400 border-s-gray-600 rounded-xs mt-1 bg-white cursor-pointer",
+            "peer appearance-none shrink-0 w-5 h-5 border-2 border-t-gray-600 border-e-gray-400 border-b-gray-400 border-s-gray-600 rounded-xs mt-1 bg-white cursor-pointer",
             "disabled:bg-gray-200/50 disabled:cursor-not-allowed",
             "dark:border-t-dark-input-border-top dark:border-e-dark-input-border-end dark:border-b-dark-input-border-bottom dark:border-s-dark-input-border-start dark:bg-dark-input-background",
             "dark:disabled:bg-dark-input-disabled-background",
@@ -62,9 +62,9 @@ export default function Checkbox({
         <TiTick
           className={clsx(
             "absolute hidden w-5 h-5 mt-1 text-gray-600 pointer-events-none",
-            "peer-checked:block",
+            "peer-checked:block peer-disabled:text-gray-400",
             "rtl:-scale-x-100",
-            "dark:text-dark-input-text",
+            "dark:text-gray-200 dark:peer-disabled:text-gray-400",
           )}
         />
         <label

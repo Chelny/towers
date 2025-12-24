@@ -3,13 +3,14 @@
 import { KeyboardEvent, ReactNode, Ref, useEffect, useMemo, useRef } from "react";
 import { useLingui } from "@lingui/react/macro";
 import clsx from "clsx/lite";
-import { TableChatMessageType } from "db/browser";
+import { ProfanityFilter, TableChatMessageType } from "db/browser";
 import { TableType } from "db/browser";
 import Input, { InputImperativeHandle } from "@/components/ui/Input";
 import { APP_CONFIG } from "@/constants/app";
 import { FKey, fKeyMessages } from "@/constants/f-key-messages";
 import { CHAT_MESSSAGE_MAX_LENGTH } from "@/constants/game";
 import { useSocket } from "@/context/SocketContext";
+import { filterProfanity } from "@/server/profanity/filter";
 import { RoomChatMessagePlainObject } from "@/server/towers/classes/RoomChatMessage";
 import { TableChatMessagePlainObject, TableChatMessageVariables } from "@/server/towers/classes/TableChatMessage";
 
@@ -19,6 +20,7 @@ type ChatProps = {
   chatMessages?: ChatMessage[]
   messageInputRef?: Ref<InputImperativeHandle>
   isMessageInputDisabled: boolean
+  profanityFilter?: ProfanityFilter
   onSendMessage: (event: KeyboardEvent<HTMLInputElement>) => void
 };
 
@@ -26,6 +28,7 @@ export default function Chat({
   chatMessages,
   messageInputRef,
   isMessageInputDisabled,
+  profanityFilter,
   onSendMessage,
 }: ChatProps): ReactNode {
   const { session } = useSocket();
@@ -145,10 +148,10 @@ export default function Chat({
 
         return {
           ...message,
-          text: translatedMessage,
+          text: filterProfanity(translatedMessage, profanityFilter),
         };
       });
-  }, [chatMessages]);
+  }, [chatMessages, profanityFilter]);
 
   useEffect(() => {
     scrollToBottom();

@@ -1,4 +1,6 @@
 import { createId } from "@paralleldrive/cuid2";
+import { ServerInternalEvents } from "@/constants/socket/server-internal";
+import { publishRedisEvent } from "@/server/redis/publish";
 import { Conversation, ConversationProps } from "@/server/towers/classes/Conversation";
 import { ConversationParticipant } from "@/server/towers/classes/ConversationParticipant";
 import { User } from "@/server/towers/classes/User";
@@ -107,23 +109,51 @@ export class ConversationManager {
   }
 
   public static async markAsRead(conversationId: string, userId: string): Promise<void> {
-    const unreadConversationsCount: number = await ConversationManager.getUnreadConversationsCount(userId);
-    ConversationParticipantManager.markConversationAsRead(conversationId, userId, unreadConversationsCount);
+    ConversationParticipantManager.markConversationAsRead(conversationId, userId);
+
+    const unreadConversationsCount: number = ConversationManager.getUnreadConversationsCount(userId);
+
+    await publishRedisEvent(ServerInternalEvents.CONVERSATION_MARK_AS_READ, {
+      userId,
+      conversationId,
+      unreadConversationsCount,
+    });
   }
 
   public static async mute(conversationId: string, userId: string): Promise<void> {
-    const unreadConversationsCount: number = await ConversationManager.getUnreadConversationsCount(userId);
-    ConversationParticipantManager.muteConversationForUser(conversationId, userId, unreadConversationsCount);
+    ConversationParticipantManager.muteConversationForUser(conversationId, userId);
+
+    const unreadConversationsCount: number = ConversationManager.getUnreadConversationsCount(userId);
+
+    await publishRedisEvent(ServerInternalEvents.CONVERSATION_MUTE, {
+      userId,
+      conversationId,
+      unreadConversationsCount,
+    });
   }
 
   public static async unmute(conversationId: string, userId: string): Promise<void> {
-    const unreadConversationsCount: number = await ConversationManager.getUnreadConversationsCount(userId);
-    ConversationParticipantManager.unmuteConversationForUser(conversationId, userId, unreadConversationsCount);
+    ConversationParticipantManager.unmuteConversationForUser(conversationId, userId);
+
+    const unreadConversationsCount: number = ConversationManager.getUnreadConversationsCount(userId);
+
+    await publishRedisEvent(ServerInternalEvents.CONVERSATION_UNMUTE, {
+      userId,
+      conversationId,
+      unreadConversationsCount,
+    });
   }
 
   public static async remove(conversationId: string, userId: string): Promise<void> {
-    const unreadConversationsCount: number = await ConversationManager.getUnreadConversationsCount(userId);
-    ConversationParticipantManager.removeConversationForUser(conversationId, userId, unreadConversationsCount);
+    ConversationParticipantManager.removeConversationForUser(conversationId, userId);
+
+    const unreadConversationsCount: number = ConversationManager.getUnreadConversationsCount(userId);
+
+    await publishRedisEvent(ServerInternalEvents.CONVERSATION_REMOVE, {
+      userId,
+      conversationId,
+      unreadConversationsCount,
+    });
   }
 
   public static async restore(conversationId: string, userId: string): Promise<void> {
@@ -131,7 +161,15 @@ export class ConversationManager {
       (conversation: Conversation) => conversation.id === conversationId,
     );
     if (!conversation) return;
-    const unreadConversationsCount: number = await ConversationManager.getUnreadConversationsCount(userId);
-    ConversationParticipantManager.restoreConversationForUser(conversation, userId, unreadConversationsCount);
+
+    ConversationParticipantManager.restoreConversationForUser(conversation, userId);
+
+    const unreadConversationsCount: number = ConversationManager.getUnreadConversationsCount(userId);
+
+    await publishRedisEvent(ServerInternalEvents.CONVERSATION_RESTORE, {
+      userId,
+      conversation: conversation.toPlainObject(),
+      unreadConversationsCount,
+    });
   }
 }

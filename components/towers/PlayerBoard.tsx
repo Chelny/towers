@@ -30,6 +30,7 @@ import { PiecePlainObject } from "@/server/towers/game/Piece";
 import { PowerBarItemPlainObject, PowerBarPlainObject } from "@/server/towers/game/PowerBar";
 import { TowersPieceBlockPlainObject } from "@/server/towers/game/TowersPieceBlock";
 import { isTestMode } from "@/server/towers/utils/test";
+import { Language, languages } from "@/translations/languages";
 
 type PlayerBoardProps = {
   roomId: string
@@ -99,6 +100,9 @@ export default function PlayerBoard({
     seatedTeamsCount < (isTestMode() ? MIN_ACTIVE_TEAMS_REQUIRED_TEST : MIN_ACTIVE_TEAMS_REQUIRED);
   const isPlayerWaitingForNextGame: boolean =
     gameState === GameState.PLAYING && !!seat.occupiedByPlayer && !isCurrentUserSeat && !isReady && !isPlaying;
+  const currentLanguage: Language | undefined = languages.find(
+    (language: Language) => language.locale === session?.user.language,
+  );
 
   useEffect(() => {
     // Set focus on correct seat when game starts
@@ -321,38 +325,61 @@ export default function PlayerBoard({
     <div className={clsx("flex flex-col", isOpponentBoard && "w-player-board-opponent-width")}>
       <div
         className={clsx(
-          "flex justify-start items-center gap-2 px-1 mx-1 cursor-pointer",
-          !isOpponentBoard ? "w-[175px] h-6" : "h-4",
-          !isOpponentBoard && isReversed && "ms-2 me-13",
-          !isOpponentBoard && !isReversed && "ms-16",
+          "grid gap-1",
+          !isOpponentBoard ? "h-6" : "h-4",
+          !isOpponentBoard &&
+            isReversed &&
+            "grid-cols-[1fr_max-content] ps-0 pe-2 rtl:grid-cols-[max-content_1fr] rtl:ps-2 rtl:pe-0",
+          !isOpponentBoard &&
+            !isReversed &&
+            "grid-cols-[max-content_1fr] ps-2 pe-0 rtl:grid-cols-[1fr_max-content] rtl:ps-0 rtl:pe-2",
+          isOpponentBoard && isReversed && "grid-cols-1 ps-0 pe-1.5 rtl:grid-cols-1 rtl:ps-1.5 rtl:pe-0",
+          isOpponentBoard && !isReversed && "grid-cols-1 ps-1.5 pe-0 rtl:grid-cols-1 rtl:ps-0 rtl:pe-1.5",
         )}
-        role="button"
-        tabIndex={0}
-        onDoubleClick={() => (seat.occupiedByPlayer ? handleOpenPlayerInfoModal(seat.occupiedByPlayer) : undefined)}
+        dir={currentLanguage?.rtl ? "rtl" : "ltr"}
       >
-        {seat.occupiedByPlayerId && (
-          <>
-            <div
-              className={clsx(isOpponentBoard ? "w-4 h-4" : "w-6 h-6")}
-              onDoubleClick={(event: MouseEvent) => event.stopPropagation()}
-            >
-              <UserAvatar
-                user={seat.occupiedByPlayer?.user}
-                dimensions={isOpponentBoard ? "w-4 h-4" : "w-6 h-6"}
-                size={isOpponentBoard ? 16 : 24}
-              />
-            </div>
-            <div
-              className={clsx(
-                "truncate select-none",
-                isOpponentBoard ? "text-sm" : "text-base",
-                board?.isHooDetected && "text-red-500 dark:text-red-400",
-              )}
-            >
-              {seat.occupiedByPlayer?.user.username}
-            </div>
-          </>
-        )}
+        <div
+          className={clsx(
+            "w-player-board-username-empty-space-width",
+            isOpponentBoard && "hidden",
+            isReversed ? "order-2 rtl:order-1" : "order-1 rtl:order-2",
+            "before:content-[' ']",
+          )}
+        />
+        <div
+          className={clsx(
+            "flex items-center w-player-board-username-width truncate cursor-pointer",
+            isOpponentBoard ? "gap-1" : "gap-2",
+            isReversed ? "order-1 ms-1 me-0.5 rtl:order-2" : "order-2 ms-0.5 me-1 rtl:order-1",
+          )}
+          role="button"
+          tabIndex={0}
+          onDoubleClick={() => (seat.occupiedByPlayer ? handleOpenPlayerInfoModal(seat.occupiedByPlayer) : undefined)}
+        >
+          {seat.occupiedByPlayerId && (
+            <>
+              <div
+                className={clsx("shrink-0", isOpponentBoard ? "w-4 h-4" : "w-6 h-6")}
+                onDoubleClick={(event: MouseEvent) => event.stopPropagation()}
+              >
+                <UserAvatar
+                  user={seat.occupiedByPlayer?.user}
+                  dimensions={isOpponentBoard ? "w-4 h-4" : "w-6 h-6"}
+                  size={isOpponentBoard ? 16 : 24}
+                />
+              </div>
+              <div
+                className={clsx(
+                  "truncate select-none",
+                  isOpponentBoard ? "text-sm" : "text-base",
+                  board?.isHooDetected && "text-red-500 dark:text-red-400",
+                )}
+              >
+                {seat.occupiedByPlayer?.user.username}
+              </div>
+            </>
+          )}
+        </div>
       </div>
       <div
         className={clsx(

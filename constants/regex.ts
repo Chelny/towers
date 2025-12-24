@@ -23,7 +23,7 @@ export const EMAIL_PATTERN =
  * - No _ or . at the beginning or at the end
  * - No __ or _. or ._ or ..
  */
-export const USERNAME_PATTERN = /^(?=[a-zA-Z0-9._]{4,32}$)(?!.*[_.]{2})[^_.].*[^_.]$/;
+export const USERNAME_PATTERN = /^(?=[a-zA-Z0-9._-]{4,32}$)(?!.*[_.]{2})[^_.].*[^_.]$/;
 
 /**
  * Password Pattern

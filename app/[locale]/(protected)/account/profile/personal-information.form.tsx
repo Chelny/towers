@@ -6,10 +6,11 @@ import { ErrorContext } from "@better-fetch/fetch";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Value, ValueError } from "@sinclair/typebox/value";
 import {
-  ProfileFormValidationErrors,
-  ProfilePayload,
+  PersonalInformationFormValidationErrors,
+  PersonalInformationPayload,
   profileSchema,
-} from "@/app/[locale]/(protected)/account/profile/profile.schema";
+} from "@/app/[locale]/(protected)/account/profile/personal-information.schema";
+import ProfileSectionHeader from "@/components/ProfileSectionHeader";
 import AlertMessage from "@/components/ui/AlertMessage";
 import Button from "@/components/ui/Button";
 import Calendar from "@/components/ui/Calendar";
@@ -20,12 +21,12 @@ import { authClient } from "@/lib/auth-client";
 import { Session } from "@/lib/auth-client";
 import { logger } from "@/lib/logger";
 
-type ProfileFormProps = {
+type PersonalInformationFormProps = {
   session: Session | null
   isNewUser?: boolean
 };
 
-export function ProfileForm({ session, isNewUser }: ProfileFormProps): ReactNode {
+export function PersonalInformationForm({ session, isNewUser }: PersonalInformationFormProps): ReactNode {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [formState, setFormState] = useState<ApiResponse>(INITIAL_FORM_STATE);
@@ -35,18 +36,23 @@ export function ProfileForm({ session, isNewUser }: ProfileFormProps): ReactNode
     event.preventDefault();
 
     const formData: FormData = new FormData(event.currentTarget);
-    const payload: ProfilePayload = {
+    const payload: PersonalInformationPayload = {
+      image: formData.get("image") as string,
       name: formData.get("name") as string,
       birthdate: formData.get("birthdate") as string,
       username: formData.get("username") as string,
-      image: formData.get("image") as string,
     };
 
     const errors: ValueError[] = Array.from(Value.Errors(profileSchema, payload));
-    const errorMessages: ProfileFormValidationErrors = {};
+    const errorMessages: PersonalInformationFormValidationErrors = {};
 
     for (const error of errors) {
       switch (error.path.replace("/", "")) {
+        case "image":
+          if (errorMessages.image) {
+            errorMessages.image = t({ message: "The image is invalid." });
+          }
+          break;
         case "name":
           errorMessages.name = t({ message: "The name is invalid." });
           break;
@@ -58,13 +64,8 @@ export function ProfileForm({ session, isNewUser }: ProfileFormProps): ReactNode
         case "username":
           errorMessages.username = t({ message: "The username is invalid." });
           break;
-        case "image":
-          if (errorMessages.image) {
-            errorMessages.image = t({ message: "The image is invalid." });
-          }
-          break;
         default:
-          logger.warn(`Profile Validation: Unknown error at ${error.path}`);
+          logger.warn(`Personal Information Validation: Unknown error at ${error.path}`);
           break;
       }
     }
@@ -78,10 +79,10 @@ export function ProfileForm({ session, isNewUser }: ProfileFormProps): ReactNode
     } else {
       await authClient.updateUser(
         {
+          // image: payload.image ? convertImageToBase64(payload.image) : null,
           name: payload.name,
           birthdate: payload.birthdate ? new Date(payload.birthdate) : undefined,
           ...(payload.username !== session?.user.username ? { username: payload.username } : {}),
-          // image: payload.image ? convertImageToBase64(payload.image) : null,
         },
         {
           onRequest: () => {
@@ -117,11 +118,12 @@ export function ProfileForm({ session, isNewUser }: ProfileFormProps): ReactNode
   };
 
   return (
-    <>
-      <h2 className="text-lg font-semibold mb-4">
-        <Trans>Profile Information</Trans>
-      </h2>
-      <form className="w-full" noValidate onSubmit={handleUpdateUser}>
+    <ProfileSectionHeader
+      title={<Trans>Personal Information</Trans>}
+      description={<Trans>Update your personal details here.</Trans>}
+      isNewUser={isNewUser}
+    >
+      <form className="grid w-full" noValidate onSubmit={handleUpdateUser}>
         {formState?.message && (
           <AlertMessage type={formState.success ? "success" : "error"}>{formState.message}</AlertMessage>
         )}
@@ -160,17 +162,22 @@ export function ProfileForm({ session, isNewUser }: ProfileFormProps): ReactNode
           autoComplete="off"
           defaultValue={session?.user?.username}
           required
+          dir="ltr"
           dataTestId="profile_input-text_username"
           description={t({
             message:
-              "Username must be between 5 and 16 characters long and can contain digits, periods, and underscores.",
+              "Username must be between 4 and 32 characters long and can contain digits, periods, and underscores.",
           })}
           errorMessage={formState?.error?.username}
         />
-        <Button type="submit" className="w-full" disabled={isLoading}>
+        <Button
+          type="submit"
+          className={!!isNewUser ? "w-full" : "max-md:w-full md:place-self-end"}
+          disabled={isLoading}
+        >
           {!!isNewUser ? t({ message: "Complete Registration" }) : t({ message: "Update Profile" })}
         </Button>
       </form>
-    </>
+    </ProfileSectionHeader>
   );
 }

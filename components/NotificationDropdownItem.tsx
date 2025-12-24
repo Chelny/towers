@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useLingui } from "@lingui/react/macro";
 import clsx from "clsx/lite";
@@ -12,7 +11,6 @@ import { ROUTE_TOWERS } from "@/constants/routes";
 import { ClientToServerEvents } from "@/constants/socket/client-to-server";
 import { useModal } from "@/context/ModalContext";
 import { useSocket } from "@/context/SocketContext";
-import { useOnScreen } from "@/hooks/useOnScreen";
 import { NotificationPlainObject } from "@/server/towers/classes/Notification";
 
 type NotificationDropdownItemProps = {
@@ -24,9 +22,8 @@ export const NotificationDropdownItem = ({ notification }: NotificationDropdownI
   const { i18n, t } = useLingui();
   const { openModal, closeModal } = useModal();
   const { socketRef } = useSocket();
-  const [ref, isInView] = useOnScreen<HTMLLIElement>();
 
-  const setNotificationLabel = (notification: NotificationPlainObject): string => {
+  const setNotificationLabel = (): string => {
     switch (notification.type) {
       case NotificationType.TABLE_INVITE:
         return i18n._("Invitation to table #{tableNumber}", {
@@ -54,15 +51,21 @@ export const NotificationDropdownItem = ({ notification }: NotificationDropdownI
     }
   };
 
-  const openNotificationModal = async (notification: NotificationPlainObject): Promise<void> => {
+  const openNotificationModal = (): void => {
     switch (notification.type) {
       case NotificationType.TABLE_INVITE:
         if (!notification.tableInvitation) return;
         openModal(TableInvitationModal, {
           tableInvitation: notification.tableInvitation,
-          onAcceptInvitation: (roomId: string, tableId: string) => {
-            router.push(`${ROUTE_TOWERS.PATH}?room=${roomId}&table=${tableId}`);
+          onAcceptInvitation: (roomId: string, tableId: string): void => {
             closeModal();
+            router.push(`${ROUTE_TOWERS.PATH}?room=${roomId}&table=${tableId}`);
+          },
+          onCancel: (): void => {
+            handleRemoveNotification();
+          },
+          onClose: (): void => {
+            handleMarkNotificationAsRead();
           },
         });
         break;
@@ -80,6 +83,9 @@ export const NotificationDropdownItem = ({ notification }: NotificationDropdownI
                 username: notification.tableInvitation.inviteePlayer.user.username,
               }),
           testId: "table-invite-declined",
+          onClose: (): void => {
+            handleMarkNotificationAsRead();
+          },
         });
         break;
 
@@ -92,33 +98,32 @@ export const NotificationDropdownItem = ({ notification }: NotificationDropdownI
             host: notification.bootedFromTable.table.hostPlayer.user.username,
           }),
           testId: "booted-user",
+          onClose: (): void => {
+            handleMarkNotificationAsRead();
+          },
         });
         break;
     }
   };
 
-  const handleMarkNotificationAsRead = async (): Promise<void> => {
-    socketRef.current?.emit(ClientToServerEvents.NOTIFICATION_MARK_AS_READ, { notificationId: notification.id });
+  const handleMarkNotificationAsRead = (): void => {
+    if (!notification.readAt) {
+      socketRef.current?.emit(ClientToServerEvents.NOTIFICATION_MARK_AS_READ, { notificationId: notification.id });
+    }
   };
 
-  const handleRemoveNotification = async (): Promise<void> => {
+  const handleRemoveNotification = (): void => {
     socketRef.current?.emit(ClientToServerEvents.NOTIFICATION_DELETE, { notificationId: notification.id });
   };
 
-  useEffect(() => {
-    if (isInView && !notification.readAt) {
-      handleMarkNotificationAsRead();
-    }
-  }, [isInView, notification]);
-
   return (
-    <li ref={ref} className={clsx("flex justify-between items-center gap-2 w-full", "hover:bg-slate-700")}>
+    <li className={clsx("flex justify-between items-center gap-2 w-full", "hover:bg-slate-700")}>
       <button
         type="button"
         className={clsx("flex-1 px-2 py-1 text-start", notification.readAt ? "font-normal" : "font-semibold")}
-        onClick={() => openNotificationModal(notification)}
+        onClick={() => openNotificationModal()}
       >
-        {setNotificationLabel(notification)}
+        {setNotificationLabel()}
       </button>
 
       <button

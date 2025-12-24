@@ -3,7 +3,7 @@ import { betterAuth, User as BetterAuthUser } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { nextCookies } from "better-auth/next-js";
 import { admin, customSession, magicLink, openAPI, username } from "better-auth/plugins";
-import { Account, User, UserRole, WebsiteTheme } from "db/browser";
+import { Account, User, UserRole } from "db/browser";
 import { APP_CONFIG, APP_PREFIX } from "@/constants/app";
 import { getAccountsByUserId } from "@/data/account";
 import { getUserById } from "@/data/user";
@@ -91,10 +91,6 @@ export const auth = betterAuth({
       role: {
         type: "string",
         required: false,
-      },
-      theme: {
-        type: "string",
-        defaultValue: WebsiteTheme.SYSTEM,
       },
       banned: {
         type: "boolean",
@@ -195,6 +191,9 @@ export const auth = betterAuth({
               role: UserRole.USER,
             },
           };
+        },
+        after: async (user) => {
+          await prisma.userSettings.create({ data: { id: user.id } });
         },
       },
     },

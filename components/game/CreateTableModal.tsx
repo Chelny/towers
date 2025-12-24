@@ -71,7 +71,7 @@ export default function CreateTableModal({ roomId, onCreateTableSuccess, onCance
     }
   };
 
-  const handleCreateTable = async (body: CreateTablePayload): Promise<void> => {
+  const handleCreateTable = (body: CreateTablePayload): void => {
     setIsSubmitting(true);
 
     socketRef.current?.emit(

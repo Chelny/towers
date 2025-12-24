@@ -29,16 +29,17 @@ export class NotificationManager {
   // ---------- Notification Actions ------------------------------
 
   public static getAllByPlayerId(playerId: string): Notification[] {
-    return this.all().filter((n: Notification) => n.playerId === playerId);
+    return this.all().filter((notification: Notification) => notification.playerId === playerId);
   }
 
-  public static async markAsRead(notificationId: string): Promise<void> {
+  public static async markAsRead(notificationId: string, userId: string): Promise<void> {
     const notification: Notification | undefined = this.get(notificationId);
     if (!notification) return undefined;
 
     notification.markAsRead();
 
     await publishRedisEvent(ServerInternalEvents.NOTIFICATION_MARK_AS_READ, {
+      userId,
       notification: notification.toPlainObject(),
     });
   }

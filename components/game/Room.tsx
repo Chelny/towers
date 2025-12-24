@@ -1,14 +1,15 @@
 "use client";
 
-import { KeyboardEvent, MouseEvent, ReactNode, useEffect, useRef, useState } from "react";
+import { KeyboardEvent, ReactNode, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Trans } from "@lingui/react/macro";
 import clsx from "clsx/lite";
-import { RoomLevel } from "db/browser";
+import { ProfanityFilter, RoomLevel } from "db/browser";
 import { Socket } from "socket.io-client";
 import useSWR from "swr";
 import CreateTableModal from "@/components/game/CreateTableModal";
+import GameOptionsModal from "@/components/game/GameOptionsModal";
 import ChatSkeleton from "@/components/skeleton/ChatSkeleton";
 import PlayersListSkeleton from "@/components/skeleton/PlayersListSkeleton";
 import RoomHeaderSkeleton from "@/components/skeleton/RoomHeaderSkeleton";
@@ -70,6 +71,7 @@ export default function Room(): ReactNode {
   const messageInputRef = useRef<InputImperativeHandle>(null);
   const [isJoined, setIsJoined] = useState<boolean>(false);
   const [room, setRoom] = useState<RoomPlainObject>();
+  const [profanityFilter, setProfanityFilter] = useState<ProfanityFilter>(ProfanityFilter.WEAK);
 
   const {
     data: roomResponse,
@@ -81,6 +83,15 @@ export default function Room(): ReactNode {
     revalidateOnMount: false,
     revalidateOnReconnect: true,
   });
+
+  const { data: settingsResponse } = useSWR<ApiResponse<{ profanityFilter: ProfanityFilter }>>(
+    `/api/users/${session?.user.id}/settings`,
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+    },
+  );
 
   useEffect(() => {
     if (room && !joinedRoomSidebarRef.current.has(room.id)) {
@@ -94,6 +105,12 @@ export default function Room(): ReactNode {
       setRoom(roomResponse.data);
     }
   }, [roomResponse]);
+
+  useEffect(() => {
+    if ((settingsResponse?.success, settingsResponse?.data)) {
+      setProfanityFilter(settingsResponse.data.profanityFilter);
+    }
+  }, [settingsResponse?.data]);
 
   useEffect(() => {
     if (!isConnected || !socketRef.current) return;
@@ -318,6 +335,13 @@ export default function Room(): ReactNode {
     }
   };
 
+  const handleOpenOptionsModal = () => {
+    openModal(GameOptionsModal, {
+      profanityFilter,
+      onSetProfanityFilter: (value: ProfanityFilter) => setProfanityFilter(value),
+    });
+  };
+
   const handleExitRoom = (): void => {
     socketRef.current?.emit(ClientToServerEvents.ROOM_LEAVE, { roomId }, (response: SocketCallback<void>) => {
       if (response.success) {
@@ -405,7 +429,7 @@ export default function Room(): ReactNode {
                 </div>
               </>
             )}
-            <Button className="w-full py-2 mb-2" disabled onClick={(_: MouseEvent<HTMLButtonElement>) => {}}>
+            <Button className="w-full py-2 mb-2" onClick={handleOpenOptionsModal}>
               <Trans>Options</Trans>
             </Button>
             <Button className="w-full py-2 mb-2" onClick={handleExitRoom}>
@@ -477,6 +501,7 @@ export default function Room(): ReactNode {
                   chatMessages={room?.chatMessages}
                   messageInputRef={messageInputRef}
                   isMessageInputDisabled={!isConnected}
+                  profanityFilter={profanityFilter}
                   onSendMessage={handleSendMessage}
                 />
               </div>

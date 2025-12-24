@@ -12,6 +12,7 @@ import { TbTower } from "react-icons/tb";
 import { Socket } from "socket.io-client";
 import ConversationsModal from "@/components/ConversationsModal";
 import SidebarMenuItem from "@/components/SidebarMenuItem";
+import ThemeToggleButton from "@/components/ThemeToggleButton";
 import UserAvatar from "@/components/UserAvatar";
 import { ROUTE_DELETE_ACCOUNT, ROUTE_PROFILE, ROUTE_SETTINGS, ROUTE_TOWERS } from "@/constants/routes";
 import { ClientToServerEvents } from "@/constants/socket/client-to-server";
@@ -33,7 +34,7 @@ export default function Sidebar(): ReactNode {
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [gameMenuItems, setGameMenuItems] = useState<SidebarMenuLinkItem[]>([]);
   const [notifications, setNotifications] = useState<NotificationPlainObject[]>([]);
-  const [hasUnreadConversations, setHasUnreadConversations] = useState<boolean>(false);
+  const [isShowUnreadConversationsBadge, setIsShowUnreadConversationsBadge] = useState<boolean>(false);
   const { isOpen: isConversationsModalOpen } = useConversations();
 
   const getAccountAccordionLinks = (): SidebarMenuLinkItem[] => {
@@ -93,9 +94,9 @@ export default function Sidebar(): ReactNode {
         }
       });
 
-      socketRef.current?.emit(ClientToServerEvents.CONVERSATIONS_UNREAD, {}, (response: SocketCallback<number>) => {
+      socket.emit(ClientToServerEvents.CONVERSATIONS_UNREAD, {}, (response: SocketCallback<number>) => {
         if (response.success && response.data) {
-          setHasUnreadConversations(response.data > 0);
+          setIsShowUnreadConversationsBadge(response.data > 0);
         }
       });
     };
@@ -105,16 +106,20 @@ export default function Sidebar(): ReactNode {
     }: {
       unreadConversationsCount: number
     }): void => {
-      setHasUnreadConversations(unreadConversationsCount > 0);
+      setIsShowUnreadConversationsBadge(unreadConversationsCount > 0);
     };
 
     const handleUpdateNotification = ({ notification }: { notification: NotificationPlainObject }): void => {
-      setNotifications((prev: NotificationPlainObject[]) => [...prev, notification]);
+      setNotifications((prev: NotificationPlainObject[]) =>
+        prev.some((n: NotificationPlainObject) => n.id === notification.id)
+          ? prev.map((n: NotificationPlainObject) => (n.id === notification.id ? { ...n, ...notification } : n))
+          : [...prev, notification],
+      );
     };
 
     const handleDeleteNotification = ({ notificationId }: { notificationId: string }): void => {
       setNotifications((prev: NotificationPlainObject[]) =>
-        prev.filter((n: NotificationPlainObject) => n.id !== notificationId),
+        prev.filter((notification: NotificationPlainObject) => notification.id !== notificationId),
       );
     };
 
@@ -173,24 +178,26 @@ export default function Sidebar(): ReactNode {
         isExpanded ? "w-72 items-start" : "w-24 items-center",
       )}
     >
-      {/* User image and collapse icon */}
-      <div className={clsx("flex items-center gap-2", isExpanded ? "w-full" : "w-auto")}>
-        <div className={clsx("flex-1 flex items-center gap-4", isExpanded && "ps-2")}>
-          <UserAvatar user={session?.user} />
-          {isExpanded && <span className="font-medium">{session?.user.name}</span>}
+      <div>
+        {/* User image and collapse icon */}
+        <div className={clsx("flex items-center gap-2", isExpanded ? "w-full" : "w-auto")}>
+          <div className={clsx("flex-1 flex items-center gap-4", isExpanded && "ps-2")}>
+            <UserAvatar user={session?.user} />
+            {isExpanded && <span className="font-medium">{session?.user.name}</span>}
+          </div>
+          <div className={isExpanded ? "flex" : "hidden"}>
+            <button type="button" aria-label={t({ message: "Collapse sidebar" })} onClick={() => setIsExpanded(false)}>
+              <RiSidebarFoldFill className={clsx("w-8 h-8 text-white/70", "rtl:-scale-x-100")} aria-hidden="true" />
+            </button>
+          </div>
         </div>
-        <div className={isExpanded ? "flex" : "hidden"}>
-          <button type="button" aria-label={t({ message: "Collapse sidebar" })} onClick={() => setIsExpanded(false)}>
-            <RiSidebarFoldFill className={clsx("w-8 h-8 text-white/70", "rtl:-scale-x-100")} aria-hidden="true" />
+
+        {/* Expand icon */}
+        <div className={isExpanded ? "hidden" : "flex justify-center items-center w-full h-8"}>
+          <button type="button" aria-label={t({ message: "Expand sidebar" })} onClick={() => setIsExpanded(true)}>
+            <RiSidebarUnfoldFill className={clsx("w-8 h-8 text-white/70", "rtl:-scale-x-100")} aria-hidden="true" />
           </button>
         </div>
-      </div>
-
-      {/* Expand icon */}
-      <div className={isExpanded ? "hidden" : "flex justify-center items-center w-full h-8"}>
-        <button type="button" aria-label={t({ message: "Expand sidebar" })} onClick={() => setIsExpanded(true)}>
-          <RiSidebarUnfoldFill className={clsx("w-8 h-8 text-white/70", "rtl:-scale-x-100")} aria-hidden="true" />
-        </button>
       </div>
 
       <hr className="w-full border-t border-t-slate-600" />
@@ -211,7 +218,7 @@ export default function Sidebar(): ReactNode {
           Icon={BsChatLeftDots}
           ariaLabel={t({ message: "Conversations" })}
           isExpanded={isExpanded}
-          isBadgeVisible={hasUnreadConversations}
+          isBadgeVisible={isShowUnreadConversationsBadge}
           isModalOpen={isConversationsModalOpen}
           onClick={handleOpenConversationsModal}
         >
@@ -248,11 +255,9 @@ export default function Sidebar(): ReactNode {
 
       <hr className="w-full border-t border-t-slate-600" />
 
-      {/* Sign out */}
-      <nav
-        className="self-end flex flex-col items-center w-full cursor-pointer"
-        aria-label={t({ message: "Settings" })}
-      >
+      {/* Settings and Sign out */}
+      <nav className="self-end flex flex-col items-center w-full" aria-label={t({ message: "Settings" })}>
+        <ThemeToggleButton isExpanded={isExpanded}></ThemeToggleButton>
         <SidebarMenuItem
           id="sign-out"
           Icon={PiSignOut}

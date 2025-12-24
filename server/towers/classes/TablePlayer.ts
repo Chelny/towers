@@ -25,7 +25,7 @@ export interface TablePlayerPlainObject {
 export class TablePlayer {
   public readonly id: string;
   public tableId: string;
-  public _table: Table;
+  private _table: Table;
   public playerId: string;
   private _player: Player;
   public createdAt: Date;

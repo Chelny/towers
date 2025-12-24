@@ -13,6 +13,7 @@ import {
   SetPasswordPayload,
   setPasswordSchema,
 } from "@/app/[locale]/(protected)/account/profile/change-password.schema";
+import ProfileSectionHeader from "@/components/ProfileSectionHeader";
 import AlertMessage from "@/components/ui/AlertMessage";
 import Button from "@/components/ui/Button";
 import Checkbox from "@/components/ui/Checkbox";
@@ -184,11 +185,11 @@ export function ChangePasswordForm({ session }: ChangePasswordFormProps): ReactN
   }, [session]);
 
   return (
-    <>
-      <h2 className="text-lg font-semibold mb-4">
-        <Trans>Change/Set Password</Trans>
-      </h2>
-      <form className="w-full" noValidate onSubmit={handleChangeSetPassword}>
+    <ProfileSectionHeader
+      title={<Trans>Password</Trans>}
+      description={<Trans>Enter your current password to make an update.</Trans>}
+    >
+      <form className="grid w-full" noValidate onSubmit={handleChangeSetPassword}>
         {formState?.message && (
           <AlertMessage type={formState.success ? "success" : "error"}>{formState.message}</AlertMessage>
         )}
@@ -245,10 +246,10 @@ export function ChangePasswordForm({ session }: ChangePasswordFormProps): ReactN
             />
           )}
         </>
-        <Button type="submit" className="w-full" disabled={isLoading}>
+        <Button type="submit" className="max-md:w-full md:place-self-end" disabled={isLoading}>
           {isUserPasswordSet ? t({ message: "Change Password" }) : t({ message: "Set Password" })}
         </Button>
       </form>
-    </>
+    </ProfileSectionHeader>
   );
 }

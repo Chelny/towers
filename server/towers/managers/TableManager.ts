@@ -325,7 +325,13 @@ export class TableManager {
 
     const isAlreadyInvited: boolean = TableInvitationManager.hasPendingInvitationForTable(table.id, inviteeId);
     if (isAlreadyInvited) {
-      logger.debug(`User ${invitee.player?.user?.username} already invited`);
+      logger.debug(`User ${invitee.player?.user?.username} already invited.`);
+      return;
+    }
+
+    // Invitee has declined all invites
+    if (invitee.player.user.declineTableInvitations) {
+      logger.debug(`Invite blocked by ${invitee.player?.user?.username} preference.`);
       return;
     }
 

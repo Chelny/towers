@@ -3,7 +3,7 @@ import { headers } from "next/headers";
 import { Metadata } from "next/types";
 import { I18n } from "@lingui/core";
 import { Trans } from "@lingui/react/macro";
-import { ProfileForm } from "@/app/[locale]/(protected)/account/profile/profile.form";
+import { PersonalInformationForm } from "@/app/[locale]/(protected)/account/profile/personal-information.form";
 import { initLingui } from "@/app/init-lingui";
 import Anchor from "@/components/ui/Anchor";
 import { ROUTE_GAMES, ROUTE_NEW_USER } from "@/constants/routes";
@@ -29,7 +29,7 @@ export default async function NewUser({ params }: NewUserProps): Promise<ReactNo
   return (
     <>
       <h1 className="mb-4 text-3xl">{i18n._(ROUTE_NEW_USER.TITLE)}</h1>
-      <ProfileForm session={session} isNewUser />
+      <PersonalInformationForm session={session} isNewUser />
       <div className="mt-4 text-center">
         <Anchor href={ROUTE_GAMES.PATH}>
           <Trans>Skip this step</Trans>

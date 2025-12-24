@@ -20,7 +20,6 @@ model User {
   image                    String?
   language                 String                    @default("en")
   role                     UserRole                  @default(USER)
-  theme                    WebsiteTheme              @default(SYSTEM)
   banned                   Boolean?
   banReason                String?                   @map("ban_reason")
   banExpires               DateTime?                 @map("ban_expires_at")
@@ -31,6 +30,7 @@ model User {
   mutedByUsers             UserMute[]                @relation("UserMuteMuted")
   conversationParticipants ConversationParticipant[]
   sentInstantMessages      InstantMessage[]          @relation("InstantMessageSender")
+  userSettings             UserSettings?
   towersPlayer             TowersPlayer?
   createdAt                DateTime                  @default(now()) @map("created_at")
   updatedAt                DateTime                  @updatedAt @map("updated_at")
@@ -118,6 +118,18 @@ model RateLimit {
   @@schema("public")
 }
 
+model UserSettings {
+  id              String          @id @map("user_id")
+  user            User            @relation(fields: [id], references: [id], onDelete: Cascade)
+  theme           WebsiteTheme    @default(SYSTEM)
+  profanityFilter ProfanityFilter @default(WEAK)
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+
+  @@map("user_settings")
+  @@schema("public")
+}
+
 model UserMute {
   id          String   @id @default(cuid(2))
   muterUserId String   @map("muter_user_id")
@@ -192,6 +204,15 @@ enum WebsiteTheme {
   DARK   @map("DARK")
 
   @@map("website_theme")
+  @@schema("public")
+}
+
+enum ProfanityFilter {
+  STRONG @map("STRONG")
+  WEAK   @map("WEAK")
+  NONE   @map("NONE")
+
+  @@map("profanity_filter")
   @@schema("public")
 }
 

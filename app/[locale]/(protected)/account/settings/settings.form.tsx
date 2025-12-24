@@ -5,8 +5,6 @@ import { usePathname, useRouter } from "next/navigation";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Value, ValueError } from "@sinclair/typebox/value";
 import clsx from "clsx/lite";
-import { WebsiteTheme } from "db/browser";
-import { useTheme } from "next-themes";
 import {
   SettingsFormValidationErrors,
   SettingsPayload,
@@ -31,7 +29,6 @@ export function SettingsForm({ session }: SettingsFormProps): ReactNode {
   const { i18n, t } = useLingui();
   const router = useRouter();
   const pathname: string = usePathname();
-  const { setTheme } = useTheme();
 
   const handleUpdateUser = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
@@ -39,7 +36,6 @@ export function SettingsForm({ session }: SettingsFormProps): ReactNode {
     const formData: FormData = new FormData(event.currentTarget);
     const payload: SettingsPayload = {
       language: formData.get("language") as SupportedLocales,
-      theme: formData.get("theme") as WebsiteTheme,
     };
 
     const errors: ValueError[] = Array.from(Value.Errors(settingsSchema, payload));
@@ -49,9 +45,6 @@ export function SettingsForm({ session }: SettingsFormProps): ReactNode {
       switch (error.path.replace("/", "")) {
         case "language":
           errorMessages.language = t({ message: "The language is invalid." });
-          break;
-        case "theme":
-          errorMessages.theme = t({ message: "The theme is invalid." });
           break;
         default:
           logger.warn(`Settings Validation: Unknown error at ${error.path}`);
@@ -68,20 +61,16 @@ export function SettingsForm({ session }: SettingsFormProps): ReactNode {
     } else {
       setIsLoading(true);
 
-      await fetch("/api/account/settings", {
-        method: "POST",
+      await fetch(`/api/users/${session?.user.id}`, {
+        method: "PATCH",
         body: JSON.stringify({
           language: payload.language,
-          theme: payload.theme,
         }),
       })
         .then(async (response) => {
           const data: ApiResponse = await response.json();
           setIsLoading(false);
           setFormState(data);
-
-          // Set theme dynamically
-          setTheme(payload.theme.toLowerCase());
 
           if (payload.language !== session?.user.language) {
             // Show form success message after page reload from language change
@@ -135,23 +124,6 @@ export function SettingsForm({ session }: SettingsFormProps): ReactNode {
                 <div>{language.flag}</div>
                 <div>{i18n._(language.getLabel())}</div>
               </div>
-            </Select.Option>
-          ))}
-        </Select>
-        <Select
-          id="theme"
-          label={t({ message: "Theme" })}
-          defaultValue={session?.user.theme ?? WebsiteTheme.SYSTEM}
-          required
-          dataTestId="settings_select_theme"
-        >
-          {Object.values(WebsiteTheme).map((theme: WebsiteTheme) => (
-            <Select.Option key={theme} value={theme}>
-              {theme === WebsiteTheme.LIGHT
-                ? t({ message: "Light" })
-                : theme === WebsiteTheme.DARK
-                  ? t({ message: "Dark" })
-                  : t({ message: "System" })}
             </Select.Option>
           ))}
         </Select>

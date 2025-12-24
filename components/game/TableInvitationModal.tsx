@@ -1,9 +1,9 @@
 "use client";
 
-import { ChangeEvent, InputEvent, ReactNode, useState } from "react";
+import { InputEvent, ReactNode, useState } from "react";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { RoomLevel } from "db/browser";
-import Checkbox from "@/components/ui/Checkbox";
+import DeclineAllInvitationsCheckbox from "@/components/game/DeclineAllInvitationsCheckbox";
 import Input from "@/components/ui/Input";
 import Modal from "@/components/ui/Modal";
 import { ClientToServerEvents } from "@/constants/socket/client-to-server";
@@ -15,14 +15,16 @@ type TableInvitationModalProps = {
   tableInvitation: TableInvitationPlainObject
   onAcceptInvitation: (roomId: string, tableId: string) => void
   onCancel: () => void
+  onClose: () => void
 };
 
 export default function TableInvitationModal({
   tableInvitation,
   onAcceptInvitation,
   onCancel,
+  onClose,
 }: TableInvitationModalProps): ReactNode {
-  const { socketRef } = useSocket();
+  const { isConnected, socketRef } = useSocket();
   const { t } = useLingui();
   const [reason, setReason] = useState<string>("");
   const [isDeclineAll, setIsDeclineAll] = useState<boolean>(false);
@@ -35,7 +37,7 @@ export default function TableInvitationModal({
 
   const handleAcceptInvitation = (): void => {
     socketRef.current?.emit(
-      ClientToServerEvents.TABLE_INVITATION_ACCEPTED,
+      ClientToServerEvents.TABLE_INVITATION_ACCEPT,
       { invitationId: tableInvitation.id },
       (response: SocketCallback<void>) => {
         if (response.success) {
@@ -48,7 +50,7 @@ export default function TableInvitationModal({
 
   const handleDeclineInvitation = (): void => {
     socketRef.current?.emit(
-      ClientToServerEvents.TABLE_INVITATION_DECLINED,
+      ClientToServerEvents.TABLE_INVITATION_DECLINE,
       {
         invitationId: tableInvitation.id,
         reason,
@@ -70,6 +72,7 @@ export default function TableInvitationModal({
       dataTestId="table-invitation"
       onConfirm={handleAcceptInvitation}
       onCancel={handleDeclineInvitation}
+      onClose={onClose}
     >
       <div className="flex flex-col gap-4">
         <div>
@@ -91,12 +94,10 @@ export default function TableInvitationModal({
             dataTestId="table-invitation_input-text_reason"
             onInput={(event: InputEvent<HTMLInputElement>) => setReason((event.target as HTMLInputElement).value)}
           />
-          <Checkbox
-            id="declineAll"
-            label={t({ message: "Decline All Invitations" })}
-            defaultChecked={isDeclineAll}
-            disabled
-            onChange={(event: ChangeEvent<HTMLInputElement>) => setIsDeclineAll(event.target.checked)}
+          <DeclineAllInvitationsCheckbox
+            isDeclineAll={isDeclineAll}
+            isDisabled={!isConnected}
+            onToggleDeclineAll={(value: boolean) => setIsDeclineAll(value)}
           />
         </div>
       </div>

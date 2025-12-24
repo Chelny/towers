@@ -1,10 +1,10 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { WebsiteTheme } from "db/browser";
 import { vi } from "vitest";
 import { SettingsForm } from "@/app/[locale]/(protected)/account/settings/settings.form";
 import { mockFetch, mockFetchResponse } from "@/test/mocks/fetch";
 import { mockUseRouter } from "@/test/mocks/router";
 import { mockSession } from "@/test/mocks/session";
+import { mockUser1 } from "@/test/mocks/user";
 
 vi.mock("next/navigation", () => ({
   usePathname: vi.fn(() => "/en/account/settings"),
@@ -24,7 +24,6 @@ describe("Settings Form", () => {
     render(<SettingsForm session={mockSession} />);
 
     expect(screen.getByTestId("settings_select_language")).toBeInTheDocument();
-    expect(screen.getByTestId("settings_select_theme")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Update Settings/i })).toBeInTheDocument();
   });
 
@@ -40,15 +39,13 @@ describe("Settings Form", () => {
 
     fireEvent.click(screen.getByTestId("settings_select_language"));
     fireEvent.click(screen.getByRole("option", { name: /French/i }));
-    fireEvent.click(screen.getByTestId("settings_select_theme"));
-    fireEvent.click(screen.getByRole("option", { name: /Dark/i }));
     fireEvent.click(screen.getByRole("button", { name: /Update Settings/i }));
 
     await waitFor(() => expect(mockFetch).toHaveBeenCalledTimes(1));
 
-    expect(mockFetch).toHaveBeenCalledWith("/api/account/settings", {
-      method: "POST",
-      body: JSON.stringify({ language: "fr", theme: WebsiteTheme.DARK }),
+    expect(mockFetch).toHaveBeenCalledWith(`/api/users/${mockUser1.id}`, {
+      method: "PATCH",
+      body: JSON.stringify({ language: "fr" }),
     });
 
     expect(screen.getByText("The settings have been updated!")).toBeInTheDocument();
@@ -81,18 +78,16 @@ describe("Settings Form", () => {
 
     fireEvent.click(screen.getByTestId("settings_select_language"));
     fireEvent.click(screen.getByRole("option", { name: /French/i }));
-    fireEvent.click(screen.getByTestId("settings_select_theme"));
-    fireEvent.click(screen.getByRole("option", { name: /Dark/i }));
     fireEvent.click(screen.getByRole("button", { name: /Update Settings/i }));
 
     await waitFor(() => expect(mockFetch).toHaveBeenCalledTimes(1));
 
-    expect(mockFetch).toHaveBeenCalledWith("/api/account/settings", {
-      method: "POST",
-      body: JSON.stringify({ language: "fr", theme: WebsiteTheme.DARK }),
+    expect(mockFetch).toHaveBeenCalledWith(`/api/users/${mockUser1.id}`, {
+      method: "PATCH",
+      body: JSON.stringify({ language: "fr" }),
     });
 
-    await new Promise((resolve: (value: unknown) => void) => setTimeout(resolve, 2000));
+    await new Promise((resolve: (value: unknown) => void) => setTimeout(resolve, 1000));
 
     await waitFor(() => {
       expect(mockUseRouter.push).toHaveBeenCalledWith("/fr/account/settings");

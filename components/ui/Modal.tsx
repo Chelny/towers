@@ -91,21 +91,21 @@ const Modal = forwardRef(function Modal(
     <dialog
       ref={dialogRef}
       className={clsx(
-        "relative top-1/2 start-1/2 z-40 border-t-4 border-t-gray-200 border-r-4 border-e-gray-400 border-b-4 border-b-gray-400 border-l-4 border-s-gray-200 rounded-xs ring-1 ring-black shadow-lg bg-gray-200 -translate-x-1/2 -translate-y-1/2",
+        "relative top-1/2 start-1/2 z-40 flex border-t-4 border-t-gray-200 border-r-4 border-e-gray-400 border-b-4 border-b-gray-400 border-l-4 border-s-gray-200 rounded-xs ring-1 ring-black shadow-lg bg-gray-200 -translate-x-1/2 -translate-y-1/2",
         "rtl:translate-x-1/2",
         "dark:border-t-dark-modal-border-top dark:border-e-dark-modal-border-end dark:border-b-dark-modal-border-bottom dark:border-s-dark-modal-border-start dark:bg-dark-modal-background",
         customDialogSize ? customDialogSize : "w-full max-w-md",
       )}
       data-testid={`dialog_${dataTestId}`}
     >
-      <form className="grid grid-rows-[max-content_1fr_max-content] h-full" noValidate onSubmit={handleConfirm}>
-        <div className={clsx("flex justify-between items-center gap-2 p-2 bg-gray-300", "dark:bg-slate-700")}>
+      <form className="flex-1 grid grid-rows-[max-content_1fr_max-content]" noValidate onSubmit={handleConfirm}>
+        <div className={clsx("flex justify-between items-center gap-2 p-2 bg-gray-300 truncate", "dark:bg-slate-700")}>
           <h3 className={clsx("flex-1 text-base font-medium truncate", "dark:text-dark-modal-heading-text")}>
             {title}
           </h3>
           <button
             type="button"
-            className="self-start text-gray-400 hover:text-gray-500"
+            className="text-gray-400 hover:text-gray-500"
             aria-label={t({ message: "Close" })}
             onClick={handleClose}
           >

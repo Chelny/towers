@@ -10,6 +10,7 @@ import {
   ChangeEmailPayload,
   changeEmailSchema,
 } from "@/app/[locale]/(protected)/account/profile/change-email.schema";
+import ProfileSectionHeader from "@/components/ProfileSectionHeader";
 import AlertMessage from "@/components/ui/AlertMessage";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
@@ -123,11 +124,11 @@ export function ChangeEmailForm({ session }: ChangeEmailFormProps): ReactNode {
   };
 
   return (
-    <>
-      <h2 className="text-lg font-semibold mb-4">
-        <Trans>Change Email</Trans>
-      </h2>
-      <form className="w-full" noValidate onSubmit={handleChangeEmail}>
+    <ProfileSectionHeader
+      title={<Trans>Email</Trans>}
+      description={<Trans>Update the email address associated with your account.</Trans>}
+    >
+      <form className="grid w-full" noValidate onSubmit={handleChangeEmail}>
         {formState?.message && (
           <AlertMessage type={formState.success ? "success" : "error"}>{formState.message}</AlertMessage>
         )}
@@ -155,10 +156,10 @@ export function ChangeEmailForm({ session }: ChangeEmailFormProps): ReactNode {
             </div>
           </div>
         )}
-        <Button type="submit" className="w-full" disabled={isLoading}>
+        <Button type="submit" className="max-md:w-full md:place-self-end" disabled={isLoading}>
           <Trans>Send Verification Email</Trans>
         </Button>
       </form>
-    </>
+    </ProfileSectionHeader>
   );
 }

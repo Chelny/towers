@@ -87,6 +87,7 @@ export function ForgotPasswordForm(): ReactNode {
         <AlertMessage type={formState.success ? "success" : "error"}>{formState.message}</AlertMessage>
       )}
       <Input
+        type="email"
         id="email"
         label={t({ message: "Email" })}
         required

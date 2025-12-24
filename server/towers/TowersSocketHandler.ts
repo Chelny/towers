@@ -62,8 +62,11 @@ export class TowersSocketHandler {
     this.socket.on(ClientToServerEvents.TABLE_PLAYERS_TO_INVITE, this.handlePlayersToInvite);
     this.socket.on(ClientToServerEvents.TABLE_INVITE_USER, this.handleInviteUserToTable);
     this.socket.on(ClientToServerEvents.TABLE_INVITATION_ACCEPTED_CHECK, this.handleCheckAcceptedTableInvitation);
-    this.socket.on(ClientToServerEvents.TABLE_INVITATION_ACCEPTED, this.handleAcceptedTableInvitation);
-    this.socket.on(ClientToServerEvents.TABLE_INVITATION_DECLINED, this.handleDeclinedTableInvitation);
+    this.socket.on(ClientToServerEvents.TABLE_INVITATION_ACCEPT, this.handleAcceptTableInvitation);
+    this.socket.on(ClientToServerEvents.TABLE_INVITATION_DECLINE, this.handleDeclineTableInvitation);
+    this.socket.on(ClientToServerEvents.TABLE_INVITATIONS_BLOCK, this.handleBlockTableInvitations);
+    this.socket.on(ClientToServerEvents.TABLE_INVITATIONS_ALLOW, this.handleAllowTableInvitations);
+    this.socket.on(ClientToServerEvents.TABLE_INVITATIONS_BLOCKED_CHECK, this.handleCheckedBlockedTableInvitations);
     this.socket.on(ClientToServerEvents.TABLE_PLAYERS_TO_BOOT, this.handlePlayersToBoot);
     this.socket.on(ClientToServerEvents.TABLE_BOOT_USER, this.handleBootUserFromTable);
     this.socket.on(ClientToServerEvents.TABLE_TYPED_HERO_CODE, this.handleHeroCode);
@@ -123,8 +126,11 @@ export class TowersSocketHandler {
     this.socket.off(ClientToServerEvents.TABLE_PLAYERS_TO_INVITE, this.handlePlayersToInvite);
     this.socket.off(ClientToServerEvents.TABLE_INVITE_USER, this.handleInviteUserToTable);
     this.socket.off(ClientToServerEvents.TABLE_INVITATION_ACCEPTED_CHECK, this.handleCheckAcceptedTableInvitation);
-    this.socket.off(ClientToServerEvents.TABLE_INVITATION_ACCEPTED, this.handleAcceptedTableInvitation);
-    this.socket.off(ClientToServerEvents.TABLE_INVITATION_DECLINED, this.handleDeclinedTableInvitation);
+    this.socket.off(ClientToServerEvents.TABLE_INVITATION_ACCEPT, this.handleAcceptTableInvitation);
+    this.socket.off(ClientToServerEvents.TABLE_INVITATION_DECLINE, this.handleDeclineTableInvitation);
+    this.socket.off(ClientToServerEvents.TABLE_INVITATIONS_BLOCK, this.handleBlockTableInvitations);
+    this.socket.off(ClientToServerEvents.TABLE_INVITATIONS_ALLOW, this.handleAllowTableInvitations);
+    this.socket.off(ClientToServerEvents.TABLE_INVITATIONS_BLOCKED_CHECK, this.handleCheckedBlockedTableInvitations);
     this.socket.off(ClientToServerEvents.TABLE_PLAYERS_TO_BOOT, this.handlePlayersToBoot);
     this.socket.off(ClientToServerEvents.TABLE_BOOT_USER, this.handleBootUserFromTable);
     this.socket.off(ClientToServerEvents.TABLE_TYPED_HERO_CODE, this.handleHeroCode);
@@ -520,7 +526,7 @@ export class TowersSocketHandler {
     }
   };
 
-  private handleAcceptedTableInvitation = async (
+  private handleAcceptTableInvitation = async (
     { invitationId }: { invitationId: string },
     callback: ({ success }: SocketCallback) => void,
   ): Promise<void> => {
@@ -532,7 +538,7 @@ export class TowersSocketHandler {
     }
   };
 
-  private handleDeclinedTableInvitation = async (
+  private handleDeclineTableInvitation = async (
     { invitationId, reason, isDeclineAll }: { invitationId: string; reason: string | null; isDeclineAll: boolean },
     callback: ({ success }: SocketCallback) => void,
   ): Promise<void> => {
@@ -541,6 +547,37 @@ export class TowersSocketHandler {
       callback({ success: true });
     } catch (error) {
       callback({ success: false, message: error instanceof Error ? error.message : "Error declining table invitation" });
+    }
+  };
+
+  private handleBlockTableInvitations = async (): Promise<void> => {
+    try {
+      await TableInvitationManager.declineAll(this.user);
+    } catch (error) {
+      // TODO: Catch error
+    }
+  };
+
+  private handleAllowTableInvitations = (): void => {
+    try {
+      UserManager.allowTableInvitations(this.user.id);
+    } catch (error) {
+      // TODO: Catch error
+    }
+  };
+
+  private handleCheckedBlockedTableInvitations = ({}, callback: ({ success }: SocketCallback) => void): void => {
+    try {
+      const user: User | undefined = UserManager.get(this.user.id);
+
+      if (user) {
+        callback({ success: true, data: user.declineTableInvitations });
+      }
+    } catch (error) {
+      callback({
+        success: false,
+        message: error instanceof Error ? error.message : "Error checking blocked table invitations",
+      });
     }
   };
 
@@ -629,11 +666,11 @@ export class TowersSocketHandler {
 
   private handleGetNotifications = ({}, callback: <T>({ success, message, data }: SocketCallback<T>) => void): void => {
     const notification: Notification[] = NotificationManager.getAllByPlayerId(this.user.id);
-    callback({ success: true, data: notification.map((n: Notification) => n.toPlainObject()) });
+    callback({ success: true, data: notification.map((notification: Notification) => notification.toPlainObject()) });
   };
 
   private handleMarkNotificationAsRead = async ({ notificationId }: { notificationId: string }): Promise<void> => {
-    await NotificationManager.markAsRead(notificationId);
+    await NotificationManager.markAsRead(notificationId, this.user.id);
   };
 
   private handleDeleteNotification = async ({ notificationId }: { notificationId: string }): Promise<void> => {

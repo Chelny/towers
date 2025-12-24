@@ -8,14 +8,20 @@ export type AlertModalProps = {
   title: string
   message: string
   testId: string
-  onCancel: () => void
+  onClose: () => void
 };
 
-export default function AlertModal({ title, message, testId, onCancel }: AlertModalProps): ReactNode {
+export default function AlertModal({ title, message, testId, onClose }: AlertModalProps): ReactNode {
   const { t } = useLingui();
 
   return (
-    <Modal title={title} cancelText={t({ message: "Close" })} dataTestId={`alert_${testId}`} onCancel={onCancel}>
+    <Modal
+      title={title}
+      cancelText={t({ message: "Close" })}
+      dataTestId={`alert_${testId}`}
+      onCancel={onClose}
+      onClose={onClose}
+    >
       {message}
     </Modal>
   );

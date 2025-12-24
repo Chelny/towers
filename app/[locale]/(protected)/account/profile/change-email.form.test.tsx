@@ -22,7 +22,7 @@ describe("Change Email Form", () => {
   it("should render the form with all elements", () => {
     render(<ChangeEmailForm session={mockSession} />);
 
-    expect(screen.getByText(/Change Email/i)).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /Email/i })).toBeInTheDocument();
     expect(screen.getByTestId("profile_input-email_email")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Send Verification Email/i })).toBeInTheDocument();
   });

@@ -41,6 +41,10 @@ export default function SidebarMenuItem({
   const searchParams: ReadonlyURLSearchParams = useSearchParams();
   const [isMounted, setIsMounted] = useState<boolean>(false);
 
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   const stripLocale = (path: string): string => {
     const segments: string[] = path.split("/").filter(Boolean);
     const locales: string[] = languages.map((language: Language) => language.locale);
@@ -84,6 +88,10 @@ export default function SidebarMenuItem({
 
   const [isAccordionOpen, setAccordionOpen] = useState<boolean>(() => isItemActive);
 
+  useEffect(() => {
+    setAccordionOpen(isItemActive);
+  }, [isItemActive]);
+
   const handleClick = (): void => {
     if (menuItems.length > 0) {
       if (!isExpanded) {
@@ -95,14 +103,6 @@ export default function SidebarMenuItem({
       onClick?.();
     }
   };
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  useEffect(() => {
-    setAccordionOpen(isItemActive);
-  }, [isItemActive]);
 
   return (
     <div
@@ -189,7 +189,7 @@ export default function SidebarMenuItem({
             isAccordionOpen ? "overflow-visible max-h-screen my-2" : "overflow-hidden max-h-0",
           )}
         >
-          {menuItems.map((menuItem: MenuItem, index, arr) => (
+          {menuItems.map((menuItem: MenuItem, index: number, arr: MenuItem[]) => (
             <SidebarMenuSubItem
               key={menuItem.id}
               item={menuItem}

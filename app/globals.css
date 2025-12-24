@@ -42,6 +42,8 @@
   --spacing-preview-piece-height: calc(var(--grid-cell-size) * 3px + 16px);
   --spacing-power-bar-width: calc(var(--grid-cell-size) * 1px + 16px);
   --spacing-power-bar-height: calc(var(--grid-cell-size) * 8px + 16px);
+  --spacing-player-board-username-width: calc(var(--grid-cols) * var(--grid-cell-size) * 1px);
+  --spacing-player-board-username-empty-space-width: calc(var(--grid-cell-size) * 1px + 16px);
   --spacing-demo-block: 28px;
 
   /* Text */

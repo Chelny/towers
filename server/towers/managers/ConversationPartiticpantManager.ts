@@ -1,6 +1,4 @@
 import { createId } from "@paralleldrive/cuid2";
-import { ServerInternalEvents } from "@/constants/socket/server-internal";
-import { publishRedisEvent } from "@/server/redis/publish";
 import { Conversation } from "@/server/towers/classes/Conversation";
 import { ConversationParticipant, ConversationParticipantProps } from "@/server/towers/classes/ConversationParticipant";
 
@@ -53,11 +51,7 @@ export class ConversationParticipantManager {
     );
   }
 
-  public static async markConversationAsRead(
-    conversationId: string,
-    userId: string,
-    unreadConversationsCount: number,
-  ): Promise<void> {
+  public static markConversationAsRead(conversationId: string, userId: string): void {
     const conversationParticipant: ConversationParticipant | undefined = this.all().find(
       (cp: ConversationParticipant) => cp.conversationId === conversationId && cp.userId === userId,
     );
@@ -65,19 +59,9 @@ export class ConversationParticipantManager {
 
     conversationParticipant.markAsRead();
     this.conversationParticipants.set(conversationParticipant.id, conversationParticipant);
-
-    await publishRedisEvent(ServerInternalEvents.CONVERSATION_MARK_AS_READ, {
-      userId,
-      conversationId: conversationParticipant.conversationId,
-      unreadConversationsCount,
-    });
   }
 
-  public static async muteConversationForUser(
-    conversationId: string,
-    userId: string,
-    unreadConversationsCount: number,
-  ): Promise<void> {
+  public static async muteConversationForUser(conversationId: string, userId: string): Promise<void> {
     const conversationParticipant: ConversationParticipant | undefined = this.all().find(
       (cp: ConversationParticipant) => cp.conversationId === conversationId && cp.userId === userId,
     );
@@ -86,19 +70,10 @@ export class ConversationParticipantManager {
     if (!conversationParticipant.mutedAt) {
       conversationParticipant.muteConversation();
       this.conversationParticipants.set(conversationParticipant.id, conversationParticipant);
-      await publishRedisEvent(ServerInternalEvents.CONVERSATION_MUTE, {
-        userId,
-        conversationId,
-        unreadConversationsCount,
-      });
     }
   }
 
-  public static async unmuteConversationForUser(
-    conversationId: string,
-    userId: string,
-    unreadConversationsCount: number,
-  ): Promise<void> {
+  public static async unmuteConversationForUser(conversationId: string, userId: string): Promise<void> {
     const conversationParticipant = this.all().find(
       (cp: ConversationParticipant) => cp.conversationId === conversationId && cp.userId === userId,
     );
@@ -107,19 +82,10 @@ export class ConversationParticipantManager {
     if (conversationParticipant.mutedAt) {
       conversationParticipant.unmuteConversation();
       this.conversationParticipants.set(conversationParticipant.id, conversationParticipant);
-      await publishRedisEvent(ServerInternalEvents.CONVERSATION_UNMUTE, {
-        userId,
-        conversationId,
-        unreadConversationsCount,
-      });
     }
   }
 
-  public static async removeConversationForUser(
-    conversationId: string,
-    userId: string,
-    unreadConversationsCount: number,
-  ): Promise<void> {
+  public static async removeConversationForUser(conversationId: string, userId: string): Promise<void> {
     const conversationParticipant: ConversationParticipant | undefined = this.all().find(
       (cp: ConversationParticipant) => cp.conversationId === conversationId && cp.userId === userId,
     );
@@ -128,19 +94,10 @@ export class ConversationParticipantManager {
     if (!conversationParticipant.removedAt) {
       conversationParticipant.removeConversation();
       this.conversationParticipants.set(conversationParticipant.id, conversationParticipant);
-      await publishRedisEvent(ServerInternalEvents.CONVERSATION_REMOVE, {
-        userId,
-        conversationId,
-        unreadConversationsCount,
-      });
     }
   }
 
-  public static async restoreConversationForUser(
-    conversation: Conversation,
-    userId: string,
-    unreadConversationsCount: number,
-  ): Promise<void> {
+  public static async restoreConversationForUser(conversation: Conversation, userId: string): Promise<void> {
     const conversationParticipant = this.all().find(
       (cp: ConversationParticipant) => cp.conversationId === conversation.id && cp.userId === userId,
     );
@@ -149,11 +106,6 @@ export class ConversationParticipantManager {
     if (conversationParticipant.removedAt) {
       conversationParticipant.restoreConversation();
       this.conversationParticipants.set(conversationParticipant.id, conversationParticipant);
-      await publishRedisEvent(ServerInternalEvents.CONVERSATION_RESTORE, {
-        userId,
-        conversation: conversation.toPlainObject(),
-        unreadConversationsCount,
-      });
     }
   }
 }

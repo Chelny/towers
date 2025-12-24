@@ -1,13 +1,18 @@
-import { User, UserRole, WebsiteTheme } from "db/browser";
+import { ProfanityFilter, User, UserRole, WebsiteTheme } from "db/browser";
+
+const commonUserSettingsProperties = {
+  theme: WebsiteTheme.SYSTEM,
+  profanityFilter: ProfanityFilter.WEAK,
+};
 
 const commonUserProperties = {
   displayUsername: null,
   language: "en",
   role: UserRole.USER,
-  theme: WebsiteTheme.SYSTEM,
   banned: false,
   banReason: null,
   banExpires: null,
+  userSettings: commonUserSettingsProperties,
   createdAt: new Date(),
   updatedAt: new Date(),
 };

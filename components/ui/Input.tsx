@@ -35,6 +35,7 @@ type InputProps = {
   required?: boolean
   readOnly?: boolean
   disabled?: boolean
+  dir?: "rtl" | "ltr"
   dataTestId?: string
   description?: string
   errorMessage?: string
@@ -58,6 +59,7 @@ export default forwardRef<InputImperativeHandle, InputProps>(function Input(
     required = false,
     readOnly = false,
     disabled = false,
+    dir = undefined,
     dataTestId = undefined,
     description = "",
     errorMessage = "",
@@ -74,6 +76,16 @@ export default forwardRef<InputImperativeHandle, InputProps>(function Input(
   const [value, setValue] = useState<string | null | undefined>(defaultValue);
   const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
   const inputType: string = type === "password" && isPasswordVisible ? "text" : type;
+
+  useImperativeHandle(ref, () => ({
+    value,
+    focus: () => inputRef.current?.focus(),
+    clear: () => setValue(""),
+  }));
+
+  const handleTogglePasswordVisibility = (): void => {
+    setIsPasswordVisible((isPasswordVisible: boolean) => !isPasswordVisible);
+  };
 
   const handleInput = (event: InputEvent<HTMLInputElement>): void => {
     setValue((event.target as HTMLInputElement).value);
@@ -93,16 +105,6 @@ export default forwardRef<InputImperativeHandle, InputProps>(function Input(
 
     onKeyDown?.(event);
   };
-
-  const handleTogglePasswordVisibility = (): void => {
-    setIsPasswordVisible((isPasswordVisible: boolean) => !isPasswordVisible);
-  };
-
-  useImperativeHandle(ref, () => ({
-    value,
-    focus: () => inputRef.current?.focus(),
-    clear: () => setValue(""),
-  }));
 
   return (
     <div className="flex flex-col mb-4">
@@ -140,9 +142,12 @@ export default forwardRef<InputImperativeHandle, InputProps>(function Input(
             required={required}
             readOnly={readOnly}
             disabled={disabled}
+            dir={type === "email" || type === "password" ? "ltr" : dir}
             aria-labelledby={`${id}Label`}
             aria-describedby={description ? `${id}Description` : undefined}
             aria-placeholder={placeholder}
+            aria-autocomplete={autoComplete === "off" ? "none" : "list"}
+            aria-haspopup={autoComplete !== "off" ? "listbox" : undefined}
             aria-invalid={errorMessage ? "true" : "false"}
             aria-errormessage={errorMessage ? `${id}ErrorMessage` : undefined}
             data-testid={dataTestId}
@@ -156,6 +161,7 @@ export default forwardRef<InputImperativeHandle, InputProps>(function Input(
               type="button"
               className={clsx("absolute inset-y-0 end-2 flex items-center text-gray-800", "dark:text-dark-input-text")}
               aria-label={isPasswordVisible ? t({ message: "Hide password" }) : t({ message: "Show password" })}
+              dir="ltr"
               onClick={handleTogglePasswordVisibility}
             >
               {isPasswordVisible ? <FaEyeSlash /> : <FaEye />}

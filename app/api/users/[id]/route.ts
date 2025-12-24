@@ -7,7 +7,7 @@ import { auth } from "@/lib/auth";
 import { Session } from "@/lib/auth-client";
 import prisma from "@/lib/prisma";
 
-export async function POST(request: NextRequest): Promise<NextResponse> {
+export async function PATCH(request: NextRequest): Promise<NextResponse> {
   const body = await request.json();
 
   const session: Session | null = await auth.api.getSession({ headers: await headers() });
@@ -20,7 +20,6 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       },
       data: {
         language: body.language,
-        theme: body.theme,
       },
     });
 

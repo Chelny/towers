@@ -60,7 +60,7 @@ export default function RadioButtonGroup({
           </span>
         )}
       </legend>
-      <div className={clsx("flex justify-evenly gap-2 mb-1", inline ? "flex-col md:flex-row" : "flex-col")}>
+      <div className={clsx("flex gap-6 mb-1", inline ? "flex-col md:flex-row" : "flex-col")}>
         {options.map((option: ReactElement<RadioButtonOptionProps>) => (
           <RadioButton
             key={option.props.id}

@@ -4,6 +4,7 @@ import { ReactNode, useEffect, useState } from "react";
 import { ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
 import { ErrorContext, SuccessContext } from "@better-fetch/fetch";
 import { Trans, useLingui } from "@lingui/react/macro";
+import ProfileSectionHeader from "@/components/ProfileSectionHeader";
 import AlertMessage from "@/components/ui/AlertMessage";
 import Button from "@/components/ui/Button";
 import { INITIAL_FORM_STATE } from "@/constants/api";
@@ -94,33 +95,37 @@ export function LinkedSocialAccountsForm(): ReactNode {
   }, []);
 
   return (
-    <>
-      <h2 className="text-lg font-semibold mb-4">
-        <Trans>Linked Social Accounts</Trans>
-      </h2>
-      {formState?.message && (
-        <AlertMessage type={formState.success ? "success" : "error"}>{formState.message}</AlertMessage>
-      )}
-      <ul className="flex flex-col gap-4">
-        {AUTH_PROVIDERS.map(({ name, label, icon }: AuthProviderDetails) => (
-          <li key={name} className="flex items-center justify-between gap-2">
-            <div className="flex-1 flex items-center gap-2">
-              <span>{icon}</span>
-              <span>{label}</span>
-            </div>
-            <Button
-              key={name}
-              type="button"
-              className="flex-1 flex justify-center items-center"
-              disabled={isLoading || isProviderLinked(name)}
-              aria-label={isProviderLinked(name) ? t({ message: `Unlink ${label}` }) : t({ message: `Link ${label}` })}
-              onClick={() => handleLinkUnlink(name)}
-            >
-              {isProviderLinked(name) ? t({ message: "Unlink" }) : t({ message: "Link" })}
-            </Button>
-          </li>
-        ))}
-      </ul>
-    </>
+    <ProfileSectionHeader
+      title={<Trans>Linked Social Accounts</Trans>}
+      description={<Trans>Connect or disconnect social accounts used to sign in.</Trans>}
+    >
+      <div>
+        {formState?.message && (
+          <AlertMessage type={formState.success ? "success" : "error"}>{formState.message}</AlertMessage>
+        )}
+        <ul className="flex flex-col gap-4">
+          {AUTH_PROVIDERS.map(({ name, label, icon }: AuthProviderDetails) => (
+            <li key={name} className="flex items-center justify-between gap-2">
+              <div className="flex-1 flex items-center gap-2">
+                <span>{icon}</span>
+                <span>{label}</span>
+              </div>
+              <Button
+                key={name}
+                type="button"
+                className="flex-1 flex justify-center items-center"
+                disabled={isLoading || isProviderLinked(name)}
+                aria-label={
+                  isProviderLinked(name) ? t({ message: `Unlink ${label}` }) : t({ message: `Link ${label}` })
+                }
+                onClick={() => handleLinkUnlink(name)}
+              >
+                {isProviderLinked(name) ? t({ message: "Unlink" }) : t({ message: "Link" })}
+              </Button>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </ProfileSectionHeader>
   );
 }

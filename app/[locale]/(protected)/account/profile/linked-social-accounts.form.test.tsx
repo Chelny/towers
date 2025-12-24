@@ -24,7 +24,7 @@ describe.todo("Linked Social Accounts Form", () => {
   it("should render the list of social providers", () => {
     render(<LinkedSocialAccountsForm />);
 
-    expect(screen.getByText(/Linked Social Accounts/i)).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /Linked Social Accounts/i })).toBeInTheDocument();
     AUTH_PROVIDERS.forEach((provider: AuthProviderDetails) => {
       expect(screen.getByText(provider.label)).toBeInTheDocument();
       expect(screen.getByRole("button", { name: new RegExp(`Link ${provider.label}`, "i") })).toBeInTheDocument();

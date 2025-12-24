@@ -71,7 +71,6 @@ export default async function RootLayout({ children, params }: Readonly<RootLayo
           attribute="class"
           storageKey={APP_STORAGE_KEYS.THEME}
           enableSystem
-          defaultTheme={session?.user.theme?.toLowerCase()}
           nonce={nonce}
           disableTransitionOnChange
         >

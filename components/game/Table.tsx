@@ -165,7 +165,13 @@ export default function Table(): ReactNode {
   const isSitAccessGranted = useMemo(() => {
     if (!currentTablePlayer?.playerId) return false;
 
+    // If user is already seated, they keep access
+    if (currentTablePlayer?.seatNumber !== null) return true;
+
+    // Table host
     if (table?.hostPlayerId === currentTablePlayer?.playerId) return true;
+
+    // Public table
     if (table?.tableType === TableType.PUBLIC) return true;
 
     // Protected or Private → invitation required

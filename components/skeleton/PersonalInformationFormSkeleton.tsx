@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import clsx from "clsx/lite";
 
-export default function ProfileFormSkeleton(): ReactNode {
+export default function PersonalInformationFormSkeleton(): ReactNode {
   return (
     <div className="flex flex-col gap-6 w-full animate-pulse">
       <div className={clsx("w-64 h-6 rounded-sm bg-gray-200", "dark:bg-dark-skeleton-content-background")} />

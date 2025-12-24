@@ -6,10 +6,12 @@ import { publishRedisEvent } from "@/server/redis/publish";
 import { Notification } from "@/server/towers/classes/Notification";
 import { TableChatMessage } from "@/server/towers/classes/TableChatMessage";
 import { TableInvitation, TableInvitationProps } from "@/server/towers/classes/TableInvitation";
+import { User } from "@/server/towers/classes/User";
 import { NotificationManager } from "@/server/towers/managers/NotificationManager";
 import { PlayerManager } from "@/server/towers/managers/PlayerManager";
 import { TableChatMessageManager } from "@/server/towers/managers/TableChatMessageManager";
 import { TablePlayerManager } from "@/server/towers/managers/TablePlayerManager";
+import { UserManager } from "@/server/towers/managers/UserManager";
 
 export class TableInvitationManager {
   private static tableInvitations: Map<string, TableInvitation> = new Map<string, TableInvitation>();
@@ -154,42 +156,42 @@ export class TableInvitationManager {
     const tableInvitation: TableInvitation | undefined = this.get(tableInvitationId);
     if (!tableInvitation) return;
 
-    let invitationsToDecline: TableInvitation[] = [];
-
     tableInvitation.status = TableInvitationStatus.DECLINED;
     tableInvitation.declinedReason = reason;
-    invitationsToDecline.push(tableInvitation);
     this.delete(tableInvitation.id);
     PlayerManager.updateLastActiveAt(tableInvitation.inviterPlayer.id);
 
+    const notification: Notification = NotificationManager.create({
+      playerId: tableInvitation.inviteePlayerId,
+      roomId: tableInvitation.roomId,
+      type: NotificationType.TABLE_INVITE_DECLINED,
+      tableInvitation: tableInvitation,
+    });
+
+    await publishRedisEvent(ServerInternalEvents.TABLE_INVITATION_DECLINE, {
+      userId: tableInvitation.inviterPlayerId,
+      notification: notification.toPlainObject(),
+    });
+
+    logger.debug(
+      `${tableInvitation.inviteePlayer?.user?.username} declined invitation to table #${tableInvitation.table?.tableNumber}. Reason: ${reason}`,
+    );
+
     if (isDeclineAll) {
-      const pendingInvitations: TableInvitation[] = this.getReceivedInvitations(tableInvitation.inviteePlayerId).filter(
-        (ti: TableInvitation) => ti.status === TableInvitationStatus.PENDING,
-      );
+      this.declineAll(tableInvitation.inviteePlayer.user);
+    }
+  }
 
-      for (const pendingInvitation of pendingInvitations) {
-        pendingInvitation.status = TableInvitationStatus.DECLINED;
-        invitationsToDecline.push(pendingInvitation);
-        this.delete(pendingInvitation.id);
-      }
+  public static async declineAll(user: User): Promise<void> {
+    const pendingInvitations: TableInvitation[] = this.getReceivedInvitations(user.id).filter(
+      (ti: TableInvitation) => ti.status === TableInvitationStatus.PENDING,
+    );
+
+    for (const pendingInvitation of pendingInvitations) {
+      pendingInvitation.status = TableInvitationStatus.DECLINED;
+      this.delete(pendingInvitation.id);
     }
 
-    for (const invitationToDecline of invitationsToDecline) {
-      const notification: Notification = NotificationManager.create({
-        playerId: invitationToDecline.inviteePlayerId,
-        roomId: invitationToDecline.roomId,
-        type: NotificationType.TABLE_INVITE_DECLINED,
-        tableInvitation: invitationToDecline,
-      });
-
-      await publishRedisEvent(ServerInternalEvents.TABLE_INVITATION_DECLINE, {
-        userId: tableInvitation.inviterPlayerId,
-        notification: notification.toPlainObject(),
-      });
-
-      logger.debug(
-        `${invitationToDecline.inviteePlayer?.user?.username} declined invitation to table #${invitationToDecline.table?.tableNumber}. Reason: ${reason}`,
-      );
-    }
+    UserManager.blockTableInvitations(user.id);
   }
 }

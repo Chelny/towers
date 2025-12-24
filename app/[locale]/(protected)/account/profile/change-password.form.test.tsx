@@ -18,7 +18,7 @@ describe("Change/Set Password Form", () => {
   it("should render the set password form with all elements", () => {
     render(<ChangePasswordForm session={{ ...mockSession, accounts: [mockSessionGitHubAccount] }} />);
 
-    expect(screen.getByText(/Change\/Set Password/i)).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /Password/i })).toBeInTheDocument();
     expect(screen.queryByTestId("change-password_input-password_current-password")).not.toBeInTheDocument();
     expect(screen.getByTestId("set-password_input-password_password")).toBeInTheDocument();
     expect(screen.getByTestId("set-password_input-password_confirm-password")).toBeInTheDocument();
@@ -81,7 +81,7 @@ describe("Change/Set Password Form", () => {
   it("should render the change password form with all elements", () => {
     render(<ChangePasswordForm session={{ ...mockSession, accounts: [mockSessionCredentialAccount] }} />);
 
-    expect(screen.getByText(/Change\/Set Password/i)).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /Password/i })).toBeInTheDocument();
     expect(screen.getByTestId("change-password_input-password_current-password")).toBeInTheDocument();
     expect(screen.getByTestId("change-password_input-password_new-password")).toBeInTheDocument();
     expect(screen.getByTestId("change-password_input-password_confirm-new-password")).toBeInTheDocument();

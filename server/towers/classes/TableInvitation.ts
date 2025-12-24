@@ -28,13 +28,13 @@ export interface TableInvitationPlainObject {
 export class TableInvitation {
   public readonly id: string;
   public roomId: string;
-  public _room: Room;
+  private _room: Room;
   public tableId: string;
-  public _table: Table;
+  private _table: Table;
   public inviterPlayerId: string;
-  public _inviterPlayer: Player;
+  private _inviterPlayer: Player;
   public inviteePlayerId: string;
-  public _inviteePlayer: Player;
+  private _inviteePlayer: Player;
   public status: TableInvitationStatus = TableInvitationStatus.PENDING;
   public declinedReason: string | null = null;
 
