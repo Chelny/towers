@@ -10,7 +10,7 @@ import {
   ChangeEmailPayload,
   changeEmailSchema,
 } from "@/app/[locale]/(protected)/account/profile/change-email.schema";
-import ProfileSectionHeader from "@/components/ProfileSectionHeader";
+import AccountSectionHeader from "@/components/AccountSectionHeader";
 import AlertMessage from "@/components/ui/AlertMessage";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
@@ -124,7 +124,7 @@ export function ChangeEmailForm({ session }: ChangeEmailFormProps): ReactNode {
   };
 
   return (
-    <ProfileSectionHeader
+    <AccountSectionHeader
       title={<Trans>Email</Trans>}
       description={<Trans>Update the email address associated with your account.</Trans>}
     >
@@ -160,6 +160,6 @@ export function ChangeEmailForm({ session }: ChangeEmailFormProps): ReactNode {
           <Trans>Send Verification Email</Trans>
         </Button>
       </form>
-    </ProfileSectionHeader>
+    </AccountSectionHeader>
   );
 }

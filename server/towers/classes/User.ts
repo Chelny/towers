@@ -5,21 +5,18 @@ import { UserSettings, UserSettingsPlainObject } from "@/server/towers/classes/U
 export interface UserProps {
   id: string
   username: string
-  image: string | null
   userSettings: UserSettingsModel | null
 }
 
 export interface UserPlainObject {
   readonly id: string
   readonly username: string
-  readonly image: string | null
   readonly userSettings?: UserSettingsPlainObject
 }
 
 export class User {
   public readonly id: string;
   public username: string;
-  public image: string | null;
   public userSettings: UserSettings | null = null;
   public socket: Socket | null = null;
 
@@ -29,7 +26,6 @@ export class User {
   constructor(props: UserProps) {
     this.id = props.id;
     this.username = props.username;
-    this.image = props.image ?? null;
 
     if (props.userSettings) {
       this.userSettings = new UserSettings({
@@ -55,7 +51,6 @@ export class User {
     return {
       id: this.id,
       username: this.username,
-      image: this.image,
       userSettings: this.userSettings?.toPlainObject(),
     };
   }

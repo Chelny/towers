@@ -58,7 +58,7 @@ const Modal = forwardRef(function Modal(
     };
 
     const handleKeyDown = (event: KeyboardEvent): void => {
-      if (event.code === "Escape") {
+      if (event.key === "Escape") {
         event.preventDefault();
         dialog.close();
       }

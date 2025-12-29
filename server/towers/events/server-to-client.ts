@@ -7,14 +7,13 @@ import { Room } from "@/server/towers/classes/Room";
 import { Table } from "@/server/towers/classes/Table";
 import { RoomManager } from "@/server/towers/managers/RoomManager";
 import { TableManager } from "@/server/towers/managers/TableManager";
-import { UserMuteManager } from "@/server/towers/managers/UserMuteManager";
+import { UserRelationshipManager } from "@/server/towers/managers/UserRelationshipManager";
 
 export function serverToClientEvents(redisSub: Redis, io: IoServer): void {
   const channels: string[] = [
     ServerInternalEvents.USER_SETTINGS_AVATAR,
-    ServerInternalEvents.USER_MUTE_CHECK,
-    ServerInternalEvents.USER_MUTE,
-    ServerInternalEvents.USER_UNMUTE,
+    ServerInternalEvents.USER_RELATIONSHIP_MUTE,
+    ServerInternalEvents.USER_RELATIONSHIP_UNMUTE,
     ServerInternalEvents.CONVERSATION_MARK_AS_READ,
     ServerInternalEvents.CONVERSATION_MUTE,
     ServerInternalEvents.CONVERSATION_UNMUTE,
@@ -55,7 +54,7 @@ export function serverToClientEvents(redisSub: Redis, io: IoServer): void {
     if (error) return logger.error(error.message);
   });
 
-  redisSub.on("message", (channel: string, message: string) => {
+  redisSub.on("message", async (channel: string, message: string) => {
     const data = JSON.parse(message);
 
     switch (channel) {
@@ -64,19 +63,14 @@ export function serverToClientEvents(redisSub: Redis, io: IoServer): void {
         io.emit(ServerToClientEvents.USER_SETTINGS_AVATAR, { userId, avatarId });
         break;
       }
-      case ServerInternalEvents.USER_MUTE_CHECK: {
-        const { muterUserId, isMuted } = data;
-        io.to(muterUserId).emit(ServerToClientEvents.USER_MUTE_CHECK, { isMuted });
+      case ServerInternalEvents.USER_RELATIONSHIP_MUTE: {
+        const { sourceUserId } = data;
+        io.to(sourceUserId).emit(ServerToClientEvents.USER_RELATIONSHIP_MUTE);
         break;
       }
-      case ServerInternalEvents.USER_MUTE: {
-        const { muterUserId, mutedUserId } = data;
-        io.to(muterUserId).emit(ServerToClientEvents.USER_MUTE, { mutedUserId });
-        break;
-      }
-      case ServerInternalEvents.USER_UNMUTE: {
-        const { muterUserId, mutedUserId } = data;
-        io.to(muterUserId).emit(ServerToClientEvents.USER_UNMUTE, { mutedUserId });
+      case ServerInternalEvents.USER_RELATIONSHIP_UNMUTE: {
+        const { sourceUserId } = data;
+        io.to(sourceUserId).emit(ServerToClientEvents.USER_RELATIONSHIP_UNMUTE);
         break;
       }
       case ServerInternalEvents.CONVERSATION_MUTE: {
@@ -139,7 +133,7 @@ export function serverToClientEvents(redisSub: Redis, io: IoServer): void {
           const socket: Socket | null = rp.player.user?.socket;
           if (!socket) continue;
 
-          const mutedUserIds: string[] = UserMuteManager.mutedUserIdsFor(rp.player.id);
+          const mutedUserIds: string[] = await UserRelationshipManager.mutedUserIdsFor(rp.player.id);
 
           // Only send if they have NOT muted the sender
           if (!mutedUserIds.includes(senderId)) {
@@ -178,7 +172,7 @@ export function serverToClientEvents(redisSub: Redis, io: IoServer): void {
           const socket: Socket | null = tp.player.user?.socket;
           if (!socket) continue;
 
-          const mutedUserIds: string[] = UserMuteManager.mutedUserIdsFor(tp.player.id);
+          const mutedUserIds: string[] = await UserRelationshipManager.mutedUserIdsFor(tp.player.id);
 
           // Only send if they have NOT muted the sender
           if (!mutedUserIds.includes(senderId)) {

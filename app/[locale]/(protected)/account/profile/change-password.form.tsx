@@ -13,7 +13,7 @@ import {
   SetPasswordPayload,
   setPasswordSchema,
 } from "@/app/[locale]/(protected)/account/profile/change-password.schema";
-import ProfileSectionHeader from "@/components/ProfileSectionHeader";
+import AccountSectionHeader from "@/components/AccountSectionHeader";
 import AlertMessage from "@/components/ui/AlertMessage";
 import Button from "@/components/ui/Button";
 import Checkbox from "@/components/ui/Checkbox";
@@ -89,7 +89,7 @@ export function ChangePasswordForm({ session }: ChangePasswordFormProps): ReactN
           password: payload.password,
         }),
       })
-        .then(async (response) => {
+        .then(async (response: Response) => {
           const data: ApiResponse = await response.json();
           setIsLoading(false);
           setFormState(data);
@@ -185,7 +185,7 @@ export function ChangePasswordForm({ session }: ChangePasswordFormProps): ReactN
   }, [session]);
 
   return (
-    <ProfileSectionHeader
+    <AccountSectionHeader
       title={<Trans>Password</Trans>}
       description={<Trans>Enter your current password to make an update.</Trans>}
     >
@@ -250,6 +250,6 @@ export function ChangePasswordForm({ session }: ChangePasswordFormProps): ReactN
           {isUserPasswordSet ? t({ message: "Change Password" }) : t({ message: "Set Password" })}
         </Button>
       </form>
-    </ProfileSectionHeader>
+    </AccountSectionHeader>
   );
 }

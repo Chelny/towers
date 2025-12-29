@@ -58,14 +58,17 @@ export default function SidebarMenuItem({
 
   const isActiveHref = (href: string): boolean => {
     const url: URL = new URL(href, process.env.BASE_URL);
-    const base: string = url.pathname;
+    const basePath: string = url.pathname;
     const expectedQuery: URLSearchParams = url.searchParams;
     const cleanPath: string = stripLocale(pathname);
 
-    if (cleanPath !== base) return false;
-    if (expectedQuery.size === 0) return searchParams.size === 0;
-    if (expectedQuery.size !== searchParams.size) return false;
+    // Path must match
+    if (cleanPath !== basePath) return false;
 
+    // If the menu href has no query, consider it active for any query on same path
+    if (expectedQuery.size === 0) return true;
+
+    // Otherwise, the current URL must contain at least the expected params
     for (const [key, val] of expectedQuery.entries()) {
       if (searchParams.get(key) !== val) return false;
     }

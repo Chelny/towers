@@ -22,7 +22,7 @@ import { TableChatMessageManager } from "@/server/towers/managers/TableChatMessa
 import { TableInvitationManager } from "@/server/towers/managers/TableInvitationManager";
 import { TablePlayerManager } from "@/server/towers/managers/TablePlayerManager";
 import { TableSeatManager } from "@/server/towers/managers/TableSeatManager";
-import { UserMuteManager } from "@/server/towers/managers/UserMuteManager";
+import { UserRelationshipManager } from "@/server/towers/managers/UserRelationshipManager";
 
 export class TableManager {
   private static tables: Map<string, Table> = new Map<string, Table>();
@@ -442,6 +442,7 @@ export class TableManager {
       table.id,
       playerToBoot.playerId,
     );
+
     for (const tableInvitation of tableInvitations) {
       this.removeInvitationFromTable(table, tableInvitation.id);
     }
@@ -558,8 +559,8 @@ export class TableManager {
     }
   }
 
-  public static tableViewForPlayer(table: Table, playerId: string): TablePlainObject {
-    const mutedUserIds: string[] = UserMuteManager.mutedUserIdsFor(playerId);
+  public static async tableViewForPlayer(table: Table, playerId: string): Promise<TablePlainObject> {
+    const mutedUserIds: string[] = await UserRelationshipManager.mutedUserIdsFor(playerId);
 
     return {
       ...table.toPlainObject(),

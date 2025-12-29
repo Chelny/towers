@@ -21,12 +21,12 @@ export class UserSettingsManager {
     return this.upsert(db);
   }
 
-  // public async updateTheme(id: string, theme: string): Promise<UserSettings> {
+  // public async updateTheme(id: string, theme: WebsiteTheme): Promise<UserSettings> {
   //   const db: UserSettingsModel = await UserSettingsService.updateTheme(id, theme);
   //   return this.upsert(db);
   // }
 
-  // public async updateProfanityFilter(id: string, filter: string): Promise<UserSettings> {
+  // public async updateProfanityFilter(id: string, filter: ProfanityFilter): Promise<UserSettings> {
   //   const db: UserSettingsModel = await UserSettingsService.updateProfanityFilter(id, filter);
   //   return this.upsert(db);
   // }
@@ -53,13 +53,8 @@ export class UserSettingsManager {
 
   public static upsert(props: UserSettingsProps): UserSettings {
     const userSetting: UserSettings | undefined = this.get(props.id);
-
-    if (userSetting) {
-      Object.assign(userSetting, props);
-      return userSetting;
-    }
-
-    return this.create(props);
+    if (!userSetting) return this.create(props);
+    return Object.assign(userSetting, props);
   }
 
   public static delete(id: string): void {

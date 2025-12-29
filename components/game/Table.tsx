@@ -585,7 +585,7 @@ export default function Table(): ReactNode {
   };
 
   const handleSendMessage = (event: React.KeyboardEvent<HTMLInputElement>): void => {
-    if (event.code === "Enter" && messageInputRef.current?.value) {
+    if (event.key === "Enter" && messageInputRef.current?.value) {
       const text: string = messageInputRef.current.value.trim();
 
       if (text !== "") {

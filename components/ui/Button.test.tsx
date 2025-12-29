@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { Mock } from "vitest";
 import Button from "@/components/ui/Button";
 
-describe("Button", () => {
+describe("Button Component", () => {
   it("should render button with provided children", () => {
     render(<Button>Click Me</Button>);
     expect(screen.getByText("Click Me")).toBeInTheDocument();

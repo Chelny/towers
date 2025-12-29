@@ -1,9 +1,8 @@
 export const ServerInternalEvents = {
   // User
-  USER_SETTINGS_AVATAR: "stc:user-settings:avatar",
-  USER_MUTE_CHECK: "stc:user-mute:check",
-  USER_MUTE: "stc:user-mute:mute",
-  USER_UNMUTE: "stc:user-mute:unmute",
+  USER_SETTINGS_AVATAR: "server:user-settings:avatar",
+  USER_RELATIONSHIP_MUTE: "server:user-relationship:mute",
+  USER_RELATIONSHIP_UNMUTE: "server:user-relationship:unmute",
 
   // Conversation
   CONVERSATION_MARK_AS_READ: "server:conversation:read",

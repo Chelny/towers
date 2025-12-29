@@ -14,7 +14,7 @@ import {
   AddPasskeyPayload,
   addPasskeySchema,
 } from "@/app/[locale]/(protected)/account/profile/passkey.schema";
-import ProfileSectionHeader from "@/components/ProfileSectionHeader";
+import AccountSectionHeader from "@/components/AccountSectionHeader";
 import AlertMessage from "@/components/ui/AlertMessage";
 import Button from "@/components/ui/Button";
 import Input, { InputImperativeHandle } from "@/components/ui/Input";
@@ -160,7 +160,7 @@ export function PasskeysForm(): ReactNode {
   };
 
   return (
-    <ProfileSectionHeader
+    <AccountSectionHeader
       title={<Trans>Passkeys</Trans>}
       description={<Trans>Manage passkeys for faster and more secure sign-in.</Trans>}
     >
@@ -207,7 +207,7 @@ export function PasskeysForm(): ReactNode {
                   readOnly={!isEditing}
                   defaultValue={isEditing ? editingValue : passkeyName}
                   onInput={(event: InputEvent<HTMLInputElement>) => {
-                    setEditingValue((event.target as HTMLInputElement).value);
+                    setEditingValue(event.currentTarget.value);
                   }}
                 ></Input>
                 <div className="flex-1 flex gap-2 justify-end items-center">
@@ -250,6 +250,6 @@ export function PasskeysForm(): ReactNode {
           })}
         </ul>
       </div>
-    </ProfileSectionHeader>
+    </AccountSectionHeader>
   );
 }

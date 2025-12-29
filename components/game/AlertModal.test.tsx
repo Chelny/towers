@@ -21,7 +21,7 @@ const renderAlertModal = (props?: Partial<AlertModalProps>) => {
   };
 };
 
-describe("AlertModal", () => {
+describe("AlertModal Component", () => {
   beforeEach(() => {
     HTMLDialogElement.prototype.showModal = vi.fn();
     HTMLDialogElement.prototype.close = vi.fn();

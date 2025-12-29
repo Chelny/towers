@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { Mock } from "vitest";
 import Select from "@/components/ui/Select";
 
-describe("Select", () => {
+describe("Select Component", () => {
   it("should render select with placeholder", () => {
     render(
       <Select id="test-select" label="Choose option" placeholder="Select an option">

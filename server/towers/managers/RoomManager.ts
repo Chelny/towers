@@ -15,7 +15,7 @@ import { PlayerManager } from "@/server/towers/managers/PlayerManager";
 import { RoomChatMessageManager } from "@/server/towers/managers/RoomChatMessageManager";
 import { RoomPlayerManager } from "@/server/towers/managers/RoomPlayerManager";
 import { TableManager } from "@/server/towers/managers/TableManager";
-import { UserMuteManager } from "@/server/towers/managers/UserMuteManager";
+import { UserRelationshipManager } from "@/server/towers/managers/UserRelationshipManager";
 import { RoomService } from "@/server/towers/services/RoomService";
 import { TowersRoomWithRelations } from "@/types/prisma";
 
@@ -253,8 +253,8 @@ export class RoomManager {
     TableManager.delete(table.id);
   }
 
-  public static roomViewForPlayer(room: Room, playerId: string): RoomPlainObject {
-    const mutedUserIds: string[] = UserMuteManager.mutedUserIdsFor(playerId);
+  public static async roomViewForPlayer(room: Room, playerId: string): Promise<RoomPlainObject> {
+    const mutedUserIds: string[] = await UserRelationshipManager.mutedUserIdsFor(playerId);
 
     return {
       ...room.toPlainObject(),

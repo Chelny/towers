@@ -5,6 +5,7 @@ declare global {
     success: boolean
     message?: string
     data?: T
+    pagination?: Pagination
     error?: string | FormValidationErrors
   };
 
@@ -17,6 +18,16 @@ declare global {
   type NonNullableObject<T> = {
     [K in keyof T as T[K] extends null | undefined ? never : K]: T[K]
   };
+
+  type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
+
+  interface Pagination {
+    totalResults: number
+    currentPage: number
+    pageSize: number
+    totalPages: number
+    hasNextPage: boolean
+  }
 }
 
 export {};

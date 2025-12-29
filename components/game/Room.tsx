@@ -211,7 +211,7 @@ export default function Room(): ReactNode {
             if (!isSeated) {
               return {
                 ...table,
-                players: [...table.players, tablePlayer],
+                players: [...table.players, { ...tablePlayer, tableNumber: tablePlayer.table.tableNumber }],
               };
             }
           }
@@ -219,7 +219,26 @@ export default function Room(): ReactNode {
           return table;
         });
 
-        return { ...prev, tables };
+        // Update player to room's player list
+        let players: RoomPlayerPlainObject[] = [];
+        const existingPlayerIndex: number = prev.players.findIndex(
+          (rp: RoomPlayerPlainObject) => rp.playerId === tablePlayer.playerId,
+        );
+
+        if (existingPlayerIndex !== -1) {
+          players = prev.players.map((rp: RoomPlayerPlainObject, index: number) => {
+            if (index === existingPlayerIndex) {
+              return {
+                ...rp,
+                tableNumber: tablePlayer.table.tableNumber,
+              };
+            }
+
+            return rp;
+          });
+        }
+
+        return { ...prev, tables, players };
       });
     };
 
@@ -235,10 +254,23 @@ export default function Room(): ReactNode {
               players: table.players.filter((tp: TablePlayerPlainObject) => tp.playerId !== tablePlayer.playerId),
             };
           }
+
           return table;
         });
 
-        return { ...prev, tables };
+        // Update player in room's player list - set tableNumber to null
+        const players: RoomPlayerPlainObject[] = prev.players.map((rp: RoomPlayerPlainObject) => {
+          if (rp.playerId === tablePlayer.playerId) {
+            return {
+              ...rp,
+              tableNumber: null,
+            };
+          }
+
+          return rp;
+        });
+
+        return { ...prev, tables, players };
       });
     };
 
@@ -264,25 +296,19 @@ export default function Room(): ReactNode {
       socket.on(ServerToClientEvents.TABLE_DELETED, handleDeleteTable);
     };
 
-    if (socket.connected) {
+    const onConnect = (): void => {
       attachListeners();
-      if (!isJoined) {
-        emitInitialData();
-      }
-    } else {
-      socket.once("connect", () => {
-        attachListeners();
-        if (!isJoined) {
-          emitInitialData();
-        }
-      });
-    }
+      if (!isJoined) emitInitialData();
+    };
 
-    socket.on("reconnect", () => {
-      if (!isJoined) {
-        emitInitialData();
-      }
-    });
+    const onReconnect = (): void => {
+      if (!isJoined) emitInitialData();
+    };
+
+    if (socket.connected) onConnect();
+    else socket.once("connect", onConnect);
+
+    socket.on("reconnect", onReconnect);
 
     return () => {
       socket.off(ServerToClientEvents.ROOM_PLAYER_JOINED, handlePlayerJoinRoom);
@@ -293,8 +319,7 @@ export default function Room(): ReactNode {
       socket.off(ServerToClientEvents.TABLE_PLAYER_JOINED, handlePlayerJoinTable);
       socket.off(ServerToClientEvents.TABLE_PLAYER_LEFT, handlePlayerLeaveTable);
       socket.off(ServerToClientEvents.TABLE_DELETED, handleDeleteTable);
-      socket.off("connect");
-      socket.off("reconnect", emitInitialData);
+      socket.off("reconnect", onReconnect);
     };
   }, [isConnected, socketRef, roomId, isJoined]);
 
@@ -320,7 +345,7 @@ export default function Room(): ReactNode {
   };
 
   const handleSendMessage = (event: KeyboardEvent<HTMLInputElement>): void => {
-    if (event.code === "Enter" && messageInputRef.current?.value) {
+    if (event.key === "Enter" && messageInputRef.current?.value) {
       const text: string = messageInputRef.current.value.trim();
 
       if (text !== "") {

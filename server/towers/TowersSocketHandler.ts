@@ -7,9 +7,9 @@ import { Conversation } from "@/server/towers/classes/Conversation";
 import { ConversationParticipant } from "@/server/towers/classes/ConversationParticipant";
 import { Notification } from "@/server/towers/classes/Notification";
 import { PlayerControlKeys, PlayerControlKeysPlainObject } from "@/server/towers/classes/PlayerControlKeys";
-import { Room } from "@/server/towers/classes/Room";
+import { Room, RoomPlainObject } from "@/server/towers/classes/Room";
 import { RoomPlayer } from "@/server/towers/classes/RoomPlayer";
-import { Table } from "@/server/towers/classes/Table";
+import { Table, TablePlainObject } from "@/server/towers/classes/Table";
 import { TableChatMessageVariables } from "@/server/towers/classes/TableChatMessage";
 import { TablePlayer } from "@/server/towers/classes/TablePlayer";
 import { User } from "@/server/towers/classes/User";
@@ -24,7 +24,7 @@ import { TableInvitationManager } from "@/server/towers/managers/TableInvitation
 import { TableManager } from "@/server/towers/managers/TableManager";
 import { TablePlayerManager } from "@/server/towers/managers/TablePlayerManager";
 import { UserManager } from "@/server/towers/managers/UserManager";
-import { UserMuteManager } from "@/server/towers/managers/UserMuteManager";
+import { UserRelationshipManager } from "@/server/towers/managers/UserRelationshipManager";
 import { UserSettingsManager } from "@/server/towers/managers/UserSettingsManager";
 
 export class TowersSocketHandler {
@@ -36,10 +36,9 @@ export class TowersSocketHandler {
 
   public registerSocketListeners(): void {
     this.socket.on(ClientToServerEvents.USER_SETTINGS_AVATAR, this.handleSetUserAvatar);
-    this.socket.on(ClientToServerEvents.USER_MUTES, this.handleGetMutedUsers);
-    this.socket.on(ClientToServerEvents.USER_MUTE_CHECK, this.handleCheckUserMuted);
-    this.socket.on(ClientToServerEvents.USER_MUTE, this.handleMuteUser);
-    this.socket.on(ClientToServerEvents.USER_UNMUTE, this.handleUnmuteUser);
+    this.socket.on(ClientToServerEvents.USER_RELATIONSHIP_MUTE_CHECK, this.handleCheckUserMuted);
+    this.socket.on(ClientToServerEvents.USER_RELATIONSHIP_MUTE, this.handleMuteUser);
+    this.socket.on(ClientToServerEvents.USER_RELATIONSHIP_UNMUTE, this.handleUnmuteUser);
     this.socket.on(ClientToServerEvents.PING_REQUEST, this.handlePingUser);
 
     this.socket.on(ClientToServerEvents.CONVERSATIONS, this.handleGetConversations);
@@ -101,10 +100,9 @@ export class TowersSocketHandler {
 
   private cleanupSocketListeners(): void {
     this.socket.off(ClientToServerEvents.USER_SETTINGS_AVATAR, this.handleSetUserAvatar);
-    this.socket.off(ClientToServerEvents.USER_MUTES, this.handleGetMutedUsers);
-    this.socket.off(ClientToServerEvents.USER_MUTE_CHECK, this.handleCheckUserMuted);
-    this.socket.off(ClientToServerEvents.USER_MUTE, this.handleMuteUser);
-    this.socket.off(ClientToServerEvents.USER_UNMUTE, this.handleUnmuteUser);
+    this.socket.off(ClientToServerEvents.USER_RELATIONSHIP_MUTE_CHECK, this.handleCheckUserMuted);
+    this.socket.off(ClientToServerEvents.USER_RELATIONSHIP_MUTE, this.handleMuteUser);
+    this.socket.off(ClientToServerEvents.USER_RELATIONSHIP_UNMUTE, this.handleUnmuteUser);
     this.socket.off(ClientToServerEvents.PING_REQUEST, this.handlePingUser);
 
     this.socket.off(ClientToServerEvents.CONVERSATIONS, this.handleGetConversations);
@@ -155,21 +153,12 @@ export class TowersSocketHandler {
     await UserSettingsManager.updateUserAvatar(this.user.id, avatarId);
   };
 
-  private handleGetMutedUsers = ({}, callback: <T>({ success, message, data }: SocketCallback<T>) => void): void => {
-    try {
-      const mutedUserIds: string[] = UserMuteManager.mutedUserIdsFor(this.user.id);
-      callback({ success: true, data: mutedUserIds });
-    } catch (error) {
-      callback({ success: false, message: error instanceof Error ? error.message : "Error getting muted users" });
-    }
-  };
-
   private handleCheckUserMuted = async (
     { mutedUserId }: { mutedUserId: string },
     callback: <T>({ success, message, data }: SocketCallback<T>) => void,
   ): Promise<void> => {
     try {
-      const isUserMuted: boolean = await UserMuteManager.isMuted(this.user.id, mutedUserId);
+      const isUserMuted: boolean = await UserRelationshipManager.isMuted(this.user.id, mutedUserId);
       callback({ success: true, data: isUserMuted });
     } catch (error) {
       callback({ success: false, message: error instanceof Error ? error.message : "Error checking if user is muted" });
@@ -177,16 +166,18 @@ export class TowersSocketHandler {
   };
 
   private handleMuteUser = async ({ mutedUserId }: { mutedUserId: string }): Promise<void> => {
-    if (!(await UserMuteManager.isMuted(this.user.id, mutedUserId))) {
+    if (!(await UserRelationshipManager.isMuted(this.user.id, mutedUserId))) {
       const user: User | undefined = UserManager.get(mutedUserId);
       if (!user) throw new Error("User not found");
-      UserMuteManager.create({ muterUser: this.user, mutedUser: user });
+      await UserRelationshipManager.mute(this.user, user);
     }
   };
 
   private handleUnmuteUser = async ({ mutedUserId }: { mutedUserId: string }): Promise<void> => {
-    if (await UserMuteManager.isMuted(this.user.id, mutedUserId)) {
-      UserMuteManager.unmute(this.user.id, mutedUserId);
+    if (await UserRelationshipManager.isMuted(this.user.id, mutedUserId)) {
+      const user: User | undefined = UserManager.get(mutedUserId);
+      if (!user) throw new Error("User not found");
+      await UserRelationshipManager.unmute(this.user, user);
     }
   };
 
@@ -336,19 +327,22 @@ export class TowersSocketHandler {
     if (room) {
       if (!RoomManager.canUserAccess(room, this.user.id)) {
         callback({ success: false, message: "Room cannot be accessed." });
-      } else if (room.players.some((rp: RoomPlayer) => rp.playerId === this.user.id)) {
-        callback({
-          success: true,
-          message: "You are already in the table.",
-          data: RoomManager.roomViewForPlayer(room, this.user.id),
-        }); // TODO: Remove data when db logic will be implemented
       } else {
-        RoomManager.joinRoom(room, this.user);
-        callback({
-          success: true,
-          message: "You joined the room.",
-          data: RoomManager.roomViewForPlayer(room, this.user.id),
-        }); // TODO: Remove data when db logic will be implemented
+        const data: RoomPlainObject = await RoomManager.roomViewForPlayer(room, this.user.id);
+        if (room.players.some((rp: RoomPlayer) => rp.playerId === this.user.id)) {
+          callback({
+            success: true,
+            message: "You are already in the table.",
+            data, // TODO: Remove data when db logic will be implemented
+          });
+        } else {
+          await RoomManager.joinRoom(room, this.user);
+          callback({
+            success: true,
+            message: "You joined the room.",
+            data, // TODO: Remove data when db logic will be implemented
+          });
+        }
       }
     } else {
       callback({ success: false, message: "Room not found." });
@@ -395,19 +389,22 @@ export class TowersSocketHandler {
     if (table) {
       if (!TableManager.canUserAccess(table, this.user.id)) {
         callback({ success: false, message: "Table cannot be accessed." });
-      } else if (table.players.some((tp: TablePlayer) => tp.playerId === this.user.id)) {
-        callback({
-          success: true,
-          message: "You are already in the table.",
-          data: TableManager.tableViewForPlayer(table, this.user.id),
-        }); // TODO: Remove data when db logic will be implemented
       } else {
-        TableManager.joinTable(table, this.user, seatNumber);
-        callback({
-          success: true,
-          message: "You joined the table.",
-          data: TableManager.tableViewForPlayer(table, this.user.id),
-        }); // TODO: Remove data when db logic will be implemented
+        const data: TablePlainObject = await TableManager.tableViewForPlayer(table, this.user.id);
+        if (table.players.some((tp: TablePlayer) => tp.playerId === this.user.id)) {
+          callback({
+            success: true,
+            message: "You are already in the table.",
+            data, // TODO: Remove data when db logic will be implemented
+          });
+        } else {
+          await TableManager.joinTable(table, this.user, seatNumber);
+          callback({
+            success: true,
+            message: "You joined the table.",
+            data, // TODO: Remove data when db logic will be implemented
+          });
+        }
       }
     } else {
       callback({ success: false, message: "Table not found." });

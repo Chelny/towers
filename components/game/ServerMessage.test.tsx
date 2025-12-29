@@ -13,9 +13,7 @@ vi.mock("@/context/SocketContext", async () => {
   };
 });
 
-describe("ServerMessage", () => {
-  const mockRoomId: string = "mock-room-1";
-
+describe("ServerMessage Component", () => {
   beforeEach(() => {
     vi.useFakeTimers();
   });

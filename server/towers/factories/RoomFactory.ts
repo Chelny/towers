@@ -27,7 +27,7 @@ export class RoomFactory {
     });
   }
 
-  public static convertToPlainObject(dbRoom: TowersRoomWithRelations, userId: string): RoomPlainObject {
+  public static async convertToPlainObject(dbRoom: TowersRoomWithRelations, userId: string): Promise<RoomPlainObject> {
     const room: Room = this.createRoom(dbRoom);
 
     room.players = dbRoom.players.map((rp: TowersRoomPlayerWithRelations) => {

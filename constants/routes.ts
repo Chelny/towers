@@ -13,6 +13,11 @@ export const ROUTE_SIGN_IN_WITH_MAGIC_LINK = {
 };
 export const ROUTE_ACCOUNT = { ID: "account", TITLE: msg`Account`, PATH: "/account" };
 export const ROUTE_PROFILE = { ID: "account-profile", TITLE: msg`Profile`, PATH: `${ROUTE_ACCOUNT.PATH}/profile` };
+export const ROUTE_RELATIONSHIPS = {
+  ID: "account-relationships",
+  TITLE: msg`Relationships`,
+  PATH: `${ROUTE_ACCOUNT.PATH}/relationships`,
+};
 export const ROUTE_SETTINGS = { ID: "account-settings", TITLE: msg`Settings`, PATH: `${ROUTE_ACCOUNT.PATH}/settings` };
 export const ROUTE_DELETE_ACCOUNT = {
   ID: "account-delete-account",

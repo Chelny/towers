@@ -41,7 +41,6 @@ export class UserManager {
 
     if (user) {
       user.username = props.username;
-      user.image = props.image;
       user.userSettings = props.userSettings
         ? new UserSettings({
             id: props.userSettings.id,

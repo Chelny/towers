@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/react";
 import { vi } from "vitest";
 import Timer from "@/components/game/Timer";
 
-describe("Timer", () => {
+describe("Timer Component", () => {
   beforeEach(() => {
     vi.useFakeTimers();
   });

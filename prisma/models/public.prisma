@@ -1,0 +1,244 @@
+model User {
+  id                       String                    @id @default(cuid(2))
+  name                     String
+  birthdate                DateTime?
+  email                    String                    @unique
+  emailVerified            Boolean                   @default(false) @map("email_verified")
+  username                 String                    @unique
+  displayUsername          String?                   @map("display_username")
+  image                    String?
+  language                 String                    @default("en")
+  role                     UserRole                  @default(USER)
+  banned                   Boolean?
+  banReason                String?                   @map("ban_reason")
+  banExpires               DateTime?                 @map("ban_expires_at")
+  accounts                 Account[]
+  passkeys                 Passkey[]
+  sessions                 Session[]
+  relationshipSourceUsers  UserRelationship[]        @relation("UserRelationshipSource")
+  relationshipTargetUsers  UserRelationship[]        @relation("UserRelationshipTarget")
+  conversationParticipants ConversationParticipant[]
+  sentInstantMessages      InstantMessage[]          @relation("InstantMessageSender")
+  userSettings             UserSettings?
+  towersPlayer             TowersPlayer?
+  createdAt                DateTime                  @default(now()) @map("created_at")
+  updatedAt                DateTime                  @updatedAt @map("updated_at")
+
+  @@map("users")
+  @@schema("public")
+}
+
+model Account {
+  id                    String    @id @default(cuid(2))
+  userId                String    @map("user_id")
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accountId             String    @map("account_id")
+  providerId            String    @map("provider_id")
+  accessToken           String?   @map("access_token")
+  refreshToken          String?   @map("refresh_token")
+  accessTokenExpiresAt  DateTime? @map("access_token_expires_at")
+  refreshTokenExpiresAt DateTime? @map("refresh_token_expires_at")
+  idToken               String?   @map("id_token")
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @updatedAt @map("updated_at")
+
+  @@map("accounts")
+  @@schema("public")
+}
+
+model Passkey {
+  id           String   @id @default(cuid(2))
+  name         String?
+  publicKey    String   @map("public_key")
+  userId       String   @map("user_id")
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  credentialID String   @map("credential_id")
+  counter      Int
+  deviceType   String   @map("device_type")
+  backedUp     Boolean  @map("backed_up")
+  transports   String?
+  aaguid       String?
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@map("passkeys")
+  @@schema("public")
+}
+
+model Session {
+  id             String   @id @default(cuid(2))
+  userId         String   @map("user_id")
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token          String   @unique
+  expiresAt      DateTime @map("expires_at")
+  ipAddress      String?  @map("ip_address")
+  userAgent      String?  @map("user_agent")
+  impersonatedBy String?  @map("impersonated_by")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  @@map("sessions")
+  @@schema("public")
+}
+
+model Verification {
+  id         String   @id @default(cuid(2))
+  identifier String
+  value      String
+  expiresAt  DateTime @map("expires_at")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@map("verifications")
+  @@schema("public")
+}
+
+model RateLimit {
+  id          String   @id @default(cuid(2))
+  key         String?
+  count       Int?
+  lastRequest BigInt?  @map("last_request")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("rate_limits")
+  @@schema("public")
+}
+
+model UserSettings {
+  id              String          @id @map("user_id")
+  user            User            @relation(fields: [id], references: [id], onDelete: Cascade)
+  avatarId        String          @default("001") @map("avatar_id")
+  theme           WebsiteTheme    @default(SYSTEM)
+  profanityFilter ProfanityFilter @default(WEAK) @map("profanity_filter")
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+
+  @@map("user_settings")
+  @@schema("public")
+}
+
+model UserRelationship {
+  id           String           @id @default(cuid(2))
+  sourceUserId String           @map("source_user_id")
+  sourceUser   User             @relation("UserRelationshipSource", fields: [sourceUserId], references: [id], onDelete: Cascade)
+  targetUserId String           @map("target_user_id")
+  targetUser   User             @relation("UserRelationshipTarget", fields: [targetUserId], references: [id], onDelete: Cascade)
+  type         RelationshipType @default(NONE)
+  blockReason  BlockReason      @default(NO_REASON) @map("block_reason")
+  isMuted      Boolean          @default(false) @map("muted")
+  createdAt    DateTime         @default(now()) @map("created_at")
+  updatedAt    DateTime         @updatedAt @map("updated_at")
+
+  @@unique([sourceUserId, targetUserId])
+  @@map("user_relationships")
+  @@schema("public")
+}
+
+model Conversation {
+  id           String                    @id @default(cuid(2))
+  participants ConversationParticipant[]
+  messages     InstantMessage[]
+  createdAt    DateTime                  @default(now()) @map("created_at")
+  updatedAt    DateTime                  @updatedAt @map("updated_at")
+
+  @@map("conversations")
+  @@schema("public")
+}
+
+model ConversationParticipant {
+  id             String       @id @default(cuid(2))
+  conversationId String       @map("conversation_id")
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  userId         String       @map("user_id")
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  readAt         DateTime?    @map("read_at")
+  mutedAt        DateTime?    @map("muted_at")
+  removedAt      DateTime?    @map("removed_at")
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+
+  @@unique([conversationId, userId])
+  @@map("conversation_participants")
+  @@schema("public")
+}
+
+model InstantMessage {
+  id              String             @id @default(cuid(2))
+  conversationId  String             @map("conversation_id")
+  conversation    Conversation       @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  userId          String             @map("user_id")
+  user            User               @relation("InstantMessageSender", fields: [userId], references: [id], onDelete: Cascade)
+  text            String?
+  type            InstantMessageType @default(CHAT)
+  textVariables   Json?              @map("text_variables")
+  visibleToUserId String?            @map("visible_to_user_id")
+  createdAt       DateTime           @default(now()) @map("created_at")
+  updatedAt       DateTime           @updatedAt @map("updated_at")
+
+  @@map("conversation_messages")
+  @@schema("public")
+}
+
+enum UserRole {
+  SUPERADMIN @map("SUPERADMIN")
+  ADMIN      @map("ADMIN")
+  USER       @map("USER")
+
+  @@map("user_role")
+  @@schema("public")
+}
+
+enum WebsiteTheme {
+  SYSTEM @map("SYSTEM")
+  LIGHT  @map("LIGHT")
+  DARK   @map("DARK")
+
+  @@map("website_theme")
+  @@schema("public")
+}
+
+enum ProfanityFilter {
+  STRONG @map("STRONG")
+  WEAK   @map("WEAK")
+  NONE   @map("NONE")
+
+  @@map("profanity_filter")
+  @@schema("public")
+}
+
+enum RelationshipType {
+  FOLLOWING @map("FOLLOWING")
+  FAVORITE  @map("FAVORITE")
+  BLOCKED   @map("BLOCKED")
+  NONE      @map("NONE")
+
+  @@map("relationship_type")
+  @@schema("public")
+}
+
+enum BlockReason {
+  CHEATING              @map("CHEATING")
+  HARASSMENT            @map("HARASSMENT")
+  HATE_SPEECH           @map("HATE_SPEECH")
+  IMPERSONATION         @map("IMPERSONATION")
+  INAPPROPRIATE_CONTENT @map("INAPPROPRIATE_CONTENT")
+  SCAM                  @map("SCAM")
+  SPAM                  @map("SPAM")
+  OTHER                 @map("OTHER")
+  NO_REASON             @map("NO_REASON")
+
+  @@map("block_reason")
+  @@schema("public")
+}
+
+enum InstantMessageType {
+  CHAT         @map("CHAT")
+  USER_ONLINE  @map("USER_ONLINE")
+  USER_OFFLINE @map("USER_OFFLINE")
+
+  @@map("instant_message_type")
+  @@schema("public")
+}

@@ -4,9 +4,9 @@ import { ConversationParticipant } from "@/server/towers/classes/ConversationPar
 import { InstantMessage } from "@/server/towers/classes/InstantMessage";
 import { User } from "@/server/towers/classes/User";
 
-const userChelny = new User({ id: "ulksi62tgp6rbeou94jyazsp", username: "chelny", image: null });
-const userBob = new User({ id: "u2", username: "Bob", image: null });
-const userCharlie = new User({ id: "u3", username: "Charlie", image: null });
+const userChelny = new User({ id: "ulksi62tgp6rbeou94jyazsp", username: "chelny", userSettings: null });
+const userBob = new User({ id: "u2", username: "Bob", userSettings: null });
+const userCharlie = new User({ id: "u3", username: "Charlie", userSettings: null });
 
 const participantChelny = new ConversationParticipant({ id: "cp1", conversationId: "c1", user: userChelny });
 const participantBob = new ConversationParticipant({ id: "cp3", conversationId: "c1", user: userBob });

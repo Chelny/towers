@@ -87,8 +87,7 @@ export class InstantMessageManager {
     PlayerManager.updateLastActiveAt(sender.id);
 
     // Restore conversation if removed in client
-    const unreadConversationsCount: number = ConversationManager.getUnreadConversationsCount(recipient.id);
-    ConversationParticipantManager.restoreConversationForUser(conversation, recipient.id, unreadConversationsCount);
+    ConversationParticipantManager.restoreConversationForUser(conversation, recipient.id);
   }
 
   /**

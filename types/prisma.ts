@@ -7,17 +7,7 @@ import { Prisma } from "db/client";
 export const getUserMinimalSelect = () => ({
   id: true,
   username: true,
-  image: true,
-  userSettings: {
-    select: {
-      id: true,
-      avatarId: true,
-      theme: true,
-      profanityFilter: true,
-      createdAt: true,
-      updatedAt: true,
-    },
-  },
+  userSettings: true,
   createdAt: true,
   updatedAt: true,
 });
@@ -33,16 +23,32 @@ export type UserWithRelations = Prisma.UserGetPayload<{
 }>;
 
 // ======================================
-// USER MUTE
+// USER RELATIONSHIP
 // ======================================
 
-export const getUserMuteIncludes = () => ({
-  muterUser: { select: getUserMinimalSelect() },
-  mutedUser: { select: getUserMinimalSelect() },
+export const getUserRelationshipIncludes = () => ({
+  sourceUser: { select: getUserMinimalSelect() },
+  targetUser: { select: getUserMinimalSelect() },
 });
 
-export type UserMuteWithRelations = Prisma.UserMuteGetPayload<{
-  include: ReturnType<typeof getUserMuteIncludes>
+export type UserRelationshipWithRelations = Prisma.UserRelationshipGetPayload<{
+  include: ReturnType<typeof getUserRelationshipIncludes>
+}>;
+
+export type UserRelationshipTableRow = Prisma.UserRelationshipGetPayload<{
+  select: {
+    id: true
+    type: true
+    isMuted: true
+    createdAt: true
+    targetUser: {
+      select: {
+        id: true
+        username: true
+        displayUsername: true
+      }
+    }
+  }
 }>;
 
 // ======================================

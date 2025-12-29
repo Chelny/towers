@@ -77,7 +77,7 @@ export function AvatarCycler({
         title={t({ message: "Double-click to change avatar" })}
         onDoubleClick={isCurrentUser ? handleDoubleClick : undefined}
       >
-        <Image src={selected.src} className="rtl:-scale-x-100" width={size} height={size} alt={selected.label} />
+        <Image src={selected.src} className="rtl:-scale-x-100" width={size} height={size} alt={selected.description} />
       </button>
     </div>
   );

@@ -1,10 +1,9 @@
 export const ClientToServerEvents = {
   // User
   USER_SETTINGS_AVATAR: "cts:user-settings:avatar",
-  USER_MUTES: "cts:user-mute:all",
-  USER_MUTE_CHECK: "cts:user-mute:check",
-  USER_MUTE: "cts:user-mute:mute",
-  USER_UNMUTE: "cts:user-mute:unmute",
+  USER_RELATIONSHIP_MUTE_CHECK: "cts:user-relationship:mute-check",
+  USER_RELATIONSHIP_MUTE: "cts:user-relationship:mute",
+  USER_RELATIONSHIP_UNMUTE: "cts:user-relationship:unmute",
   USER_CONNECTED: "cts:user:connected",
   USER_DISCONNECTED: "cts:user:disconnected",
   PING_REQUEST: "cts:user:ping:request",

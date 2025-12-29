@@ -92,7 +92,7 @@ export default function TableInvitationModal({
             label={t({ message: "Reason" })}
             defaultValue={reason}
             dataTestId="table-invitation_input-text_reason"
-            onInput={(event: InputEvent<HTMLInputElement>) => setReason((event.target as HTMLInputElement).value)}
+            onInput={(event: InputEvent<HTMLInputElement>) => setReason(event.currentTarget.value)}
           />
           <DeclineAllInvitationsCheckbox
             isDeclineAll={isDeclineAll}

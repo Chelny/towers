@@ -1,8 +1,7 @@
-import React from "react";
 import { render, screen } from "@testing-library/react";
 import Anchor from "@/components/ui/Anchor";
 
-describe("Anchor", () => {
+describe("Anchor Component", () => {
   it("should render the component correctly", () => {
     const href: string = "/home";
     const className: string = "custom-class";

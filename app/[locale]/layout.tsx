@@ -10,6 +10,7 @@ import { ThemeProvider } from "next-themes";
 import { LinguiClientProvider } from "@/app/[locale]/lingui-client-provider";
 import { allMessages, getI18nInstance } from "@/app/app-router-i18n";
 import { initLingui } from "@/app/init-lingui";
+import TestModeBanner from "@/components/TestModeBanner";
 import { APP_CONFIG, APP_STORAGE_KEYS } from "@/constants/app";
 import { ConversationsProvider } from "@/context/ConversationsContext";
 import { GameProvider } from "@/context/GameContext";
@@ -67,6 +68,7 @@ export default async function RootLayout({ children, params }: Readonly<RootLayo
   return (
     <html lang={locale} dir={currentLanguage?.rtl ? "rtl" : "ltr"} suppressHydrationWarning>
       <body className={inter.className}>
+        <TestModeBanner />
         <ThemeProvider
           attribute="class"
           storageKey={APP_STORAGE_KEYS.THEME}

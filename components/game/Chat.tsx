@@ -170,11 +170,10 @@ export default function Chat({
         onKeyDown={onSendMessage}
       />
       <div className="overflow-y-auto flex-1 my-1">
-        {translatedMessages?.map((message: ChatMessage) => {
-          // Table chat message
-          if ("type" in message) {
-            return (
-              <div key={message.id} className="flex">
+        {translatedMessages?.map((message: ChatMessage) => (
+          <div key={message.id} className="flex">
+            {"type" in message ? (
+              <>
                 {(message as TableChatMessagePlainObject).type === TableChatMessageType.CHAT && (
                   <span className="order-1">{message.player.user?.username}:&nbsp;</span>
                 )}
@@ -185,18 +184,15 @@ export default function Chat({
                 >
                   {message.text}
                 </span>
-              </div>
-            );
-          }
-
-          // Room chat message
-          return (
-            <div key={message.id} className="flex">
-              <span className="order-1">{message.player?.user?.username}:&nbsp;</span>
-              <span className="order-2">{message.text}</span>
-            </div>
-          );
-        })}
+              </>
+            ) : (
+              <>
+                <span className="order-1">{message.player?.user?.username}:&nbsp;</span>
+                <span className="order-2">{message.text}</span>
+              </>
+            )}
+          </div>
+        ))}
         <div ref={chatEndRef} />
       </div>
     </div>

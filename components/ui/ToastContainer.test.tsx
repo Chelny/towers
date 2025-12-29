@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import type { Toast } from "@/context/ToastContext";
 import { ToastContainer } from "./ToastContainer";
 
-describe("ToastContainer", () => {
+describe("ToastContainer Component", () => {
   it("should render nothing if there are no toasts", () => {
     render(<ToastContainer toasts={[]} />);
     expect(screen.queryByText(/.+/)).toBeNull();

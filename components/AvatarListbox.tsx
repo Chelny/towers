@@ -64,7 +64,7 @@ export function AvatarListbox({ initialAvatarId = AVATARS[0].id }: AvatarListbox
               aria-selected={isSelectedAvatar}
               onClick={() => handleSelectAvatar(avatar.id)}
             >
-              <Image src={avatar.src} className="rtl:-scale-x-100" width={32} height={32} alt={avatar.label} />
+              <Image src={avatar.src} className="rtl:-scale-x-100" width={32} height={32} alt={avatar.description} />
             </button>
           );
         })}

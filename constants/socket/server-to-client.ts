@@ -1,9 +1,8 @@
 export const ServerToClientEvents = {
   // User
   USER_SETTINGS_AVATAR: "stc:user-settings:avatar",
-  USER_MUTE_CHECK: "stc:user-mute:check",
-  USER_MUTE: "stc:user-mute:mute",
-  USER_UNMUTE: "stc:user-mute:unmute",
+  USER_RELATIONSHIP_MUTE: "stc:user-relationship:mute",
+  USER_RELATIONSHIP_UNMUTE: "stc:user-relationship:unmute",
   USER_ONLINE: "stc:user:online",
   USER_OFFLINE: "stc:user:offline",
   PING_ECHO: "stc:user:ping:echo",

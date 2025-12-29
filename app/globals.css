@@ -122,11 +122,22 @@
   --leading-default: 1;
 
   /* Animations */
+  --animate-marquee: marquee 50s linear infinite;
   --animate-move-background: move-background 180s linear infinite;
   --animate-move-up: move-up 1.5s ease-in-out forwards;
   --animate-move-down: move-down 1.5s ease-in-out forwards;
   --animate-demo-slide-power-block: demo-slide-power-block 0.8s ease-in-out forwards;
   --animate-demo-slide-power-block-rtl: demo-slide-power-block-rtl 0.4s ease-out forwards;
+
+  @keyframes marquee {
+    from {
+      transform: translateX(100%);
+    }
+
+    to {
+      transform: translateX(-100%);
+    }
+  }
 
   @keyframes move-background {
     0% {
@@ -198,6 +209,7 @@
 
   .towers-link {
     color: theme("color.blue.600");
+    text-decoration: underline;
   }
 
   .towers-link:hover {
@@ -232,6 +244,21 @@ body {
   height: 100%;
 }
 
+html {
+  scrollbar-gutter: stable both-edges;
+}
+
+@supports (scrollbar-color: auto) {
+  html {
+    scrollbar-width: thin;
+    scrollbar-color: #d4d4d8 #f1f5f9; /* Thumb, track */
+  }
+
+  html.dark {
+    scrollbar-color: #475569 #1e293b;
+  }
+}
+
 body {
   overflow-x: hidden;
   background-color: theme("color.gray.100");
@@ -241,17 +268,6 @@ body {
   @variant dark {
     background-color: var(--color-dark-background);
     color: var(--color-dark-text);
-  }
-}
-
-@supports (scrollbar-color: auto) {
-  body {
-    scrollbar-width: thin;
-    scrollbar-color: #d4d4d8 #f1f5f9; /* Thumb, track */
-  }
-
-  .dark body {
-    scrollbar-color: #475569 #1e293b;
   }
 }
 

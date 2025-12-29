@@ -4,7 +4,7 @@ import { ReactNode, useEffect, useState } from "react";
 import { ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
 import { ErrorContext, SuccessContext } from "@better-fetch/fetch";
 import { Trans, useLingui } from "@lingui/react/macro";
-import ProfileSectionHeader from "@/components/ProfileSectionHeader";
+import AccountSectionHeader from "@/components/AccountSectionHeader";
 import AlertMessage from "@/components/ui/AlertMessage";
 import Button from "@/components/ui/Button";
 import { INITIAL_FORM_STATE } from "@/constants/api";
@@ -95,7 +95,7 @@ export function LinkedSocialAccountsForm(): ReactNode {
   }, []);
 
   return (
-    <ProfileSectionHeader
+    <AccountSectionHeader
       title={<Trans>Linked Social Accounts</Trans>}
       description={<Trans>Connect or disconnect social accounts used to sign in.</Trans>}
     >
@@ -126,6 +126,6 @@ export function LinkedSocialAccountsForm(): ReactNode {
           ))}
         </ul>
       </div>
-    </ProfileSectionHeader>
+    </AccountSectionHeader>
   );
 }

@@ -1,6 +1,7 @@
 import { ProfanityFilter, User, UserRole, WebsiteTheme } from "db/browser";
 
 const commonUserSettingsProperties = {
+  avatarId: "001",
   theme: WebsiteTheme.SYSTEM,
   profanityFilter: ProfanityFilter.WEAK,
 };

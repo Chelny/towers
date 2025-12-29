@@ -14,7 +14,7 @@ import { AvatarCycler } from "@/components/AvatarCycler";
 import ConversationsModal from "@/components/ConversationsModal";
 import SidebarMenuItem from "@/components/SidebarMenuItem";
 import ThemeToggleButton from "@/components/ThemeToggleButton";
-import { ROUTE_DELETE_ACCOUNT, ROUTE_PROFILE, ROUTE_SETTINGS, ROUTE_TOWERS } from "@/constants/routes";
+import { ROUTE_PROFILE, ROUTE_RELATIONSHIPS, ROUTE_SETTINGS, ROUTE_TOWERS } from "@/constants/routes";
 import { ClientToServerEvents } from "@/constants/socket/client-to-server";
 import { ServerToClientEvents } from "@/constants/socket/server-to-client";
 import { useConversations } from "@/context/ConversationsContext";
@@ -40,8 +40,8 @@ export default function Sidebar(): ReactNode {
   const getAccountAccordionLinks = (): SidebarMenuLinkItem[] => {
     return [
       { id: ROUTE_PROFILE.ID, label: i18n._(ROUTE_PROFILE.TITLE), href: ROUTE_PROFILE.PATH },
+      { id: ROUTE_RELATIONSHIPS.ID, label: i18n._(ROUTE_RELATIONSHIPS.TITLE), href: ROUTE_RELATIONSHIPS.PATH },
       { id: ROUTE_SETTINGS.ID, label: i18n._(ROUTE_SETTINGS.TITLE), href: ROUTE_SETTINGS.PATH },
-      { id: ROUTE_DELETE_ACCOUNT.ID, label: i18n._(ROUTE_DELETE_ACCOUNT.TITLE), href: ROUTE_DELETE_ACCOUNT.PATH },
     ];
   };
 
@@ -178,8 +178,8 @@ export default function Sidebar(): ReactNode {
         isExpanded ? "w-72 items-start" : "w-24 items-center",
       )}
     >
-      <div className="flex flex-col gap-2">
-        {/* User image and collapse icon */}
+      <div className={clsx("flex flex-col gap-2", isExpanded ? "w-full" : "w-auto")}>
+        {/* User avatar and collapse icon */}
         <div className={clsx("flex items-center gap-2", isExpanded ? "w-full" : "w-auto")}>
           <div className={clsx("flex-1 flex items-center gap-4", isExpanded && "ps-2")}>
             <AvatarCycler userId={session?.user.id} initialAvatarId={session?.user.userSettings?.avatarId} />

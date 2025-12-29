@@ -88,7 +88,7 @@ export default forwardRef<InputImperativeHandle, InputProps>(function Input(
   };
 
   const handleInput = (event: InputEvent<HTMLInputElement>): void => {
-    setValue((event.target as HTMLInputElement).value);
+    setValue(event.currentTarget.value);
     onInput?.(event);
   };
 

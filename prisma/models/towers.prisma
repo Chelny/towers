@@ -1,0 +1,314 @@
+model TowersPlayer {
+  id                       String                   @id @map("user_id")
+  user                     User                     @relation(fields: [id], references: [id], onDelete: Cascade)
+  controlKeys              TowersPlayerControlKeys?
+  stats                    TowersPlayerStats?
+  roomsJoined              TowersRoomPlayer[]
+  tablesJoined             TowersTablePlayer[]
+  roomChatMessages         TowersRoomChatMessage[]
+  hostedTables             TowersTable[]
+  tableSeats               TowersTableSeat[]
+  tableChatMessages        TowersTableChatMessage[]
+  tablesBooterPlayer       TowersTableBoot[]        @relation("TableBootBooter")
+  tablesBootedPlayer       TowersTableBoot[]        @relation("TableBootBooted")
+  sentTableInvitations     TowersTableInvitation[]  @relation("TableInvitationSent")
+  receivedTableInvitations TowersTableInvitation[]  @relation("TableInvitationReceived")
+  notifications            TowersNotification[]
+  lastActiveAt             DateTime?                @map("last_active_at")
+  createdAt                DateTime                 @default(now()) @map("created_at")
+  updatedAt                DateTime                 @updatedAt @map("updated_at")
+
+  @@map("towers_players")
+  @@schema("towers")
+}
+
+model TowersPlayerControlKeys {
+  id               String       @id @default(cuid(2))
+  playerId         String       @unique @map("player_id")
+  player           TowersPlayer @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  moveLeft         String       @default("ArrowLeft") @map("move_left")
+  moveRight        String       @default("ArrowRight") @map("move_right")
+  cycleBlock       String       @default("ArrowUp") @map("cycle_block")
+  dropPiece        String       @default("ArrowDown") @map("drop_piece")
+  useItem          String       @default("Space") @map("use_item")
+  useItemOnPlayer1 String       @default("Digit1") @map("use_item_on_player_1")
+  useItemOnPlayer2 String       @default("Digit2") @map("use_item_on_player_2")
+  useItemOnPlayer3 String       @default("Digit3") @map("use_item_on_player_3")
+  useItemOnPlayer4 String       @default("Digit4") @map("use_item_on_player_4")
+  useItemOnPlayer5 String       @default("Digit5") @map("use_item_on_player_5")
+  useItemOnPlayer6 String       @default("Digit6") @map("use_item_on_player_6")
+  useItemOnPlayer7 String       @default("Digit7") @map("use_item_on_player_7")
+  useItemOnPlayer8 String       @default("Digit8") @map("use_item_on_player_8")
+  createdAt        DateTime     @default(now()) @map("created_at")
+  updatedAt        DateTime     @updatedAt @map("updated_at")
+
+  @@map("towers_player_control_keys")
+  @@schema("towers")
+}
+
+model TowersPlayerStats {
+  id             String       @id @default(cuid(2))
+  playerId       String       @unique @map("player_id")
+  player         TowersPlayer @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  rating         Int          @default(1200)
+  gamesCompleted Int          @default(0) @map("games_completed")
+  wins           Int          @default(0)
+  losses         Int          @default(0)
+  streak         Int          @default(0)
+  winHistory     Json?        @map("win_history")
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+
+  @@map("towers_player_stats")
+  @@schema("towers")
+}
+
+model TowersRoom {
+  id               String                  @id @default(cuid(2))
+  name             String                  @unique
+  level            RoomLevel               @default(SOCIAL)
+  sortOrder        Int                     @map("sort_order")
+  isFull           Boolean                 @default(false) @map("full")
+  players          TowersRoomPlayer[]
+  chatMessages     TowersRoomChatMessage[]
+  tables           TowersTable[]
+  tableInvitations TowersTableInvitation[]
+  createdAt        DateTime                @default(now()) @map("created_at")
+  updatedAt        DateTime                @updatedAt @map("updated_at")
+
+  @@map("towers_rooms")
+  @@schema("towers")
+}
+
+model TowersRoomPlayer {
+  id        String       @id @default(cuid())
+  roomId    String       @map("room_id")
+  room      TowersRoom   @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  playerId  String       @map("player_id")
+  player    TowersPlayer @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  createdAt DateTime     @default(now()) @map("created_at")
+  updatedAt DateTime     @updatedAt @map("updated_at")
+
+  @@unique([roomId, playerId])
+  @@map("towers_room_players")
+  @@schema("towers")
+}
+
+model TowersRoomChatMessage {
+  id        String       @id @default(cuid(2))
+  roomId    String       @map("room_id")
+  room      TowersRoom   @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  playerId  String       @map("player_id")
+  player    TowersPlayer @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  text      String
+  createdAt DateTime     @default(now()) @map("created_at")
+  updatedAt DateTime     @updatedAt @map("updated_at")
+
+  @@map("towers_room_chat_messages")
+  @@schema("towers")
+}
+
+model TowersTable {
+  id           String                   @id @default(cuid(2))
+  roomId       String                   @map("room_id")
+  room         TowersRoom               @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  tableNumber  Int                      @map("table_number")
+  hostPlayerId String                   @map("host_player_id")
+  hostPlayer   TowersPlayer             @relation(fields: [hostPlayerId], references: [id], onDelete: Cascade)
+  tableType    TableType                @default(PUBLIC) @map("table_type")
+  isRated      Boolean                  @default(true) @map("rated")
+  seats        TowersTableSeat[]
+  players      TowersTablePlayer[]
+  chatMessages TowersTableChatMessage[]
+  invitations  TowersTableInvitation[]
+  boots        TowersTableBoot[]
+  game         TowersGame?
+  createdAt    DateTime                 @default(now()) @map("created_at")
+  updatedAt    DateTime                 @updatedAt @map("updated_at")
+
+  @@unique([roomId, tableNumber])
+  @@map("towers_tables")
+  @@schema("towers")
+}
+
+model TowersTableSeat {
+  id                 String        @id @default(cuid(2))
+  tableId            String        @map("table_id")
+  table              TowersTable   @relation(fields: [tableId], references: [id], onDelete: Cascade)
+  seatNumber         Int           @map("seat_number")
+  teamNumber         Int           @map("team_number")
+  occupiedByPlayerId String?       @map("occupied_by_player_id")
+  occupiedByPlayer   TowersPlayer? @relation(fields: [occupiedByPlayerId], references: [id], onDelete: Cascade)
+  createdAt          DateTime      @default(now()) @map("created_at")
+  updatedAt          DateTime      @updatedAt @map("updated_at")
+
+  @@unique([tableId, seatNumber])
+  @@map("towers_table_seats")
+  @@schema("towers")
+}
+
+model TowersTablePlayer {
+  id        String       @id @default(cuid())
+  tableId   String       @map("table_id")
+  table     TowersTable  @relation(fields: [tableId], references: [id], onDelete: Cascade)
+  playerId  String       @map("player_id")
+  player    TowersPlayer @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  createdAt DateTime     @default(now()) @map("created_at")
+  updatedAt DateTime     @updatedAt @map("updated_at")
+
+  @@unique([tableId, playerId])
+  @@map("towers_table_players")
+  @@schema("towers")
+}
+
+model TowersTableChatMessage {
+  id              String               @id @default(cuid(2))
+  tableId         String               @map("table_id")
+  table           TowersTable          @relation(fields: [tableId], references: [id], onDelete: Cascade)
+  playerId        String               @map("player_id")
+  player          TowersPlayer         @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  text            String?
+  type            TableChatMessageType @default(CHAT)
+  textVariables   Json?                @map("text_variables")
+  visibleToUserId String?              @map("visible_to_user_id")
+  createdAt       DateTime             @default(now()) @map("created_at")
+  updatedAt       DateTime             @updatedAt @map("updated_at")
+
+  @@map("towers_table_chat_messages")
+  @@schema("towers")
+}
+
+model TowersTableInvitation {
+  id              String                @id @default(cuid(2))
+  roomId          String                @map("room_id")
+  room            TowersRoom            @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  tableId         String                @map("table_id")
+  table           TowersTable           @relation(fields: [tableId], references: [id], onDelete: Cascade)
+  inviterPlayerId String                @map("inviter_player_id")
+  inviterPlayer   TowersPlayer          @relation(name: "TableInvitationSent", fields: [inviterPlayerId], references: [id], onDelete: Cascade)
+  inviteePlayerId String                @map("invitee_player_id")
+  inviteePlayer   TowersPlayer          @relation(name: "TableInvitationReceived", fields: [inviteePlayerId], references: [id], onDelete: Cascade)
+  status          TableInvitationStatus @default(PENDING)
+  declinedReason  String?               @map("declined_reason")
+  notification    TowersNotification?
+  createdAt       DateTime              @default(now()) @map("created_at")
+  updatedAt       DateTime              @updatedAt @map("updated_at")
+
+  @@map("towers_table_invitations")
+  @@schema("towers")
+}
+
+model TowersTableBoot {
+  id             String              @id @default(cuid(2))
+  tableId        String              @map("table_id")
+  table          TowersTable         @relation(fields: [tableId], references: [id], onDelete: Cascade)
+  booterPlayerId String              @map("booter_player_id")
+  booterPlayer   TowersPlayer        @relation(name: "TableBootBooter", fields: [booterPlayerId], references: [id], onDelete: Cascade)
+  bootedPlayerId String              @map("booted_player_id")
+  bootedPlayer   TowersPlayer        @relation(name: "TableBootBooted", fields: [bootedPlayerId], references: [id], onDelete: Cascade)
+  notification   TowersNotification?
+  createdAt      DateTime            @default(now()) @map("created_at")
+  updatedAt      DateTime            @updatedAt @map("updated_at")
+
+  @@map("towers_table_boots")
+  @@schema("towers")
+}
+
+model TowersNotification {
+  id                String                 @id @default(cuid(2))
+  playerId          String                 @map("player_id")
+  player            TowersPlayer           @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  roomId            String                 @map("room_id")
+  type              NotificationType
+  tableInvitationId String?                @unique @map("table_invitation_id")
+  tableInvitation   TowersTableInvitation? @relation(fields: [tableInvitationId], references: [id], onDelete: Cascade)
+  bootedFromTableId String?                @unique @map("booted_from_table_id")
+  bootedFromTable   TowersTableBoot?       @relation(fields: [bootedFromTableId], references: [id], onDelete: Cascade)
+  readAt            DateTime?              @map("read_at")
+  createdAt         DateTime               @default(now()) @map("created_at")
+  updatedAt         DateTime               @updatedAt @map("updated_at")
+
+  @@map("towers_notifications")
+  @@schema("towers")
+}
+
+model TowersGame {
+  id        String      @id @default(cuid())
+  tableId   String      @unique @map("table_id")
+  table     TowersTable @relation(fields: [tableId], references: [id], onDelete: Cascade)
+  state     GameState   @default(WAITING)
+  startedAt DateTime?   @map("started_at")
+  endedAt   DateTime?   @map("ended_at")
+  createdAt DateTime    @default(now()) @map("created_at")
+  updatedAt DateTime    @updatedAt @map("updated_at")
+
+  @@map("towers_games")
+  @@schema("towers")
+}
+
+enum RoomLevel {
+  SOCIAL       @map("SOCIAL")
+  BEGINNER     @map("BEGINNER")
+  INTERMEDIATE @map("INTERMEDIATE")
+  ADVANCED     @map("ADVANCED")
+
+  @@map("room_level")
+  @@schema("towers")
+}
+
+enum TableType {
+  PUBLIC    @map("PUBLIC")
+  PROTECTED @map("PROTECTED")
+  PRIVATE   @map("PRIVATE")
+
+  @@map("table_type")
+  @@schema("towers")
+}
+
+enum TableChatMessageType {
+  CHAT                             @map("CHAT")
+  CIPHER_KEY                       @map("CIPHER_KEY")
+  F_KEY                            @map("F_KEY")
+  GAME_RATING                      @map("GAME_RATING")
+  HERO_CODE                        @map("HERO_CODE")
+  HERO_MESSAGE                     @map("HERO_MESSAGE")
+  TABLE_HOST                       @map("TABLE_HOST")
+  TABLE_TYPE                       @map("TABLE_TYPE")
+  USER_BOOTED_FROM_TABLE           @map("USER_BOOTED_FROM_TABLE")
+  USER_GRANTED_SEAT_ACCESS_INVITEE @map("USER_GRANTED_SEAT_ACCESS_INVITEE")
+  USER_GRANTED_SEAT_ACCESS_INVITER @map("USER_GRANTED_SEAT_ACCESS_INVITER")
+  USER_JOINED_TABLE                @map("USER_JOINED_TABLE")
+  USER_INVITED_TO_TABLE            @map("USER_INVITED_TO_TABLE")
+  USER_LEFT_TABLE                  @map("USER_LEFT_TABLE")
+
+  @@map("table_chat_message_type")
+  @@schema("towers")
+}
+
+enum TableInvitationStatus {
+  PENDING  @map("PENDING")
+  ACCEPTED @map("ACCEPTED")
+  DECLINED @map("DECLINED")
+
+  @@map("table_invitation_status")
+  @@schema("towers")
+}
+
+enum GameState {
+  WAITING   @map("WAITING")
+  COUNTDOWN @map("COUNTDOWN")
+  PLAYING   @map("PLAYING")
+  GAME_OVER @map("GAME_OVER")
+
+  @@map("game_status")
+  @@schema("towers")
+}
+
+enum NotificationType {
+  TABLE_INVITE          @map("TABLE_INVITE")
+  TABLE_INVITE_DECLINED @map("TABLE_INVITE_DECLINED")
+  TABLE_BOOTED          @map("TABLE_BOOTED")
+
+  @@map("notification_type")
+  @@schema("towers")
+}

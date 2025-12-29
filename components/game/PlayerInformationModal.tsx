@@ -90,10 +90,10 @@ export default function PlayerInformationModal({
 
     const emitInitialData = (): void => {
       socket.emit(
-        ClientToServerEvents.USER_MUTE_CHECK,
+        ClientToServerEvents.USER_RELATIONSHIP_MUTE_CHECK,
         { mutedUserId: selectedPlayer?.id },
         (response: SocketCallback<boolean>) => {
-          if (response.success && response.data) {
+          if (response.success && typeof response.data !== "undefined") {
             setIsMuted(response.data);
           }
         },
@@ -109,8 +109,8 @@ export default function PlayerInformationModal({
     };
 
     const attachListeners = (): void => {
-      socket.on(ServerToClientEvents.USER_MUTE, handleMuteUser);
-      socket.on(ServerToClientEvents.USER_UNMUTE, handleUnmuteUser);
+      socket.on(ServerToClientEvents.USER_RELATIONSHIP_MUTE, handleMuteUser);
+      socket.on(ServerToClientEvents.USER_RELATIONSHIP_UNMUTE, handleUnmuteUser);
     };
 
     if (socket.connected) {
@@ -126,8 +126,8 @@ export default function PlayerInformationModal({
     socket.on("reconnect", () => emitInitialData());
 
     return () => {
-      socket.off(ServerToClientEvents.USER_MUTE, handleMuteUser);
-      socket.off(ServerToClientEvents.USER_UNMUTE, handleUnmuteUser);
+      socket.off(ServerToClientEvents.USER_RELATIONSHIP_MUTE, handleMuteUser);
+      socket.off(ServerToClientEvents.USER_RELATIONSHIP_UNMUTE, handleUnmuteUser);
       socket.off("connect");
       socket.off("reconnect", emitInitialData);
     };
@@ -148,9 +148,9 @@ export default function PlayerInformationModal({
 
   const handleToggleMuteUser = (): void => {
     if (isMuted) {
-      socketRef.current?.emit(ClientToServerEvents.USER_UNMUTE, { mutedUserId: selectedPlayer?.id });
+      socketRef.current?.emit(ClientToServerEvents.USER_RELATIONSHIP_UNMUTE, { mutedUserId: selectedPlayer?.id });
     } else {
-      socketRef.current?.emit(ClientToServerEvents.USER_MUTE, { mutedUserId: selectedPlayer?.id });
+      socketRef.current?.emit(ClientToServerEvents.USER_RELATIONSHIP_MUTE, { mutedUserId: selectedPlayer?.id });
     }
   };
 
@@ -209,7 +209,7 @@ export default function PlayerInformationModal({
             label={t({ message: "Send instant message" })}
             defaultValue={message}
             inlineButtonText={t({ message: "Send" })}
-            onInput={(event: InputEvent<HTMLInputElement>) => setMessage((event.target as HTMLInputElement).value)}
+            onInput={(event: InputEvent<HTMLInputElement>) => setMessage(event.currentTarget.value)}
             onInlineButtonClick={handleSendMessage}
           />
         )}

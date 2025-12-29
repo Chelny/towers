@@ -1,10 +1,10 @@
 "use client";
 
 import { ReactNode, useEffect, useMemo, useState } from "react";
-import { Trans, useLingui } from "@lingui/react/macro";
+import { Trans } from "@lingui/react/macro";
 import clsx from "clsx/lite";
-import { BsSortAlphaDown, BsSortAlphaDownAlt, BsSortNumericDown, BsSortNumericDownAlt } from "react-icons/bs";
 import PlayerInformationModal from "@/components/game/PlayerInformationModal";
+import { SortIcon } from "@/components/ui/SortIcon";
 import {
   PROVISIONAL_MAX_COMPLETED_GAMES,
   RATING_DIAMOND,
@@ -18,17 +18,9 @@ import { useKeyboardActions } from "@/hooks/useKeyboardActions";
 import { RoomPlayerPlainObject } from "@/server/towers/classes/RoomPlayer";
 import { TablePlayerPlainObject } from "@/server/towers/classes/TablePlayer";
 
-type PlayersListProps = {
-  roomId: string
-  players: PlayerListItem[] | undefined
-  isRatingsVisible?: boolean | null
-  isTableNumberVisible?: boolean
-  onSelectedPlayer?: (userId: string) => void
-};
+type PlayerListItem = RoomPlayerPlainObject | TablePlayerPlainObject;
 
-export type PlayerListItem = RoomPlayerPlainObject | TablePlayerPlainObject;
-
-export function getTableNumber(playerListItem: PlayerListItem): number | null {
+function getTableNumber(playerListItem: PlayerListItem): number | null {
   if ("tableNumber" in playerListItem) {
     // RoomPlayerPlainObject
     return playerListItem.tableNumber;
@@ -42,6 +34,14 @@ export function getTableNumber(playerListItem: PlayerListItem): number | null {
   return null;
 }
 
+type PlayersListProps = {
+  roomId: string
+  players: PlayerListItem[] | undefined
+  isRatingsVisible?: boolean | null
+  isTableNumberVisible?: boolean
+  onSelectedPlayer?: (userId: string) => void
+};
+
 export default function PlayersList({
   roomId,
   players,
@@ -50,9 +50,8 @@ export default function PlayersList({
   onSelectedPlayer,
 }: PlayersListProps): ReactNode {
   const { session } = useSocket();
-  const { t } = useLingui();
   const { openModal } = useModal();
-  const [sortKey, setSortKey] = useState<"name" | "rating" | "table">("name");
+  const [orderBy, setOrderBy] = useState<"name" | "rating" | "table">("name");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | undefined>(undefined);
   const [isRTL, setIsRtl] = useState<boolean>(false);
@@ -119,7 +118,7 @@ export default function PlayersList({
     if (!players) return [];
 
     return players.slice().sort((a: PlayerListItem, b: PlayerListItem) => {
-      switch (sortKey) {
+      switch (orderBy) {
         case "name":
           const nameA: string = a.player.user.username || "";
           const nameB: string = b.player.user.username || "";
@@ -150,7 +149,7 @@ export default function PlayersList({
 
       return 0;
     });
-  }, [players, sortKey, sortOrder]);
+  }, [players, orderBy, sortOrder]);
 
   useEffect(() => {
     const checkTheme = (): void => {
@@ -177,10 +176,10 @@ export default function PlayersList({
   }, []);
 
   const handleSort = (key: "name" | "rating" | "table"): void => {
-    if (sortKey === key) {
+    if (orderBy === key) {
       setSortOrder(sortOrder === "asc" ? "desc" : "asc");
     } else {
-      setSortKey(key);
+      setOrderBy(key);
       setSortOrder("asc");
     }
   };
@@ -225,54 +224,39 @@ export default function PlayersList({
       >
         <div
           className="flex items-center gap-2 p-2 cursor-pointer"
-          role="buton"
+          role="button"
           tabIndex={0}
           onClick={() => handleSort("name")}
         >
           <span>
             <Trans>Name</Trans>
           </span>
-          {sortKey === "name" &&
-            (sortOrder === "asc" ? (
-              <BsSortAlphaDown aria-label={t({ message: "Sort ascending" })} />
-            ) : (
-              <BsSortAlphaDownAlt aria-label={t({ message: "Sort descending" })} />
-            ))}
+          <SortIcon isActive={orderBy === "name"} direction={sortOrder} variant="alpha" />
         </div>
         {isRatingsVisible && (
           <div
             className="flex items-center gap-2 p-2 cursor-pointer"
-            role="buton"
+            role="button"
             tabIndex={0}
             onClick={() => handleSort("rating")}
           >
             <span>
               <Trans>Rating</Trans>
             </span>
-            {sortKey === "rating" &&
-              (sortOrder === "asc" ? (
-                <BsSortNumericDown aria-label={t({ message: "Sort ascending" })} />
-              ) : (
-                <BsSortNumericDownAlt aria-label={t({ message: "Sort descending" })} />
-              ))}
+            <SortIcon isActive={orderBy === "rating"} direction={sortOrder} variant="numeric" />
           </div>
         )}
         {isTableNumberVisible && (
           <div
             className="flex items-center gap-2 p-2 cursor-pointer"
-            role="buton"
+            role="button"
             tabIndex={0}
             onClick={() => handleSort("table")}
           >
             <span>
               <Trans>Table</Trans>
             </span>
-            {sortKey === "table" &&
-              (sortOrder === "asc" ? (
-                <BsSortNumericDown aria-label={t({ message: "Sort ascending" })} />
-              ) : (
-                <BsSortNumericDownAlt aria-label={t({ message: "Sort descending" })} />
-              ))}
+            <SortIcon isActive={orderBy === "table"} direction={sortOrder} variant="numeric" />
           </div>
         )}
       </div>

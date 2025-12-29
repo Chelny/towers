@@ -3,7 +3,7 @@ import { Mock } from "vitest";
 import Modal from "@/components/ui/Modal";
 import { ModalProvider } from "@/context/ModalContext";
 
-describe("Modal", () => {
+describe("Modal Component", () => {
   beforeEach(() => {
     HTMLDialogElement.prototype.showModal = vi.fn();
     HTMLDialogElement.prototype.close = vi.fn();

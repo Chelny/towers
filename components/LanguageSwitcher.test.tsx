@@ -8,7 +8,7 @@ vi.mock("next/navigation", () => ({
   useRouter: vi.fn(() => mockUseRouter),
 }));
 
-describe("LanguageSwitcher", () => {
+describe("LanguageSwitcher Component", () => {
   beforeEach(() => {
     HTMLElement.prototype.scrollIntoView = vi.fn();
   });

@@ -10,7 +10,7 @@ import {
   PersonalInformationPayload,
   profileSchema,
 } from "@/app/[locale]/(protected)/account/profile/personal-information.schema";
-import ProfileSectionHeader from "@/components/ProfileSectionHeader";
+import AccountSectionHeader from "@/components/AccountSectionHeader";
 import AlertMessage from "@/components/ui/AlertMessage";
 import Button from "@/components/ui/Button";
 import Calendar from "@/components/ui/Calendar";
@@ -37,7 +37,6 @@ export function PersonalInformationForm({ session, isNewUser }: PersonalInformat
 
     const formData: FormData = new FormData(event.currentTarget);
     const payload: PersonalInformationPayload = {
-      image: formData.get("image") as string,
       name: formData.get("name") as string,
       birthdate: formData.get("birthdate") as string,
       username: formData.get("username") as string,
@@ -48,11 +47,6 @@ export function PersonalInformationForm({ session, isNewUser }: PersonalInformat
 
     for (const error of errors) {
       switch (error.path.replace("/", "")) {
-        case "image":
-          if (errorMessages.image) {
-            errorMessages.image = t({ message: "The image is invalid." });
-          }
-          break;
         case "name":
           errorMessages.name = t({ message: "The name is invalid." });
           break;
@@ -79,7 +73,6 @@ export function PersonalInformationForm({ session, isNewUser }: PersonalInformat
     } else {
       await authClient.updateUser(
         {
-          // image: payload.image ? convertImageToBase64(payload.image) : null,
           name: payload.name,
           birthdate: payload.birthdate ? new Date(payload.birthdate) : undefined,
           ...(payload.username !== session?.user.username ? { username: payload.username } : {}),
@@ -118,7 +111,7 @@ export function PersonalInformationForm({ session, isNewUser }: PersonalInformat
   };
 
   return (
-    <ProfileSectionHeader
+    <AccountSectionHeader
       title={<Trans>Personal Information</Trans>}
       description={<Trans>Update your personal details here.</Trans>}
       isNewUser={isNewUser}
@@ -127,16 +120,6 @@ export function PersonalInformationForm({ session, isNewUser }: PersonalInformat
         {formState?.message && (
           <AlertMessage type={formState.success ? "success" : "error"}>{formState.message}</AlertMessage>
         )}
-        {/* <Input
-          type="file"
-          id="image"
-          label={t({ message: "Avatar" })}
-          defaultValue={undefined}
-          disabled
-          dataTestId="profile_input-file_image"
-          errorMessage={formState?.error?.image}
-        />
-        <hr className="mt-6 mb-4" /> */}
         <Input
           id="name"
           label={t({ message: "Name" })}
@@ -178,6 +161,6 @@ export function PersonalInformationForm({ session, isNewUser }: PersonalInformat
           {!!isNewUser ? t({ message: "Complete Registration" }) : t({ message: "Update Profile" })}
         </Button>
       </form>
-    </ProfileSectionHeader>
+    </AccountSectionHeader>
   );
 }

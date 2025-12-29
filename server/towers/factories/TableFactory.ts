@@ -17,7 +17,10 @@ import {
 import { isObject } from "@/utils/object";
 
 export class TableFactory {
-  public static convertToPlainObject(dbTable: TowersTableWithRelations, userId: string): TablePlainObject {
+  public static async convertToPlainObject(
+    dbTable: TowersTableWithRelations,
+    userId: string,
+  ): Promise<TablePlainObject> {
     const room: Room = RoomFactory.createRoom(dbTable.room);
     const hostPlayer: Player = PlayerFactory.createPlayer(dbTable.hostPlayer);
     const table: Table = new Table({ ...dbTable, room, hostPlayer });
