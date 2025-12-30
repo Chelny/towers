@@ -6,12 +6,12 @@ import { publishRedisEvent } from "@/server/redis/publish";
 import { Notification } from "@/server/towers/classes/Notification";
 import { TableChatMessage } from "@/server/towers/classes/TableChatMessage";
 import { TableInvitation, TableInvitationProps } from "@/server/towers/classes/TableInvitation";
-import { User } from "@/server/towers/classes/User";
 import { NotificationManager } from "@/server/towers/managers/NotificationManager";
 import { PlayerManager } from "@/server/towers/managers/PlayerManager";
 import { TableChatMessageManager } from "@/server/towers/managers/TableChatMessageManager";
 import { TablePlayerManager } from "@/server/towers/managers/TablePlayerManager";
-import { UserManager } from "@/server/towers/managers/UserManager";
+import { User } from "@/server/youpi/classes/User";
+import { UserManager } from "@/server/youpi/managers/UserManager";
 
 export class TableInvitationManager {
   private static tableInvitations: Map<string, TableInvitation> = new Map<string, TableInvitation>();

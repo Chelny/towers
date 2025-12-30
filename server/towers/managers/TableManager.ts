@@ -13,7 +13,6 @@ import { TableChatMessage, TableChatMessageVariables } from "@/server/towers/cla
 import { TableInvitation } from "@/server/towers/classes/TableInvitation";
 import { TablePlayer } from "@/server/towers/classes/TablePlayer";
 import { TableSeat } from "@/server/towers/classes/TableSeat";
-import { User } from "@/server/towers/classes/User";
 import { CipherHeroManager } from "@/server/towers/game/CipherHeroManager";
 import { NotificationManager } from "@/server/towers/managers/NotificationManager";
 import { PlayerManager } from "@/server/towers/managers/PlayerManager";
@@ -22,7 +21,8 @@ import { TableChatMessageManager } from "@/server/towers/managers/TableChatMessa
 import { TableInvitationManager } from "@/server/towers/managers/TableInvitationManager";
 import { TablePlayerManager } from "@/server/towers/managers/TablePlayerManager";
 import { TableSeatManager } from "@/server/towers/managers/TableSeatManager";
-import { UserRelationshipManager } from "@/server/towers/managers/UserRelationshipManager";
+import { User } from "@/server/youpi/classes/User";
+import { UserRelationshipManager } from "@/server/youpi/managers/UserRelationshipManager";
 
 export class TableManager {
   private static tables: Map<string, Table> = new Map<string, Table>();

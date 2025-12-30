@@ -1,8 +1,8 @@
-import { Conversation, ConversationPlainObject } from "@/server/towers/classes/Conversation";
-import { ConversationParticipant } from "@/server/towers/classes/ConversationParticipant";
-import { InstantMessage } from "@/server/towers/classes/InstantMessage";
-import { User } from "@/server/towers/classes/User";
-import { UserFactory } from "@/server/towers/factories/UserFactory";
+import { Conversation, ConversationPlainObject } from "@/server/youpi/classes/Conversation";
+import { ConversationParticipant } from "@/server/youpi/classes/ConversationParticipant";
+import { InstantMessage } from "@/server/youpi/classes/InstantMessage";
+import { User } from "@/server/youpi/classes/User";
+import { UserFactory } from "@/server/youpi/factories/UserFactory";
 import {
   ConversationParticipantWithRelations,
   ConversationWithRelations,

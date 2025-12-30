@@ -14,12 +14,12 @@ import {
 describe("isTowersPieceBlock", () => {
   it("should return true for towers block with valid letters", () => {
     const blocks: PieceBlock[] = [
-      { letter: "T", position: { row: 0, col: 0 }, powerType: undefined, powerLevel: undefined, isToBeRemoved: false },
+      { letter: "Y", position: { row: 0, col: 0 }, powerType: undefined, powerLevel: undefined, isToBeRemoved: false },
       { letter: "O", position: { row: 0, col: 0 }, powerType: undefined, powerLevel: undefined, isToBeRemoved: false },
-      { letter: "W", position: { row: 0, col: 0 }, powerType: undefined, powerLevel: undefined, isToBeRemoved: false },
-      { letter: "E", position: { row: 0, col: 0 }, powerType: undefined, powerLevel: undefined, isToBeRemoved: false },
-      { letter: "R", position: { row: 0, col: 0 }, powerType: undefined, powerLevel: undefined, isToBeRemoved: false },
-      { letter: "S", position: { row: 0, col: 0 }, powerType: undefined, powerLevel: undefined, isToBeRemoved: false },
+      { letter: "U", position: { row: 0, col: 0 }, powerType: undefined, powerLevel: undefined, isToBeRemoved: false },
+      { letter: "P", position: { row: 0, col: 0 }, powerType: undefined, powerLevel: undefined, isToBeRemoved: false },
+      { letter: "I", position: { row: 0, col: 0 }, powerType: undefined, powerLevel: undefined, isToBeRemoved: false },
+      { letter: "!", position: { row: 0, col: 0 }, powerType: undefined, powerLevel: undefined, isToBeRemoved: false },
     ];
 
     blocks.forEach((block: PieceBlock) => {
@@ -48,7 +48,7 @@ describe("isMedusaPieceBlock", () => {
 
   it("should return false for non-medusa block", () => {
     const blocks: Block[] = [
-      { letter: "T", position: { row: 0, col: 0 }, powerType: undefined, powerLevel: undefined },
+      { letter: "Y", position: { row: 0, col: 0 }, powerType: undefined, powerLevel: undefined },
       { letter: "MI", position: { row: 0, col: 0 } },
       { letter: "SD", powerType: "speed drop" },
     ];
@@ -67,7 +67,7 @@ describe("isMidasPieceBlock", () => {
 
   it("should return false for non-midas block", () => {
     const blocks: Block[] = [
-      { letter: "T", position: { row: 0, col: 0 }, powerType: undefined, powerLevel: undefined },
+      { letter: "Y", position: { row: 0, col: 0 }, powerType: undefined, powerLevel: undefined },
       { letter: "ME", position: { row: 0, col: 0 } },
       { letter: "SD", powerType: "speed drop" },
     ];
@@ -86,7 +86,7 @@ describe("isSpecialDiamond", () => {
 
   it("should return false for non-special diamond", () => {
     const blocks: Block[] = [
-      { letter: "T", position: { row: 0, col: 0 }, powerType: undefined, powerLevel: undefined },
+      { letter: "Y", position: { row: 0, col: 0 }, powerType: undefined, powerLevel: undefined },
       { letter: "MI", position: { row: 0, col: 0 } },
       { letter: "ME", position: { row: 0, col: 0 } },
     ];
@@ -100,7 +100,7 @@ describe("isSpecialDiamond", () => {
 describe("isBoardBlock", () => {
   it("should return true for board block", () => {
     const blocks: Block[] = [
-      { letter: "T", position: { row: 0, col: 0 }, powerType: undefined, powerLevel: undefined },
+      { letter: "Y", position: { row: 0, col: 0 }, powerType: undefined, powerLevel: undefined },
       { letter: "ME", position: { row: 0, col: 0 } },
       { letter: "MI", position: { row: 0, col: 0 } },
     ];
@@ -133,7 +133,7 @@ describe("isPowerPieceBlock", () => {
 
   it("should return false for non-power piece block", () => {
     const blocks: Block[] = [
-      { letter: "T", position: { row: 0, col: 0 }, powerType: undefined, powerLevel: undefined },
+      { letter: "Y", position: { row: 0, col: 0 }, powerType: undefined, powerLevel: undefined },
       { letter: "SD", powerType: "speed drop" },
     ];
 
@@ -146,7 +146,7 @@ describe("isPowerPieceBlock", () => {
 describe("isPowerBarItem", () => {
   it("should return true for power bar block with non-undefined powerType", () => {
     const blocks: Block[] = [
-      { letter: "T", position: { row: 0, col: 0 }, powerType: "attack", powerLevel: "minor" },
+      { letter: "Y", position: { row: 0, col: 0 }, powerType: "attack", powerLevel: "minor" },
       { letter: "SD", powerType: "speed drop" },
     ];
 
@@ -157,7 +157,7 @@ describe("isPowerBarItem", () => {
 
   it("should return false for non-power bar block", () => {
     const blocks: Block[] = [
-      { letter: "T", position: { row: 0, col: 0 }, powerType: undefined, powerLevel: undefined },
+      { letter: "Y", position: { row: 0, col: 0 }, powerType: undefined, powerLevel: undefined },
       { letter: "ME", position: { row: 0, col: 0 } },
     ];
 
@@ -175,7 +175,7 @@ describe("isEmptyCell", () => {
 
   it("should return false for non-empty cell", () => {
     const blocks: Block[] = [
-      { letter: "T", position: { row: 0, col: 0 }, powerType: undefined, powerLevel: undefined },
+      { letter: "Y", position: { row: 0, col: 0 }, powerType: undefined, powerLevel: undefined },
       { letter: "ME", position: { row: 0, col: 0 } },
       { letter: "MI", position: { row: 0, col: 0 } },
       { letter: "SD", powerType: "speed drop" },

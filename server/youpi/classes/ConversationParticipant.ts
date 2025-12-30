@@ -1,4 +1,4 @@
-import { User, UserPlainObject } from "@/server/towers/classes/User";
+import { User, UserPlainObject } from "@/server/youpi/classes/User";
 
 export interface ConversationParticipantProps {
   id: string

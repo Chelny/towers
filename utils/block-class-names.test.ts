@@ -16,14 +16,14 @@ const defaultTowersBlockProps = {
 describe("getClassNameForBlock", () => {
   it("should return the correct class name for Towers block types", () => {
     const towersBlocks: PieceBlock[] = [
-      { ...defaultTowersBlockProps, letter: "T" },
+      { ...defaultTowersBlockProps, letter: "Y" },
       { ...defaultTowersBlockProps, letter: "O" },
-      { ...defaultTowersBlockProps, letter: "W" },
-      { ...defaultTowersBlockProps, letter: "E" },
-      { ...defaultTowersBlockProps, letter: "R" },
-      { ...defaultTowersBlockProps, letter: "S" },
+      { ...defaultTowersBlockProps, letter: "U" },
+      { ...defaultTowersBlockProps, letter: "P" },
+      { ...defaultTowersBlockProps, letter: "I" },
+      { ...defaultTowersBlockProps, letter: "!" },
     ];
-    const expectedClasses: string[] = ["block-t", "block-o", "block-w", "block-e", "block-r", "block-s"];
+    const expectedClasses: string[] = ["block-y", "block-o", "block-u", "block-p", "block-i", "block-x"];
 
     towersBlocks.forEach((block: PieceBlock, index: number) => {
       expect(getClassNameForBlock(block)).toBe(expectedClasses[index]);
@@ -47,7 +47,7 @@ describe("getClassNameForBlockPowerType", () => {
   it("should return the correct class name for attack power type", () => {
     const attackBlock: PieceBlock = {
       ...defaultTowersBlockProps,
-      letter: "T",
+      letter: "Y",
       powerType: "attack",
       powerLevel: "minor",
     };
@@ -58,7 +58,7 @@ describe("getClassNameForBlockPowerType", () => {
   it("should return the correct class name for defense power type", () => {
     const defenseBlock: PieceBlock = {
       ...defaultTowersBlockProps,
-      letter: "T",
+      letter: "Y",
       powerType: "defense",
       powerLevel: "minor",
     };
@@ -69,7 +69,7 @@ describe("getClassNameForBlockPowerType", () => {
   it("should return an empty string for unknown power types", () => {
     const unknownPowerTypeBlock: PieceBlock = {
       ...defaultTowersBlockProps,
-      letter: "T",
+      letter: "Y",
       powerType: "test" as PowerType,
     };
 
@@ -86,7 +86,7 @@ describe("getBlockRemovalAnimationClass", () => {
   it("should return an empty string if block is not marked to be removed", () => {
     const towersBlock: PieceBlock = {
       ...defaultTowersBlockProps,
-      letter: "T",
+      letter: "Y",
     };
     expect(getBlockRemovalAnimationClass(towersBlock)).toBe("");
   });
@@ -94,7 +94,7 @@ describe("getBlockRemovalAnimationClass", () => {
   it("should return \"block-break\" if no origin is provided", () => {
     const towersBlock: PieceBlock = {
       ...defaultTowersBlockProps,
-      letter: "T",
+      letter: "Y",
       isToBeRemoved: true,
     };
     expect(getBlockRemovalAnimationClass(towersBlock)).toBe("block-break");
@@ -117,7 +117,7 @@ describe("getBlockRemovalAnimationClass", () => {
     isToBeRemoved = false,
     removedByOrigin?: { row: number; col: number },
   ): PieceBlock => ({
-    letter: "T",
+    letter: "Y",
     position: { row, col },
     powerType: undefined,
     powerLevel: undefined,

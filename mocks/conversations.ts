@@ -1,8 +1,8 @@
 import { InstantMessageType } from "db/browser";
-import { Conversation } from "@/server/towers/classes/Conversation";
-import { ConversationParticipant } from "@/server/towers/classes/ConversationParticipant";
-import { InstantMessage } from "@/server/towers/classes/InstantMessage";
-import { User } from "@/server/towers/classes/User";
+import { Conversation } from "@/server/youpi/classes/Conversation";
+import { ConversationParticipant } from "@/server/youpi/classes/ConversationParticipant";
+import { InstantMessage } from "@/server/youpi/classes/InstantMessage";
+import { User } from "@/server/youpi/classes/User";
 
 const userChelny = new User({ id: "ulksi62tgp6rbeou94jyazsp", username: "chelny", userSettings: null });
 const userBob = new User({ id: "u2", username: "Bob", userSettings: null });

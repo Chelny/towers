@@ -8,11 +8,13 @@ import { ClientToServerEvents } from "@/constants/socket/client-to-server";
 import { ServerToClientEvents } from "@/constants/socket/server-to-client";
 import { logger } from "@/lib/logger";
 import { initRedisPublisher } from "@/server/redis/publish";
-import { User } from "@/server/towers/classes/User";
-import { serverToClientEvents } from "@/server/towers/events/server-to-client";
+import { towersServerToClientEvents } from "@/server/towers/events/server-to-client";
 import { RoomManager } from "@/server/towers/managers/RoomManager";
-import { UserManager } from "@/server/towers/managers/UserManager";
 import { TowersSocketHandler } from "@/server/towers/TowersSocketHandler";
+import { User } from "@/server/youpi/classes/User";
+import { youpiServerToClientEvents } from "@/server/youpi/events/server-to-client";
+import { UserManager } from "@/server/youpi/managers/UserManager";
+import { YoupiSocketHandler } from "@/server/youpi/YoupiSocketHandler";
 
 class AppServer {
   private readonly dev: boolean = process.env.NODE_ENV !== "production";
@@ -53,7 +55,8 @@ class AppServer {
       logger.info("Redis connection successful.");
 
       if (this.io) {
-        serverToClientEvents(this.redisSub, this.io);
+        towersServerToClientEvents(this.redisSub, this.io);
+        youpiServerToClientEvents(this.redisSub, this.io);
       } else {
         logger.warn("Socket.IO server not yet initialized — delaying serverEvents setup.");
       }
@@ -175,8 +178,11 @@ class AppServer {
     });
 
     // **************************************************
-    // * Towers Events
+    // * Other Events
     // **************************************************
+
+    const youpiHandler: YoupiSocketHandler = new YoupiSocketHandler(this.io, socket, user);
+    youpiHandler.registerSocketListeners();
 
     const towersHandler: TowersSocketHandler = new TowersSocketHandler(this.io, socket, user);
     towersHandler.registerSocketListeners();

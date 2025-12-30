@@ -22,12 +22,12 @@ export default async function SettingsLayout({ children, params }: SettingsLayou
                 <h3 className="mb-2 text-lg font-semibold text-muted-foreground">{i18n._("Preferences")}</h3>
                 <ul className="space-y-1">
                   <li>
-                    <Link href={ROUTE_SETTINGS.PATH} className="towers-link">
+                    <Link href={ROUTE_SETTINGS.PATH} className="youpi-link">
                       {i18n._("Language")}
                     </Link>
                   </li>
                   <li>
-                    <Link href={ROUTE_SETTINGS.PATH} className="towers-link">
+                    <Link href={ROUTE_SETTINGS.PATH} className="youpi-link">
                       {i18n._("Theme")}
                     </Link>
                   </li>
@@ -39,7 +39,7 @@ export default async function SettingsLayout({ children, params }: SettingsLayou
                 <h3 className="mb-2 text-lg font-semibold text-red-500">{i18n._("Danger zone")}</h3>
                 <ul>
                   <li>
-                    <Link href={ROUTE_DELETE_ACCOUNT.PATH} className="towers-link">
+                    <Link href={ROUTE_DELETE_ACCOUNT.PATH} className="youpi-link">
                       {i18n._(ROUTE_DELETE_ACCOUNT.TITLE)}
                     </Link>
                   </li>

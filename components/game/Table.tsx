@@ -622,7 +622,7 @@ export default function Table(): ReactNode {
 
     // Attack powers
     if (powerType === "attack") {
-      if (letter === "T") {
+      if (letter === "Y") {
         return <Trans>You can add a row</Trans>;
       } else if (letter === "O") {
         return (
@@ -633,7 +633,7 @@ export default function Table(): ReactNode {
             other="You can dither"
           />
         );
-      } else if (letter === "W") {
+      } else if (letter === "U") {
         return (
           <TransSelect
             value={powerLevel}
@@ -643,7 +643,7 @@ export default function Table(): ReactNode {
             other="You can add stones"
           />
         );
-      } else if (letter === "E") {
+      } else if (letter === "P") {
         return (
           <TransSelect
             value={powerLevel}
@@ -652,9 +652,9 @@ export default function Table(): ReactNode {
             other="You can defuse"
           />
         );
-      } else if (letter === "R") {
+      } else if (letter === "I") {
         return <Trans>You can send a Medusa piece</Trans>;
-      } else if (letter === "S") {
+      } else if (letter === "!") {
         return (
           <TransSelect
             value={powerLevel}
@@ -668,7 +668,7 @@ export default function Table(): ReactNode {
 
     // Defense powers
     if (powerType === "defense") {
-      if (letter === "T") {
+      if (letter === "Y") {
         return <Trans>You can remove a row</Trans>;
       } else if (letter === "O") {
         return (
@@ -679,7 +679,7 @@ export default function Table(): ReactNode {
             other="You can clump"
           />
         );
-      } else if (letter === "W") {
+      } else if (letter === "U") {
         return (
           <TransSelect
             value={powerLevel}
@@ -689,11 +689,11 @@ export default function Table(): ReactNode {
             other="You can drop stones"
           />
         );
-      } else if (letter === "E") {
+      } else if (letter === "P") {
         return <Trans>You can color blast</Trans>;
-      } else if (letter === "R") {
+      } else if (letter === "I") {
         return <Trans>You can send a Midas piece</Trans>;
-      } else if (letter === "S") {
+      } else if (letter === "!") {
         return <Trans>You can send a color plague</Trans>;
       }
     }
@@ -720,7 +720,7 @@ export default function Table(): ReactNode {
 
     // Attack
     if (powerType === "attack") {
-      if (letter === "T") {
+      if (letter === "Y") {
         return (
           <Trans>
             {sourceUsername} added a row to {targetUsername}
@@ -735,13 +735,13 @@ export default function Table(): ReactNode {
             other={`${sourceUsername} dithered ${targetUsername}`}
           />
         );
-      } else if (letter === "W") {
+      } else if (letter === "U") {
         return (
           <Trans>
             {sourceUsername} stoned {targetUsername}
           </Trans>
         );
-      } else if (letter === "E") {
+      } else if (letter === "P") {
         return (
           <TransSelect
             value={powerLevel}
@@ -750,13 +750,13 @@ export default function Table(): ReactNode {
             other={`${sourceUsername} defused ${targetUsername}`}
           />
         );
-      } else if (letter === "R") {
+      } else if (letter === "I") {
         return (
           <Trans>
             {sourceUsername} sent a Medusa piece to {targetUsername}
           </Trans>
         );
-      } else if (letter === "S") {
+      } else if (letter === "!") {
         return (
           <Trans>
             {sourceUsername} removed powers from {targetUsername}
@@ -767,7 +767,7 @@ export default function Table(): ReactNode {
 
     // Defense
     if (powerType === "defense") {
-      if (letter === "T") {
+      if (letter === "Y") {
         return (
           <Trans>
             {sourceUsername} removed a row from {targetUsername}
@@ -779,7 +779,7 @@ export default function Table(): ReactNode {
             {sourceUsername} clumped {targetUsername}
           </Trans>
         );
-      } else if (letter === "W") {
+      } else if (letter === "U") {
         const value: number | undefined =
           powerLevel === "minor" ? 1 : powerLevel === "normal" ? 2 : powerLevel === "mega" ? 3 : undefined;
         return (
@@ -791,19 +791,19 @@ export default function Table(): ReactNode {
             other={`${sourceUsername} dropped stones for ${targetUsername}`}
           />
         );
-      } else if (letter === "E") {
+      } else if (letter === "P") {
         return (
           <Trans>
             {sourceUsername} color blasted {targetUsername}
           </Trans>
         );
-      } else if (letter === "R") {
+      } else if (letter === "I") {
         return (
           <Trans>
             {sourceUsername} sent a Midas piece to {targetUsername}
           </Trans>
         );
-      } else if (letter === "S") {
+      } else if (letter === "!") {
         return (
           <Trans>
             {sourceUsername} sent a color plague to {targetUsername}

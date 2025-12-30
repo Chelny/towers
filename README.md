@@ -1,10 +1,10 @@
 <a name="readme-top"></a>
 
-[![Contributors](https://img.shields.io/github/contributors/Chelny/towers.svg?style=for-the-badge)](https://github.com/Chelny/towers/graphs/contributors)
-[![Forks](https://img.shields.io/github/forks/Chelny/towers.svg?style=for-the-badge)](https://github.com/Chelny/towers/network/members)
-[![Stargazers](https://img.shields.io/github/stars/Chelny/towers.svg?style=for-the-badge)](https://github.com/Chelny/towers/stargazers)
-[![Issues](https://img.shields.io/github/issues/Chelny/towers.svg?style=for-the-badge)](https://github.com/Chelny/towers/issues)
-[![MIT License](https://img.shields.io/github/license/Chelny/towers.svg?style=for-the-badge)](https://github.com/Chelny/towers/blob/master/LICENSE.txt)
+[![Contributors](https://img.shields.io/github/contributors/Chelny/youpi.svg?style=for-the-badge)](https://github.com/Chelny/youpi/graphs/contributors)
+[![Forks](https://img.shields.io/github/forks/Chelny/youpi.svg?style=for-the-badge)](https://github.com/Chelny/youpi/network/members)
+[![Stargazers](https://img.shields.io/github/stars/Chelny/youpi.svg?style=for-the-badge)](https://github.com/Chelny/youpi/stargazers)
+[![Issues](https://img.shields.io/github/issues/Chelny/youpi.svg?style=for-the-badge)](https://github.com/Chelny/youpi/issues)
+[![MIT License](https://img.shields.io/github/license/Chelny/youpi.svg?style=for-the-badge)](https://github.com/Chelny/youpi/blob/master/LICENSE.txt)
 
 <br />
 
@@ -19,14 +19,14 @@
 
   <br />
 
-  <h1 align="center" style="border-bottom: none;">Towers</h1>
+  <h1 align="center" style="border-bottom: none;">Youpi!</h1>
 
   <p align="center">
     <del>View Demo</del>
     ·
-    <a href="https://github.com/Chelny/towers/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
+    <a href="https://github.com/Chelny/youpi/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
     ·
-    <a href="https://github.com/Chelny/towers/issues/new?labels=enhancement&template=feature-request---.md">Request Feature</a>
+    <a href="https://github.com/Chelny/youpi/issues/new?labels=enhancement&template=feature-request---.md">Request Feature</a>
   </p>
 </div>
 
@@ -94,8 +94,8 @@ This project is inspired by Yahoo! Towers but is an independent work. It is not 
 1. Clone the repository
 
    ```sh
-   git clone git@github.com:Chelny/towers.git
-   cd towers
+   git clone git@github.com:Chelny/youpi.git
+   cd youpi
    ```
 
 1. Install dependencies
@@ -168,7 +168,7 @@ This project is inspired by Yahoo! Towers but is an independent work. It is not 
   - [ ] Prevent user from accessing the profile page while in a game room (show prompt on click)
   - [ ] Send websocket event to all rooms and tables to update the username if changed
 
-See the [open issues](https://github.com/Chelny/towers/issues) for a full list of proposed features (and known issues).
+See the [open issues](https://github.com/Chelny/youpi/issues) for a full list of proposed features (and known issues).
 
 <p align="end">(<a href="#readme-top">back to top</a>)</p>
 

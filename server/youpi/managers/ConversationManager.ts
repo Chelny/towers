@@ -1,11 +1,11 @@
 import { createId } from "@paralleldrive/cuid2";
 import { ServerInternalEvents } from "@/constants/socket/server-internal";
 import { publishRedisEvent } from "@/server/redis/publish";
-import { Conversation, ConversationProps } from "@/server/towers/classes/Conversation";
-import { ConversationParticipant } from "@/server/towers/classes/ConversationParticipant";
-import { User } from "@/server/towers/classes/User";
-import { ConversationParticipantManager } from "@/server/towers/managers/ConversationPartiticpantManager";
-import { UserManager } from "@/server/towers/managers/UserManager";
+import { Conversation, ConversationProps } from "@/server/youpi/classes/Conversation";
+import { ConversationParticipant } from "@/server/youpi/classes/ConversationParticipant";
+import { User } from "@/server/youpi/classes/User";
+import { ConversationParticipantManager } from "@/server/youpi/managers/ConversationPartiticpantManager";
+import { UserManager } from "@/server/youpi/managers/UserManager";
 
 export class ConversationManager {
   private static conversations: Map<string, Conversation> = new Map<string, Conversation>();

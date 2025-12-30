@@ -10,13 +10,13 @@ import { RoomPlayer } from "@/server/towers/classes/RoomPlayer";
 import { Table } from "@/server/towers/classes/Table";
 import { TablePlayer } from "@/server/towers/classes/TablePlayer";
 import { TableSeat } from "@/server/towers/classes/TableSeat";
-import { User } from "@/server/towers/classes/User";
 import { PlayerManager } from "@/server/towers/managers/PlayerManager";
 import { RoomChatMessageManager } from "@/server/towers/managers/RoomChatMessageManager";
 import { RoomPlayerManager } from "@/server/towers/managers/RoomPlayerManager";
 import { TableManager } from "@/server/towers/managers/TableManager";
-import { UserRelationshipManager } from "@/server/towers/managers/UserRelationshipManager";
 import { RoomService } from "@/server/towers/services/RoomService";
+import { User } from "@/server/youpi/classes/User";
+import { UserRelationshipManager } from "@/server/youpi/managers/UserRelationshipManager";
 import { TowersRoomWithRelations } from "@/types/prisma";
 
 export class RoomManager {

@@ -1,6 +1,6 @@
 import { JsonValue } from "@prisma/client/runtime/client";
 import { InstantMessageType } from "db/client";
-import { User, UserPlainObject } from "@/server/towers/classes/User";
+import { User, UserPlainObject } from "@/server/youpi/classes/User";
 
 export interface InstantMessageProps {
   id: string

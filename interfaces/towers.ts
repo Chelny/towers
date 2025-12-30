@@ -6,7 +6,7 @@ import { SpecialDiamondPlainObject } from "@/server/towers/game/SpecialDiamond";
 import { TowersPieceBlockPlainObject } from "@/server/towers/game/TowersPieceBlock";
 
 // Base Types
-export type BlockLetter = "T" | "O" | "W" | "E" | "R" | "S" | "ME" | "MI" | "SD" | typeof EMPTY_CELL;
+export type BlockLetter = "Y" | "O" | "U" | "P" | "I" | "!" | "ME" | "MI" | "SD" | typeof EMPTY_CELL;
 export type TowersLetter = Exclude<BlockLetter, "ME" | "MI" | "SD" | typeof EMPTY_CELL>;
 
 // Power-related Types

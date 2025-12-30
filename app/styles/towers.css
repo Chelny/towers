@@ -2,7 +2,7 @@
  *  Towers Blocks
  **************************************************/
 
-.block-t {
+.block-y {
   border-top: 2px solid #cecfce;
   border-right: 2px solid #313031;
   border-bottom: 2px solid #313031;
@@ -20,7 +20,7 @@
   color: #316500;
 }
 
-.block-w {
+.block-u {
   border-top: 2px solid #9ccfce;
   border-right: 2px solid #31659c;
   border-bottom: 2px solid #31659c;
@@ -29,7 +29,7 @@
   color: #003063;
 }
 
-.block-e {
+.block-p {
   border-top: 2px solid #9c9ace;
   border-right: 2px solid #313063;
   border-bottom: 2px solid #313063;
@@ -38,7 +38,7 @@
   color: #313063;
 }
 
-.block-r {
+.block-i {
   border-top: 2px solid #ffffce;
   border-right: 2px solid #9c9a63;
   border-bottom: 2px solid #9c9a63;
@@ -47,7 +47,7 @@
   color: #636531;
 }
 
-.block-s {
+.block-x {
   border-top: 2px solid #ffcf31;
   border-right: 2px solid #9c6500;
   border-bottom: 2px solid #9c6500;
@@ -72,7 +72,8 @@
     left: 0;
     width: 2rem;
     height: 2rem;
-    background: linear-gradient(-45deg, transparent 20%, #ffffff80 20%, transparent 40%),
+    background:
+      linear-gradient(-45deg, transparent 20%, #ffffff80 20%, transparent 40%),
       linear-gradient(45deg, transparent 20%, #ffffff80 20%, transparent 40%);
     background-position:
       0 0,

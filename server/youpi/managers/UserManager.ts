@@ -1,9 +1,9 @@
 import { User as UserModel, UserSettings as UserSettingsModel } from "db/client";
 import { Socket } from "socket.io";
 import { logger } from "@/lib/logger";
-import { User, UserProps } from "@/server/towers/classes/User";
-import { UserSettings } from "@/server/towers/classes/UserSettings";
-import { UserService } from "@/server/towers/services/UserService";
+import { User, UserProps } from "@/server/youpi/classes/User";
+import { UserSettings } from "@/server/youpi/classes/UserSettings";
+import { UserService } from "@/server/youpi/services/UserService";
 
 export class UserManager {
   private static users: Map<string, User> = new Map<string, User>();

@@ -1,9 +1,9 @@
 import { Player } from "@/server/towers/classes/Player";
 import { PlayerControlKeys } from "@/server/towers/classes/PlayerControlKeys";
 import { PlayerStats } from "@/server/towers/classes/PlayerStats";
-import { User } from "@/server/towers/classes/User";
 import { PlayerStatsFactory } from "@/server/towers/factories/PlayerStatsFactory";
-import { UserFactory } from "@/server/towers/factories/UserFactory";
+import { User } from "@/server/youpi/classes/User";
+import { UserFactory } from "@/server/youpi/factories/UserFactory";
 import { TowersPlayerLite } from "@/types/prisma";
 
 export class PlayerFactory {

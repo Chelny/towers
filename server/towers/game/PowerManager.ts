@@ -105,7 +105,7 @@ export class PowerManager {
       const isAttack: boolean = powerItem.powerType === "attack";
 
       switch (powerItem.letter) {
-        case "T":
+        case "Y":
           isAttack ? this.addRow() : this.removeRow();
           logger.debug(`${sourceUsername} ${isAttack ? "added a row to" : "removed a row from"} ${targetUsername}`);
           break;
@@ -113,21 +113,21 @@ export class PowerManager {
           isAttack ? this.dither(powerItem.powerLevel) : this.clump(powerItem.powerLevel);
           logger.debug(`${sourceUsername} ${isAttack ? "dithered" : "clumped"} ${targetUsername}`);
           break;
-        case "W":
+        case "U":
           isAttack ? this.addStones(powerItem.powerLevel) : this.dropStones(powerItem.powerLevel);
           logger.debug(`${sourceUsername} ${isAttack ? "stoned" : "dropped stones for"} ${targetUsername}`);
           break;
-        case "E":
+        case "P":
           isAttack ? this.defuse(powerItem.powerLevel) : this.colorBlast();
           logger.debug(`${sourceUsername} ${isAttack ? "defused" : "color blasted"} ${targetUsername}`);
           break;
-        case "R":
+        case "I":
           isAttack ? this.medusaPiece() : this.midasPiece();
           logger.debug(
             `${sourceUsername} ${isAttack ? "sent a Medusa piece to" : "sent a Midas piece to"} ${targetUsername}`,
           );
           break;
-        case "S":
+        case "!":
           isAttack ? this.removePowers(powerItem.powerLevel) : this.colorPlague();
           logger.debug(
             `${sourceUsername} ${isAttack ? "removed powers from" : "sent a color plague to"} ${targetUsername}`,
@@ -464,7 +464,7 @@ export class PowerManager {
 
     const numPurpleBlocks: number = this.grid.reduce(
       (count: number, row: BoardGridRow) =>
-        count + row.filter((block: BoardBlock) => isTowersPieceBlock(block) && block.letter === "E").length,
+        count + row.filter((block: BoardBlock) => isTowersPieceBlock(block) && block.letter === "P").length,
       0,
     );
 
@@ -479,7 +479,7 @@ export class PowerManager {
 
         const pieceBlock: BoardBlock = this.grid[row][col];
 
-        if (isTowersPieceBlock(pieceBlock) && pieceBlock.letter === "E") {
+        if (isTowersPieceBlock(pieceBlock) && pieceBlock.letter === "P") {
           this.grid[row][col] = new MedusaPieceBlock({ row, col });
           powersDefusedCount++;
         }
@@ -502,7 +502,7 @@ export class PowerManager {
       for (let col = 0; col < BOARD_COLS; col++) {
         const pieceBlock: BoardBlock = this.grid[row][col];
 
-        if (isTowersPieceBlock(pieceBlock) && pieceBlock.letter === "E") {
+        if (isTowersPieceBlock(pieceBlock) && pieceBlock.letter === "P") {
           positions.push({ row, col });
         }
       }
@@ -523,7 +523,7 @@ export class PowerManager {
             !isEmptyCell(this.grid[newRow][newCol]) &&
             !isMedusaPieceBlock(this.grid[newRow][newCol])
           ) {
-            this.grid[newRow][newCol] = new TowersPieceBlock("E", { row: newRow, col: newCol });
+            this.grid[newRow][newCol] = new TowersPieceBlock("P", { row: newRow, col: newCol });
           }
         }
       }

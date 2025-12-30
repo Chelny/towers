@@ -11,12 +11,12 @@ export interface PowerBlock {
 }
 
 export const INITIAL_TOWERS_LETTER_POWER_STATE: TowersBlockPowerState = {
-  T: { powerType: undefined, powerLevel: undefined, isPowerToBeApplied: false, brokenBlocksCount: 0 },
+  Y: { powerType: undefined, powerLevel: undefined, isPowerToBeApplied: false, brokenBlocksCount: 0 },
   O: { powerType: undefined, powerLevel: undefined, isPowerToBeApplied: false, brokenBlocksCount: 0 },
-  W: { powerType: undefined, powerLevel: undefined, isPowerToBeApplied: false, brokenBlocksCount: 0 },
-  E: { powerType: undefined, powerLevel: undefined, isPowerToBeApplied: false, brokenBlocksCount: 0 },
-  R: { powerType: undefined, powerLevel: undefined, isPowerToBeApplied: false, brokenBlocksCount: 0 },
-  S: { powerType: undefined, powerLevel: undefined, isPowerToBeApplied: false, brokenBlocksCount: 0 },
+  U: { powerType: undefined, powerLevel: undefined, isPowerToBeApplied: false, brokenBlocksCount: 0 },
+  P: { powerType: undefined, powerLevel: undefined, isPowerToBeApplied: false, brokenBlocksCount: 0 },
+  I: { powerType: undefined, powerLevel: undefined, isPowerToBeApplied: false, brokenBlocksCount: 0 },
+  "!": { powerType: undefined, powerLevel: undefined, isPowerToBeApplied: false, brokenBlocksCount: 0 },
 };
 
 /**

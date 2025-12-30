@@ -20,7 +20,7 @@ export default function Anchor({
 }: AnchorProps): ReactNode {
   return (
     <Link
-      className={clsx("towers-link", className)}
+      className={clsx("youpi-link", className)}
       href={href}
       target={target}
       rel="noopener noreferrer"

@@ -20,7 +20,7 @@ export const isPieceBlock = (block: Block): block is PieceBlock => {
 };
 
 export const isTowersPieceBlock = (block: Block): block is TowersPieceBlock => {
-  return !isEmptyCell(block) && ["T", "O", "W", "E", "R", "S"].includes(block.letter);
+  return !isEmptyCell(block) && ["Y", "O", "U", "P", "I", "!"].includes(block.letter);
 };
 
 export const isMedusaPieceBlock = (block: Block): block is MedusaPieceBlock => {

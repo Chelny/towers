@@ -18,7 +18,7 @@ export default function Error({ error, reset }: RootErrorProps): ReactNode {
   }, [error]);
 
   return (
-    <div className="relative overflow-hidden flex flex-col items-center justify-center w-full h-screen p-2 sm:p-0 bg-towers-primary">
+    <div className="relative overflow-hidden flex flex-col items-center justify-center w-full h-screen p-2 sm:p-0 bg-youpi-primary">
       <div
         className={clsx(
           "flex flex-col items-center justify-center gap-2 w-full sm:w-96 rounded shadow-xl bg-gray-200",

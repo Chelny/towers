@@ -18,7 +18,7 @@ export interface TowersPieceBlockPlainObject {
   removedByOrigin?: RemovedByOrigin
 }
 
-export const TOWERS_LETTERS: TowersBlockLetter[] = ["T", "O", "W", "E", "R", "S"];
+export const TOWERS_LETTERS: TowersBlockLetter[] = ["Y", "O", "U", "P", "I", "!"];
 
 export const isTowersPieceBlockLetter = (letter: BlockLetter): letter is TowersBlockLetter => {
   return TOWERS_LETTERS.includes(letter as TowersBlockLetter);

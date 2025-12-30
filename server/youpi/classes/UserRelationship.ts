@@ -1,5 +1,5 @@
 import { BlockReason, RelationshipType } from "db/enums";
-import { User, UserPlainObject } from "@/server/towers/classes/User";
+import { User, UserPlainObject } from "@/server/youpi/classes/User";
 
 export interface UserRelationshipProps {
   id: string

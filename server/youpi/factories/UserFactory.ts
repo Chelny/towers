@@ -1,4 +1,4 @@
-import { User } from "@/server/towers/classes/User";
+import { User } from "@/server/youpi/classes/User";
 import { UserLite } from "@/types/prisma";
 
 export class UserFactory {

@@ -1,5 +1,5 @@
-import { ConversationPlainObject } from "@/server/towers/classes/Conversation";
-import { ConversationParticipantPlainObject } from "@/server/towers/classes/ConversationParticipant";
+import { ConversationPlainObject } from "@/server/youpi/classes/Conversation";
+import { ConversationParticipantPlainObject } from "@/server/youpi/classes/ConversationParticipant";
 
 export const getUnreadConversationsCount = (conversation: ConversationPlainObject, userId?: string): number => {
   const currentParticipant: ConversationParticipantPlainObject | undefined = conversation.participants.find(

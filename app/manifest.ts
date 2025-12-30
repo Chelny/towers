@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: APP_CONFIG.NAME,
     short_name: APP_CONFIG.NAME_SHORT,
-    description: "Arcade game based on Yahoo! Towers",
+    description: "A modern recreation of the classic online block-stacking puzzle game",
     start_url: "/",
     display: "standalone",
     background_color: "#ffffff",

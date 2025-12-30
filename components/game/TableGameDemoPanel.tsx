@@ -135,17 +135,17 @@ export default function TableGameDemoPanel({ nextGameCountdown, onChangeView }: 
   const { i18n, t } = useLingui();
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [isVideoPaused, setIsVideoPaused] = useState<boolean>(false);
-  const [letters, setLetters] = useState<TowersBlockLetter[]>(["W", "E", "S"]);
+  const [letters, setLetters] = useState<TowersBlockLetter[]>(["U", "P", "!"]);
   const [position, setPosition] = useState<PieceBlockPosition>({ x: 28, y: 28 });
   const [arrowPressed, setArrowPressed] = useState<string | null>(null);
   const randomArrow: string[] = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowUp", "ArrowUp", "ArrowDown", "center"];
   const powerBlocks: PowerBlockDemo[] = [
-    { letter: "T", attackLabel: t({ message: "Add Row" }), defenseLabel: t({ message: "Remove Row" }) },
+    { letter: "Y", attackLabel: t({ message: "Add Row" }), defenseLabel: t({ message: "Remove Row" }) },
     { letter: "O", attackLabel: t({ message: "Dither" }), defenseLabel: t({ message: "Clump" }) },
-    { letter: "W", attackLabel: t({ message: "Add Stones" }), defenseLabel: t({ message: "Drop Stones" }) },
-    { letter: "E", attackLabel: t({ message: "Defuse" }), defenseLabel: t({ message: "Color Blast" }) },
-    { letter: "R", attackLabel: t({ message: "Medusa Piece" }), defenseLabel: t({ message: "Midas Piece" }) },
-    { letter: "S", attackLabel: t({ message: "Remove Powers" }), defenseLabel: t({ message: "Remove Color" }) },
+    { letter: "U", attackLabel: t({ message: "Add Stones" }), defenseLabel: t({ message: "Drop Stones" }) },
+    { letter: "P", attackLabel: t({ message: "Defuse" }), defenseLabel: t({ message: "Color Blast" }) },
+    { letter: "I", attackLabel: t({ message: "Medusa Piece" }), defenseLabel: t({ message: "Midas Piece" }) },
+    { letter: "!", attackLabel: t({ message: "Remove Powers" }), defenseLabel: t({ message: "Remove Color" }) },
   ];
   const powerColumns: PowerBlockDemo[][] = splitIntoColumns<PowerBlockDemo>(powerBlocks, 3);
   const [visibleBlockPowerType, setVisibleBlockPowerType] = useState<"attack" | "defense">("attack");
@@ -330,7 +330,7 @@ export default function TableGameDemoPanel({ nextGameCountdown, onChangeView }: 
 
     const letter: TowersBlockLetter = powerBlocks[activePowerBlockIndex].letter;
 
-    if (letter === "T") {
+    if (letter === "Y") {
       if (visibleBlockPowerType === "defense") {
         setDefenseBoard((prev) =>
           Array(BOARD_COLS)
@@ -362,7 +362,7 @@ export default function TableGameDemoPanel({ nextGameCountdown, onChangeView }: 
           return board;
         });
       }
-    } else if (letter === "W") {
+    } else if (letter === "U") {
       if (visibleBlockPowerType === "defense") {
         setDefenseBoard((prev) => {
           const board: string[] = [...prev];
@@ -389,7 +389,7 @@ export default function TableGameDemoPanel({ nextGameCountdown, onChangeView }: 
           return board;
         });
       }
-    } else if (letter === "E") {
+    } else if (letter === "P") {
       if (visibleBlockPowerType === "defense") {
         setDefenseBoard((prev) => {
           const board: string[] = [...prev];
@@ -416,7 +416,7 @@ export default function TableGameDemoPanel({ nextGameCountdown, onChangeView }: 
           return board;
         });
       }
-    } else if (letter === "R") {
+    } else if (letter === "I") {
       if (visibleBlockPowerType === "defense") {
         setDefenseBoard((prev) => {
           const board: string[] = [...prev];
@@ -448,7 +448,7 @@ export default function TableGameDemoPanel({ nextGameCountdown, onChangeView }: 
           return board;
         });
       }
-    } else if (letter === "S") {
+    } else if (letter === "!") {
       if (visibleBlockPowerType === "defense") {
         setDefenseBoard((prev) => {
           const board: string[] = [...prev];
@@ -619,12 +619,12 @@ export default function TableGameDemoPanel({ nextGameCountdown, onChangeView }: 
                           <div
                             key={index}
                             className={clsx("w-full aspect-square", {
-                              "block-t": color === "gray",
-                              "block-r": color === "yellow",
-                              "block-s": color === "orange",
-                              "block-w": color === "blue",
+                              "block-y": color === "gray",
+                              "block-i": color === "yellow",
+                              "block-x": color === "orange",
+                              "block-u": color === "blue",
                               "block-o": color === "green",
-                              "block-e": color === "purple",
+                              "block-p": color === "purple",
                               "block-medusa": color === "medusa",
                             })}
                           />
@@ -697,12 +697,12 @@ export default function TableGameDemoPanel({ nextGameCountdown, onChangeView }: 
                           <div
                             key={index}
                             className={clsx("w-full aspect-square", {
-                              "block-t": color === "gray",
-                              "block-r": color === "yellow",
-                              "block-s": color === "orange",
-                              "block-w": color === "blue",
+                              "block-y": color === "gray",
+                              "block-i": color === "yellow",
+                              "block-x": color === "orange",
+                              "block-u": color === "blue",
                               "block-o": color === "green",
-                              "block-e": color === "purple",
+                              "block-p": color === "purple",
                               "block-medusa": color === "medusa",
                             })}
                           />
@@ -710,10 +710,10 @@ export default function TableGameDemoPanel({ nextGameCountdown, onChangeView }: 
                       </div>
                       <div className="mb-11">
                         <div className={powerBarClasses}>
-                          <div className="aspect-square block-t attack-block" />
-                          <div className="aspect-square block-e defense-block" />
+                          <div className="aspect-square block-y attack-block" />
+                          <div className="aspect-square block-p defense-block" />
                           <div className="aspect-square block-o defense-block" />
-                          <div className="aspect-square block-r attack-block" />
+                          <div className="aspect-square block-i attack-block" />
                           <div className="aspect-square bg-neutral-600 dark:bg-slate-600" />
                           <div className="aspect-square bg-neutral-600 dark:bg-slate-600" />
                           <div className="aspect-square bg-neutral-600 dark:bg-slate-600" />

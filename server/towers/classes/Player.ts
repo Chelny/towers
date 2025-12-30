@@ -1,6 +1,6 @@
 import { PlayerControlKeys, PlayerControlKeysPlainObject } from "@/server/towers/classes/PlayerControlKeys";
 import { PlayerStats, PlayerStatsPlainObject } from "@/server/towers/classes/PlayerStats";
-import { User, UserPlainObject } from "@/server/towers/classes/User";
+import { User, UserPlainObject } from "@/server/youpi/classes/User";
 
 export interface PlayerProps {
   id: string

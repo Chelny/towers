@@ -17,14 +17,14 @@ msgstr ""
 #: app/[locale]/(protected)/account/profile/change-email.form.tsx:45
 #: app/[locale]/(public)/(auth)/forgot-password/forgot-password.form.tsx:39
 #: app/[locale]/(public)/(auth)/sign-in-with-magic-link/sign-in-with-magic-link.form.tsx:40
-#: app/[locale]/(public)/(auth)/sign-in/sign-in.form.tsx:55
-#: app/[locale]/(public)/(auth)/sign-up/sign-up.form.tsx:58
+#: app/[locale]/(public)/(auth)/sign-in/sign-in.form.tsx:59
+#: app/[locale]/(public)/(auth)/sign-up/sign-up.form.tsx:62
 msgid "The email is invalid."
 msgstr ""
 
 #: app/[locale]/(protected)/account/(settings)/delete/delete.form.tsx:51
 #: app/[locale]/(protected)/account/(settings)/settings/language.form.tsx:58
-#: app/[locale]/(protected)/account/(settings)/settings/theme.form.tsx:80
+#: app/[locale]/(protected)/account/(settings)/settings/theme.form.tsx:81
 #: app/[locale]/(protected)/account/profile/change-email.form.tsx:56
 #: app/[locale]/(protected)/account/profile/change-password.form.tsx:80
 #: app/[locale]/(protected)/account/profile/change-password.form.tsx:142
@@ -33,7 +33,7 @@ msgstr ""
 #: app/[locale]/(public)/(auth)/forgot-password/forgot-password.form.tsx:50
 #: app/[locale]/(public)/(auth)/reset-password/reset-password.form.tsx:67
 #: app/[locale]/(public)/(auth)/sign-in-with-magic-link/sign-in-with-magic-link.form.tsx:51
-#: app/[locale]/(public)/(auth)/sign-up/sign-up.form.tsx:85
+#: app/[locale]/(public)/(auth)/sign-up/sign-up.form.tsx:89
 msgid "Validation errors occurred."
 msgstr ""
 
@@ -51,7 +51,7 @@ msgstr ""
 
 #: app/[locale]/(protected)/account/(settings)/delete/delete.form.tsx:115
 #: app/[locale]/(protected)/account/profile/change-email.form.tsx:139
-#: app/[locale]/(public)/(auth)/sign-up/sign-up.form.tsx:160
+#: app/[locale]/(public)/(auth)/sign-up/sign-up.form.tsx:164
 msgid "Enter your email"
 msgstr ""
 
@@ -60,23 +60,23 @@ msgid "Confirm Deletion"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: app/[locale]/(protected)/account/(settings)/layout.tsx:23
+#: app/[locale]/(protected)/account/(settings)/layout.tsx:22
 #: app/[locale]/(protected)/account/(settings)/settings/page.tsx:33
 msgid "Preferences"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: app/[locale]/(protected)/account/(settings)/layout.tsx:28
+#: app/[locale]/(protected)/account/(settings)/layout.tsx:26
 msgid "Language"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: app/[locale]/(protected)/account/(settings)/layout.tsx:33
+#: app/[locale]/(protected)/account/(settings)/layout.tsx:31
 msgid "Theme"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: app/[locale]/(protected)/account/(settings)/layout.tsx:42
+#: app/[locale]/(protected)/account/(settings)/layout.tsx:39
 msgid "Danger zone"
 msgstr ""
 
@@ -97,40 +97,40 @@ msgstr ""
 msgid "Update Language"
 msgstr ""
 
-#: app/[locale]/(protected)/account/(settings)/settings/theme.form.tsx:39
+#: app/[locale]/(protected)/account/(settings)/settings/theme.form.tsx:40
 #: components/ThemeToggleButton.tsx:20
 msgid "Light"
 msgstr ""
 
-#: app/[locale]/(protected)/account/(settings)/settings/theme.form.tsx:43
+#: app/[locale]/(protected)/account/(settings)/settings/theme.form.tsx:44
 #: components/ThemeToggleButton.tsx:21
 msgid "Dark"
 msgstr ""
 
-#: app/[locale]/(protected)/account/(settings)/settings/theme.form.tsx:47
+#: app/[locale]/(protected)/account/(settings)/settings/theme.form.tsx:48
 #: components/ThemeToggleButton.tsx:22
 msgid "System"
 msgstr ""
 
-#: app/[locale]/(protected)/account/(settings)/settings/theme.form.tsx:69
+#: app/[locale]/(protected)/account/(settings)/settings/theme.form.tsx:70
 msgid "The theme is invalid."
 msgstr ""
 
-#: app/[locale]/(protected)/account/(settings)/settings/theme.form.tsx:87
+#: app/[locale]/(protected)/account/(settings)/settings/theme.form.tsx:88
 msgid "The theme has been updated!"
 msgstr ""
 
-#: app/[locale]/(protected)/account/(settings)/settings/theme.form.tsx:97
-#: app/[locale]/(protected)/account/(settings)/settings/theme.form.tsx:106
+#: app/[locale]/(protected)/account/(settings)/settings/theme.form.tsx:98
+#: app/[locale]/(protected)/account/(settings)/settings/theme.form.tsx:107
 #: components/ThemeToggleButton.tsx:59
 msgid "Theme"
 msgstr ""
 
-#: app/[locale]/(protected)/account/(settings)/settings/theme.form.tsx:98
+#: app/[locale]/(protected)/account/(settings)/settings/theme.form.tsx:99
 msgid "Choose how the site looks and feels."
 msgstr ""
 
-#: app/[locale]/(protected)/account/(settings)/settings/theme.form.tsx:127
+#: app/[locale]/(protected)/account/(settings)/settings/theme.form.tsx:128
 msgid "Update Theme"
 msgstr ""
 
@@ -143,8 +143,8 @@ msgstr ""
 #: app/[locale]/(protected)/account/profile/change-email.form.tsx:138
 #: app/[locale]/(public)/(auth)/forgot-password/forgot-password.form.tsx:92
 #: app/[locale]/(public)/(auth)/sign-in-with-magic-link/sign-in-with-magic-link.form.tsx:94
-#: app/[locale]/(public)/(auth)/sign-in/sign-in.form.tsx:174
-#: app/[locale]/(public)/(auth)/sign-up/sign-up.form.tsx:159
+#: app/[locale]/(public)/(auth)/sign-in/sign-in.form.tsx:178
+#: app/[locale]/(public)/(auth)/sign-up/sign-up.form.tsx:163
 msgid "Email"
 msgstr ""
 
@@ -162,20 +162,20 @@ msgstr ""
 
 #: app/[locale]/(protected)/account/profile/change-password.form.tsx:62
 #: app/[locale]/(public)/(auth)/reset-password/reset-password.form.tsx:49
-#: app/[locale]/(public)/(auth)/sign-in/sign-in.form.tsx:58
-#: app/[locale]/(public)/(auth)/sign-up/sign-up.form.tsx:64
+#: app/[locale]/(public)/(auth)/sign-in/sign-in.form.tsx:62
+#: app/[locale]/(public)/(auth)/sign-up/sign-up.form.tsx:68
 msgid "The password is invalid."
 msgstr ""
 
 #: app/[locale]/(protected)/account/profile/change-password.form.tsx:65
 #: app/[locale]/(public)/(auth)/reset-password/reset-password.form.tsx:52
-#: app/[locale]/(public)/(auth)/sign-up/sign-up.form.tsx:67
+#: app/[locale]/(public)/(auth)/sign-up/sign-up.form.tsx:71
 msgid "The password confirmation is invalid."
 msgstr ""
 
 #: app/[locale]/(protected)/account/profile/change-password.form.tsx:74
 #: app/[locale]/(public)/(auth)/reset-password/reset-password.form.tsx:61
-#: app/[locale]/(public)/(auth)/sign-up/sign-up.form.tsx:79
+#: app/[locale]/(public)/(auth)/sign-up/sign-up.form.tsx:83
 msgid "The password and password confirmation do not match."
 msgstr ""
 
@@ -202,8 +202,8 @@ msgstr ""
 #: app/[locale]/(protected)/account/profile/change-password.form.tsx:189
 #: app/[locale]/(protected)/account/profile/change-password.form.tsx:213
 #: app/[locale]/(public)/(auth)/reset-password/reset-password.form.tsx:127
-#: app/[locale]/(public)/(auth)/sign-in/sign-in.form.tsx:182
-#: app/[locale]/(public)/(auth)/sign-up/sign-up.form.tsx:184
+#: app/[locale]/(public)/(auth)/sign-in/sign-in.form.tsx:186
+#: app/[locale]/(public)/(auth)/sign-up/sign-up.form.tsx:188
 msgid "Password"
 msgstr ""
 
@@ -221,13 +221,13 @@ msgstr ""
 
 #: app/[locale]/(protected)/account/profile/change-password.form.tsx:219
 #: app/[locale]/(public)/(auth)/reset-password/reset-password.form.tsx:132
-#: app/[locale]/(public)/(auth)/sign-up/sign-up.form.tsx:188
+#: app/[locale]/(public)/(auth)/sign-up/sign-up.form.tsx:192
 msgid "Password must be at least 8 characters long, must contain at least one digit, one uppercase letter, and at least one special character."
 msgstr ""
 
 #: app/[locale]/(protected)/account/profile/change-password.form.tsx:229
 #: app/[locale]/(public)/(auth)/reset-password/reset-password.form.tsx:141
-#: app/[locale]/(public)/(auth)/sign-up/sign-up.form.tsx:197
+#: app/[locale]/(public)/(auth)/sign-up/sign-up.form.tsx:201
 msgid "Confirm Password"
 msgstr ""
 
@@ -281,7 +281,7 @@ msgstr ""
 
 #: app/[locale]/(protected)/account/profile/passkeys.form.tsx:49
 #: app/[locale]/(protected)/account/profile/personal-information.form.tsx:51
-#: app/[locale]/(public)/(auth)/sign-up/sign-up.form.tsx:50
+#: app/[locale]/(public)/(auth)/sign-up/sign-up.form.tsx:54
 msgid "The name is invalid."
 msgstr ""
 
@@ -307,7 +307,7 @@ msgstr ""
 
 #: app/[locale]/(protected)/account/profile/passkeys.form.tsx:175
 #: app/[locale]/(protected)/account/profile/personal-information.form.tsx:125
-#: app/[locale]/(public)/(auth)/sign-up/sign-up.form.tsx:142
+#: app/[locale]/(public)/(auth)/sign-up/sign-up.form.tsx:146
 #: components/game/PlayersList.tsx:232
 msgid "Name"
 msgstr ""
@@ -333,12 +333,12 @@ msgid "Delete \"{passkeyName}\" passkey"
 msgstr ""
 
 #: app/[locale]/(protected)/account/profile/personal-information.form.tsx:55
-#: app/[locale]/(public)/(auth)/sign-up/sign-up.form.tsx:54
+#: app/[locale]/(public)/(auth)/sign-up/sign-up.form.tsx:58
 msgid "The birthdate is invalid."
 msgstr ""
 
 #: app/[locale]/(protected)/account/profile/personal-information.form.tsx:59
-#: app/[locale]/(public)/(auth)/sign-up/sign-up.form.tsx:61
+#: app/[locale]/(public)/(auth)/sign-up/sign-up.form.tsx:65
 msgid "The username is invalid."
 msgstr ""
 
@@ -359,33 +359,33 @@ msgid "Update your personal details here."
 msgstr ""
 
 #: app/[locale]/(protected)/account/profile/personal-information.form.tsx:126
-#: app/[locale]/(public)/(auth)/sign-up/sign-up.form.tsx:143
+#: app/[locale]/(public)/(auth)/sign-up/sign-up.form.tsx:147
 msgid "Enter your name"
 msgstr ""
 
 #: app/[locale]/(protected)/account/profile/personal-information.form.tsx:134
-#: app/[locale]/(public)/(auth)/sign-up/sign-up.form.tsx:150
+#: app/[locale]/(public)/(auth)/sign-up/sign-up.form.tsx:154
 msgid "Birthdate"
 msgstr ""
 
 #: app/[locale]/(protected)/account/profile/personal-information.form.tsx:138
-#: app/[locale]/(public)/(auth)/sign-up/sign-up.form.tsx:153
+#: app/[locale]/(public)/(auth)/sign-up/sign-up.form.tsx:157
 msgid "You must be at least 13 years old."
 msgstr ""
 
 #: app/[locale]/(protected)/account/profile/personal-information.form.tsx:143
-#: app/[locale]/(protected)/account/relationships/Relationships.tsx:296
-#: app/[locale]/(public)/(auth)/sign-up/sign-up.form.tsx:169
+#: app/[locale]/(protected)/account/relationships/Relationships.tsx:275
+#: app/[locale]/(public)/(auth)/sign-up/sign-up.form.tsx:173
 msgid "Username"
 msgstr ""
 
 #: app/[locale]/(protected)/account/profile/personal-information.form.tsx:144
-#: app/[locale]/(public)/(auth)/sign-up/sign-up.form.tsx:170
+#: app/[locale]/(public)/(auth)/sign-up/sign-up.form.tsx:174
 msgid "Enter your username"
 msgstr ""
 
 #: app/[locale]/(protected)/account/profile/personal-information.form.tsx:150
-#: app/[locale]/(public)/(auth)/sign-up/sign-up.form.tsx:175
+#: app/[locale]/(public)/(auth)/sign-up/sign-up.form.tsx:179
 msgid "Username must be between 4 and 32 characters long and can contain digits, periods, and underscores."
 msgstr ""
 
@@ -397,87 +397,87 @@ msgstr ""
 msgid "Update Profile"
 msgstr ""
 
-#: app/[locale]/(protected)/account/relationships/Relationships.tsx:208
+#: app/[locale]/(protected)/account/relationships/Relationships.tsx:198
 msgid "Search users"
 msgstr ""
 
-#: app/[locale]/(protected)/account/relationships/Relationships.tsx:209
+#: app/[locale]/(protected)/account/relationships/Relationships.tsx:199
 msgid "Search by username..."
 msgstr ""
 
-#: app/[locale]/(protected)/account/relationships/Relationships.tsx:220
-#: app/[locale]/(protected)/account/relationships/Relationships.tsx:304
+#: app/[locale]/(protected)/account/relationships/Relationships.tsx:210
+#: app/[locale]/(protected)/account/relationships/Relationships.tsx:279
 msgid "Relation Type"
 msgstr ""
 
-#: app/[locale]/(protected)/account/relationships/Relationships.tsx:227
-#: app/[locale]/(protected)/account/relationships/Relationships.tsx:245
+#: app/[locale]/(protected)/account/relationships/Relationships.tsx:217
+#: app/[locale]/(protected)/account/relationships/Relationships.tsx:235
 msgid "All"
 msgstr ""
 
-#: app/[locale]/(protected)/account/relationships/Relationships.tsx:228
-#: app/[locale]/(protected)/account/relationships/Relationships.tsx:366
+#: app/[locale]/(protected)/account/relationships/Relationships.tsx:218
+#: app/[locale]/(protected)/account/relationships/Relationships.tsx:335
 msgid "Following"
 msgstr ""
 
-#: app/[locale]/(protected)/account/relationships/Relationships.tsx:229
-#: app/[locale]/(protected)/account/relationships/Relationships.tsx:367
+#: app/[locale]/(protected)/account/relationships/Relationships.tsx:219
+#: app/[locale]/(protected)/account/relationships/Relationships.tsx:336
 msgid "Favorite"
 msgstr ""
 
-#: app/[locale]/(protected)/account/relationships/Relationships.tsx:230
-#: app/[locale]/(protected)/account/relationships/Relationships.tsx:368
+#: app/[locale]/(protected)/account/relationships/Relationships.tsx:220
+#: app/[locale]/(protected)/account/relationships/Relationships.tsx:337
 msgid "Blocked"
 msgstr ""
 
-#: app/[locale]/(protected)/account/relationships/Relationships.tsx:231
-#: app/[locale]/(protected)/account/relationships/Relationships.tsx:369
+#: app/[locale]/(protected)/account/relationships/Relationships.tsx:221
+#: app/[locale]/(protected)/account/relationships/Relationships.tsx:338
 #: components/game/GameOptionsModal.tsx:117
 msgid "None"
 msgstr ""
 
-#: app/[locale]/(protected)/account/relationships/Relationships.tsx:238
-#: app/[locale]/(protected)/account/relationships/Relationships.tsx:246
-#: app/[locale]/(protected)/account/relationships/Relationships.tsx:305
+#: app/[locale]/(protected)/account/relationships/Relationships.tsx:228
+#: app/[locale]/(protected)/account/relationships/Relationships.tsx:236
+#: app/[locale]/(protected)/account/relationships/Relationships.tsx:280
 msgid "Muted"
 msgstr ""
 
-#: app/[locale]/(protected)/account/relationships/Relationships.tsx:247
+#: app/[locale]/(protected)/account/relationships/Relationships.tsx:237
 msgid "Not muted"
 msgstr ""
 
-#: app/[locale]/(protected)/account/relationships/Relationships.tsx:258
+#: app/[locale]/(protected)/account/relationships/Relationships.tsx:249
 msgid "Reset"
 msgstr ""
 
-#: app/[locale]/(protected)/account/relationships/Relationships.tsx:266
+#: app/[locale]/(protected)/account/relationships/Relationships.tsx:255
 msgid "Failed to load relationships."
 msgstr ""
 
-#: app/[locale]/(protected)/account/relationships/Relationships.tsx:319
+#: app/[locale]/(protected)/account/relationships/Relationships.tsx:294
 msgid "Date"
 msgstr ""
 
-#: app/[locale]/(protected)/account/relationships/Relationships.tsx:334
+#: app/[locale]/(protected)/account/relationships/Relationships.tsx:305
 msgid "Loading..."
 msgstr ""
 
-#: app/[locale]/(protected)/account/relationships/Relationships.tsx:340
+#: app/[locale]/(protected)/account/relationships/Relationships.tsx:311
 msgid "No results"
 msgstr ""
 
-#: app/[locale]/(protected)/account/relationships/Relationships.tsx:402
+#: app/[locale]/(protected)/account/relationships/Relationships.tsx:369
 msgid "Page"
 msgstr ""
 
 #. placeholder {0}: pagination.totalResults
 #. placeholder {1}: pagination.totalResults
 #. placeholder {2}: pagination.totalResults
-#: app/[locale]/(protected)/account/relationships/Relationships.tsx:402
+#: app/[locale]/(protected)/account/relationships/Relationships.tsx:370
 msgid "{0, plural, zero {No results} one {{1} result} other {{2} results}}"
 msgstr ""
 
-#: app/[locale]/(protected)/account/relationships/Relationships.tsx:418
+#: app/[locale]/(protected)/account/relationships/Relationships.tsx:382
 msgid "Load more"
 msgstr ""
 
@@ -549,75 +549,75 @@ msgstr ""
 msgid "Email Me A Sign In Link"
 msgstr ""
 
-#: app/[locale]/(public)/(auth)/sign-in/sign-in.form.tsx:69
+#: app/[locale]/(public)/(auth)/sign-in/sign-in.form.tsx:73
 msgid "The email or the password is invalid."
 msgstr ""
 
-#: app/[locale]/(public)/(auth)/sign-in/sign-in.form.tsx:97
-#: app/[locale]/(public)/(auth)/sign-in/sign-in.form.tsx:132
-#: app/[locale]/(public)/(auth)/sign-in/sign-in.form.tsx:161
+#: app/[locale]/(public)/(auth)/sign-in/sign-in.form.tsx:101
+#: app/[locale]/(public)/(auth)/sign-in/sign-in.form.tsx:136
+#: app/[locale]/(public)/(auth)/sign-in/sign-in.form.tsx:165
 msgid "You’re signed in successfully. Welcome back!"
 msgstr ""
 
-#: app/[locale]/(public)/(auth)/sign-in/sign-in.form.tsx:191
+#: app/[locale]/(public)/(auth)/sign-in/sign-in.form.tsx:195
 msgid "Remember me"
 msgstr ""
 
-#: app/[locale]/(public)/(auth)/sign-in/sign-in.form.tsx:198
+#: app/[locale]/(public)/(auth)/sign-in/sign-in.form.tsx:202
 #: constants/routes.ts:6
 msgid "Forgot Password"
 msgstr ""
 
-#: app/[locale]/(public)/(auth)/sign-in/sign-in.form.tsx:206
+#: app/[locale]/(public)/(auth)/sign-in/sign-in.form.tsx:210
 msgid "Sign in with email and password"
 msgstr ""
 
-#: app/[locale]/(public)/(auth)/sign-in/sign-in.form.tsx:209
+#: app/[locale]/(public)/(auth)/sign-in/sign-in.form.tsx:213
 #: constants/routes.ts:8
 msgid "Sign In"
 msgstr ""
 
-#: app/[locale]/(public)/(auth)/sign-in/sign-in.form.tsx:212
+#: app/[locale]/(public)/(auth)/sign-in/sign-in.form.tsx:216
 msgid "<0>Don’t have an account?</0> <1>Sign Up</1>"
 msgstr ""
 
-#: app/[locale]/(public)/(auth)/sign-in/sign-in.form.tsx:222
+#: app/[locale]/(public)/(auth)/sign-in/sign-in.form.tsx:226
 msgid "or sign in with"
 msgstr ""
 
-#: app/[locale]/(public)/(auth)/sign-in/sign-in.form.tsx:234
+#: app/[locale]/(public)/(auth)/sign-in/sign-in.form.tsx:238
 msgid "Magic Link"
 msgstr ""
 
-#: app/[locale]/(public)/(auth)/sign-in/sign-in.form.tsx:244
+#: app/[locale]/(public)/(auth)/sign-in/sign-in.form.tsx:248
 msgid "Sign in with {provider}"
 msgstr ""
 
-#: app/[locale]/(public)/(auth)/sign-in/sign-in.form.tsx:259
+#: app/[locale]/(public)/(auth)/sign-in/sign-in.form.tsx:263
 msgid "Passkey"
 msgstr ""
 
-#: app/[locale]/(public)/(auth)/sign-in/sign-in.form.tsx:263
+#: app/[locale]/(public)/(auth)/sign-in/sign-in.form.tsx:267
 msgid "By signing in, you agree to our <0>Terms of Service</0> and <1>Privacy Policy</1>."
 msgstr ""
 
-#: app/[locale]/(public)/(auth)/sign-up/sign-up.form.tsx:70
+#: app/[locale]/(public)/(auth)/sign-up/sign-up.form.tsx:74
 msgid "You must accept the terms and conditions."
 msgstr ""
 
-#: app/[locale]/(public)/(auth)/sign-up/sign-up.form.tsx:117
+#: app/[locale]/(public)/(auth)/sign-up/sign-up.form.tsx:121
 msgid "A confirmation email has been sent to {email}. If you don’t see it in your inbox, please check your spam or junk folder."
 msgstr ""
 
-#: app/[locale]/(public)/(auth)/sign-up/sign-up.form.tsx:130
+#: app/[locale]/(public)/(auth)/sign-up/sign-up.form.tsx:134
 msgid "Already have an account? <0>Sign In</0>"
 msgstr ""
 
-#: app/[locale]/(public)/(auth)/sign-up/sign-up.form.tsx:208
+#: app/[locale]/(public)/(auth)/sign-up/sign-up.form.tsx:212
 msgid "I agree to the <0>Terms of Service</0> and <1>Privacy Policy</1>."
 msgstr ""
 
-#: app/[locale]/(public)/(auth)/sign-up/sign-up.form.tsx:226
+#: app/[locale]/(public)/(auth)/sign-up/sign-up.form.tsx:230
 #: constants/routes.ts:4
 msgid "Sign Up"
 msgstr ""
@@ -635,7 +635,7 @@ msgid "Try again"
 msgstr ""
 
 #: app/[locale]/layout.tsx:48
-msgid "Arcade game based on Yahoo! Towers"
+msgid "A modern recreation of the classic online block-stacking puzzle game"
 msgstr ""
 
 #: app/[locale]/not-found.tsx:21
@@ -822,12 +822,12 @@ msgid "Rooms"
 msgstr ""
 
 #: components/Sidebar.tsx:251
-#: constants/routes.ts:23
+#: constants/routes.ts:27
 msgid "Games"
 msgstr ""
 
 #: components/Sidebar.tsx:269
-#: constants/routes.ts:17
+#: constants/routes.ts:21
 msgid "Settings"
 msgstr ""
 
@@ -1050,11 +1050,11 @@ msgstr ""
 msgid "Watch"
 msgstr ""
 
-#: components/game/PlayersList.tsx:248
+#: components/game/PlayersList.tsx:244
 msgid "Rating"
 msgstr ""
 
-#: components/game/PlayersList.tsx:265
+#: components/game/PlayersList.tsx:257
 #: components/game/Room.tsx:485
 msgid "Table"
 msgstr ""
@@ -1649,7 +1649,7 @@ msgstr ""
 #: components/ui/Calendar.tsx:280
 #: components/ui/Input.tsx:116
 #: components/ui/RadioButtonGroup.tsx:59
-#: components/ui/Select.tsx:177
+#: components/ui/Select.tsx:188
 msgid "optional"
 msgstr ""
 
@@ -1691,11 +1691,11 @@ msgstr ""
 msgid "Confirm"
 msgstr ""
 
-#: components/ui/SortIcon.tsx:35
+#: components/ui/SortIcon.tsx:30
 msgid "Sort ascending"
 msgstr ""
 
-#: components/ui/SortIcon.tsx:36
+#: components/ui/SortIcon.tsx:30
 msgid "Sort descending"
 msgstr ""
 
@@ -1764,27 +1764,27 @@ msgstr ""
 msgid "Profile"
 msgstr ""
 
-#: constants/routes.ts:16
+#: constants/routes.ts:18
 msgid "Relationships"
 msgstr ""
 
-#: constants/routes.ts:20
+#: constants/routes.ts:24
 msgid "Delete Account"
 msgstr ""
 
-#: constants/routes.ts:24
+#: constants/routes.ts:28
 msgid "Towers Rooms"
 msgstr ""
 
-#: constants/routes.ts:27
+#: constants/routes.ts:31
 msgid "Terms of Service"
 msgstr ""
 
-#: constants/routes.ts:30
+#: constants/routes.ts:34
 msgid "Privacy Policy"
 msgstr ""
 
-#: constants/routes.ts:31
+#: constants/routes.ts:35
 msgid "Error"
 msgstr ""
 

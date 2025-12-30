@@ -1,6 +1,6 @@
 import { UserSettings as UserSettingsModel } from "db/client";
 import { Socket } from "socket.io";
-import { UserSettings, UserSettingsPlainObject } from "@/server/towers/classes/UserSettings";
+import { UserSettings, UserSettingsPlainObject } from "@/server/youpi/classes/UserSettings";
 
 export interface UserProps {
   id: string

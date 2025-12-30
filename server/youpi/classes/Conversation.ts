@@ -1,8 +1,8 @@
 import {
   ConversationParticipant,
   ConversationParticipantPlainObject,
-} from "@/server/towers/classes/ConversationParticipant";
-import { InstantMessage, InstantMessagePlainObject } from "@/server/towers/classes/InstantMessage";
+} from "@/server/youpi/classes/ConversationParticipant";
+import { InstantMessage, InstantMessagePlainObject } from "@/server/youpi/classes/InstantMessage";
 
 export interface ConversationProps {
   id: string

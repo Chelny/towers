@@ -172,7 +172,7 @@ export class Board {
             if (isMedusaPiece(powerPiece)) {
               this.grid[adjRow][adjCol] = new MedusaPieceBlock({ row: adjRow, col: adjCol });
             } else if (isMidasPiece(powerPiece)) {
-              this.grid[adjRow][adjCol] = new TowersPieceBlock("R", { row: adjRow, col: adjCol });
+              this.grid[adjRow][adjCol] = new TowersPieceBlock("I", { row: adjRow, col: adjCol });
             }
           }
         }

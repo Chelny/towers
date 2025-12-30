@@ -1,8 +1,8 @@
 import { UserSettings as UserSettingsModel } from "db/client";
 import { ServerInternalEvents } from "@/constants/socket/server-internal";
 import { publishRedisEvent } from "@/server/redis/publish";
-import { UserSettings, UserSettingsProps } from "@/server/towers/classes/UserSettings";
-import { UserSettingsService } from "@/server/towers/services/UserSettingsService";
+import { UserSettings, UserSettingsProps } from "@/server/youpi/classes/UserSettings";
+import { UserSettingsService } from "@/server/youpi/services/UserSettingsService";
 
 export class UserSettingsManager {
   private static userSettings: Map<string, UserSettings> = new Map<string, UserSettings>();

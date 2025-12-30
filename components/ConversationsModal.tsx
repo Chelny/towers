@@ -18,9 +18,9 @@ import { useConversations } from "@/context/ConversationsContext";
 import { useSocket } from "@/context/SocketContext";
 import { useContextMenu } from "@/hooks/useContextMenu";
 import { SocketCallback } from "@/interfaces/socket";
-import { ConversationPlainObject } from "@/server/towers/classes/Conversation";
-import { ConversationParticipantPlainObject } from "@/server/towers/classes/ConversationParticipant";
-import { InstantMessagePlainObject } from "@/server/towers/classes/InstantMessage";
+import { ConversationPlainObject } from "@/server/youpi/classes/Conversation";
+import { ConversationParticipantPlainObject } from "@/server/youpi/classes/ConversationParticipant";
+import { InstantMessagePlainObject } from "@/server/youpi/classes/InstantMessage";
 import { getDateFnsLocale } from "@/translations/languages";
 import { getUnreadConversationsCount } from "@/utils/conversations";
 

@@ -149,7 +149,7 @@ export function ChangeEmailForm({ session }: ChangeEmailFormProps): ReactNode {
             <div>
               <Trans>
                 <span className="font-medium">Email not verified.</span> Please verify your email to continue.{" "}
-                <button type="button" className="towers-link" onClick={handleSendVerificationEmail}>
+                <button type="button" className="youpi-link" onClick={handleSendVerificationEmail}>
                   Resend verification
                 </button>
               </Trans>

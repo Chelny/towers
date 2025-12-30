@@ -11,7 +11,7 @@ const generateErrorMessage = (errorCode: string, message: ReactNode) => (
     <p>
       <Trans>
         {message} Please try again or{" "}
-        <a href={`mailto:${APP_CONFIG.EMAIL.SUPPORT}`} className="towers-link">
+        <a href={`mailto:${APP_CONFIG.EMAIL.SUPPORT}`} className="youpi-link">
           contact our support team
         </a>{" "}
         if the issue persists.
@@ -61,7 +61,7 @@ function ErrorMessage(): ReactNode {
         <div>
           <Trans>
             An unexpected error occurred. Please try again later or{" "}
-            <a href={`mailto:${APP_CONFIG.EMAIL.SUPPORT}`} className="towers-link">
+            <a href={`mailto:${APP_CONFIG.EMAIL.SUPPORT}`} className="youpi-link">
               contact our support team
             </a>{" "}
             if this issue continues.

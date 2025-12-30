@@ -1,6 +1,6 @@
-import { User } from "@/server/towers/classes/User";
-import { UserRelationship, UserRelationshipPlainObject } from "@/server/towers/classes/UserRelationship";
-import { UserFactory } from "@/server/towers/factories/UserFactory";
+import { User } from "@/server/youpi/classes/User";
+import { UserRelationship, UserRelationshipPlainObject } from "@/server/youpi/classes/UserRelationship";
+import { UserFactory } from "@/server/youpi/factories/UserFactory";
 import { UserRelationshipWithRelations } from "@/types/prisma";
 
 export class UserRelationshipFactory {

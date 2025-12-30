@@ -7,19 +7,10 @@ import { Room } from "@/server/towers/classes/Room";
 import { Table } from "@/server/towers/classes/Table";
 import { RoomManager } from "@/server/towers/managers/RoomManager";
 import { TableManager } from "@/server/towers/managers/TableManager";
-import { UserRelationshipManager } from "@/server/towers/managers/UserRelationshipManager";
+import { UserRelationshipManager } from "@/server/youpi/managers/UserRelationshipManager";
 
-export function serverToClientEvents(redisSub: Redis, io: IoServer): void {
+export function towersServerToClientEvents(redisSub: Redis, io: IoServer): void {
   const channels: string[] = [
-    ServerInternalEvents.USER_SETTINGS_AVATAR,
-    ServerInternalEvents.USER_RELATIONSHIP_MUTE,
-    ServerInternalEvents.USER_RELATIONSHIP_UNMUTE,
-    ServerInternalEvents.CONVERSATION_MARK_AS_READ,
-    ServerInternalEvents.CONVERSATION_MUTE,
-    ServerInternalEvents.CONVERSATION_UNMUTE,
-    ServerInternalEvents.CONVERSATION_REMOVE,
-    ServerInternalEvents.CONVERSATION_RESTORE,
-    ServerInternalEvents.CONVERSATION_MESSAGE_SEND,
     ServerInternalEvents.ROOM_JOIN,
     ServerInternalEvents.ROOM_LEAVE,
     ServerInternalEvents.ROOM_MESSAGE_SEND,
@@ -58,57 +49,6 @@ export function serverToClientEvents(redisSub: Redis, io: IoServer): void {
     const data = JSON.parse(message);
 
     switch (channel) {
-      case ServerInternalEvents.USER_SETTINGS_AVATAR: {
-        const { userId, avatarId } = data;
-        io.emit(ServerToClientEvents.USER_SETTINGS_AVATAR, { userId, avatarId });
-        break;
-      }
-      case ServerInternalEvents.USER_RELATIONSHIP_MUTE: {
-        const { sourceUserId } = data;
-        io.to(sourceUserId).emit(ServerToClientEvents.USER_RELATIONSHIP_MUTE);
-        break;
-      }
-      case ServerInternalEvents.USER_RELATIONSHIP_UNMUTE: {
-        const { sourceUserId } = data;
-        io.to(sourceUserId).emit(ServerToClientEvents.USER_RELATIONSHIP_UNMUTE);
-        break;
-      }
-      case ServerInternalEvents.CONVERSATION_MUTE: {
-        const { userId, conversationId, unreadConversationsCount } = data;
-        io.to(userId).emit(ServerToClientEvents.CONVERSATION_MUTE, { conversationId });
-        io.to(userId).emit(ServerToClientEvents.CONVERSATIONS_UNREAD, { unreadConversationsCount });
-        break;
-      }
-      case ServerInternalEvents.CONVERSATION_UNMUTE: {
-        const { userId, conversationId, unreadConversationsCount } = data;
-        io.to(userId).emit(ServerToClientEvents.CONVERSATION_UNMUTE, { conversationId });
-        io.to(userId).emit(ServerToClientEvents.CONVERSATIONS_UNREAD, { unreadConversationsCount });
-        break;
-      }
-      case ServerInternalEvents.CONVERSATION_REMOVE: {
-        const { userId, conversationId, unreadConversationsCount } = data;
-        io.to(userId).emit(ServerToClientEvents.CONVERSATION_REMOVE, { conversationId });
-        io.to(userId).emit(ServerToClientEvents.CONVERSATIONS_UNREAD, { unreadConversationsCount });
-        break;
-      }
-      case ServerInternalEvents.CONVERSATION_RESTORE: {
-        const { userId, conversation, unreadConversationsCount } = data;
-        io.to(userId).emit(ServerToClientEvents.CONVERSATION_RESTORE, { conversation });
-        io.to(userId).emit(ServerToClientEvents.CONVERSATIONS_UNREAD, { unreadConversationsCount });
-        break;
-      }
-      case ServerInternalEvents.CONVERSATION_MESSAGE_SEND: {
-        const { userId, conversation, unreadConversationsCount } = data;
-        io.to(userId).emit(ServerToClientEvents.CONVERSATION_MESSAGE_SENT, { conversation });
-        io.to(userId).emit(ServerToClientEvents.CONVERSATIONS_UNREAD, { unreadConversationsCount });
-        break;
-      }
-      case ServerInternalEvents.CONVERSATION_MARK_AS_READ: {
-        const { userId, conversationId, unreadConversationsCount } = data;
-        io.to(userId).emit(ServerToClientEvents.CONVERSATION_MARK_AS_READ, { conversationId });
-        io.to(userId).emit(ServerToClientEvents.CONVERSATIONS_UNREAD, { unreadConversationsCount });
-        break;
-      }
       case ServerInternalEvents.ROOM_JOIN: {
         const { roomId, roomPlayer } = data;
         io.emit(ServerToClientEvents.ROOMS_LIST_UPDATED);

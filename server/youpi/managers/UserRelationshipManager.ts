@@ -1,10 +1,10 @@
 import { ServerInternalEvents } from "@/constants/socket/server-internal";
 import { publishRedisEvent } from "@/server/redis/publish";
-import { User } from "@/server/towers/classes/User";
-import { UserRelationship, UserRelationshipProps } from "@/server/towers/classes/UserRelationship";
-import { UserRelationshipFactory } from "@/server/towers/factories/UserRelationshipFactory";
 import { PlayerManager } from "@/server/towers/managers/PlayerManager";
-import { UserRelationshipService } from "@/server/towers/services/UserRelationshipService";
+import { User } from "@/server/youpi/classes/User";
+import { UserRelationship, UserRelationshipProps } from "@/server/youpi/classes/UserRelationship";
+import { UserRelationshipFactory } from "@/server/youpi/factories/UserRelationshipFactory";
+import { UserRelationshipService } from "@/server/youpi/services/UserRelationshipService";
 import { UserRelationshipWithRelations } from "@/types/prisma";
 
 export class UserRelationshipManager {

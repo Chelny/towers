@@ -5,12 +5,12 @@ import { InstantMessageType } from "db/client";
 import { INSTANT_MESSAGE_MAX_LENGTH } from "@/constants/game";
 import { ServerInternalEvents } from "@/constants/socket/server-internal";
 import { publishRedisEvent } from "@/server/redis/publish";
-import { Conversation } from "@/server/towers/classes/Conversation";
-import { InstantMessage, InstantMessageProps, InstantMessageVariables } from "@/server/towers/classes/InstantMessage";
-import { User } from "@/server/towers/classes/User";
-import { ConversationManager } from "@/server/towers/managers/ConversationManager";
-import { ConversationParticipantManager } from "@/server/towers/managers/ConversationPartiticpantManager";
 import { PlayerManager } from "@/server/towers/managers/PlayerManager";
+import { Conversation } from "@/server/youpi/classes/Conversation";
+import { InstantMessage, InstantMessageProps, InstantMessageVariables } from "@/server/youpi/classes/InstantMessage";
+import { User } from "@/server/youpi/classes/User";
+import { ConversationManager } from "@/server/youpi/managers/ConversationManager";
+import { ConversationParticipantManager } from "@/server/youpi/managers/ConversationPartiticpantManager";
 
 export class InstantMessageManager {
   private static instantMessages: Map<string, InstantMessage> = new Map<string, InstantMessage>();

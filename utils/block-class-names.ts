@@ -16,18 +16,18 @@ import {
 export const getClassNameForBlock = (block: Block): string => {
   if (isTowersPieceBlock(block)) {
     switch (block.letter) {
-      case "T":
-        return "block-t";
+      case "Y":
+        return "block-y";
       case "O":
         return "block-o";
-      case "W":
-        return "block-w";
-      case "E":
-        return "block-e";
-      case "R":
-        return "block-r";
-      case "S":
-        return "block-s";
+      case "U":
+        return "block-u";
+      case "P":
+        return "block-p";
+      case "I":
+        return "block-i";
+      case "!":
+        return "block-x";
     }
   } else if (isMedusaPieceBlock(block)) {
     return "block-medusa";

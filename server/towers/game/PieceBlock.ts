@@ -1,6 +1,6 @@
 import { EMPTY_CELL } from "@/constants/game";
 
-export type BlockLetter = "T" | "O" | "W" | "E" | "R" | "S" | "ME" | "MI" | "SD" | typeof EMPTY_CELL;
+export type BlockLetter = "Y" | "O" | "U" | "P" | "I" | "!" | "ME" | "MI" | "SD" | typeof EMPTY_CELL;
 export type PieceBlockLetter = Exclude<BlockLetter, "SD" | typeof EMPTY_CELL>;
 export type TowersBlockLetter = Exclude<PieceBlockLetter, "MI" | "ME">;
 export type PowerBlockLetter = Extract<PieceBlockLetter, "MI" | "ME">;

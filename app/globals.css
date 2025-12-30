@@ -52,7 +52,7 @@
   --text-board-button-opponent: clamp(6px, 4vw, 10px);
 
   /* Colors */
-  --color-towers-primary: theme("colors.teal.800");
+  --color-youpi-primary: theme("colors.teal.800");
   --color-dark-background: #1e2a35;
   --color-dark-text: #e1e8ed;
   --color-dark-text-muted: #aab8c2;
@@ -207,28 +207,28 @@
     font-family: Verdana, Arial, Helvetica, sans-serif;
   }
 
-  .towers-link {
+  .youpi-link {
     color: theme("color.blue.600");
     text-decoration: underline;
   }
 
-  .towers-link:hover {
+  .youpi-link:hover {
     color: theme("color.blue.800");
   }
 
-  .towers-link:visited {
+  .youpi-link:visited {
     color: theme("color.purple.600");
   }
 
-  .dark .towers-link {
+  .dark .youpi-link {
     color: theme("color.blue.500");
   }
 
-  .dark .towers-link:hover {
+  .dark .youpi-link:hover {
     color: theme("color.blue.600");
   }
 
-  .dark .towers-link:visited {
+  .dark .youpi-link:visited {
     color: theme("color.purple.400");
   }
 }
@@ -358,17 +358,17 @@ button:disabled:hover {
   }
 }
 
-.towers-game-bg {
+.youpi-bg {
   display: none;
 }
 
 @media (min-width: 768px) {
-  .towers-game-bg {
+  .youpi-bg {
     display: block;
   }
 }
 
-.towers-game-bg::before {
+.youpi-bg::before {
   content: " ";
   position: absolute;
   top: -50%;

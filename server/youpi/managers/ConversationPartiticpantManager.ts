@@ -1,6 +1,6 @@
 import { createId } from "@paralleldrive/cuid2";
-import { Conversation } from "@/server/towers/classes/Conversation";
-import { ConversationParticipant, ConversationParticipantProps } from "@/server/towers/classes/ConversationParticipant";
+import { Conversation } from "@/server/youpi/classes/Conversation";
+import { ConversationParticipant, ConversationParticipantProps } from "@/server/youpi/classes/ConversationParticipant";
 
 export class ConversationParticipantManager {
   private static conversationParticipants: Map<string, ConversationParticipant> = new Map<
