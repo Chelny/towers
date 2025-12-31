@@ -57,7 +57,7 @@ export default function Select({
   const [dropdownStyle, setDropdownStyle] = useState<CSSProperties>({});
   const optionRefs = useRef<Array<HTMLDivElement | null>>([]);
   const { modalPortalTarget } = useModal();
-  const portalTarget: HTMLElement = modalPortalTarget ?? document.body;
+  const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent): void => {
@@ -73,6 +73,11 @@ export default function Select({
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  useEffect(() => {
+    const target: HTMLElement = modalPortalTarget ?? document.body;
+    setPortalTarget(target);
+  }, [modalPortalTarget]);
 
   useLayoutEffect(() => {
     if (!isDropdownOpen) return;
@@ -253,6 +258,7 @@ export default function Select({
         {disabled ? <PiCaretDownDuotone /> : <PiCaretDownFill className="ms-2" />}
       </div>
       {isDropdownOpen &&
+        portalTarget &&
         createPortal(
           <div
             ref={dropdownRef}

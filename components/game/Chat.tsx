@@ -34,9 +34,9 @@ export default function Chat({
   const { i18n, t } = useLingui();
   const chatEndRef = useRef<HTMLDivElement>(null);
 
-  const scrollToBottom = (): void => {
-    chatEndRef.current?.scrollIntoView({ behavior: "instant", block: "end" });
-  };
+  useEffect(() => {
+    scrollToBottom();
+  }, [chatMessages]);
 
   const getTableAutomatedChatMessage = (
     type: TableChatMessageType,
@@ -152,9 +152,9 @@ export default function Chat({
       });
   }, [chatMessages, profanityFilter, session?.user.id]);
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [chatMessages]);
+  const scrollToBottom = (): void => {
+    chatEndRef.current?.scrollIntoView({ behavior: "instant", block: "end" });
+  };
 
   return (
     <div className="overflow-hidden flex flex-col gap-1 h-full">
