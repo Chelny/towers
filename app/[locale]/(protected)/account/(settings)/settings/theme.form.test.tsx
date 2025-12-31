@@ -2,6 +2,7 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { WebsiteTheme } from "db/enums";
 import { Mock, vi } from "vitest";
 import { ThemeForm } from "@/app/[locale]/(protected)/account/(settings)/settings/theme.form";
+import { ModalProvider } from "@/context/ModalContext";
 import { mockFetch, mockFetchResponse } from "@/test/mocks/fetch";
 import { mockUseRouter } from "@/test/mocks/router";
 import { mockSession } from "@/test/mocks/session";
@@ -61,7 +62,11 @@ describe("Theme Form", () => {
   });
 
   it("should render the form with all elements", () => {
-    render(<ThemeForm session={mockSession} />);
+    render(
+      <ModalProvider>
+        <ThemeForm session={mockSession} />
+      </ModalProvider>,
+    );
 
     expect(screen.getByTestId("settings_select_theme")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Update Theme/i })).toBeInTheDocument();
@@ -76,7 +81,11 @@ describe("Theme Form", () => {
 
     mockUpdateSettings.mockResolvedValue(mockFetchResponse(mockResponse));
 
-    const { rerender } = render(<ThemeForm session={mockSession} />);
+    const { rerender } = render(
+      <ModalProvider>
+        <ThemeForm session={mockSession} />
+      </ModalProvider>,
+    );
 
     fireEvent.click(screen.getByTestId("settings_select_theme"));
     fireEvent.click(screen.getByText(/Light/i));
@@ -93,7 +102,11 @@ describe("Theme Form", () => {
       success: true,
     };
 
-    rerender(<ThemeForm session={mockSession} />);
+    rerender(
+      <ModalProvider>
+        <ThemeForm session={mockSession} />
+      </ModalProvider>,
+    );
 
     await waitFor(() => {
       expect(screen.getByText("The theme has been updated!")).toBeInTheDocument();
@@ -108,13 +121,21 @@ describe("Theme Form", () => {
       return Promise.reject(new Error(errorMessage));
     });
 
-    const { rerender } = render(<ThemeForm session={mockSession} />);
+    const { rerender } = render(
+      <ModalProvider>
+        <ThemeForm session={mockSession} />
+      </ModalProvider>,
+    );
 
     fireEvent.click(screen.getByRole("button", { name: /Update Theme/i }));
 
     await waitFor(() => expect(mockUpdateSettings).toHaveBeenCalledTimes(1));
 
-    rerender(<ThemeForm session={mockSession} />);
+    rerender(
+      <ModalProvider>
+        <ThemeForm session={mockSession} />
+      </ModalProvider>,
+    );
 
     await waitFor(() => {
       expect(screen.getByText(errorMessage)).toBeInTheDocument();

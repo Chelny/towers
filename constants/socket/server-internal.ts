@@ -36,6 +36,7 @@ export const ServerInternalEvents = {
 
   // Game
   GAME_CONTROL_KEYS_UPDATE: "server:game:control-keys:update",
+  GAME_SEATS_UPDATE: "server:game:seats:update",
   GAME_STATE: "server:game:state",
   GAME_COUNTDOWN: "server:game:countdown",
   GAME_TIMER: "server:game:timer",

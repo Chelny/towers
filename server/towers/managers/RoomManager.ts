@@ -1,5 +1,5 @@
 import { logger } from "better-auth";
-import { GameState, TableType } from "db/client";
+import { GameState, RoomLevel, TableType } from "db/client";
 import { ServerInternalEvents } from "@/constants/socket/server-internal";
 import { ServerTowersSeat, ServerTowersTeam } from "@/interfaces/table-seats";
 import { publishRedisEvent } from "@/server/redis/publish";
@@ -16,7 +16,6 @@ import { RoomPlayerManager } from "@/server/towers/managers/RoomPlayerManager";
 import { TableManager } from "@/server/towers/managers/TableManager";
 import { RoomService } from "@/server/towers/services/RoomService";
 import { User } from "@/server/youpi/classes/User";
-import { UserRelationshipManager } from "@/server/youpi/managers/UserRelationshipManager";
 import { TowersRoomWithRelations } from "@/types/prisma";
 
 export class RoomManager {
@@ -145,7 +144,7 @@ export class RoomManager {
 
     let tableNumber: number = 1;
 
-    const takenTableNumbers: number[] = room.tables.map((t: Table) => t.tableNumber);
+    const takenTableNumbers: number[] = room.tables.map((table: Table) => table.tableNumber);
 
     for (let i = 1; i <= takenTableNumbers.length + 1; i++) {
       if (!takenTableNumbers.includes(i)) {
@@ -205,7 +204,12 @@ export class RoomManager {
 
     if (!chosenTable) {
       // If no tables available, create one
-      chosenTable = this.createTable(roomId, player.id);
+      chosenTable = this.createTable(
+        roomId,
+        player.id,
+        TableType.PUBLIC,
+        room.level === RoomLevel.SOCIAL ? false : true,
+      );
     }
 
     const teams: ServerTowersTeam[] = chosenTable.groupSeatsByTeam();
@@ -253,15 +257,10 @@ export class RoomManager {
     TableManager.delete(table.id);
   }
 
-  public static async roomViewForPlayer(room: Room, playerId: string): Promise<RoomPlainObject> {
-    const mutedUserIds: string[] = await UserRelationshipManager.mutedUserIdsFor(playerId);
-
+  public static roomViewForPlayer(room: Room, playerId: string): RoomPlainObject {
     return {
       ...room.toPlainObject(),
-      chatMessages: room
-        .messagesFor(playerId)
-        .filter((rcm: RoomChatMessage) => !mutedUserIds.includes(rcm.player.id))
-        .map((rcm: RoomChatMessage) => rcm.toPlainObject()),
+      chatMessages: room.messagesFor(playerId).map((rcm: RoomChatMessage) => rcm.toPlainObject()),
     };
   }
 }

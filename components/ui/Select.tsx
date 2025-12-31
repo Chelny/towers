@@ -16,6 +16,7 @@ import { Trans } from "@lingui/react/macro";
 import clsx from "clsx/lite";
 import { createPortal } from "react-dom";
 import { PiCaretDownDuotone, PiCaretDownFill } from "react-icons/pi";
+import { useModal } from "@/context/ModalContext";
 import { useKeyboardActions } from "@/hooks/useKeyboardActions";
 
 type SelectProps = PropsWithChildren<{
@@ -55,6 +56,8 @@ export default function Select({
   const options = Children.toArray(children) as ReactElement<SelectOptionProps>[];
   const [dropdownStyle, setDropdownStyle] = useState<CSSProperties>({});
   const optionRefs = useRef<Array<HTMLDivElement | null>>([]);
+  const { modalPortalTarget } = useModal();
+  const portalTarget: HTMLElement = modalPortalTarget ?? document.body;
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent): void => {
@@ -119,11 +122,13 @@ export default function Select({
 
     return {
       position: "fixed",
-      top: isOpenUp ? rect.top - margin : rect.bottom + margin,
+      ...(isOpenUp ? { bottom: window.innerHeight - rect.top + margin } : { top: rect.bottom + margin }),
       left: rect.left,
-      zIndex: 9999,
+      zIndex: 50,
+      minWidth: rect.width, // Prevents shrink on first paint
       width: rect.width,
-      transform: isOpenUp ? "translateY(-100%)" : undefined,
+      maxWidth: rect.width,
+      overflowY: "auto",
     };
   };
 
@@ -215,7 +220,14 @@ export default function Select({
         onClick={() => {
           if (disabled) return;
           selectBoxRef.current?.focus();
-          setIsDropdownOpen((prev: boolean) => !prev);
+          setIsDropdownOpen((prev: boolean) => {
+            const next: boolean = !prev;
+            if (next) {
+              // Compute immediately so first render has correct width
+              setDropdownStyle(computeDropdownStyle());
+            }
+            return next;
+          });
         }}
         onKeyDown={(event: KeyboardEvent) => {
           if (event.key === "Tab" && isDropdownOpen) {
@@ -272,22 +284,18 @@ export default function Select({
                 onClick={() => !disabled && handleSelectChange(option.props.value)}
                 onKeyDown={(event: KeyboardEvent<HTMLDivElement>) => {
                   if (event.key === "Tab") {
-                    const isFirst = index === 0;
-                    const isLast = index === options.length - 1;
+                    const isFirst: boolean = index === 0;
+                    const isLast: boolean = index === options.length - 1;
 
-                    // Let Tab move between options normally *except* at the edges
                     if ((event.shiftKey && isFirst) || (!event.shiftKey && isLast)) {
                       event.preventDefault();
-
                       setIsDropdownOpen(false);
-
                       requestAnimationFrame(() => {
-                        // move relative to the trigger (combobox), not portal
                         focusAfterTrigger(event.shiftKey ? "prev" : "next");
                       });
                     }
 
-                    return; // important
+                    return;
                   }
 
                   if (event.key === "Escape") {
@@ -307,7 +315,7 @@ export default function Select({
               </div>
             ))}
           </div>,
-          document.body,
+          portalTarget,
         )}
       {description && (
         <p id={`${id}Description`} className={clsx("text-neutral-500", "dark:text-dark-text-muted")}>

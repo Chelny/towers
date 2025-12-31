@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { vi } from "vitest";
 import { LanguageForm } from "@/app/[locale]/(protected)/account/(settings)/settings/language.form";
+import { ModalProvider } from "@/context/ModalContext";
 import { mockFetch, mockFetchResponse } from "@/test/mocks/fetch";
 import { mockUseRouter } from "@/test/mocks/router";
 import { mockSession } from "@/test/mocks/session";
@@ -21,7 +22,11 @@ describe("Language Form", () => {
   });
 
   it("should render the form with all elements", () => {
-    render(<LanguageForm session={mockSession} />);
+    render(
+      <ModalProvider>
+        <LanguageForm session={mockSession} />
+      </ModalProvider>,
+    );
 
     expect(screen.getByTestId("settings_select_language")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Update Language/i })).toBeInTheDocument();
@@ -35,7 +40,11 @@ describe("Language Form", () => {
 
     mockFetch.mockResolvedValue(mockFetchResponse(mockResponse));
 
-    render(<LanguageForm session={mockSession} />);
+    render(
+      <ModalProvider>
+        <LanguageForm session={mockSession} />
+      </ModalProvider>,
+    );
 
     fireEvent.click(screen.getByTestId("settings_select_language"));
     fireEvent.click(screen.getByRole("option", { name: /French/i }));
@@ -59,7 +68,11 @@ describe("Language Form", () => {
 
     mockFetch.mockResolvedValue(mockFetchResponse(mockResponse));
 
-    render(<LanguageForm session={mockSession} />);
+    render(
+      <ModalProvider>
+        <LanguageForm session={mockSession} />
+      </ModalProvider>,
+    );
 
     fireEvent.click(screen.getByRole("button", { name: /Update Language/i }));
 
@@ -74,7 +87,11 @@ describe("Language Form", () => {
 
     mockFetch.mockResolvedValue(mockFetchResponse(mockResponse));
 
-    render(<LanguageForm session={mockSession} />);
+    render(
+      <ModalProvider>
+        <LanguageForm session={mockSession} />
+      </ModalProvider>,
+    );
 
     fireEvent.click(screen.getByTestId("settings_select_language"));
     fireEvent.click(screen.getByRole("option", { name: /French/i }));

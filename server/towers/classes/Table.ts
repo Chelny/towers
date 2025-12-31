@@ -1,4 +1,4 @@
-import { GameState, TableType } from "db/client";
+import { GameState, TableChatMessageType, TableType } from "db/client";
 import type { Room, RoomLitePlainObject } from "@/server/towers/classes/Room";
 import type { TableInvitation, TableInvitationPlainObject } from "@/server/towers/classes/TableInvitation";
 import { ServerTowersSeat, ServerTowersTeam } from "@/interfaces/table-seats";
@@ -8,6 +8,7 @@ import { TableChatMessage, TableChatMessagePlainObject } from "@/server/towers/c
 import { TablePlayer, TablePlayerPlainObject } from "@/server/towers/classes/TablePlayer";
 import { TableSeat, TableSeatPlainObject } from "@/server/towers/classes/TableSeat";
 import { Game, GamePlainObject } from "@/server/towers/game/Game";
+import { UserRelationshipManager } from "@/server/youpi/managers/UserRelationshipManager";
 
 export interface TableProps {
   id: string
@@ -34,7 +35,10 @@ export interface TablePlainObject {
   readonly game?: GamePlainObject | null
 }
 
-export type TableLitePlainObject = Omit<TablePlainObject, "seats" | "players" | "chatMessages" | "invitations" | "game">;
+export type TableLitePlainObject = Pick<
+  TablePlainObject,
+  "id" | "roomId" | "room" | "tableNumber" | "hostPlayerId" | "hostPlayer" | "tableType" | "isRated"
+>;
 
 export class Table {
   public readonly id: string;
@@ -181,7 +185,19 @@ export class Table {
     const tablePlayer: TablePlayer | undefined = this.players.find((tp: TablePlayer) => tp.playerId === playerId);
     if (!tablePlayer) return [];
 
-    return this.chatMessages.filter((tcm: TableChatMessage) => tcm.createdAt >= tablePlayer.createdAt);
+    return this.chatMessages.filter(async (tcm: TableChatMessage) => {
+      if (tcm.createdAt < tablePlayer.createdAt) {
+        return false;
+      }
+
+      const mutedUserIds: string[] = await UserRelationshipManager.mutedUserIdsFor(playerId);
+
+      if (mutedUserIds.includes(tcm.player.id) && tcm.type === TableChatMessageType.CHAT) {
+        return false;
+      }
+
+      return true;
+    });
   }
 
   public toLitePlainObject(): TableLitePlainObject {

@@ -3,10 +3,10 @@
 import { ReactNode } from "react";
 import clsx from "clsx/lite";
 import Banner from "@/components/Banner";
-import { RoomPlainObject } from "@/server/towers/classes/Room";
+import { RoomLitePlainObject } from "@/server/towers/classes/Room";
 
 type RoomHeaderProps = {
-  room?: RoomPlainObject
+  room: RoomLitePlainObject | null
 };
 
 export default function RoomHeader({ room }: RoomHeaderProps): ReactNode {

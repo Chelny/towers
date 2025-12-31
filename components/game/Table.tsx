@@ -41,7 +41,7 @@ import { fetcher } from "@/lib/fetcher";
 import { getReadableKeyLabel } from "@/lib/keyboard/get-readable-key-label";
 import { logger } from "@/lib/logger";
 import { PlayerControlKeysPlainObject } from "@/server/towers/classes/PlayerControlKeys";
-import { TablePlainObject } from "@/server/towers/classes/Table";
+import { TableLitePlainObject, TablePlainObject } from "@/server/towers/classes/Table";
 import { TableChatMessagePlainObject } from "@/server/towers/classes/TableChatMessage";
 import { TableInvitationPlainObject } from "@/server/towers/classes/TableInvitation";
 import { TablePlayerPlainObject } from "@/server/towers/classes/TablePlayer";
@@ -97,9 +97,13 @@ export default function Table(): ReactNode {
   const formRef = useRef<HTMLFormElement>(null);
   const messageInputRef = useRef<InputImperativeHandle>(null);
   const [isJoined, setIsJoined] = useState<boolean>(false);
-  const [table, setTable] = useState<TablePlainObject>();
+  const [tableInfo, setTableInfo] = useState<TableLitePlainObject | null>(null);
+  const [players, setPlayers] = useState<TablePlayerPlainObject[]>([]);
+  const [chatMessages, setChatMessages] = useState<TableChatMessagePlainObject[]>([]);
+  const [seats, setSeats] = useState<TableSeatPlainObject[]>([]);
+  const [invitations, setInvitations] = useState<TableInvitationPlainObject[]>([]);
   const [currentTablePlayer, setCurrentTablePlayer] = useState<TablePlayerPlainObject>();
-  const [seats, setSeats] = useState<ServerTowersTeam[]>([]);
+  const [uiSeats, setUISeats] = useState<ServerTowersTeam[]>([]);
   const [gameState, setGameState] = useState<GameState>(GameState.WAITING);
   const [countdown, setCountdown] = useState<number | null>(null);
   const [timer, setTimer] = useState<number | null>(null);
@@ -119,6 +123,7 @@ export default function Table(): ReactNode {
     { sourceUsername: string; targetUsername: string; powerItem: PowerBarItemPlainObject } | undefined
   >(undefined);
   const [usedPowerItemTextOpacity, setUsedPowerItemTextOpacity] = useState<number>(1);
+  const isSocialRoom: boolean = tableInfo?.room?.level === RoomLevel.SOCIAL;
 
   const {
     data: tableResponse,
@@ -132,20 +137,34 @@ export default function Table(): ReactNode {
   });
 
   useEffect(() => {
-    if (table && !joinedTableSidebarRef.current.has(table.id)) {
-      joinedTableSidebarRef.current.add(table.id);
+    if (tableInfo && !joinedTableSidebarRef.current.has(tableInfo.id)) {
+      joinedTableSidebarRef.current.add(tableInfo.id);
       addJoinedTable({
-        id: table.id,
-        roomId: table.room.id,
-        roomName: table.room.name,
-        tableNumber: table.tableNumber,
+        id: tableInfo.id,
+        roomId: tableInfo.roomId,
+        roomName: tableInfo.room.name,
+        tableNumber: tableInfo.tableNumber,
       });
     }
-  }, [table]);
+  }, [tableInfo]);
 
   useEffect(() => {
     if (tableResponse?.success && tableResponse.data) {
-      setTable(tableResponse.data);
+      const tableData: TablePlainObject = tableResponse.data;
+      setTableInfo({
+        id: tableData.id,
+        roomId: tableData.roomId,
+        room: tableData.room,
+        tableNumber: tableData.tableNumber,
+        hostPlayerId: tableData.hostPlayerId,
+        hostPlayer: tableData.hostPlayer,
+        tableType: tableData.tableType,
+        isRated: tableData.isRated,
+      });
+      setPlayers(tableData.players || []);
+      setChatMessages(tableData.chatMessages || []);
+      setSeats(tableData.seats || []);
+      setInvitations(tableData.invitations || []);
       setCurrentTablePlayer(
         tableResponse.data?.players.find((tp: TablePlayerPlainObject) => tp.playerId === session?.user.id),
       );
@@ -169,22 +188,22 @@ export default function Table(): ReactNode {
     if (currentTablePlayer?.seatNumber !== null) return true;
 
     // Table host
-    if (table?.hostPlayerId === currentTablePlayer?.playerId) return true;
+    if (tableInfo?.hostPlayerId === currentTablePlayer?.playerId) return true;
 
     // Public table
-    if (table?.tableType === TableType.PUBLIC) return true;
+    if (tableInfo?.tableType === TableType.PUBLIC) return true;
 
     // Protected or Private → invitation required
-    return !!table?.invitations.some(
+    return !!invitations.some(
       (ti: TableInvitationPlainObject) =>
         ti.inviteePlayerId === session?.user.id && ti.status === TableInvitationStatus.ACCEPTED,
     );
-  }, [table, currentTablePlayer]);
+  }, [tableInfo, invitations, currentTablePlayer]);
 
   useEffect(() => {
-    if (!table?.seats) return;
-    setSeats(groupAndStructureSeats(table.seats, seatNumber));
-  }, [table?.seats, seatNumber]);
+    if (!seats) return;
+    setUISeats(groupAndStructureSeats(seats, seatNumber));
+  }, [seats, seatNumber]);
 
   useEffect(() => {
     const handleFKeyMessage = (event: KeyboardEvent): void => {
@@ -248,12 +267,31 @@ export default function Table(): ReactNode {
         ClientToServerEvents.TABLE_JOIN,
         { tableId },
         async (response: SocketCallback<TablePlainObject>): Promise<void> => {
-          if (response.success) {
+          if (response.success && response.data) {
             setIsJoined(true);
-            setTable(response.data); // await loadTable(); // TODO: Switch to loadRoom when db logic will be implemented
+
+            // TODO: Switch to loadRoom when db logic will be implemented
+            // await loadTable();
+            const tableData: TablePlainObject = response.data;
+            setTableInfo({
+              id: tableData.id,
+              roomId: tableData.roomId,
+              room: tableData.room,
+              tableNumber: tableData.tableNumber,
+              hostPlayerId: tableData.hostPlayerId,
+              hostPlayer: tableData.hostPlayer,
+              tableType: tableData.tableType,
+              isRated: tableData.isRated,
+            });
+            setPlayers(tableData.players || []);
+            setChatMessages(tableData.chatMessages || []);
+            setSeats(tableData.seats || []);
+            setInvitations(tableData.invitations || []);
+
+            // TODO: Delete when API will be used
             setCurrentTablePlayer(
               response.data?.players.find((tp: TablePlayerPlainObject) => tp.playerId === session?.user.id),
-            ); // TODO: Delete when API will be used
+            );
 
             socket.emit(
               ClientToServerEvents.GAME_CONTROL_KEYS,
@@ -272,7 +310,16 @@ export default function Table(): ReactNode {
     };
 
     const handleUpdateTable = ({ table }: { table: TablePlainObject }): void => {
-      setTable(table);
+      setTableInfo({
+        id: table.id,
+        roomId: table.roomId,
+        room: table.room,
+        tableNumber: table.tableNumber,
+        hostPlayerId: table.hostPlayerId,
+        hostPlayer: table.hostPlayer,
+        tableType: table.tableType,
+        isRated: table.isRated,
+      });
     };
 
     const handleUpdateTableSeat = ({
@@ -282,76 +329,52 @@ export default function Table(): ReactNode {
       tableSeat: TableSeatPlainObject
       tablePlayer: TablePlayerPlainObject
     }): void => {
-      setTable((prev: TablePlainObject | undefined) => {
-        if (!prev) return prev;
+      setSeats((prev: TableSeatPlainObject[]) =>
+        prev.map((ts: TableSeatPlainObject) => (ts.id === tableSeat.id ? tableSeat : ts)),
+      );
 
-        return {
-          ...prev,
-          seats: prev.seats.map((ts: TableSeatPlainObject) => (ts.id === tableSeat.id ? tableSeat : ts)),
-          players: prev.players.map((tp: TablePlayerPlainObject) =>
-            tp.playerId === tablePlayer.playerId ? tablePlayer : tp,
-          ),
-        };
-      });
+      setPlayers((prev: TablePlayerPlainObject[]) =>
+        prev.map((tp: TablePlayerPlainObject) => (tp.playerId === tablePlayer.playerId ? tablePlayer : tp)),
+      );
 
       updateTablePlayer(tablePlayer);
     };
 
     const handlePlayerJoin = ({ tablePlayer }: { tablePlayer: TablePlayerPlainObject }): void => {
-      setTable((prev: TablePlainObject | undefined) => {
-        if (!prev) return prev;
-
-        const isPlayerExists: boolean = prev.players.some(
-          (tp: TablePlayerPlainObject) => tp.playerId === tablePlayer.playerId,
-        );
+      setPlayers((prev: TablePlayerPlainObject[]) => {
+        const isPlayerExists: boolean = prev.some((tp: TablePlayerPlainObject) => tp.playerId === tablePlayer.playerId);
         if (isPlayerExists) return prev;
-
-        return { ...prev, players: [...prev.players, tablePlayer] };
+        return [...prev, tablePlayer];
       });
 
       updateTablePlayer(tablePlayer);
     };
 
     const handlePlayerLeave = ({ tablePlayer }: { tablePlayer: TablePlayerPlainObject }): void => {
-      setTable((prev: TablePlainObject | undefined) => {
-        if (!prev) return prev;
-
-        return {
-          ...prev,
-          players: prev.players.filter((tp: TablePlayerPlainObject) => tp.playerId !== tablePlayer.playerId),
-        };
-      });
-
+      setPlayers((prev: TablePlayerPlainObject[]) =>
+        prev.filter((tp: TablePlayerPlainObject) => tp.playerId !== tablePlayer.playerId),
+      );
       updateTablePlayer(tablePlayer);
     };
 
     const handleUpdateTablePlayer = ({ tablePlayer }: { tablePlayer: TablePlayerPlainObject }): void => {
-      setTable((prev: TablePlainObject | undefined) => {
-        if (!prev) return prev;
-
-        const players: TablePlayerPlainObject[] = prev.players.map((tp: TablePlayerPlainObject) =>
-          tp.playerId === tablePlayer.playerId ? tablePlayer : tp,
-        );
-
-        return { ...prev, players };
-      });
+      setPlayers((prev: TablePlayerPlainObject[]) =>
+        prev.map((tp: TablePlayerPlainObject) => (tp.playerId === tablePlayer.playerId ? tablePlayer : tp)),
+      );
 
       updateTablePlayer(tablePlayer);
     };
 
     const handleUpdateChatMessages = ({ chatMessage }: { chatMessage: TableChatMessagePlainObject }): void => {
-      setTable((prev: TablePlainObject | undefined) => {
-        if (!prev) return prev;
-
-        return {
-          ...prev,
-          chatMessages: [...(prev.chatMessages ?? []), chatMessage],
-        };
-      });
+      setChatMessages((prev: TableChatMessagePlainObject[]) => [...prev, chatMessage]);
     };
 
     const handleUpdateControlKeys = ({ controlKeys }: { controlKeys: PlayerControlKeysPlainObject }): void => {
       setControlKeys(controlKeys);
+    };
+
+    const handleGameSeats = ({ tableSeats }: { tableSeats: TableSeatPlainObject[] }): void => {
+      setSeats(tableSeats);
     };
 
     const handleGameState = ({ gameState }: { gameState: GameState }): void => {
@@ -421,6 +444,7 @@ export default function Table(): ReactNode {
       socket.on(ServerToClientEvents.TABLE_PLAYER_UPDATED, handleUpdateTablePlayer);
       socket.on(ServerToClientEvents.TABLE_MESSAGE_SENT, handleUpdateChatMessages);
       socket.on(ServerToClientEvents.GAME_CONTROL_KEYS_UPDATED, handleUpdateControlKeys);
+      socket.on(ServerToClientEvents.GAME_SEATS, handleGameSeats);
       socket.on(ServerToClientEvents.GAME_STATE, handleGameState);
       socket.on(ServerToClientEvents.GAME_COUNTDOWN, handleCountdown);
       socket.on(ServerToClientEvents.GAME_TIMER, handleTimer);
@@ -456,6 +480,7 @@ export default function Table(): ReactNode {
       socket.off(ServerToClientEvents.TABLE_PLAYER_UPDATED, handleUpdateTablePlayer);
       socket.off(ServerToClientEvents.TABLE_MESSAGE_SENT, handleUpdateChatMessages);
       socket.off(ServerToClientEvents.GAME_CONTROL_KEYS_UPDATED, handleUpdateControlKeys);
+      socket.off(ServerToClientEvents.GAME_SEATS, handleGameSeats);
       socket.off(ServerToClientEvents.GAME_STATE, handleGameState);
       socket.off(ServerToClientEvents.GAME_COUNTDOWN, handleCountdown);
       socket.off(ServerToClientEvents.GAME_TIMER, handleTimer);
@@ -469,9 +494,9 @@ export default function Table(): ReactNode {
   const seatedTeamsCount = useMemo(() => {
     const seatedTeams: Set<number> = new Set<number>();
 
-    if (!seats || seats.length === 0) return 0;
+    if (!uiSeats || uiSeats.length === 0) return 0;
 
-    seats.forEach((team: ServerTowersTeam) => {
+    uiSeats.forEach((team: ServerTowersTeam) => {
       const hasSeatedPlayer: boolean = team.seats.some((seat: ServerTowersSeat) => !!seat.occupiedByPlayerId);
       if (hasSeatedPlayer) {
         seatedTeams.add(team.teamNumber);
@@ -479,7 +504,7 @@ export default function Table(): ReactNode {
     });
 
     return seatedTeams.size;
-  }, [seats]);
+  }, [uiSeats]);
 
   const handleOptionChange = (): void => {
     setTimeout(() => {
@@ -526,7 +551,7 @@ export default function Table(): ReactNode {
   };
 
   const handleChangeTableOptions = (body: ChangeTableOptionsPayload): void => {
-    if (!table) return;
+    if (!tableInfo) return;
 
     const payload: {
       tableId: string
@@ -536,11 +561,11 @@ export default function Table(): ReactNode {
       tableId,
     };
 
-    if (body.tableType !== table.tableType) {
+    if (body.tableType !== tableInfo.tableType) {
       payload.tableType = body.tableType;
     }
 
-    if (body.isRated !== table.isRated) {
+    if (body.isRated !== tableInfo.isRated) {
       payload.isRated = body.isRated;
     }
 
@@ -553,7 +578,7 @@ export default function Table(): ReactNode {
     openModal(TableInviteUserModal, {
       roomId,
       tableId,
-      isRatingsVisible: table?.room?.level !== RoomLevel.SOCIAL,
+      isRatingsVisible: !isSocialRoom,
     });
   };
 
@@ -561,8 +586,8 @@ export default function Table(): ReactNode {
     openModal(TableBootUserModal, {
       roomId,
       tableId,
-      hostId: table?.hostPlayerId,
-      isRatingsVisible: table?.room?.level !== RoomLevel.SOCIAL,
+      hostId: tableInfo?.hostPlayerId,
+      isRatingsVisible: !isSocialRoom,
     });
   };
 
@@ -825,7 +850,7 @@ export default function Table(): ReactNode {
           "dark:bg-dark-game-background",
         )}
       >
-        <TableHeader room={table?.room} table={table} />
+        <TableHeader room={tableInfo?.room} table={tableInfo} />
 
         {/* Left sidebar */}
         <div
@@ -868,8 +893,8 @@ export default function Table(): ReactNode {
             </div>
             <Select
               id="tableType"
-              defaultValue={table?.tableType}
-              disabled={!isConnected || session?.user.id !== table?.hostPlayerId}
+              defaultValue={tableInfo?.tableType}
+              disabled={!isConnected || session?.user.id !== tableInfo?.hostPlayerId}
               isNoBottomSpace
               onChange={() => {
                 handleOptionChange();
@@ -887,14 +912,14 @@ export default function Table(): ReactNode {
             </Select>
             <Button
               className="w-full"
-              disabled={!isConnected || session?.user.id !== table?.hostPlayerId}
+              disabled={!isConnected || session?.user.id !== tableInfo?.hostPlayerId}
               onClick={handleOpenInviteUserModal}
             >
               <Trans>Invite</Trans>
             </Button>
             <Button
               className="w-full"
-              disabled={!isConnected || session?.user.id !== table?.hostPlayerId}
+              disabled={!isConnected || session?.user.id !== tableInfo?.hostPlayerId}
               onClick={handleOpenBootUserModal}
             >
               <Trans>Boot</Trans>
@@ -904,19 +929,21 @@ export default function Table(): ReactNode {
                 <Trans>Options</Trans>
               </span>
             </div>
-            <Checkbox
-              id="isRated"
-              label={t({ message: "Rated Game" })}
-              defaultChecked={table?.isRated}
-              disabled={
-                !isConnected ||
-                session?.user.id !== table?.hostPlayerId ||
-                gameState === GameState.COUNTDOWN ||
-                gameState === GameState.PLAYING
-              }
-              isNoBottomSpace
-              onChange={handleOptionChange}
-            />
+            {!isSocialRoom && (
+              <Checkbox
+                id="isRated"
+                label={t({ message: "Rated Game" })}
+                defaultChecked={tableInfo?.isRated}
+                disabled={
+                  !isConnected ||
+                  session?.user.id !== tableInfo?.hostPlayerId ||
+                  gameState === GameState.COUNTDOWN ||
+                  gameState === GameState.PLAYING
+                }
+                isNoBottomSpace
+                onChange={handleOptionChange}
+              />
+            )}
             <Checkbox
               id="sound"
               label={t({ message: "Sound" })}
@@ -1061,8 +1088,8 @@ export default function Table(): ReactNode {
                   </div>
 
                   {/* Game */}
-                  {seats.map((group: ServerTowersTeam, index: number) => {
-                    const isPlayerSeated: boolean = seats.some((team: ServerTowersTeam) =>
+                  {uiSeats.map((group: ServerTowersTeam, index: number) => {
+                    const isPlayerSeated: boolean = uiSeats.some((team: ServerTowersTeam) =>
                       team.seats.some((seat: ServerTowersSeat) => seat.occupiedByPlayerId === session?.user.id),
                     );
 
@@ -1075,7 +1102,7 @@ export default function Table(): ReactNode {
                       >
                         <div className={index === 0 ? "contents" : "flex flex-row justify-center items-center"}>
                           {group.seats.map((seat: ServerTowersSeat) => {
-                            const tablePlayerForSeat: TablePlayerPlainObject | undefined = table?.players.find(
+                            const tablePlayerForSeat: TablePlayerPlainObject | undefined = players.find(
                               (tp: TablePlayerPlainObject) => tp.playerId === seat.occupiedByPlayerId,
                             );
 
@@ -1091,7 +1118,7 @@ export default function Table(): ReactNode {
                                 seatedTeamsCount={seatedTeamsCount}
                                 isPlayerSeated={isPlayerSeated}
                                 tablePlayerForSeat={tablePlayerForSeat}
-                                isRatingsVisible={table?.room?.level !== RoomLevel.SOCIAL}
+                                isRatingsVisible={!isSocialRoom}
                                 onSit={handleSit}
                                 onStand={handleStand}
                                 onStart={handleStart}
@@ -1140,7 +1167,7 @@ export default function Table(): ReactNode {
               {/* Chat */}
               <div className="overflow-hidden flex flex-col gap-1 h-full px-2">
                 <Chat
-                  chatMessages={table?.chatMessages}
+                  chatMessages={chatMessages}
                   messageInputRef={messageInputRef}
                   isMessageInputDisabled={!isConnected}
                   onSendMessage={handleSendMessage}
@@ -1149,11 +1176,7 @@ export default function Table(): ReactNode {
             </div>
 
             <div className="w-[385px]">
-              <PlayersList
-                roomId={roomId}
-                players={table?.players}
-                isRatingsVisible={table?.room?.level !== RoomLevel.SOCIAL}
-              />
+              <PlayersList roomId={roomId} players={players} isRatingsVisible={!isSocialRoom} />
             </div>
           </div>
         </div>

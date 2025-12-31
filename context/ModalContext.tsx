@@ -8,6 +8,7 @@ import {
   ReactNode,
   useCallback,
   useContext,
+  useMemo,
   useState,
 } from "react";
 
@@ -31,19 +32,22 @@ interface ModalContextType {
   ) => void
   closeModal: () => void
   closeAllModals: () => void
+  modalPortalTarget: HTMLElement | null
+  setModalPortalTarget: (element: HTMLElement | null) => void
 }
 
 const ModalContext: Context<ModalContextType | undefined> = createContext<ModalContextType | undefined>(undefined);
 
 export const ModalProvider = ({ children }: PropsWithChildren): ReactNode => {
   const [modals, setModals] = useState<ModalInstance[]>([]);
+  const [modalPortalTarget, setModalPortalTarget] = useState<HTMLElement | null>(null);
 
   const openModal = useCallback(
     <P extends ModalPropsBase>(
       Component: ModalComponent<P>,
       props?: Omit<P, "onCancel" | "onClose"> & Partial<Pick<P, "onCancel" | "onClose">>,
     ) => {
-      setModals((prev): ModalInstance[] => [
+      setModals((prev: ModalInstance<ModalPropsBase>[]): ModalInstance[] => [
         ...prev,
         {
           Component: Component as ModalComponent<ModalPropsBase>,
@@ -70,13 +74,26 @@ export const ModalProvider = ({ children }: PropsWithChildren): ReactNode => {
 
   const closeAllModals = useCallback(() => {
     setModals([]);
+    setModalPortalTarget(null);
   }, []);
 
+  const value = useMemo(
+    () => ({
+      modals,
+      openModal,
+      closeModal,
+      closeAllModals,
+      modalPortalTarget,
+      setModalPortalTarget,
+    }),
+    [modals, openModal, closeModal, closeAllModals, modalPortalTarget],
+  );
+
   return (
-    <ModalContext.Provider value={{ modals, openModal, closeModal, closeAllModals }}>
+    <ModalContext.Provider value={value}>
       {children}
-      {modals?.map(({ Component, props }, index) => (
-        <Component key={index} {...props} onCancel={props.onCancel} />
+      {modals.map(({ Component, props }, index) => (
+        <Component key={index} {...props} onCancel={props.onCancel} onClose={props.onClose} />
       ))}
     </ModalContext.Provider>
   );

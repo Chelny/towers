@@ -23,7 +23,7 @@ export default [
   ...compat.extends("next/core-web-vitals"),
   pluginLingui.configs["flat/recommended"],
   {
-    files: ["**/*.js", "**/*.ts", "**/*.tsx"],
+    files: ["**/*.ts", "**/*.tsx"],
 
     plugins: {
       "@typescript-eslint": typescriptEslint,

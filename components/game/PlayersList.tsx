@@ -36,7 +36,7 @@ function getTableNumber(playerListItem: PlayerListItem): number | null {
 
 type PlayersListProps = {
   roomId: string
-  players: PlayerListItem[] | undefined
+  players: PlayerListItem[]
   isRatingsVisible?: boolean | null
   isTableNumberVisible?: boolean
   onSelectedPlayer?: (userId: string) => void

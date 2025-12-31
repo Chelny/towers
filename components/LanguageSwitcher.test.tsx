@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { Mock, vi } from "vitest";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { ModalProvider } from "@/context/ModalContext";
 import { mockUseRouter } from "@/test/mocks/router";
 
 vi.mock("next/navigation", () => ({
@@ -14,7 +15,11 @@ describe("LanguageSwitcher Component", () => {
   });
 
   it("should render the language switcher correctly", () => {
-    render(<LanguageSwitcher />);
+    render(
+      <ModalProvider>
+        <LanguageSwitcher />
+      </ModalProvider>,
+    );
 
     waitFor(() => {
       expect(screen.getByTestId("language-switcher_select_locale")).toBeInTheDocument();
@@ -26,7 +31,11 @@ describe("LanguageSwitcher Component", () => {
     const mockPush: Mock = vi.fn().mockReturnValue("/en/account/settings");
     mockUseRouter.push = mockPush;
 
-    render(<LanguageSwitcher />);
+    render(
+      <ModalProvider>
+        <LanguageSwitcher />
+      </ModalProvider>,
+    );
 
     waitFor(() => {
       const selectElement: HTMLInputElement | null = screen
@@ -40,7 +49,11 @@ describe("LanguageSwitcher Component", () => {
     const mockPush: Mock = vi.fn();
     mockUseRouter.push = mockPush;
 
-    render(<LanguageSwitcher />);
+    render(
+      <ModalProvider>
+        <LanguageSwitcher />
+      </ModalProvider>,
+    );
 
     fireEvent.click(screen.getByTestId("language-switcher_select_locale"));
     fireEvent.click(screen.getByRole("option", { name: /French/i }));
@@ -54,7 +67,11 @@ describe("LanguageSwitcher Component", () => {
     const mockPush: Mock = vi.fn();
     mockUseRouter.push = mockPush;
 
-    render(<LanguageSwitcher />);
+    render(
+      <ModalProvider>
+        <LanguageSwitcher />
+      </ModalProvider>,
+    );
 
     fireEvent.click(screen.getByTestId("language-switcher_select_locale"));
     fireEvent.click(screen.getByRole("option", { name: /French/i }));

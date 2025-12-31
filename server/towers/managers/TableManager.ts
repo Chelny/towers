@@ -22,7 +22,6 @@ import { TableInvitationManager } from "@/server/towers/managers/TableInvitation
 import { TablePlayerManager } from "@/server/towers/managers/TablePlayerManager";
 import { TableSeatManager } from "@/server/towers/managers/TableSeatManager";
 import { User } from "@/server/youpi/classes/User";
-import { UserRelationshipManager } from "@/server/youpi/managers/UserRelationshipManager";
 
 export class TableManager {
   private static tables: Map<string, Table> = new Map<string, Table>();
@@ -559,15 +558,10 @@ export class TableManager {
     }
   }
 
-  public static async tableViewForPlayer(table: Table, playerId: string): Promise<TablePlainObject> {
-    const mutedUserIds: string[] = await UserRelationshipManager.mutedUserIdsFor(playerId);
-
+  public static tableViewForPlayer(table: Table, playerId: string): TablePlainObject {
     return {
       ...table.toPlainObject(),
-      chatMessages: table
-        .messagesFor(playerId)
-        .filter((tcm: TableChatMessage) => !mutedUserIds.includes(tcm.player.id))
-        .map((tcm: TableChatMessage) => tcm.toPlainObject()),
+      chatMessages: table.messagesFor(playerId).map((tcm: TableChatMessage) => tcm.toPlainObject()),
     };
   }
 }

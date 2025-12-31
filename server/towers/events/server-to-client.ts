@@ -1,4 +1,5 @@
 import { logger } from "better-auth";
+import { TableChatMessageType } from "db/client";
 import { Redis } from "ioredis";
 import { Server as IoServer, Socket } from "socket.io";
 import { ServerInternalEvents } from "@/constants/socket/server-internal";
@@ -28,6 +29,7 @@ export function towersServerToClientEvents(redisSub: Redis, io: IoServer): void 
     ServerInternalEvents.TABLE_SEAT_STAND,
     ServerInternalEvents.TABLE_SEAT_PLAYER_STATE,
     ServerInternalEvents.GAME_CONTROL_KEYS_UPDATE,
+    ServerInternalEvents.GAME_SEATS_UPDATE,
     ServerInternalEvents.GAME_STATE,
     ServerInternalEvents.GAME_COUNTDOWN,
     ServerInternalEvents.GAME_TIMER,
@@ -115,10 +117,11 @@ export function towersServerToClientEvents(redisSub: Redis, io: IoServer): void 
           const mutedUserIds: string[] = await UserRelationshipManager.mutedUserIdsFor(tp.player.id);
 
           // Only send if they have NOT muted the sender
-          if (!mutedUserIds.includes(senderId)) {
+          if (!(mutedUserIds.includes(senderId) && chatMessage.type === TableChatMessageType.CHAT)) {
             socket.emit(ServerToClientEvents.TABLE_MESSAGE_SENT, { chatMessage });
           }
         }
+
         break;
       }
       case ServerInternalEvents.TABLE_INVITE_USER: {
@@ -165,6 +168,11 @@ export function towersServerToClientEvents(redisSub: Redis, io: IoServer): void 
       case ServerInternalEvents.GAME_CONTROL_KEYS_UPDATE: {
         const { userId, controlKeys } = data;
         io.to(userId).emit(ServerToClientEvents.GAME_CONTROL_KEYS_UPDATED, { controlKeys });
+        break;
+      }
+      case ServerInternalEvents.GAME_SEATS_UPDATE: {
+        const { tableId, tableSeats } = data;
+        io.to(tableId).emit(ServerToClientEvents.GAME_SEATS, { tableSeats });
         break;
       }
       case ServerInternalEvents.GAME_STATE: {

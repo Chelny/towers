@@ -7,6 +7,7 @@ import clsx from "clsx/lite";
 import { GoTriangleDown, GoTriangleLeft } from "react-icons/go";
 import { IconType } from "react-icons/lib";
 import { SidebarMenuSubItem } from "@/components/SidebarMenuSubItem";
+import { IGNORED_QUERY_PARAMS_ROUTES } from "@/constants/routes";
 import { MenuItem } from "@/interfaces/sidebar-menu";
 import { Language, languages } from "@/translations/languages";
 import { isLinkItem } from "@/utils/sidebar-menu";
@@ -65,10 +66,21 @@ export default function SidebarMenuItem({
     // Path must match
     if (cleanPath !== basePath) return false;
 
-    // If the menu href has no query, consider it active for any query on same path
-    if (expectedQuery.size === 0) return true;
+    const currentQuerySize: number = searchParams.size;
+    const expectedQuerySize: number = expectedQuery.size;
 
-    // Otherwise, the current URL must contain at least the expected params
+    // Base route should be active regardless of query parameters
+    if (IGNORED_QUERY_PARAMS_ROUTES.includes(basePath) && expectedQuerySize === 0) {
+      return true;
+    }
+
+    // If menu href has no query, current URL must also have no query
+    if (expectedQuerySize === 0 && currentQuerySize > 0) return false;
+
+    // If menu href has query, current URL must have no query
+    if (expectedQuerySize > 0 && currentQuerySize === 0) return false;
+
+    // Check if all expected params match
     for (const [key, val] of expectedQuery.entries()) {
       if (searchParams.get(key) !== val) return false;
     }

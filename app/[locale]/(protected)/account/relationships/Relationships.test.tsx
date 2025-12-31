@@ -3,6 +3,7 @@ import { RelationshipType } from "db/enums";
 import { default as mockedUseSWRInfinite } from "swr/infinite";
 import { beforeEach, describe, expect, it, Mock, vi } from "vitest";
 import { Relationships } from "@/app/[locale]/(protected)/account/relationships/Relationships";
+import { ModalProvider } from "@/context/ModalContext";
 import { mockUseRouter, mockUseSearchParams } from "@/test/mocks/router";
 import { mockSession } from "@/test/mocks/session";
 import { mockUser2, mockUser3 } from "@/test/mocks/user";
@@ -64,7 +65,11 @@ describe("Relationships Component", () => {
       }),
     );
 
-    render(<Relationships session={mockSession} />);
+    render(
+      <ModalProvider>
+        <Relationships session={mockSession} />
+      </ModalProvider>,
+    );
 
     expect(screen.getByTestId("relationships-filter_search_username")).toBeInTheDocument();
     expect(screen.getByTestId("relationships-filter_select_type")).toBeInTheDocument();
@@ -98,7 +103,11 @@ describe("Relationships Component", () => {
       }),
     );
 
-    render(<Relationships session={mockSession} />);
+    render(
+      <ModalProvider>
+        <Relationships session={mockSession} />
+      </ModalProvider>,
+    );
 
     const searchInput: HTMLInputElement = screen.getByTestId("relationships-filter_search_username");
     fireEvent.input(searchInput, { target: { value: "test" } });
@@ -128,7 +137,11 @@ describe("Relationships Component", () => {
       }),
     );
 
-    render(<Relationships session={mockSession} />);
+    render(
+      <ModalProvider>
+        <Relationships session={mockSession} />
+      </ModalProvider>,
+    );
 
     expect(screen.getByText("jane_smith")).toBeInTheDocument();
 
@@ -159,7 +172,11 @@ describe("Relationships Component", () => {
       }),
     );
 
-    render(<Relationships session={mockSession} />);
+    render(
+      <ModalProvider>
+        <Relationships session={mockSession} />
+      </ModalProvider>,
+    );
 
     const resetButton: HTMLElement = screen.getByTestId("relationships-filter_button_reset");
     fireEvent.click(resetButton);
@@ -179,7 +196,11 @@ describe("Relationships Component", () => {
       }),
     );
 
-    render(<Relationships session={mockSession} />);
+    render(
+      <ModalProvider>
+        <Relationships session={mockSession} />
+      </ModalProvider>,
+    );
 
     const usernameHeader: Element | null = screen.getByTestId("relationships-table_heading_username");
     fireEvent.click(usernameHeader);

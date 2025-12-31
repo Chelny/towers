@@ -26,7 +26,7 @@ import { useModal } from "@/context/ModalContext";
 import { useSocket } from "@/context/SocketContext";
 import { SocketCallback } from "@/interfaces/socket";
 import { fetcher } from "@/lib/fetcher";
-import { RoomPlainObject } from "@/server/towers/classes/Room";
+import { RoomLitePlainObject, RoomPlainObject } from "@/server/towers/classes/Room";
 import { RoomChatMessagePlainObject } from "@/server/towers/classes/RoomChatMessage";
 import { RoomPlayerPlainObject } from "@/server/towers/classes/RoomPlayer";
 import { TablePlainObject } from "@/server/towers/classes/Table";
@@ -70,9 +70,13 @@ export default function Room(): ReactNode {
   const joinedRoomSidebarRef = useRef<Set<string>>(new Set<string>());
   const messageInputRef = useRef<InputImperativeHandle>(null);
   const [isJoined, setIsJoined] = useState<boolean>(false);
-  const [room, setRoom] = useState<RoomPlainObject>();
+  const [roomInfo, setRoomInfo] = useState<RoomLitePlainObject | null>(null);
+  const [players, setPlayers] = useState<RoomPlayerPlainObject[]>([]);
+  const [chatMessages, setChatMessages] = useState<RoomChatMessagePlainObject[]>([]);
+  const [tables, setTables] = useState<TablePlainObject[]>([]);
   const [avatarId, setAvatarId] = useState<string>("001");
   const [profanityFilter, setProfanityFilter] = useState<ProfanityFilter>(ProfanityFilter.WEAK);
+  const isSocialRoom: boolean = roomInfo?.level === RoomLevel.SOCIAL;
 
   const {
     data: roomResponse,
@@ -95,15 +99,23 @@ export default function Room(): ReactNode {
   );
 
   useEffect(() => {
-    if (room && !joinedRoomSidebarRef.current.has(room.id)) {
-      joinedRoomSidebarRef.current.add(room.id);
-      addJoinedRoom({ id: room.id, name: room.name, basePath: ROUTE_TOWERS.PATH });
+    if (roomInfo && !joinedRoomSidebarRef.current.has(roomInfo.id)) {
+      joinedRoomSidebarRef.current.add(roomInfo.id);
+      addJoinedRoom({ id: roomInfo.id, name: roomInfo.name, basePath: ROUTE_TOWERS.PATH });
     }
-  }, [room]);
+  }, [roomInfo]);
 
   useEffect(() => {
     if (roomResponse?.success && roomResponse.data) {
-      setRoom(roomResponse.data);
+      const roomData: RoomPlainObject = roomResponse.data;
+      setRoomInfo({
+        id: roomData.id,
+        name: roomData.name,
+        level: roomData.level,
+      });
+      setPlayers(roomData.players || []);
+      setChatMessages(roomData.chatMessages || []);
+      setTables(roomData.tables || []);
     }
   }, [roomResponse]);
 
@@ -123,7 +135,18 @@ export default function Room(): ReactNode {
       socket.emit(ClientToServerEvents.ROOM_JOIN, { roomId }, (response: SocketCallback<RoomPlainObject>) => {
         if (response.success && response.data) {
           setIsJoined(true);
-          setRoom(response.data); // await loadRoom(); // TODO: Switch to loadRoom when db logic will be implemented
+
+          // TODO: Switch to loadRoom when db logic will be implemented
+          // await loadRoom();
+          const roomData: RoomPlainObject = response.data;
+          setRoomInfo({
+            id: roomData.id,
+            name: roomData.name,
+            level: roomData.level,
+          });
+          setPlayers(roomData.players || []);
+          setChatMessages(roomData.chatMessages || []);
+          setTables(roomData.tables || []);
         } else {
           router.push(ROUTE_TOWERS.PATH);
         }
@@ -131,83 +154,42 @@ export default function Room(): ReactNode {
     };
 
     const handlePlayerJoinRoom = ({ roomPlayer }: { roomPlayer: RoomPlayerPlainObject }): void => {
-      setRoom((prev: RoomPlainObject | undefined) => {
-        if (!prev) return prev;
-
-        const isPlayerExists: boolean = prev.players.some(
-          (rp: RoomPlayerPlainObject) => rp.playerId === roomPlayer.playerId,
-        );
+      setPlayers((prev: RoomPlayerPlainObject[]) => {
+        const isPlayerExists: boolean = prev.some((rp: RoomPlayerPlainObject) => rp.playerId === roomPlayer.playerId);
         if (isPlayerExists) return prev;
-
-        return { ...prev, players: [...prev.players, roomPlayer] };
+        return [...prev, roomPlayer];
       });
     };
 
     const handlePlayerLeaveRoom = ({ roomPlayer }: { roomPlayer: RoomPlayerPlainObject }): void => {
-      setRoom((prev: RoomPlainObject | undefined) => {
-        if (!prev) return prev;
-
-        return {
-          ...prev,
-          players: prev.players.filter((rp: RoomPlayerPlainObject) => rp.playerId !== roomPlayer.playerId),
-        };
-      });
+      setPlayers((prev: RoomPlayerPlainObject[]) =>
+        prev.filter((rp: RoomPlayerPlainObject) => rp.playerId !== roomPlayer.playerId),
+      );
     };
 
     const handleUpdateChatMessages = ({ chatMessage }: { chatMessage: RoomChatMessagePlainObject }): void => {
-      setRoom((prev: RoomPlainObject | undefined) => {
-        if (!prev) return prev;
-        return {
-          ...prev,
-          chatMessages: [...(prev.chatMessages ?? []), chatMessage],
-        };
-      });
+      setChatMessages((prev: RoomChatMessagePlainObject[]) => [...prev, chatMessage]);
     };
 
     const handleUpdateTable = ({ table }: { table: TablePlainObject }): void => {
-      setRoom((prev: RoomPlainObject | undefined) => {
-        if (!prev) return prev;
-
-        const existingTableIndex: number = prev.tables.findIndex((t: TablePlainObject) => t.id === table.id);
+      setTables((prev: TablePlainObject[]) => {
+        const existingTableIndex: number = prev.findIndex((t: TablePlainObject) => t.id === table.id);
         if (existingTableIndex !== -1) {
-          const updatedTables: TablePlainObject[] = [...prev.tables];
-          updatedTables[existingTableIndex] = { ...prev.tables[existingTableIndex], ...table };
-          return { ...prev, tables: updatedTables };
+          const updatedTables: TablePlainObject[] = [...prev];
+          updatedTables[existingTableIndex] = { ...prev[existingTableIndex], ...table };
+          return updatedTables;
         }
-
-        // Add new table
-        return { ...prev, tables: [...prev.tables, table] };
-      });
-    };
-
-    const handleUpdateTableSeat = ({ tableSeat }: { tableSeat: TableSeatPlainObject }) => {
-      setRoom((prev: RoomPlainObject | undefined) => {
-        if (!prev) return prev;
-
-        const updatedTables: TablePlainObject[] = prev.tables.map((table: TablePlainObject) => {
-          if (table.id !== tableSeat.tableId) return table;
-
-          return {
-            ...table,
-            seats: table.seats.map((ts: TableSeatPlainObject) => (ts.id === tableSeat.id ? tableSeat : ts)),
-          };
-        });
-
-        return { ...prev, tables: updatedTables };
+        return [...prev, table];
       });
     };
 
     const handlePlayerJoinTable = ({ tablePlayer }: { tablePlayer: TablePlayerPlainObject }): void => {
-      setRoom((prev: RoomPlainObject | undefined) => {
-        if (!prev) return prev;
-
-        // Update the table’s players list
-        const tables: TablePlainObject[] = prev.tables.map((table: TablePlainObject) => {
+      setTables((prev: TablePlainObject[]) =>
+        prev.map((table: TablePlainObject) => {
           if (table.id === tablePlayer.tableId) {
             const isSeated: boolean = table.players.some(
               (tp: TablePlayerPlainObject) => tp.playerId === tablePlayer.playerId,
             );
-
             if (!isSeated) {
               return {
                 ...table,
@@ -215,74 +197,68 @@ export default function Room(): ReactNode {
               };
             }
           }
-
           return table;
-        });
+        }),
+      );
 
-        // Update player to room's player list
-        let players: RoomPlayerPlainObject[] = [];
-        const existingPlayerIndex: number = prev.players.findIndex(
-          (rp: RoomPlayerPlainObject) => rp.playerId === tablePlayer.playerId,
-        );
-
-        if (existingPlayerIndex !== -1) {
-          players = prev.players.map((rp: RoomPlayerPlainObject, index: number) => {
-            if (index === existingPlayerIndex) {
-              return {
-                ...rp,
-                tableNumber: tablePlayer.table.tableNumber,
-              };
-            }
-
-            return rp;
-          });
-        }
-
-        return { ...prev, tables, players };
-      });
+      setPlayers((prev: RoomPlayerPlainObject[]) =>
+        prev.map((roomPlayer: RoomPlayerPlainObject) => {
+          if (roomPlayer.playerId === tablePlayer.playerId) {
+            return { ...roomPlayer, tableNumber: tablePlayer.table.tableNumber };
+          }
+          return roomPlayer;
+        }),
+      );
     };
 
     const handlePlayerLeaveTable = ({ tablePlayer }: { tablePlayer: TablePlayerPlainObject }): void => {
-      setRoom((prev: RoomPlainObject | undefined) => {
-        if (!prev) return prev;
-
-        // Remove the player from the table’s players list
-        const tables: TablePlainObject[] = prev.tables.map((table: TablePlainObject) => {
+      setTables((prev: TablePlainObject[]) =>
+        prev.map((table: TablePlainObject) => {
           if (table.id === tablePlayer.tableId) {
             return {
               ...table,
               players: table.players.filter((tp: TablePlayerPlainObject) => tp.playerId !== tablePlayer.playerId),
             };
           }
-
           return table;
-        });
+        }),
+      );
 
-        // Update player in room's player list - set tableNumber to null
-        const players: RoomPlayerPlainObject[] = prev.players.map((rp: RoomPlayerPlainObject) => {
+      setPlayers((prev: RoomPlayerPlainObject[]) =>
+        prev.map((rp: RoomPlayerPlainObject) => {
           if (rp.playerId === tablePlayer.playerId) {
+            return { ...rp, tableNumber: null };
+          }
+          return rp;
+        }),
+      );
+    };
+
+    const handleUpdateTableSeat = ({
+      tableSeat,
+      tablePlayer,
+    }: {
+      tableSeat: TableSeatPlainObject
+      tablePlayer: TablePlayerPlainObject
+    }) => {
+      setTables((prev: TablePlainObject[]) =>
+        prev.map((table: TablePlainObject) => {
+          if (table.id === tableSeat.tableId) {
             return {
-              ...rp,
-              tableNumber: null,
+              ...table,
+              seats: table.seats.map((ts: TableSeatPlainObject) => (ts.id === tableSeat.id ? tableSeat : ts)),
+              players: table.players.map((tp: TablePlayerPlainObject) =>
+                tp.playerId === tablePlayer.playerId ? { ...tp, seatNumber: tablePlayer.seatNumber } : tp,
+              ),
             };
           }
-
-          return rp;
-        });
-
-        return { ...prev, tables, players };
-      });
+          return table;
+        }),
+      );
     };
 
     const handleDeleteTable = ({ tableId }: { tableId: string }): void => {
-      setRoom((prev: RoomPlainObject | undefined) => {
-        if (!prev) return prev;
-
-        return {
-          ...prev,
-          tables: prev.tables.filter((t: TablePlainObject) => t.id !== tableId),
-        };
-      });
+      setTables((prev: TablePlainObject[]) => prev.filter((t: TablePlainObject) => t.id !== tableId));
     };
 
     const attachListeners = (): void => {
@@ -290,9 +266,9 @@ export default function Room(): ReactNode {
       socket.on(ServerToClientEvents.ROOM_PLAYER_LEFT, handlePlayerLeaveRoom);
       socket.on(ServerToClientEvents.ROOM_MESSAGE_SENT, handleUpdateChatMessages);
       socket.on(ServerToClientEvents.TABLE_UPDATED, handleUpdateTable);
-      socket.on(ServerToClientEvents.TABLE_SEAT_UPDATED, handleUpdateTableSeat);
       socket.on(ServerToClientEvents.TABLE_PLAYER_JOINED, handlePlayerJoinTable);
       socket.on(ServerToClientEvents.TABLE_PLAYER_LEFT, handlePlayerLeaveTable);
+      socket.on(ServerToClientEvents.TABLE_SEAT_UPDATED, handleUpdateTableSeat);
       socket.on(ServerToClientEvents.TABLE_DELETED, handleDeleteTable);
     };
 
@@ -315,9 +291,9 @@ export default function Room(): ReactNode {
       socket.off(ServerToClientEvents.ROOM_PLAYER_LEFT, handlePlayerLeaveRoom);
       socket.off(ServerToClientEvents.ROOM_MESSAGE_SENT, handleUpdateChatMessages);
       socket.off(ServerToClientEvents.TABLE_UPDATED, handleUpdateTable);
-      socket.off(ServerToClientEvents.TABLE_SEAT_UPDATED, handleUpdateTableSeat);
       socket.off(ServerToClientEvents.TABLE_PLAYER_JOINED, handlePlayerJoinTable);
       socket.off(ServerToClientEvents.TABLE_PLAYER_LEFT, handlePlayerLeaveTable);
+      socket.off(ServerToClientEvents.TABLE_SEAT_UPDATED, handleUpdateTableSeat);
       socket.off(ServerToClientEvents.TABLE_DELETED, handleDeleteTable);
       socket.off("reconnect", onReconnect);
     };
@@ -338,6 +314,7 @@ export default function Room(): ReactNode {
   const handleOpenCreateTableModal = (): void => {
     openModal(CreateTableModal, {
       roomId,
+      isSocialRoom,
       onCreateTableSuccess: (tableId: string): void => {
         router.push(`${ROUTE_TOWERS.PATH}?room=${roomId}&table=${tableId}`);
       },
@@ -389,7 +366,7 @@ export default function Room(): ReactNode {
           "dark:bg-dark-game-background",
         )}
       >
-        <RoomHeader room={room} />
+        <RoomHeader room={roomInfo} />
 
         {/* Left sidebar */}
         <div
@@ -407,7 +384,7 @@ export default function Room(): ReactNode {
             </Button>
           </div>
           <div className="mt-4">
-            {room && room?.level !== RoomLevel.SOCIAL && (
+            {!isSocialRoom && (
               <>
                 <div>
                   <span className="p-1 rounded-tl-sm rounded-tr-sm bg-sky-700 text-white text-sm">
@@ -502,12 +479,12 @@ export default function Room(): ReactNode {
               </div>
             </div>
             <div className="overflow-y-auto">
-              {room?.tables.map((table: TablePlainObject) => (
+              {tables.map((table: TablePlainObject) => (
                 <RoomTable
                   key={table.id}
                   roomId={roomId}
                   table={table}
-                  roomPlayer={room?.players.find((rp: RoomPlayerPlainObject) => rp.playerId === session?.user.id)}
+                  roomPlayer={players.find((rp: RoomPlayerPlainObject) => rp.playerId === session?.user.id)}
                 />
               ))}
             </div>
@@ -526,7 +503,7 @@ export default function Room(): ReactNode {
               {/* Chat */}
               <div className="overflow-hidden flex flex-col gap-1 h-full px-2">
                 <Chat
-                  chatMessages={room?.chatMessages}
+                  chatMessages={chatMessages}
                   messageInputRef={messageInputRef}
                   isMessageInputDisabled={!isConnected}
                   profanityFilter={profanityFilter}
@@ -536,12 +513,7 @@ export default function Room(): ReactNode {
             </div>
 
             <div className="w-[385px]">
-              <PlayersList
-                roomId={roomId}
-                players={room?.players}
-                isRatingsVisible={room && room?.level !== RoomLevel.SOCIAL}
-                isTableNumberVisible
-              />
+              <PlayersList roomId={roomId} players={players} isRatingsVisible={!isSocialRoom} isTableNumberVisible />
             </div>
           </div>
         </div>

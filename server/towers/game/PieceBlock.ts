@@ -46,7 +46,7 @@ export class PieceBlock {
   /**
    * Creates a new block for a piece.
    *
-   * @param letter - The letter representing the block (from "TOWERS", "MI" or "ME").
+   * @param letter - The letter representing the block (from "YOUPI!", "MI" or "ME").
    * @param position - The position of the block (default: { row: 0, col: 0 }).
    * @param powerType - The power type of the block (default: null).
    * @param powerLevel - The power level of the block (default: null).

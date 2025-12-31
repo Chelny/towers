@@ -40,6 +40,7 @@ export const ServerToClientEvents = {
 
   // Game
   GAME_CONTROL_KEYS_UPDATED: "stc:game:control-keys:updated",
+  GAME_SEATS: "stc:game:seats",
   GAME_STATE: "stc:game:state",
   GAME_COUNTDOWN: "stc:game:countdown",
   GAME_TIMER: "stc:game:timer",

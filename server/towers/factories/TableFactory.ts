@@ -2,6 +2,7 @@ import { Player } from "@/server/towers/classes/Player";
 import { Room } from "@/server/towers/classes/Room";
 import { Table, TablePlainObject } from "@/server/towers/classes/Table";
 import { TableChatMessage, TableChatMessageVariables } from "@/server/towers/classes/TableChatMessage";
+import { TableInvitation } from "@/server/towers/classes/TableInvitation";
 import { TablePlayer } from "@/server/towers/classes/TablePlayer";
 import { TableSeat } from "@/server/towers/classes/TableSeat";
 import { PlayerFactory } from "@/server/towers/factories/PlayerFactory";
@@ -10,6 +11,7 @@ import { TableManager } from "@/server/towers/managers/TableManager";
 import {
   TowersPlayerLite,
   TowersTableChatMessageWithRelations,
+  TowersTableInvitationWithRelations,
   TowersTablePlayerWithRelations,
   TowersTableSeatWithRelations,
   TowersTableWithRelations,
@@ -17,10 +19,7 @@ import {
 import { isObject } from "@/utils/object";
 
 export class TableFactory {
-  public static async convertToPlainObject(
-    dbTable: TowersTableWithRelations,
-    userId: string,
-  ): Promise<TablePlainObject> {
+  public static convertToPlainObject(dbTable: TowersTableWithRelations, userId: string): TablePlainObject {
     const room: Room = RoomFactory.createRoom(dbTable.room);
     const hostPlayer: Player = PlayerFactory.createPlayer(dbTable.hostPlayer);
     const table: Table = new Table({ ...dbTable, room, hostPlayer });
@@ -63,6 +62,26 @@ export class TableFactory {
       },
       [] as TableChatMessage[],
     );
+
+    table.invitations = dbTable.invitations.map((invitation: TowersTableInvitationWithRelations) => {
+      const inviterTablePlayer: TablePlayer | undefined = table.players.find(
+        (tp: TablePlayer) => tp.player.id === invitation.inviterPlayerId,
+      );
+
+      const inviteeTablePlayer: TablePlayer | undefined = table.players.find(
+        (tp: TablePlayer) => tp.player.id === invitation.inviteePlayerId,
+      );
+
+      const inviterPlayer: Player = inviterTablePlayer
+        ? inviterTablePlayer.player
+        : PlayerFactory.createPlayer(invitation.inviterPlayer);
+
+      const inviteePlayer: Player = inviteeTablePlayer
+        ? inviteeTablePlayer.player
+        : PlayerFactory.createPlayer(invitation.inviteePlayer);
+
+      return new TableInvitation({ ...invitation, room, table, inviterPlayer, inviteePlayer });
+    });
 
     return TableManager.tableViewForPlayer(table, userId);
   }

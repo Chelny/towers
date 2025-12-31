@@ -2,7 +2,6 @@
 
 import { KeyboardEvent, ReactNode, Ref, useEffect, useMemo, useRef } from "react";
 import { useLingui } from "@lingui/react/macro";
-import clsx from "clsx/lite";
 import { ProfanityFilter, TableChatMessageType } from "db/browser";
 import { TableType } from "db/browser";
 import Input, { InputImperativeHandle } from "@/components/ui/Input";
@@ -17,7 +16,7 @@ import { TableChatMessagePlainObject, TableChatMessageVariables } from "@/server
 type ChatMessage = RoomChatMessagePlainObject | TableChatMessagePlainObject;
 
 type ChatProps = {
-  chatMessages?: ChatMessage[]
+  chatMessages: ChatMessage[]
   messageInputRef?: Ref<InputImperativeHandle>
   isMessageInputDisabled: boolean
   profanityFilter?: ProfanityFilter
@@ -151,7 +150,7 @@ export default function Chat({
           text: filterProfanity(translatedMessage, profanityFilter),
         };
       });
-  }, [chatMessages, profanityFilter]);
+  }, [chatMessages, profanityFilter, session?.user.id]);
 
   useEffect(() => {
     scrollToBottom();
@@ -172,24 +171,13 @@ export default function Chat({
       <div className="overflow-y-auto flex-1 my-1">
         {translatedMessages?.map((message: ChatMessage) => (
           <div key={message.id} className="flex">
-            {"type" in message ? (
+            {!("type" in message) || (message as TableChatMessagePlainObject).type === TableChatMessageType.CHAT ? (
               <>
-                {(message as TableChatMessagePlainObject).type === TableChatMessageType.CHAT && (
-                  <span className="order-1">{message.player.user?.username}:&nbsp;</span>
-                )}
-                <span
-                  className={clsx(
-                    (message as TableChatMessagePlainObject).type === TableChatMessageType.CHAT && "order-2",
-                  )}
-                >
-                  {message.text}
-                </span>
-              </>
-            ) : (
-              <>
-                <span className="order-1">{message.player?.user?.username}:&nbsp;</span>
+                <span className="order-1">{message.player.user?.username}:&nbsp;</span>
                 <span className="order-2">{message.text}</span>
               </>
+            ) : (
+              <span>{message.text}</span>
             )}
           </div>
         ))}

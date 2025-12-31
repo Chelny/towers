@@ -382,7 +382,7 @@ export class Board {
   }
 
   /**
-   * Checks the board for the word "TOWERS" in all four possible directions (horizontal, vertical, and both diagonals).
+   * Checks the board for the word "YOUPI!" in all four possible directions (horizontal, vertical, and both diagonals).
    * When a hoo is detected, it sets `isHooDetected` to `true` and calculates the number of falls based on the hoo type.
    * Multiple hoos can be detected at the same time, and the number of falls is accumulated.
    */
@@ -394,7 +394,7 @@ export class Board {
       { row: 1, col: -1 }, // Diagonal (bottom-left to top-right)
     ];
 
-    // Iterate through the board to find "TOWERS" sequences
+    // Iterate through the board to find "YOUPI!" sequences
     for (let row = 0; row < BOARD_ROWS; row++) {
       for (let col = 0; col < BOARD_COLS; col++) {
         const block: BoardBlock = this.grid[row][col];
@@ -416,12 +416,12 @@ export class Board {
   }
 
   /**
-   * Checks for the "TOWERS" sequence on the board.
+   * Checks for the "YOUPI!" sequence on the board.
    *
    * @param startRow - The starting row position.
    * @param startCol - The starting column position.
    * @param possibleHooDirection - Possible hoo direction.
-   * @returns An array of positions of blocks forming the "TOWERS" sequence.
+   * @returns An array of positions of blocks forming the "YOUPI!" sequence.
    */
   private findHooSequenceInDirection(
     startRow: number,

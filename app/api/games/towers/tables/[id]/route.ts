@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { handleApiError, handleUnauthorizedApiError } from "@/lib/api-error";
 import { auth, Session } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { TablePlainObject } from "@/server/towers/classes/Table";
 import { TableFactory } from "@/server/towers/factories/TableFactory";
 import { getTowersTableIncludes, TowersTableWithRelations } from "@/types/prisma";
 
@@ -22,13 +23,9 @@ export async function GET(
       include: getTowersTableIncludes(),
     });
 
-    return NextResponse.json(
-      {
-        success: true,
-        data: TableFactory.convertToPlainObject(table, session.user.id),
-      },
-      { status: 200 },
-    );
+    const data: TablePlainObject = await TableFactory.convertToPlainObject(table, session.user.id);
+
+    return NextResponse.json({ success: true, data }, { status: 200 });
   } catch (error) {
     return handleApiError(error);
   }

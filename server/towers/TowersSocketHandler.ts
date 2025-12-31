@@ -122,7 +122,7 @@ export class TowersSocketHandler {
       if (!RoomManager.canUserAccess(room, this.user.id)) {
         callback({ success: false, message: "Room cannot be accessed." });
       } else {
-        const data: RoomPlainObject = await RoomManager.roomViewForPlayer(room, this.user.id);
+        const data: RoomPlainObject = RoomManager.roomViewForPlayer(room, this.user.id);
         if (room.players.some((rp: RoomPlayer) => rp.playerId === this.user.id)) {
           callback({
             success: true,
@@ -184,7 +184,7 @@ export class TowersSocketHandler {
       if (!TableManager.canUserAccess(table, this.user.id)) {
         callback({ success: false, message: "Table cannot be accessed." });
       } else {
-        const data: TablePlainObject = await TableManager.tableViewForPlayer(table, this.user.id);
+        const data: TablePlainObject = TableManager.tableViewForPlayer(table, this.user.id);
         if (table.players.some((tp: TablePlayer) => tp.playerId === this.user.id)) {
           callback({
             success: true,

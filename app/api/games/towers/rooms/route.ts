@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { handleApiError } from "@/lib/api-error";
 import prisma from "@/lib/prisma";
-import { RoomFactory } from "@/server/towers/factories/RoomFactory";
 import { towersRoomsListIncludes, TowersRoomsListWithCount } from "@/types/prisma";
 
 export async function GET(): Promise<NextResponse<ApiResponse>> {
@@ -14,7 +13,7 @@ export async function GET(): Promise<NextResponse<ApiResponse>> {
     return NextResponse.json(
       {
         success: true,
-        data: RoomFactory.convertManyToPlainObject(rooms),
+        data: rooms,
       },
       { status: 200 },
     );

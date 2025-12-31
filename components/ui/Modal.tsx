@@ -36,7 +36,7 @@ const Modal = forwardRef(function Modal(
 ): ReactNode {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const { t } = useLingui();
-  const { closeModal } = useModal();
+  const { closeModal, setModalPortalTarget } = useModal();
 
   useEffect(() => {
     if (ref && typeof ref === "object") {
@@ -50,9 +50,12 @@ const Modal = forwardRef(function Modal(
     const dialog: HTMLDialogElement | null = dialogRef.current;
     if (!dialog) return;
 
+    setModalPortalTarget(dialog);
+
     dialog.showModal();
 
     const handleDialogClose = (): void => {
+      setModalPortalTarget(null);
       closeModal();
       onClose?.();
     };
@@ -70,6 +73,7 @@ const Modal = forwardRef(function Modal(
     return () => {
       dialog.removeEventListener("close", handleDialogClose);
       dialog.removeEventListener("keydown", handleKeyDown);
+      setModalPortalTarget(null);
     };
   }, []);
 
@@ -91,8 +95,7 @@ const Modal = forwardRef(function Modal(
     <dialog
       ref={dialogRef}
       className={clsx(
-        "relative top-1/2 start-1/2 z-40 flex border-t-4 border-t-gray-200 border-r-4 border-e-gray-400 border-b-4 border-b-gray-400 border-l-4 border-s-gray-200 rounded-xs ring-1 ring-black shadow-lg bg-gray-200 -translate-x-1/2 -translate-y-1/2",
-        "rtl:translate-x-1/2",
+        "flex place-self-center border-t-4 border-t-gray-200 border-r-4 border-e-gray-400 border-b-4 border-b-gray-400 border-l-4 border-s-gray-200 rounded-xs ring-1 ring-black shadow-lg bg-gray-200 overflow-visible",
         "dark:border-t-dark-modal-border-top dark:border-e-dark-modal-border-end dark:border-b-dark-modal-border-bottom dark:border-s-dark-modal-border-start dark:bg-dark-modal-background",
         customDialogSize ? customDialogSize : "w-full max-w-md",
       )}

@@ -63,6 +63,7 @@ export class Game {
     // Clear board before starting a new game
     if (state === GameState.COUNTDOWN && state !== this._state) {
       this.table.seats.forEach((ts: TableSeat) => ts.clearSeatGame());
+      this.emitSeatUpdates();
     }
 
     this._state = state;
@@ -449,30 +450,32 @@ export class Game {
         });
       }
 
-      const ratingResults: EloResult[] = EloRating.rateTeams(roundTeams, winnerIds);
+      if (this.table.isRated) {
+        const ratingResults: EloResult[] = EloRating.rateTeams(roundTeams, winnerIds);
 
-      ratingResults.forEach((er: EloResult) => {
-        const tablePlayer: TablePlayer | undefined = this.table.players.find(
-          (tp: TablePlayer) => tp.playerId === er.playerId,
-        );
+        ratingResults.forEach((er: EloResult) => {
+          const tablePlayer: TablePlayer | undefined = this.table.players.find(
+            (tp: TablePlayer) => tp.playerId === er.playerId,
+          );
 
-        if (tablePlayer) {
-          PlayerStatsManager.updateRating(tablePlayer.playerId, er.newRating);
+          if (tablePlayer) {
+            PlayerStatsManager.updateRating(tablePlayer.playerId, er.newRating);
 
-          TableChatMessageManager.create({
-            tableId: this.table.id,
-            player: tablePlayer.player,
-            text: null,
-            type: TableChatMessageType.GAME_RATING,
-            textVariables: {
-              username: tablePlayer.player.user.username,
-              oldRating: er.oldRating,
-              newRating: er.newRating,
-            },
-            visibleToUserId: null,
-          });
-        }
-      });
+            TableChatMessageManager.create({
+              tableId: this.table.id,
+              player: tablePlayer.player,
+              text: null,
+              type: TableChatMessageType.GAME_RATING,
+              textVariables: {
+                username: tablePlayer.player.user.username,
+                oldRating: er.oldRating,
+                newRating: er.newRating,
+              },
+              visibleToUserId: null,
+            });
+          }
+        });
+      }
     }
 
     await publishRedisEvent(ServerInternalEvents.GAME_OVER, {
@@ -533,6 +536,13 @@ export class Game {
     this.playerGameInstances.clear();
 
     this.cleanupGame({ emitState: true, fullDestroy: true });
+  }
+
+  private async emitSeatUpdates(): Promise<void> {
+    await publishRedisEvent(ServerInternalEvents.GAME_SEATS_UPDATE, {
+      tableId: this.table.id,
+      tableSeats: this.table.seats.map((ts: TableSeat) => ts.toPlainObject()),
+    });
   }
 
   private async emitGameStateToAll(): Promise<void> {

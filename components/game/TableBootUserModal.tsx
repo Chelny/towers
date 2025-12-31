@@ -33,7 +33,7 @@ export default function TableBootUserModal({
 }: TableBootUserModalProps): ReactNode {
   const { socketRef, isConnected } = useSocket();
   const { t } = useLingui();
-  const [playersToBoot, setPlayersToBoot] = useState<TablePlayerPlainObject[] | undefined>(undefined);
+  const [playersToBoot, setPlayersToBoot] = useState<TablePlayerPlainObject[]>([]);
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -46,7 +46,7 @@ export default function TableBootUserModal({
         ClientToServerEvents.TABLE_PLAYERS_TO_BOOT,
         { tableId },
         (response: SocketCallback<TablePlayerPlainObject[]>) => {
-          if (response.success) {
+          if (response.success && response.data) {
             setPlayersToBoot(response.data);
           }
         },

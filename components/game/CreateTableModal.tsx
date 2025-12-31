@@ -15,6 +15,7 @@ import { logger } from "@/lib/logger";
 
 type CreateTableModalProps = {
   roomId: string
+  isSocialRoom: boolean
   onCreateTableSuccess: (tableId: string) => void
   onCancel: () => void
 };
@@ -31,13 +32,18 @@ export const createTableSchema = Type.Object({
 export type CreateTablePayload = FormPayload<typeof createTableSchema>;
 export type CreateTableFormValidationErrors = FormValidationErrors<keyof CreateTablePayload>;
 
-export default function CreateTableModal({ roomId, onCreateTableSuccess, onCancel }: CreateTableModalProps): ReactNode {
+export default function CreateTableModal({
+  roomId,
+  isSocialRoom,
+  onCreateTableSuccess,
+  onCancel,
+}: CreateTableModalProps): ReactNode {
   const { t } = useLingui();
   const { socketRef, session } = useSocket();
   const [errorMessages, setErrorMessages] = useState<CreateTableFormValidationErrors>({});
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-  const handleFormValidation = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
+  const handleFormValidation = (event: FormEvent<HTMLFormElement>): void => {
     const formElement: EventTarget & HTMLFormElement = event.currentTarget;
     const formData: FormData = new FormData(formElement);
     const payload: CreateTablePayload = {
@@ -67,7 +73,7 @@ export default function CreateTableModal({ roomId, onCreateTableSuccess, onCance
     }
 
     if (Object.keys(errorMessages).length === 0) {
-      await handleCreateTable(payload);
+      handleCreateTable(payload);
     }
   };
 
@@ -108,12 +114,14 @@ export default function CreateTableModal({ roomId, onCreateTableSuccess, onCance
         <Select.Option value={TableType.PRIVATE}>Private</Select.Option>
       </Select>
 
-      <Checkbox
-        id="isRated"
-        label={t({ message: "Rated Game" })}
-        defaultChecked={true}
-        errorMessage={errorMessages.isRated}
-      />
+      {!isSocialRoom && (
+        <Checkbox
+          id="isRated"
+          label={t({ message: "Rated Game" })}
+          defaultChecked={true}
+          errorMessage={errorMessages.isRated}
+        />
+      )}
     </Modal>
   );
 }

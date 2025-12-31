@@ -107,6 +107,12 @@ export default function PlayerBoard({
   );
 
   useEffect(() => {
+    setNextPieces(seat.nextPieces);
+    setPowerBar(seat.powerBar);
+    setBoard(seat.board);
+  }, [seat]);
+
+  useEffect(() => {
     // Set focus on correct seat when game starts
     if (gameState === GameState.PLAYING) {
       const boardEl: HTMLDivElement | null = isCurrentUserSeat ? boardRefs.current[seat.seatNumber - 1] : null;

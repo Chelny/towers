@@ -3,6 +3,7 @@ import { ROOM_MAX_USERS_CAPACITY } from "@/constants/game";
 import { RoomChatMessage, RoomChatMessagePlainObject } from "@/server/towers/classes/RoomChatMessage";
 import { RoomPlayer, RoomPlayerPlainObject } from "@/server/towers/classes/RoomPlayer";
 import { Table, TablePlainObject } from "@/server/towers/classes/Table";
+import { UserRelationshipManager } from "@/server/youpi/managers/UserRelationshipManager";
 
 export interface RoomProps {
   id: string
@@ -16,15 +17,12 @@ export interface RoomPlainObject {
   readonly id: string
   readonly name: string
   readonly level: RoomLevel
-  readonly sortOrder: number
-  readonly isFull: boolean
   readonly players: RoomPlayerPlainObject[]
   readonly chatMessages: RoomChatMessagePlainObject[]
   readonly tables: TablePlainObject[]
-  readonly playersCount: number
 }
 
-export type RoomLitePlainObject = Omit<RoomPlainObject, "players" | "chatMessages" | "tables">;
+export type RoomLitePlainObject = Pick<RoomPlainObject, "id" | "name" | "level">;
 
 export class Room {
   public readonly id: string;
@@ -92,7 +90,19 @@ export class Room {
     const roomPlayer: RoomPlayer | undefined = this.players.find((rp: RoomPlayer) => rp.playerId === playerId);
     if (!roomPlayer) return [];
 
-    return this.chatMessages.filter((rcm: RoomChatMessage) => rcm.createdAt >= roomPlayer.createdAt);
+    return this.chatMessages.filter(async (rcm: RoomChatMessage) => {
+      if (rcm.createdAt < roomPlayer.createdAt) {
+        return false;
+      }
+
+      const mutedUserIds: string[] = await UserRelationshipManager.mutedUserIdsFor(playerId);
+
+      if (mutedUserIds.includes(rcm.player.id)) {
+        return false;
+      }
+
+      return true;
+    });
   }
 
   public toLitePlainObject(): RoomLitePlainObject {
@@ -100,9 +110,6 @@ export class Room {
       id: this.id,
       name: this.name,
       level: this.level,
-      sortOrder: this.sortOrder,
-      isFull: this.isFull,
-      playersCount: this.playersCount,
     };
   }
 

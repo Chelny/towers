@@ -31,7 +31,7 @@ export default function TableInviteUserModal({
 }: TableInviteUserModalProps): ReactNode {
   const { socketRef, isConnected, session } = useSocket();
   const { t } = useLingui();
-  const [playersToInvite, setPlayersToInvite] = useState<RoomPlayerPlainObject[] | undefined>(undefined);
+  const [playersToInvite, setPlayersToInvite] = useState<RoomPlayerPlainObject[]>([]);
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -44,7 +44,7 @@ export default function TableInviteUserModal({
         ClientToServerEvents.TABLE_PLAYERS_TO_INVITE,
         { tableId },
         (response: SocketCallback<RoomPlayerPlainObject[]>) => {
-          if (response.success) {
+          if (response.success && response.data) {
             setPlayersToInvite(response.data);
           }
         },

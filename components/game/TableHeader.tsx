@@ -4,11 +4,11 @@ import { ReactNode } from "react";
 import { Trans } from "@lingui/react/macro";
 import Banner from "@/components/Banner";
 import { RoomLitePlainObject } from "@/server/towers/classes/Room";
-import { TablePlainObject } from "@/server/towers/classes/Table";
+import { TableLitePlainObject } from "@/server/towers/classes/Table";
 
 type TableHeaderProps = {
   room?: RoomLitePlainObject
-  table?: TablePlainObject
+  table: TableLitePlainObject | null
 };
 
 export default function TableHeader({ room, table }: TableHeaderProps): ReactNode {

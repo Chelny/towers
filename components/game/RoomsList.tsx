@@ -2,9 +2,9 @@
 
 import { ReactNode, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Plural, Trans, useLingui } from "@lingui/react/macro";
+import { Plural, useLingui } from "@lingui/react/macro";
 import clsx from "clsx/lite";
-import { RoomLevel } from "db/browser";
+import { TowersRoomPlayer } from "db/browser";
 import { Socket } from "socket.io-client";
 import useSWR from "swr";
 import Button from "@/components/ui/Button";
@@ -12,20 +12,20 @@ import { ROUTE_TOWERS } from "@/constants/routes";
 import { ServerToClientEvents } from "@/constants/socket/server-to-client";
 import { useSocket } from "@/context/SocketContext";
 import { fetcher } from "@/lib/fetcher";
-import { RoomPlainObject } from "@/server/towers/classes/Room";
-import { RoomPlayerPlainObject } from "@/server/towers/classes/RoomPlayer";
+import { TowersRoomsListWithCount } from "@/types/prisma";
+import { getRoomLevelBadgeClasses, getRoomLevelText } from "@/utils/room";
 
 export default function RoomsList(): ReactNode {
   const router = useRouter();
   const { t } = useLingui();
   const { socketRef, isConnected, session } = useSocket();
-  const [rooms, setRooms] = useState<RoomPlainObject[]>([]);
+  const [rooms, setRooms] = useState<TowersRoomsListWithCount[]>([]);
 
   const {
     data: roomsResponse,
     error: roomsError,
     mutate: loadRooms,
-  } = useSWR<ApiResponse<RoomPlainObject[]>>("/api/games/towers/rooms", fetcher, {
+  } = useSWR<ApiResponse<TowersRoomsListWithCount[]>>("/api/games/towers/rooms", fetcher, {
     shouldRetryOnError: false,
     revalidateOnFocus: false,
     revalidateOnReconnect: true,
@@ -72,10 +72,10 @@ export default function RoomsList(): ReactNode {
 
   return (
     <ul className="grid grid-cols-[repeat(auto-fill,_minmax(14rem,_1fr))] gap-8">
-      {rooms?.map((room: RoomPlainObject) => {
-        const usersCount: number = room.playersCount;
+      {rooms?.map((room: TowersRoomsListWithCount) => {
+        const usersCount: number = room._count.players;
         const isUserInRoom: boolean = room.players?.some(
-          (roomPlayer: RoomPlayerPlainObject) => roomPlayer.playerId === session?.user?.id,
+          (roomPlayer: TowersRoomPlayer) => roomPlayer.playerId === session?.user?.id,
         );
 
         return (
@@ -89,15 +89,7 @@ export default function RoomsList(): ReactNode {
           >
             <div className="font-medium">{room.name}</div>
             <div>
-              {room.level === RoomLevel.SOCIAL ? (
-                <Trans>Social</Trans>
-              ) : room.level === RoomLevel.BEGINNER ? (
-                <Trans>Beginner</Trans>
-              ) : room.level === RoomLevel.INTERMEDIATE ? (
-                <Trans>Intermediate</Trans>
-              ) : room.level === RoomLevel.ADVANCED ? (
-                <Trans>Advanced</Trans>
-              ) : undefined}
+              <span className={getRoomLevelBadgeClasses(room.level)}>{getRoomLevelText(room.level)}</span>
             </div>
             <div>
               <Plural value={usersCount} zero="no users" one="# user" other="# users" />
