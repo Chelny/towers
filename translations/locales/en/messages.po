@@ -866,8 +866,8 @@ msgstr "Theme: {themeLabel}"
 
 #. js-lingui-explicit-id
 #: components/game/Chat.tsx:59
-msgid "Cipher key: {encryptedChar} => {decryptedChar}"
-msgstr "Cipher key: {encryptedChar} => {decryptedChar}"
+msgid "Cipher key: {plainChar} => {cipherChar}"
+msgstr "Cipher key: {plainChar} => {cipherChar}"
 
 #. js-lingui-explicit-id
 #: components/game/Chat.tsx:65
@@ -1096,7 +1096,7 @@ msgid "Who is Watching"
 msgstr "Who is Watching"
 
 #: components/game/RoomTable.tsx:140
-#: components/game/RoomsList.tsx:139
+#: components/game/RoomsList.tsx:135
 #: components/towers/PlayerBoard.tsx:466
 msgid "Join"
 msgstr "Join"
@@ -1109,15 +1109,15 @@ msgstr "Option: rated"
 msgid "Host: {hostUsername}"
 msgstr "Host: {hostUsername}"
 
-#: components/game/RoomsList.tsx:125
+#: components/game/RoomsList.tsx:121
 msgid "{usersCount, plural, zero {no users} one {# user} other {# users}}"
 msgstr "{usersCount, plural, zero {no users} one {# user} other {# users}}"
 
-#: components/game/RoomsList.tsx:136
+#: components/game/RoomsList.tsx:132
 msgid "Joined"
 msgstr "Joined"
 
-#: components/game/RoomsList.tsx:138
+#: components/game/RoomsList.tsx:134
 msgid "Full"
 msgstr "Full"
 

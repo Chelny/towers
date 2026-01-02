@@ -1,12 +1,8 @@
 export interface CipherKey {
-  encryptedChar: string // Original character to be encrypted
-  decryptedChar: string // Cipher character that replaces the original
+  plainChar: string // Original character to be encrypted
+  cipherChar: string // Cipher character that replaces the original
 }
 
-/**
- * Manages cipher keys awarded to users, and provides decryption functionality.
- * Each user has a collection of one-way cipher keys.
- */
 export class CipherHeroManager {
   private static readonly CIPHER_MAP: Record<string, string> = {
     A: "P",
@@ -45,7 +41,6 @@ export class CipherHeroManager {
     "8": "S",
     "9": "Y",
     "0": "H",
-    " ": " ",
   };
   private static userCipherKeys: Map<string, CipherKey[]> = new Map<string, CipherKey[]>();
   private static heroCodes: Map<string, string> = new Map<string, string>();
@@ -59,15 +54,17 @@ export class CipherHeroManager {
   public static getCipherKey(userId: string): CipherKey | null {
     const allKeys: [string, string][] = Object.entries(CipherHeroManager.CIPHER_MAP);
     const existingKeys: Set<string> = new Set(
-      CipherHeroManager.getUserCipherKeys(userId).map((k: CipherKey) => k.encryptedChar),
+      CipherHeroManager.getUserCipherKeys(userId).map((k: CipherKey) => k.plainChar),
     );
-    const availableKeys: [string, string][] = allKeys.filter(([encryptedChar]) => !existingKeys.has(encryptedChar));
+    const availableKeys: [string, string][] = allKeys.filter(
+      ([plainChar]: [string, string]) => !existingKeys.has(plainChar),
+    );
 
     if (availableKeys.length === 0) return null;
 
-    const [encryptedChar, decryptedChar]: [string, string] =
-      availableKeys[Math.floor(Math.random() * availableKeys.length)];
-    const key: CipherKey = { encryptedChar, decryptedChar };
+    const [plainChar, cipherChar]: [string, string] = availableKeys[Math.floor(Math.random() * availableKeys.length)];
+
+    const key: CipherKey = { plainChar, cipherChar };
 
     const keys: CipherKey[] = CipherHeroManager.userCipherKeys.get(userId) ?? [];
     keys.push(key);
@@ -248,13 +245,16 @@ export class CipherHeroManager {
       plainHeroCode = `${adjective} ${noun} ${verb} ${adverb}`;
     }
 
-    CipherHeroManager.heroCodes.set(userId, plainHeroCode.toUpperCase());
-
     const encryptedHeroCode: string = plainHeroCode
       .toUpperCase()
       .split("")
-      .map((char: string) => CipherHeroManager.CIPHER_MAP[char] ?? char)
+      .map((char: string) => {
+        if (char === " ") return " ";
+        return CipherHeroManager.CIPHER_MAP[char] ?? char;
+      })
       .join("");
+
+    CipherHeroManager.heroCodes.set(userId, encryptedHeroCode);
 
     return encryptedHeroCode;
   }
@@ -267,14 +267,17 @@ export class CipherHeroManager {
    * @returns The decrypted version of the code (e.g., "QROB 7AH6").
    */
   private static decryptHeroCode(code: string): string {
-    const DECRYPT_CIPHER_MAP: Record<string, string> = Object.fromEntries(
-      Object.entries(CipherHeroManager.CIPHER_MAP).map(([key, value]) => [value, key]),
+    const decryptMap: Record<string, string> = Object.fromEntries(
+      Object.entries(CipherHeroManager.CIPHER_MAP).map(([plain, cipher]: [string, string]) => [cipher, plain]),
     );
 
     return code
       .toUpperCase()
       .split("")
-      .map((char: string) => DECRYPT_CIPHER_MAP[char] ?? char)
+      .map((char: string) => {
+        if (char === " ") return " ";
+        return decryptMap[char] ?? char;
+      })
       .join("");
   }
 
@@ -287,9 +290,11 @@ export class CipherHeroManager {
    * @returns True if the guessed code matches the decrypted hero code; otherwise, false.
    */
   public static isGuessedCodeMatchesHeroCode(userId: string, code: string): boolean {
-    const heroCode: string | undefined = CipherHeroManager.heroCodes.get(userId);
-    if (!heroCode) return false;
-    return code.toUpperCase().includes(heroCode);
+    const encryptedCode: string | undefined = CipherHeroManager.heroCodes.get(userId);
+    if (!encryptedCode) return false;
+
+    const expectedPlain: string = CipherHeroManager.decryptHeroCode(encryptedCode);
+    return code.toUpperCase().includes(expectedPlain);
   }
 
   /**

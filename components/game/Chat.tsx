@@ -42,8 +42,8 @@ export default function Chat({
     type: TableChatMessageType,
     textVariables: TableChatMessageVariables | null,
   ): string => {
-    const encryptedChar: string | undefined = textVariables?.encryptedChar;
-    const decryptedChar: string | undefined = textVariables?.decryptedChar;
+    const plainChar: string | undefined = textVariables?.plainChar;
+    const cipherChar: string | undefined = textVariables?.cipherChar;
     const fKey: FKey | undefined = textVariables?.fKey;
     const oldRating: number | undefined = textVariables?.oldRating;
     const newRating: number | undefined = textVariables?.newRating;
@@ -56,7 +56,7 @@ export default function Chat({
 
     switch (type) {
       case TableChatMessageType.CIPHER_KEY:
-        message = i18n._("Cipher key: {encryptedChar} => {decryptedChar}", { encryptedChar, decryptedChar });
+        message = i18n._("Cipher key: {plainChar} => {cipherChar}", { plainChar, cipherChar });
         break;
 
       case TableChatMessageType.F_KEY:

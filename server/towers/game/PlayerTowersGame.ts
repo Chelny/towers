@@ -498,7 +498,7 @@ export class PlayerTowersGame {
         player: this.tablePlayer.player,
         text: null,
         type: TableChatMessageType.CIPHER_KEY,
-        textVariables: { encryptedChar: cipherKey.encryptedChar, decryptedChar: cipherKey.decryptedChar },
+        textVariables: { plainChar: cipherKey.plainChar, cipherChar: cipherKey.cipherChar },
         visibleToUserId: this.tablePlayer.playerId,
       });
     }

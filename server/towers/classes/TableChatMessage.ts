@@ -4,8 +4,8 @@ import { FKey } from "@/constants/f-key-messages";
 import { ChatMessage, ChatMessagePlainObject, ChatMessageProps } from "@/server/towers/classes/ChatMessage";
 
 export interface TableChatMessageVariables {
-  encryptedChar?: string
-  decryptedChar?: string
+  plainChar?: string
+  cipherChar?: string
   fKey?: FKey
   newRating?: number
   oldRating?: number
