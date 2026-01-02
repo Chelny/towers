@@ -81,8 +81,9 @@ export default async function RootLayout({ children, params }: Readonly<RootLayo
           attribute="class"
           storageKey={APP_STORAGE_KEYS.THEME}
           enableSystem
-          nonce={nonce}
+          defaultTheme="system"
           disableTransitionOnChange
+          nonce={nonce}
         >
           <LinguiClientProvider initialLocale={locale} initialMessages={allMessages[locale]}>
             <SocketProvider session={session}>

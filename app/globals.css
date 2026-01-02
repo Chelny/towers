@@ -246,6 +246,15 @@ body {
 
 html {
   scrollbar-gutter: stable both-edges;
+  color-scheme: light dark;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+html.light {
+  color-scheme: light;
 }
 
 @supports (scrollbar-color: auto) {
