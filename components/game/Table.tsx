@@ -258,9 +258,8 @@ export default function Table(): ReactNode {
   }, [usedPowerItem]);
 
   useEffect(() => {
-    if (!isConnected || !socketRef.current) return;
-
     const socket: Socket | null = socketRef.current;
+    if (!isConnected || !socket) return;
 
     const emitInitialData = (): void => {
       socket.emit(
@@ -452,27 +451,7 @@ export default function Table(): ReactNode {
       socket.on(ServerToClientEvents.GAME_OVER, handleGameOver);
     };
 
-    if (socket.connected) {
-      attachListeners();
-      if (!isJoined) {
-        emitInitialData();
-      }
-    } else {
-      socket.once("connect", () => {
-        attachListeners();
-        if (!isJoined) {
-          emitInitialData();
-        }
-      });
-    }
-
-    socket.on("reconnect", () => {
-      if (!isJoined) {
-        emitInitialData();
-      }
-    });
-
-    return () => {
+    const detachListeners = (): void => {
       socket.off(ServerToClientEvents.TABLE_UPDATED, handleUpdateTable);
       socket.off(ServerToClientEvents.TABLE_SEAT_UPDATED, handleUpdateTableSeat);
       socket.off(ServerToClientEvents.TABLE_PLAYER_JOINED, handlePlayerJoin);
@@ -486,10 +465,24 @@ export default function Table(): ReactNode {
       socket.off(ServerToClientEvents.GAME_TIMER, handleTimer);
       socket.off(ServerToClientEvents.GAME_POWER_FIRE, handlePowerFire);
       socket.off(ServerToClientEvents.GAME_OVER, handleGameOver);
-      socket.off("connect");
-      socket.off("reconnect", emitInitialData);
     };
-  }, [isConnected, socketRef, tableId, isJoined]);
+
+    const onConnect = (): void => {
+      attachListeners();
+      if (!isJoined) emitInitialData();
+    };
+
+    if (socket.connected) {
+      attachListeners();
+    } else {
+      socket.once("connect", onConnect);
+    }
+
+    return () => {
+      socket.off("connect", onConnect);
+      detachListeners();
+    };
+  }, [isConnected, tableId, isJoined]);
 
   const seatedTeamsCount = useMemo(() => {
     const seatedTeams: Set<number> = new Set<number>();

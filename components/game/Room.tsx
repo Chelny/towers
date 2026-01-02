@@ -127,9 +127,8 @@ export default function Room(): ReactNode {
   }, [settingsResponse?.data]);
 
   useEffect(() => {
-    if (!isConnected || !socketRef.current) return;
-
     const socket: Socket | null = socketRef.current;
+    if (!isConnected || !socket) return;
 
     const emitInitialData = (): void => {
       socket.emit(ClientToServerEvents.ROOM_JOIN, { roomId }, (response: SocketCallback<RoomPlainObject>) => {
@@ -272,21 +271,7 @@ export default function Room(): ReactNode {
       socket.on(ServerToClientEvents.TABLE_DELETED, handleDeleteTable);
     };
 
-    const onConnect = (): void => {
-      attachListeners();
-      if (!isJoined) emitInitialData();
-    };
-
-    const onReconnect = (): void => {
-      if (!isJoined) emitInitialData();
-    };
-
-    if (socket.connected) onConnect();
-    else socket.once("connect", onConnect);
-
-    socket.on("reconnect", onReconnect);
-
-    return () => {
+    const detachListeners = (): void => {
       socket.off(ServerToClientEvents.ROOM_PLAYER_JOINED, handlePlayerJoinRoom);
       socket.off(ServerToClientEvents.ROOM_PLAYER_LEFT, handlePlayerLeaveRoom);
       socket.off(ServerToClientEvents.ROOM_MESSAGE_SENT, handleUpdateChatMessages);
@@ -295,9 +280,24 @@ export default function Room(): ReactNode {
       socket.off(ServerToClientEvents.TABLE_PLAYER_LEFT, handlePlayerLeaveTable);
       socket.off(ServerToClientEvents.TABLE_SEAT_UPDATED, handleUpdateTableSeat);
       socket.off(ServerToClientEvents.TABLE_DELETED, handleDeleteTable);
-      socket.off("reconnect", onReconnect);
     };
-  }, [isConnected, socketRef, roomId, isJoined]);
+
+    const onConnect = (): void => {
+      attachListeners();
+      if (!isJoined) emitInitialData();
+    };
+
+    if (socket.connected) {
+      attachListeners();
+    } else {
+      socket.once("connect", onConnect);
+    }
+
+    return () => {
+      socket.off("connect", onConnect);
+      detachListeners();
+    };
+  }, [isConnected, roomId, isJoined]);
 
   const handlePlayNow = (): void => {
     socketRef.current?.emit(

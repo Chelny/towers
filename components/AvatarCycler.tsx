@@ -33,9 +33,8 @@ export function AvatarCycler({
   const selected = useMemo(() => AVATARS.find((avatar: Avatar) => avatar.id === avatarId) ?? AVATARS[0], [avatarId]);
 
   useEffect(() => {
-    if (!isConnected || !socketRef.current) return;
-
     const socket: Socket | null = socketRef.current;
+    if (!isConnected || !socket) return;
 
     const handleUpdateAvatar = ({ userId: updatedUserId, avatarId }: { userId: string; avatarId: string }): void => {
       if (updatedUserId === userId) {
@@ -47,19 +46,23 @@ export function AvatarCycler({
       socket.on(ServerToClientEvents.USER_SETTINGS_AVATAR, handleUpdateAvatar);
     };
 
+    const detachListeners = (): void => {
+      socket.off(ServerToClientEvents.USER_SETTINGS_AVATAR, handleUpdateAvatar);
+    };
+
+    const onConnect = (): void => attachListeners();
+
     if (socket.connected) {
       attachListeners();
     } else {
-      socket.once("connect", () => {
-        attachListeners();
-      });
+      socket.once("connect", onConnect);
     }
 
     return () => {
-      socket.off(ServerToClientEvents.USER_SETTINGS_AVATAR, handleUpdateAvatar);
-      socket.off("connect");
+      socket.off("connect", onConnect);
+      detachListeners();
     };
-  }, [isConnected, socketRef]);
+  }, [isConnected, userId]);
 
   const handleDoubleClick = (): void => {
     const nextId: string = getNextId(avatarId);

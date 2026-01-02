@@ -83,9 +83,8 @@ export default function Sidebar(): ReactNode {
   }, [joinedRooms, joinedTables, notifications]);
 
   useEffect(() => {
-    if (!isConnected || !socketRef.current) return;
-
     const socket: Socket | null = socketRef.current;
+    if (!isConnected || !socket) return;
 
     const emitInitialData = (): void => {
       socket.emit(ClientToServerEvents.NOTIFICATIONS, {}, (response: SocketCallback<NotificationPlainObject[]>) => {
@@ -132,29 +131,32 @@ export default function Sidebar(): ReactNode {
       socket.on(ServerToClientEvents.NOTIFICATION_DELETE, handleDeleteNotification);
     };
 
-    if (socket.connected) {
-      attachListeners();
-      emitInitialData();
-    } else {
-      socket.once("connect", () => {
-        attachListeners();
-        emitInitialData();
-      });
-    }
-
-    socket.on("reconnect", () => emitInitialData());
-
-    return () => {
+    const detachListeners = (): void => {
       socket.off(ServerToClientEvents.CONVERSATIONS_UNREAD, handleUpdateUnreadConversations);
       socket.off(ServerToClientEvents.TABLE_INVITATION_INVITED_NOTIFICATION, handleUpdateNotification);
       socket.off(ServerToClientEvents.TABLE_INVITATION_DECLINED_NOTIFICATION, handleUpdateNotification);
       socket.off(ServerToClientEvents.TABLE_BOOTED_NOTIFICATION, handleUpdateNotification);
       socket.off(ServerToClientEvents.NOTIFICATION_MARK_AS_READ, handleUpdateNotification);
       socket.off(ServerToClientEvents.NOTIFICATION_DELETE, handleDeleteNotification);
-      socket.off("connect");
-      socket.off("reconnect", emitInitialData);
     };
-  }, [isConnected, socketRef]);
+
+    const onConnect = (): void => {
+      attachListeners();
+      emitInitialData();
+    };
+
+    if (socket.connected) {
+      attachListeners();
+      emitInitialData();
+    } else {
+      socket.once("connect", onConnect);
+    }
+
+    return () => {
+      socket.off("connect", onConnect);
+      detachListeners();
+    };
+  }, [isConnected]);
 
   const handleOpenConversationsModal = (): void => {
     setIsExpanded(true);

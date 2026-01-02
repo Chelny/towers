@@ -36,9 +36,8 @@ export default function RoomTable({ roomId, table, roomPlayer }: RoomTableProps)
   const isSitAccessGranted: boolean = (!isPrivate && !isProtected) || hasAccess;
 
   useEffect(() => {
-    if (!isConnected || !socketRef.current) return;
-
     const socket: Socket | null = socketRef.current;
+    if (!isConnected || !socket) return;
 
     const emitInitialData = (): void => {
       socket.emit(
@@ -51,19 +50,19 @@ export default function RoomTable({ roomId, table, roomPlayer }: RoomTableProps)
         },
       );
     };
+
+    const onConnect = (): void => {
+      emitInitialData();
+    };
+
     if (socket.connected) {
       emitInitialData();
     } else {
-      socket.once("connect", () => {
-        emitInitialData();
-      });
+      socket.once("connect", onConnect);
     }
 
-    socket.on("reconnect", () => emitInitialData());
-
     return () => {
-      socket.off("connect");
-      socket.off("reconnect", emitInitialData);
+      socket.off("connect", onConnect);
     };
   }, [isConnected]);
 

@@ -217,9 +217,8 @@ export default function PlayerBoard({
   }, [tableId, isCurrentUserSeated]);
 
   useEffect(() => {
-    if (!isConnected || !socketRef.current) return;
-
     const socket: Socket | null = socketRef.current;
+    if (!isConnected || !socket) return;
 
     const handleGameUpdate = ({
       seatNumber: incomingSeatNumber,
@@ -289,19 +288,25 @@ export default function PlayerBoard({
       socket.on(ServerToClientEvents.GAME_BLOCKS_MARKED_FOR_REMOVAL, handleBlocksMarkedForRemoval);
     };
 
-    if (socket.connected) {
-      attachListeners();
-    } else {
-      socket.once("connect", () => {
-        attachListeners();
-      });
-    }
-
-    return () => {
+    const detachListeners = (): void => {
       socket.off(ServerToClientEvents.GAME_UPDATE, handleGameUpdate);
       socket.off(ServerToClientEvents.GAME_HOO_SEND_BLOCKS, handleHooSendBlocks);
       socket.off(ServerToClientEvents.GAME_BLOCKS_MARKED_FOR_REMOVAL, handleBlocksMarkedForRemoval);
-      socket.off("connect");
+    };
+
+    const onConnect = (): void => {
+      attachListeners();
+    };
+
+    if (socket.connected) {
+      attachListeners();
+    } else {
+      socket.once("connect", onConnect);
+    }
+
+    return () => {
+      socket.off("connect", onConnect);
+      detachListeners();
     };
   }, [isConnected, tableId, seat?.seatNumber, seat?.teamNumber, isCurrentUserSeat]);
 

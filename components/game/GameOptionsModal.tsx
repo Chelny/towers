@@ -46,9 +46,8 @@ export default function GameOptionsModal({
   );
 
   useEffect(() => {
-    if (!isConnected || !socketRef.current) return;
-
     const socket: Socket | null = socketRef.current;
+    if (!isConnected || !socket) return;
 
     const emitInitialData = (): void => {
       socket.emit(ClientToServerEvents.TABLE_INVITATIONS_BLOCKED_CHECK, {}, (response: SocketCallback<boolean>) => {
@@ -58,28 +57,25 @@ export default function GameOptionsModal({
       });
     };
 
+    const onConnect = (): void => {
+      emitInitialData();
+    };
+
     if (socket.connected) {
       emitInitialData();
     } else {
-      socket.once("connect", () => {
-        emitInitialData();
-      });
+      socket.once("connect", onConnect);
     }
 
-    socket.on("reconnect", () => emitInitialData());
-
     return () => {
-      socket.off("connect");
-      socket.off("reconnect", emitInitialData);
+      socket.off("connect", onConnect);
     };
-  }, [isConnected, socketRef, session?.user.id]);
+  }, [isConnected, session?.user.id]);
 
   const handleToggleDeclineAll = (value: boolean): void => {
     setIsDeclineAll(value);
 
-    if (!isConnected || !socketRef.current) return;
-
-    socketRef.current.emit(
+    socketRef.current?.emit(
       value ? ClientToServerEvents.TABLE_INVITATIONS_BLOCK : ClientToServerEvents.TABLE_INVITATIONS_ALLOW,
     );
   };

@@ -162,9 +162,8 @@ export default function ConversationsModal({ conversationId, onClose }: Conversa
   }, [currentConversation]);
 
   useEffect(() => {
-    if (!isConnected || !socketRef.current) return;
-
     const socket: Socket | null = socketRef.current;
+    if (!isConnected || !socket) return;
 
     const emitInitialData = (): void => {
       socket.emit(ClientToServerEvents.CONVERSATIONS, {}, (response: SocketCallback<ConversationPlainObject[]>) => {
@@ -321,29 +320,32 @@ export default function ConversationsModal({ conversationId, onClose }: Conversa
       socket.on(ServerToClientEvents.CONVERSATION_MESSAGE_SENT, handleUpdateConversation);
     };
 
-    if (socket.connected) {
-      attachListeners();
-      emitInitialData();
-    } else {
-      socket.once("connect", () => {
-        attachListeners();
-        emitInitialData();
-      });
-    }
-
-    socket.on("reconnect", () => emitInitialData());
-
-    return () => {
+    const detachListeners = (): void => {
       socket.off(ServerToClientEvents.CONVERSATION_MARK_AS_READ, handleMarkConversationAsRead);
       socket.off(ServerToClientEvents.CONVERSATION_MUTE, handleMuteConversation);
       socket.off(ServerToClientEvents.CONVERSATION_UNMUTE, handleUnmuteConversation);
       socket.off(ServerToClientEvents.CONVERSATION_REMOVE, handleRemoveConversation);
       socket.off(ServerToClientEvents.CONVERSATION_RESTORE, handleRestoreConversation);
       socket.off(ServerToClientEvents.CONVERSATION_MESSAGE_SENT, handleUpdateConversation);
-      socket.off("connect");
-      socket.off("reconnect", emitInitialData);
     };
-  }, [isConnected, socketRef, session?.user.id]);
+
+    const onConnect = (): void => {
+      attachListeners();
+      emitInitialData();
+    };
+
+    if (socket.connected) {
+      attachListeners();
+      emitInitialData();
+    } else {
+      socket.once("connect", onConnect);
+    }
+
+    return () => {
+      socket.off("connect", onConnect);
+      detachListeners();
+    };
+  }, [isConnected, session?.user.id]);
 
   const markConversationAsRead = (conversationId: string): void => {
     if (currentConversation?.id === conversationId && document.visibilityState === "visible" && document.hasFocus()) {

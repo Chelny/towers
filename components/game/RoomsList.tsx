@@ -38,9 +38,8 @@ export default function RoomsList(): ReactNode {
   }, [roomsResponse]);
 
   useEffect(() => {
-    if (!isConnected || !socketRef.current) return;
-
     const socket: Socket | null = socketRef.current;
+    if (!isConnected || !socket) return;
 
     const handleUpdateRoomslist = async (): Promise<void> => {
       await loadRooms();
@@ -50,17 +49,23 @@ export default function RoomsList(): ReactNode {
       socket.on(ServerToClientEvents.ROOMS_LIST_UPDATED, handleUpdateRoomslist);
     };
 
+    const detachListeners = (): void => {
+      socket.on(ServerToClientEvents.ROOMS_LIST_UPDATED, handleUpdateRoomslist);
+    };
+
+    const onConnect = (): void => {
+      attachListeners();
+    };
+
     if (socket.connected) {
       attachListeners();
     } else {
-      socket.once("connect", () => {
-        attachListeners();
-      });
+      socket.once("connect", onConnect);
     }
 
     return () => {
-      socket.off(ServerToClientEvents.ROOMS_LIST_UPDATED, handleUpdateRoomslist);
-      socket.off("connect");
+      socket.off("connect", onConnect);
+      detachListeners();
     };
   }, [isConnected, socketRef]);
 

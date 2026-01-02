@@ -31,9 +31,8 @@ export default function TowersPageContent(): ReactNode {
   }, [tableId]);
 
   useEffect(() => {
-    if (!isConnected || !socketRef.current) return;
-
     const socket: Socket | null = socketRef.current;
+    if (!isConnected || !socket) return;
 
     const handleUpdateNotification = ({ notification }: { notification: NotificationPlainObject }): void => {
       if (notification.type === NotificationType.TABLE_BOOTED && !!notification.bootedFromTable) {
@@ -50,19 +49,25 @@ export default function TowersPageContent(): ReactNode {
       socket.on(ServerToClientEvents.TABLE_BOOTED_NOTIFICATION, handleUpdateNotification);
     };
 
+    const detachListeners = (): void => {
+      socket.on(ServerToClientEvents.TABLE_BOOTED_NOTIFICATION, handleUpdateNotification);
+    };
+
+    const onConnect = (): void => {
+      attachListeners();
+    };
+
     if (socket.connected) {
       attachListeners();
     } else {
-      socket.once("connect", () => {
-        attachListeners();
-      });
+      socket.once("connect", onConnect);
     }
 
     return () => {
-      socket.off(ServerToClientEvents.TABLE_BOOTED_NOTIFICATION, handleUpdateNotification);
-      socket.off("connect");
+      socket.off("connect", onConnect);
+      detachListeners();
     };
-  }, [isConnected, socketRef, activeTableId]);
+  }, [isConnected, activeTableId]);
 
   return <>{tableId ? <Table key={tableId} /> : <Room key={roomId} />}</>;
 }

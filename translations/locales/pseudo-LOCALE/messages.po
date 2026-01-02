@@ -432,7 +432,7 @@ msgstr ""
 
 #: app/[locale]/(protected)/account/relationships/Relationships.tsx:221
 #: app/[locale]/(protected)/account/relationships/Relationships.tsx:338
-#: components/game/GameOptionsModal.tsx:117
+#: components/game/GameOptionsModal.tsx:113
 msgid "None"
 msgstr ""
 
@@ -659,7 +659,7 @@ msgstr ""
 msgid "The settings have been updated!"
 msgstr ""
 
-#: components/AvatarCycler.tsx:77
+#: components/AvatarCycler.tsx:80
 msgid "Double-click to change avatar"
 msgstr ""
 
@@ -692,49 +692,49 @@ msgid "Remove this conversation"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: components/ConversationsModal.tsx:375
+#: components/ConversationsModal.tsx:377
 msgid "{username} is online."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: components/ConversationsModal.tsx:379
+#: components/ConversationsModal.tsx:381
 msgid "{username} is offline."
 msgstr ""
 
 #. js-lingui-explicit-id
-#: components/ConversationsModal.tsx:430
+#: components/ConversationsModal.tsx:432
 msgid "Instant message with {username} started {time}"
 msgstr ""
 
-#: components/ConversationsModal.tsx:434
-#: components/Sidebar.tsx:229
-#: components/Sidebar.tsx:235
+#: components/ConversationsModal.tsx:436
+#: components/Sidebar.tsx:231
+#: components/Sidebar.tsx:237
 msgid "Conversations"
 msgstr ""
 
-#: components/ConversationsModal.tsx:437
+#: components/ConversationsModal.tsx:439
 #: components/game/AlertModal.tsx:20
-#: components/game/PlayerInformationModal.tsx:192
+#: components/game/PlayerInformationModal.tsx:194
 #: components/ui/Calendar.tsx:385
 #: components/ui/Modal.tsx:112
 #: components/ui/Modal.tsx:113
 msgid "Close"
 msgstr ""
 
-#: components/ConversationsModal.tsx:554
-#: components/game/PlayerInformationModal.tsx:211
+#: components/ConversationsModal.tsx:556
+#: components/game/PlayerInformationModal.tsx:213
 msgid "Send"
 msgstr ""
 
-#: components/ConversationsModal.tsx:570
+#: components/ConversationsModal.tsx:572
 msgid "Select a conversation"
 msgstr ""
 
-#: components/ConversationsModal.tsx:571
+#: components/ConversationsModal.tsx:573
 msgid "No conversations"
 msgstr ""
 
-#: components/ConversationsModal.tsx:580
+#: components/ConversationsModal.tsx:582
 msgid "Allow instant messages from my friends only."
 msgstr ""
 
@@ -796,43 +796,43 @@ msgstr ""
 msgid "Notifications"
 msgstr ""
 
-#: components/Sidebar.tsx:191
-#: components/Sidebar.tsx:192
+#: components/Sidebar.tsx:193
+#: components/Sidebar.tsx:194
 msgid "Collapse sidebar"
 msgstr ""
 
-#: components/Sidebar.tsx:204
-#: components/Sidebar.tsx:205
+#: components/Sidebar.tsx:206
+#: components/Sidebar.tsx:207
 msgid "Expand sidebar"
 msgstr ""
 
-#: components/Sidebar.tsx:215
+#: components/Sidebar.tsx:217
 msgid "User"
 msgstr ""
 
-#: components/Sidebar.tsx:219
-#: components/Sidebar.tsx:224
+#: components/Sidebar.tsx:221
+#: components/Sidebar.tsx:226
 #: constants/routes.ts:14
 msgid "Account"
 msgstr ""
 
-#: components/Sidebar.tsx:240
-#: components/Sidebar.tsx:244
+#: components/Sidebar.tsx:242
+#: components/Sidebar.tsx:246
 msgid "Rooms"
 msgstr ""
 
-#: components/Sidebar.tsx:251
+#: components/Sidebar.tsx:253
 #: constants/routes.ts:27
 msgid "Games"
 msgstr ""
 
-#: components/Sidebar.tsx:269
+#: components/Sidebar.tsx:271
 #: constants/routes.ts:21
 msgid "Settings"
 msgstr ""
 
-#: components/Sidebar.tsx:274
-#: components/Sidebar.tsx:278
+#: components/Sidebar.tsx:276
+#: components/Sidebar.tsx:280
 msgid "Sign out"
 msgstr ""
 
@@ -939,12 +939,12 @@ msgid "Write something..."
 msgstr ""
 
 #: components/game/CreateTableModal.tsx:60
-#: components/game/Table.tsx:533
+#: components/game/Table.tsx:527
 msgid "You must select a table type."
 msgstr ""
 
 #: components/game/CreateTableModal.tsx:66
-#: components/game/Table.tsx:539
+#: components/game/Table.tsx:533
 msgid "You must rate this game."
 msgstr ""
 
@@ -958,12 +958,12 @@ msgid "Create"
 msgstr ""
 
 #: components/game/CreateTableModal.tsx:107
-#: components/game/Table.tsx:891
+#: components/game/Table.tsx:885
 msgid "Table Type"
 msgstr ""
 
 #: components/game/CreateTableModal.tsx:120
-#: components/game/Table.tsx:935
+#: components/game/Table.tsx:929
 msgid "Rated Game"
 msgstr ""
 
@@ -971,82 +971,82 @@ msgstr ""
 msgid "Decline All Invitations"
 msgstr ""
 
-#: components/game/GameOptionsModal.tsx:93
+#: components/game/GameOptionsModal.tsx:89
 #: components/game/Room.tsx:438
-#: components/game/Table.tsx:929
+#: components/game/Table.tsx:923
 msgid "Options"
 msgstr ""
 
-#: components/game/GameOptionsModal.tsx:94
+#: components/game/GameOptionsModal.tsx:90
 msgid "Done"
 msgstr ""
 
-#: components/game/GameOptionsModal.tsx:107
+#: components/game/GameOptionsModal.tsx:103
 msgid "Profanity Filter"
 msgstr ""
 
-#: components/game/GameOptionsModal.tsx:118
+#: components/game/GameOptionsModal.tsx:114
 msgid "Weak"
 msgstr ""
 
-#: components/game/GameOptionsModal.tsx:119
+#: components/game/GameOptionsModal.tsx:115
 msgid "Strong"
 msgstr ""
 
-#: components/game/PlayerInformationModal.tsx:191
+#: components/game/PlayerInformationModal.tsx:193
 msgid "Player information of {username}"
 msgstr ""
 
-#: components/game/PlayerInformationModal.tsx:199
+#: components/game/PlayerInformationModal.tsx:201
 msgid "Rating: {rating}"
 msgstr ""
 
-#: components/game/PlayerInformationModal.tsx:200
+#: components/game/PlayerInformationModal.tsx:202
 msgid "Games Completed: {gamesCompleted}"
 msgstr ""
 
-#: components/game/PlayerInformationModal.tsx:201
+#: components/game/PlayerInformationModal.tsx:203
 msgid "Wins: {wins}"
 msgstr ""
 
-#: components/game/PlayerInformationModal.tsx:202
+#: components/game/PlayerInformationModal.tsx:204
 msgid "Losses: {losses}"
 msgstr ""
 
-#: components/game/PlayerInformationModal.tsx:203
+#: components/game/PlayerInformationModal.tsx:205
 msgid "Streak: {streak}"
 msgstr ""
 
-#: components/game/PlayerInformationModal.tsx:209
+#: components/game/PlayerInformationModal.tsx:211
 msgid "Send instant message"
 msgstr ""
 
-#: components/game/PlayerInformationModal.tsx:218
+#: components/game/PlayerInformationModal.tsx:220
 msgid "Idle time: {idleTime}."
 msgstr ""
 
-#: components/game/PlayerInformationModal.tsx:220
+#: components/game/PlayerInformationModal.tsx:222
 msgid "Idle time: <0>unavailable</0>"
 msgstr ""
 
-#: components/game/PlayerInformationModal.tsx:234
+#: components/game/PlayerInformationModal.tsx:236
 msgid "Ping"
 msgstr ""
 
-#: components/game/PlayerInformationModal.tsx:239
+#: components/game/PlayerInformationModal.tsx:241
 msgid "{targetNetDelay, plural, zero {{username}’s net delay: {targetNetDelay} seconds.} one {{username}’s net delay: {targetNetDelay} second.} other {{username}’s net delay: {targetNetDelay} seconds.}}"
 msgstr ""
 
-#: components/game/PlayerInformationModal.tsx:246
+#: components/game/PlayerInformationModal.tsx:248
 msgid "{myNetDelay, plural, zero {My net delay: {myNetDelay} seconds.} one {My net delay: {myNetDelay} second.} other {My net delay: {myNetDelay} seconds.}}"
 msgstr ""
 
-#: components/game/PlayerInformationModal.tsx:262
+#: components/game/PlayerInformationModal.tsx:264
 msgid "Ignore"
 msgstr ""
 
-#: components/game/PlayerInformationModal.tsx:270
-#: components/game/RoomTable.tsx:112
+#: components/game/PlayerInformationModal.tsx:272
+#: components/game/RoomTable.tsx:111
 msgid "Watch"
 msgstr ""
 
@@ -1095,29 +1095,29 @@ msgstr ""
 msgid "Who is Watching"
 msgstr ""
 
-#: components/game/RoomTable.tsx:140
-#: components/game/RoomsList.tsx:135
-#: components/towers/PlayerBoard.tsx:466
+#: components/game/RoomTable.tsx:139
+#: components/game/RoomsList.tsx:140
+#: components/towers/PlayerBoard.tsx:471
 msgid "Join"
 msgstr ""
 
-#: components/game/RoomTable.tsx:158
+#: components/game/RoomTable.tsx:157
 msgid "Option: rated"
 msgstr ""
 
-#: components/game/RoomTable.tsx:162
+#: components/game/RoomTable.tsx:161
 msgid "Host: {hostUsername}"
 msgstr ""
 
-#: components/game/RoomsList.tsx:121
+#: components/game/RoomsList.tsx:126
 msgid "{usersCount, plural, zero {no users} one {# user} other {# users}}"
 msgstr ""
 
-#: components/game/RoomsList.tsx:132
+#: components/game/RoomsList.tsx:137
 msgid "Joined"
 msgstr ""
 
-#: components/game/RoomsList.tsx:134
+#: components/game/RoomsList.tsx:139
 msgid "Full"
 msgstr ""
 
@@ -1133,206 +1133,206 @@ msgstr ""
 msgid "Disconnected from server"
 msgstr ""
 
-#: components/game/Table.tsx:643
+#: components/game/Table.tsx:637
 msgid "You can use a special cell"
 msgstr ""
 
-#: components/game/Table.tsx:651
+#: components/game/Table.tsx:645
 msgid "You can add a row"
 msgstr ""
 
-#: components/game/Table.tsx:654
+#: components/game/Table.tsx:648
 msgid "{powerLevel, select, minor {You can minorly dither} mega {You can mega dither} other {You can dither}}"
 msgstr ""
 
-#: components/game/Table.tsx:663
+#: components/game/Table.tsx:657
 msgid "{powerLevel, select, minor {You can add a stone} normal {You can add 2 stones} mega {You can add 3 stones} other {You can add stones}}"
 msgstr ""
 
-#: components/game/Table.tsx:673
+#: components/game/Table.tsx:667
 msgid "{powerLevel, select, minor {You can minorly defuse} mega {You can mega defuse} other {You can defuse}}"
 msgstr ""
 
-#: components/game/Table.tsx:681
+#: components/game/Table.tsx:675
 msgid "You can send a Medusa piece"
 msgstr ""
 
-#: components/game/Table.tsx:684
+#: components/game/Table.tsx:678
 msgid "{powerLevel, select, minor {You can minorly remove powers} mega {You can mega remove powers} other {You can remove powers}}"
 msgstr ""
 
-#: components/game/Table.tsx:697
+#: components/game/Table.tsx:691
 msgid "You can remove a row"
 msgstr ""
 
-#: components/game/Table.tsx:700
+#: components/game/Table.tsx:694
 msgid "{powerLevel, select, minor {You can minorly clump} mega {You can mega clump} other {You can clump}}"
 msgstr ""
 
-#: components/game/Table.tsx:709
+#: components/game/Table.tsx:703
 msgid "{powerLevel, select, minor {You can drop a stone} normal {You can drop 2 stones} mega {You can drop 3 stones} other {You can drop stones}}"
 msgstr ""
 
-#: components/game/Table.tsx:718
+#: components/game/Table.tsx:712
 msgid "You can color blast"
 msgstr ""
 
-#: components/game/Table.tsx:720
+#: components/game/Table.tsx:714
 msgid "You can send a Midas piece"
 msgstr ""
 
-#: components/game/Table.tsx:722
+#: components/game/Table.tsx:716
 msgid "You can send a color plague"
 msgstr ""
 
-#: components/game/Table.tsx:738
+#: components/game/Table.tsx:732
 msgid "{sourceUsername} used a special cell on {targetUsername}"
 msgstr ""
 
-#: components/game/Table.tsx:750
+#: components/game/Table.tsx:744
 msgid "{sourceUsername} added a row to {targetUsername}"
 msgstr ""
 
-#: components/game/Table.tsx:756
+#: components/game/Table.tsx:750
 msgid "{powerLevel, select, minor {{sourceUsername} minorly dithered {targetUsername}} mega {{sourceUsername} mega dithered {targetUsername}} other {{sourceUsername} dithered {targetUsername}}}"
 msgstr ""
 
-#: components/game/Table.tsx:765
+#: components/game/Table.tsx:759
 msgid "{sourceUsername} stoned {targetUsername}"
 msgstr ""
 
-#: components/game/Table.tsx:771
+#: components/game/Table.tsx:765
 msgid "{powerLevel, select, minor {{sourceUsername} minorly defused {targetUsername}} mega {{sourceUsername} mega defused {targetUsername}} other {{sourceUsername} defused {targetUsername}}}"
 msgstr ""
 
-#: components/game/Table.tsx:780
+#: components/game/Table.tsx:774
 msgid "{sourceUsername} sent a Medusa piece to {targetUsername}"
 msgstr ""
 
-#: components/game/Table.tsx:786
+#: components/game/Table.tsx:780
 msgid "{sourceUsername} removed powers from {targetUsername}"
 msgstr ""
 
-#: components/game/Table.tsx:797
+#: components/game/Table.tsx:791
 msgid "{sourceUsername} removed a row from {targetUsername}"
 msgstr ""
 
-#: components/game/Table.tsx:803
+#: components/game/Table.tsx:797
 msgid "{sourceUsername} clumped {targetUsername}"
 msgstr ""
 
-#: components/game/Table.tsx:811
+#: components/game/Table.tsx:805
 msgid "{value, plural, one {{sourceUsername} dropped 1 stone for {targetUsername}} two {{sourceUsername} dropped 2 stones for {targetUsername}} =3 {{sourceUsername} dropped 3 stones for {targetUsername}} other {{sourceUsername} dropped stones for {targetUsername}}}"
 msgstr ""
 
-#: components/game/Table.tsx:821
+#: components/game/Table.tsx:815
 msgid "{sourceUsername} color blasted {targetUsername}"
 msgstr ""
 
-#: components/game/Table.tsx:827
+#: components/game/Table.tsx:821
 msgid "{sourceUsername} sent a Midas piece to {targetUsername}"
 msgstr ""
 
-#: components/game/Table.tsx:833
+#: components/game/Table.tsx:827
 msgid "{sourceUsername} sent a color plague to {targetUsername}"
 msgstr ""
 
-#: components/game/Table.tsx:868
-#: components/towers/PlayerBoard.tsx:482
+#: components/game/Table.tsx:862
+#: components/towers/PlayerBoard.tsx:487
 msgid "Start"
 msgstr ""
 
-#: components/game/Table.tsx:876
+#: components/game/Table.tsx:870
 msgid "Change Keys"
 msgstr ""
 
-#: components/game/Table.tsx:883
+#: components/game/Table.tsx:877
 msgid "Demo"
 msgstr ""
 
-#: components/game/Table.tsx:887
-#: components/towers/PlayerBoard.tsx:472
+#: components/game/Table.tsx:881
+#: components/towers/PlayerBoard.tsx:477
 msgid "Stand"
 msgstr ""
 
-#: components/game/Table.tsx:904
+#: components/game/Table.tsx:898
 msgid "Public"
 msgstr ""
 
-#: components/game/Table.tsx:907
+#: components/game/Table.tsx:901
 msgid "Protected"
 msgstr ""
 
-#: components/game/Table.tsx:910
+#: components/game/Table.tsx:904
 msgid "Private"
 msgstr ""
 
-#: components/game/Table.tsx:918
-#: components/game/TableInviteUserModal.tsx:98
+#: components/game/Table.tsx:912
+#: components/game/TableInviteUserModal.tsx:100
 msgid "Invite"
 msgstr ""
 
-#: components/game/Table.tsx:925
-#: components/game/TableBootUserModal.tsx:100
+#: components/game/Table.tsx:919
+#: components/game/TableBootUserModal.tsx:102
 msgid "Boot"
 msgstr ""
 
-#: components/game/Table.tsx:949
+#: components/game/Table.tsx:943
 msgid "Sound"
 msgstr ""
 
-#: components/game/Table.tsx:957
+#: components/game/Table.tsx:951
 msgid "Help"
 msgstr ""
 
-#: components/game/Table.tsx:960
+#: components/game/Table.tsx:954
 msgid "Quit"
 msgstr ""
 
-#: components/game/Table.tsx:994
+#: components/game/Table.tsx:988
 msgid "<0>The next game is starting in</0><1>{countdown}</1><2>{countdown, plural, one {second} other {seconds}}</2>"
 msgstr ""
 
-#: components/game/Table.tsx:1015
+#: components/game/Table.tsx:1009
 msgid "Game Over"
 msgstr ""
 
-#: components/game/Table.tsx:1020
+#: components/game/Table.tsx:1014
 msgid "You lose!"
 msgstr ""
 
-#: components/game/Table.tsx:1027
+#: components/game/Table.tsx:1021
 msgid "You win!"
 msgstr ""
 
-#: components/game/Table.tsx:1032
+#: components/game/Table.tsx:1026
 msgid ""
 "{winnersCount, plural, one {Congratulations\n"
 "{firstWinner}} other {Congratulations\n"
 "{firstWinner} and {secondWinner}}}"
 msgstr ""
 
-#: components/game/Table.tsx:1048
+#: components/game/Table.tsx:1042
 msgid "Left:"
 msgstr ""
 
-#: components/game/Table.tsx:1056
+#: components/game/Table.tsx:1050
 msgid "Right:"
 msgstr ""
 
-#: components/game/Table.tsx:1064
+#: components/game/Table.tsx:1058
 msgid "Drop:"
 msgstr ""
 
-#: components/game/Table.tsx:1072
+#: components/game/Table.tsx:1066
 msgid "Cycle Color:"
 msgstr ""
 
-#: components/game/Table.tsx:1080
+#: components/game/Table.tsx:1074
 msgid "Use Item:"
 msgstr ""
 
-#: components/game/TableBootUserModal.tsx:99
+#: components/game/TableBootUserModal.tsx:101
 msgid "Boot User"
 msgstr ""
 
@@ -1518,23 +1518,23 @@ msgstr ""
 msgid "Reason"
 msgstr ""
 
-#: components/game/TableInviteUserModal.tsx:97
+#: components/game/TableInviteUserModal.tsx:99
 msgid "Invite User"
 msgstr ""
 
-#: components/towers/PlayerBoard.tsx:385
+#: components/towers/PlayerBoard.tsx:390
 msgid "Double-click to view player information"
 msgstr ""
 
-#: components/towers/PlayerBoard.tsx:498
+#: components/towers/PlayerBoard.tsx:503
 msgid "Ready"
 msgstr ""
 
-#: components/towers/PlayerBoard.tsx:499
+#: components/towers/PlayerBoard.tsx:504
 msgid "Waiting for more players"
 msgstr ""
 
-#: components/towers/PlayerBoard.tsx:500
+#: components/towers/PlayerBoard.tsx:505
 msgid "Waiting for the next game"
 msgstr ""
 

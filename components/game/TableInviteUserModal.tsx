@@ -35,9 +35,8 @@ export default function TableInviteUserModal({
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!isConnected || !socketRef.current) return;
-
     const socket: Socket | null = socketRef.current;
+    if (!isConnected || !socket) return;
 
     const handleUpdatePlayersList = (): void => {
       socket.emit(
@@ -60,25 +59,28 @@ export default function TableInviteUserModal({
       socket.on(ServerToClientEvents.TABLE_PLAYER_LEFT, handleUpdatePlayersList);
     };
 
+    const detachListeners = (): void => {
+      socket.off(ServerToClientEvents.TABLE_PLAYER_JOINED, handleUpdatePlayersList);
+      socket.off(ServerToClientEvents.TABLE_PLAYER_LEFT, handleUpdatePlayersList);
+    };
+
+    const onConnect = (): void => {
+      attachListeners();
+      emitInitialData();
+    };
+
     if (socket.connected) {
       attachListeners();
       emitInitialData();
     } else {
-      socket.once("connect", () => {
-        attachListeners();
-        emitInitialData();
-      });
+      socket.once("connect", onConnect);
     }
 
-    socket.on("reconnect", () => emitInitialData());
-
     return () => {
-      socket.off(ServerToClientEvents.TABLE_PLAYER_JOINED, handleUpdatePlayersList);
-      socket.off(ServerToClientEvents.TABLE_PLAYER_LEFT, handleUpdatePlayersList);
-      socket.off("connect");
-      socket.off("reconnect", emitInitialData);
+      socket.off("connect", onConnect);
+      detachListeners();
     };
-  }, [isConnected, socketRef, tableId]);
+  }, [isConnected, tableId]);
 
   const handleUserToInvite = (): void => {
     socketRef.current?.emit(

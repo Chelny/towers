@@ -84,9 +84,8 @@ export default function PlayerInformationModal({
   }, [selectedPlayer?.lastActiveAt]);
 
   useEffect(() => {
-    if (!isConnected || !socketRef.current) return;
-
     const socket: Socket | null = socketRef.current;
+    if (!isConnected || !socket) return;
 
     const emitInitialData = (): void => {
       socket.emit(
@@ -113,23 +112,26 @@ export default function PlayerInformationModal({
       socket.on(ServerToClientEvents.USER_RELATIONSHIP_UNMUTE, handleUnmuteUser);
     };
 
+    const detachListeners = (): void => {
+      socket.off(ServerToClientEvents.USER_RELATIONSHIP_MUTE, handleMuteUser);
+      socket.off(ServerToClientEvents.USER_RELATIONSHIP_UNMUTE, handleUnmuteUser);
+    };
+
+    const onConnect = (): void => {
+      attachListeners();
+      emitInitialData();
+    };
+
     if (socket.connected) {
       attachListeners();
       emitInitialData();
     } else {
-      socket.once("connect", () => {
-        attachListeners();
-        emitInitialData();
-      });
+      socket.once("connect", onConnect);
     }
 
-    socket.on("reconnect", () => emitInitialData());
-
     return () => {
-      socket.off(ServerToClientEvents.USER_RELATIONSHIP_MUTE, handleMuteUser);
-      socket.off(ServerToClientEvents.USER_RELATIONSHIP_UNMUTE, handleUnmuteUser);
-      socket.off("connect");
-      socket.off("reconnect", emitInitialData);
+      socket.off("connect", onConnect);
+      detachListeners();
     };
   }, [isConnected, selectedPlayer?.id]);
 
