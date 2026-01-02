@@ -288,7 +288,7 @@ export default function Room(): ReactNode {
     };
 
     if (socket.connected) {
-      attachListeners();
+      onConnect();
     } else {
       socket.once("connect", onConnect);
     }

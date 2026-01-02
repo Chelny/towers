@@ -53,7 +53,7 @@ export function AvatarCycler({
     const onConnect = (): void => attachListeners();
 
     if (socket.connected) {
-      attachListeners();
+      onConnect();
     } else {
       socket.once("connect", onConnect);
     }

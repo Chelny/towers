@@ -299,7 +299,7 @@ export default function PlayerBoard({
     };
 
     if (socket.connected) {
-      attachListeners();
+      onConnect();
     } else {
       socket.once("connect", onConnect);
     }

@@ -146,8 +146,7 @@ export default function Sidebar(): ReactNode {
     };
 
     if (socket.connected) {
-      attachListeners();
-      emitInitialData();
+      onConnect();
     } else {
       socket.once("connect", onConnect);
     }
