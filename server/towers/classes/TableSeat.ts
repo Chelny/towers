@@ -1,5 +1,5 @@
 import { Player, PlayerPlainObject } from "@/server/towers/classes/Player";
-import { Board, BoardPlainObject } from "@/server/towers/game/Board";
+import { Board, BoardPlainObject } from "@/server/towers/game/board/Board";
 import { NextPieces, NextPiecesPlainObject } from "@/server/towers/game/NextPieces";
 import { PieceBlock } from "@/server/towers/game/PieceBlock";
 import { PowerBar, PowerBarPlainObject } from "@/server/towers/game/PowerBar";

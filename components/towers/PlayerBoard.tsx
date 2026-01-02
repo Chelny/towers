@@ -25,7 +25,7 @@ import { ServerTowersSeat } from "@/interfaces/table-seats";
 import { PlayerPlainObject } from "@/server/towers/classes/Player";
 import { PlayerControlKeysPlainObject } from "@/server/towers/classes/PlayerControlKeys";
 import { TablePlayerPlainObject } from "@/server/towers/classes/TablePlayer";
-import { BlockToRemove, BoardPlainObject } from "@/server/towers/game/Board";
+import { BlockToRemove, BoardPlainObject } from "@/server/towers/game/board/Board";
 import { NextPiecesPlainObject } from "@/server/towers/game/NextPieces";
 import { PiecePlainObject } from "@/server/towers/game/Piece";
 import { PowerBarItemPlainObject, PowerBarPlainObject } from "@/server/towers/game/PowerBar";

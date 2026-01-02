@@ -14,7 +14,7 @@ import { logger } from "@/lib/logger";
 import { publishRedisEvent } from "@/server/redis/publish";
 import { TablePlayer, TablePlayerPlainObject } from "@/server/towers/classes/TablePlayer";
 import { TableSeat } from "@/server/towers/classes/TableSeat";
-import { Board } from "@/server/towers/game/Board";
+import { Board } from "@/server/towers/game/board/Board";
 import { CipherHeroManager } from "@/server/towers/game/CipherHeroManager";
 import { EloRating, EloResult, EloUserRating } from "@/server/towers/game/EloRating";
 import { PlayerTowersGame } from "@/server/towers/game/PlayerTowersGame";

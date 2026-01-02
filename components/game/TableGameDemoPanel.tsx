@@ -228,7 +228,7 @@ export default function TableGameDemoPanel({ nextGameCountdown, onChangeView }: 
 
   const renderRegularBlock = ({ letter }: { letter: TowersBlockLetter }): ReactNode => (
     <div
-      className={`flex items-center justify-center w-demo-block h-demo-block box-border block-${letter.toLowerCase()}`}
+      className={`flex items-center justify-center w-demo-block h-demo-block box-border block-${letter === "!" ? "x" : letter.toLowerCase()}`}
     >
       <RegularBlock letter={letter} />
     </div>
@@ -237,7 +237,7 @@ export default function TableGameDemoPanel({ nextGameCountdown, onChangeView }: 
   const renderAttackBlock = ({ letter, attackLabel, defenseLabel }: PowerBlockDemo): ReactNode => (
     <li key={letter} className="flex items-center gap-2">
       <div
-        className={`flex items-center justify-center w-demo-block h-demo-block box-border block-${letter.toLowerCase()} ${visibleBlockPowerType}-block`}
+        className={`flex items-center justify-center w-demo-block h-demo-block box-border block-${letter === "!" ? "x" : letter.toLowerCase()} ${visibleBlockPowerType}-block`}
       >
         {visibleBlockPowerType === "defense" ? <DefenseBlock letter={letter} /> : <RegularBlock letter={letter} />}
       </div>
@@ -620,11 +620,11 @@ export default function TableGameDemoPanel({ nextGameCountdown, onChangeView }: 
                             key={index}
                             className={clsx("w-full aspect-square", {
                               "block-y": color === "gray",
+                              "block-o": color === "green",
+                              "block-u": color === "blue",
+                              "block-p": color === "purple",
                               "block-i": color === "yellow",
                               "block-x": color === "orange",
-                              "block-u": color === "blue",
-                              "block-o": color === "green",
-                              "block-p": color === "purple",
                               "block-medusa": color === "medusa",
                             })}
                           />
@@ -635,7 +635,7 @@ export default function TableGameDemoPanel({ nextGameCountdown, onChangeView }: 
                           {visiblePowerBlocks.map(({ letter }: { letter: TowersBlockLetter }, index: number) => (
                             <div key={index} className={"relative flex items-center"}>
                               <div
-                                className={`w-full h-full aspect-square block-${letter.toLowerCase()} ${visibleBlockPowerType}-block`}
+                                className={`w-full h-full aspect-square block-${letter === "!" ? "x" : letter.toLowerCase()} ${visibleBlockPowerType}-block`}
                               />
 
                               {index === 0 && (
@@ -657,7 +657,7 @@ export default function TableGameDemoPanel({ nextGameCountdown, onChangeView }: 
 
                                   {/* Power block */}
                                   <div
-                                    className={`w-6 aspect-square block-${letter.toLowerCase()} ${visibleBlockPowerType}-block`}
+                                    className={`w-6 aspect-square block-${letter === "!" ? "x" : letter.toLowerCase()} ${visibleBlockPowerType}-block`}
                                   />
                                 </div>
                               )}
@@ -698,11 +698,11 @@ export default function TableGameDemoPanel({ nextGameCountdown, onChangeView }: 
                             key={index}
                             className={clsx("w-full aspect-square", {
                               "block-y": color === "gray",
+                              "block-o": color === "green",
+                              "block-u": color === "blue",
+                              "block-p": color === "purple",
                               "block-i": color === "yellow",
                               "block-x": color === "orange",
-                              "block-u": color === "blue",
-                              "block-o": color === "green",
-                              "block-p": color === "purple",
                               "block-medusa": color === "medusa",
                             })}
                           />

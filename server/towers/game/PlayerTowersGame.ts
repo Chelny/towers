@@ -3,7 +3,6 @@ import { DisconnectReason, Socket } from "socket.io";
 import {
   BLOCK_BREAK_ANIMATION_DURATION_MS,
   BOARD_ROWS,
-  HIDDEN_ROWS_COUNT,
   REMOVED_BLOCKS_COUNT_FOR_REMOVE_POWERS,
   REMOVED_BLOCKS_COUNT_FOR_REMOVE_STONES,
   REMOVED_BLOCKS_COUNT_FOR_SPEED_DROP,
@@ -15,19 +14,20 @@ import { publishRedisEvent } from "@/server/redis/publish";
 import { SocketEventBinder } from "@/server/socket/SocketEventBinder";
 import { TablePlayer } from "@/server/towers/classes/TablePlayer";
 import { TableSeat } from "@/server/towers/classes/TableSeat";
-import { BlockToRemove, Board } from "@/server/towers/game/Board";
+import { BlockToRemove, Board } from "@/server/towers/game/board/Board";
+import { PowerManager } from "@/server/towers/game/board/PowerManager";
 import { CipherHeroManager, CipherKey } from "@/server/towers/game/CipherHeroManager";
 import { NextPieces } from "@/server/towers/game/NextPieces";
 import { Piece } from "@/server/towers/game/Piece";
 import { PieceBlock, PieceBlockPosition, TowersBlockLetter } from "@/server/towers/game/PieceBlock";
 import { PowerBar } from "@/server/towers/game/PowerBar";
-import { PowerManager } from "@/server/towers/game/PowerManager";
 import { SpecialDiamond } from "@/server/towers/game/SpecialDiamond";
 import { TowersPiece } from "@/server/towers/game/TowersPiece";
 import { TowersPieceBlock, TowersPieceBlockPlainObject } from "@/server/towers/game/TowersPieceBlock";
 import { TableChatMessageManager } from "@/server/towers/managers/TableChatMessageManager";
 import { TablePlayerManager } from "@/server/towers/managers/TablePlayerManager";
 import { TableSeatManager } from "@/server/towers/managers/TableSeatManager";
+import { LoopRunner } from "@/server/towers/utils/LoopRunner";
 import { isMedusaPiece, isMidasPiece } from "@/server/towers/utils/piece-type-check";
 
 enum TickSpeed {
@@ -49,7 +49,7 @@ export class PlayerTowersGame {
   private currentPiece: Piece;
   private powerManager: PowerManager;
   private isSpecialSpeedDropActivated: boolean = false;
-  private gameLoopIntervalId: NodeJS.Timeout | null = null;
+  private loop: LoopRunner = new LoopRunner();
   private tickSpeed: TickSpeed = TickSpeed.NORMAL;
   private isTickInProgress: boolean = false;
   private isPieceLocked: boolean = false;
@@ -174,46 +174,26 @@ export class PlayerTowersGame {
   }
 
   public startGameLoop(): void {
-    this.tick();
-  }
-
-  private tick(): void {
-    this.clearGameLoop();
-
-    this.gameLoopIntervalId = setInterval(() => {
-      this.tickFallPiece();
-    }, this.tickSpeed);
-  }
-
-  private updateTickSpeed(speed: TickSpeed): void {
-    if (this.tickSpeed !== speed) {
-      this.tickSpeed = speed;
-
-      if (this.gameLoopIntervalId !== null) {
-        this.tick();
-      }
-    }
-  }
-
-  private clearGameLoop(): void {
-    if (this.gameLoopIntervalId) {
-      clearInterval(this.gameLoopIntervalId);
-      this.gameLoopIntervalId = null;
-    }
+    this.loop.start(
+      () => this.tickFallPiece(),
+      () => this.tickSpeed,
+    );
   }
 
   public stopGameLoop(): void {
-    // Hide falling piece from board
-    if (this.currentPiece.position.row >= HIDDEN_ROWS_COUNT) {
-      this.currentPiece.position = { ...this.currentPiece.position, row: BOARD_ROWS + 1 };
-    }
+    // Hide current piece from board
+    this.currentPiece.position = { ...this.currentPiece.position, row: BOARD_ROWS + 1 };
 
-    this.clearGameLoop();
+    this.loop.stop();
 
     this.eventBinder?.unbindAll();
     this.eventBinder = null;
 
-    this.sendGameStateToClient();
+    void this.sendGameStateToClient();
+  }
+
+  private updateTickSpeed(speed: TickSpeed): void {
+    this.tickSpeed = speed;
   }
 
   /**
@@ -231,15 +211,13 @@ export class PlayerTowersGame {
       const nextPieces: NextPieces | null | undefined = tableSeat?.nextPieces;
       const board: Board | null | undefined = tableSeat?.board;
 
-      if (!tableSeat || !nextPieces || !board) {
-        this.isTickInProgress = false;
-        return;
-      }
+      if (!tableSeat || !nextPieces || !board) return;
 
       const newPosition: PieceBlockPosition = {
         row: this.currentPiece.position.row + 1,
         col: this.currentPiece.position.col,
       };
+
       const simulatedPiece: Piece = Piece.simulateAtPosition(this.currentPiece, newPosition);
 
       if (board.hasCollision(simulatedPiece)) {
@@ -268,7 +246,7 @@ export class PlayerTowersGame {
         this.sendGameStateToClient();
       } else {
         this.currentPiece.position = newPosition;
-        this.sendGameStateToClient();
+        await this.sendGameStateToClient();
       }
     } finally {
       this.isTickInProgress = false;
@@ -300,7 +278,7 @@ export class PlayerTowersGame {
     }
 
     // Run all recursive block-breaking logic
-    await board.processLandedPiece(async (board: Board, blocksToRemove: BlockToRemove[]) => {
+    await board.processLandedPiece(async (board: Board, blocksToRemove: BlockToRemove[]): Promise<void> => {
       await this.waitForClientToFade(board, blocksToRemove);
     });
 
@@ -462,7 +440,7 @@ export class PlayerTowersGame {
     this.updateTickSpeed(TickSpeed.DROP);
     logger.debug(`Increased piece drop speed to ${this.tickSpeed}ms.`);
 
-    this.sendGameStateToClient();
+    void this.sendGameStateToClient();
   }
 
   /**
@@ -474,7 +452,7 @@ export class PlayerTowersGame {
     this.updateTickSpeed(TickSpeed.NORMAL);
     logger.debug(`Reset piece drop speed to ${this.tickSpeed}ms.`);
 
-    this.sendGameStateToClient();
+    void this.sendGameStateToClient();
   }
 
   /**
@@ -487,17 +465,15 @@ export class PlayerTowersGame {
   }
 
   public applySpecialSpeedDrop(): void {
-    if (!this.isSpecialSpeedDropActivated) {
-      this.isSpecialSpeedDropActivated = true;
-      this.updateTickSpeed(TickSpeed.SPEED_DROP);
-    }
+    if (this.isSpecialSpeedDropActivated) return;
+    this.isSpecialSpeedDropActivated = true;
+    this.updateTickSpeed(TickSpeed.SPEED_DROP);
   }
 
   public removeSpecialSpeedDrop(): void {
-    if (this.isSpecialSpeedDropActivated) {
-      this.isSpecialSpeedDropActivated = false;
-      this.updateTickSpeed(TickSpeed.NORMAL);
-    }
+    if (!this.isSpecialSpeedDropActivated) return;
+    this.isSpecialSpeedDropActivated = false;
+    this.updateTickSpeed(TickSpeed.NORMAL);
   }
 
   private ignoreInput(): boolean {

@@ -1,4 +1,4 @@
-import type { BoardBlock } from "@/server/towers/game/Board";
+import type { BoardBlock } from "@/server/towers/game/board/Board";
 import { EMPTY_CELL } from "@/constants/game";
 import { MedusaPiece } from "@/server/towers/game/MedusaPiece";
 import { MedusaPieceBlock } from "@/server/towers/game/MedusaPieceBlock";

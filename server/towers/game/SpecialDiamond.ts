@@ -16,8 +16,7 @@ export class SpecialDiamond {
   }
 
   public static fromPlainObject(obj: SpecialDiamondPlainObject): SpecialDiamond {
-    const block: SpecialDiamond = new SpecialDiamond(obj.powerType);
-    return block;
+    return new SpecialDiamond(obj.powerType);
   }
 
   public toPlainObject(): SpecialDiamondPlainObject {

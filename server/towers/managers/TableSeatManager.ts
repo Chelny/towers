@@ -1,7 +1,7 @@
 import { createId } from "@paralleldrive/cuid2";
 import { Player } from "@/server/towers/classes/Player";
 import { TableSeat, TableSeatProps } from "@/server/towers/classes/TableSeat";
-import { Board } from "@/server/towers/game/Board";
+import { Board } from "@/server/towers/game/board/Board";
 
 export class TableSeatManager {
   private static tableSeats: Map<string, TableSeat> = new Map<string, TableSeat>();

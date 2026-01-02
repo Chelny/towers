@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import GridRow from "@/components/towers/GridRow";
-import { BlockToRemove, BoardGridRowPlainObject, BoardPlainObject } from "@/server/towers/game/Board";
+import { BlockToRemove, BoardGridRowPlainObject, BoardPlainObject } from "@/server/towers/game/board/Board";
 import { PiecePlainObject } from "@/server/towers/game/Piece";
 
 type GridProps = {

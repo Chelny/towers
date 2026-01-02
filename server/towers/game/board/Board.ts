@@ -1,13 +1,7 @@
-import {
-  BOARD_COLS,
-  BOARD_ROWS,
-  DIRECTIONS,
-  EMPTY_CELL,
-  HIDDEN_ROWS_COUNT,
-  HOO_SEQUENCE,
-  MIN_MATCHING_BLOCKS,
-} from "@/constants/game";
+import { BOARD_COLS, BOARD_ROWS, EMPTY_CELL, HIDDEN_ROWS_COUNT, MATCH_DIRECTIONS } from "@/constants/game";
 import { logger } from "@/lib/logger";
+import { HooDetector } from "@/server/towers/game/board/HooDetector";
+import { MatchDetector } from "@/server/towers/game/board/MatchDetector";
 import { MedusaPieceBlock } from "@/server/towers/game/MedusaPieceBlock";
 import { MidasPieceBlock } from "@/server/towers/game/MidasPieceBlock";
 import { Piece } from "@/server/towers/game/Piece";
@@ -72,13 +66,14 @@ export interface BoardPlainObject {
 export class Board {
   public grid: BoardGrid;
   public towersPieceBlockPowerManager: TowersPieceBlockPowerManager;
+  private readonly hooDetector: HooDetector = new HooDetector();
   public isHooDetected: boolean = false;
   public hoos: Hoo[] = [];
   public hoosFallsCount: number = 0;
   public removedBlocksFromHoo: TowersPieceBlock[] = [];
+  private readonly matchDetector: MatchDetector = new MatchDetector();
   public matchingBlockColors: PieceBlockPosition[] = [];
   public removedBlocksCount: number = 0;
-  public shouldApplyRemovedByOriginNextCycle: boolean = false;
   public isSpeedDropUnlocked: boolean = false;
   public isRemovePowersUnlocked: boolean = false;
   public isRemoveStonesUnlocked: boolean = false;
@@ -134,7 +129,7 @@ export class Board {
       }
     }
 
-    this.printGrid();
+    // this.printGrid();
   }
 
   private printGrid(): void {
@@ -156,14 +151,14 @@ export class Board {
    * @param powerPiece - The block type to convert surrounding blocks into.
    */
   public async convertSurroundingBlocksToPowerBlocks(powerPiece: Piece): Promise<void> {
-    const blocksToRemove: PieceBlockPosition[] = [];
+    const blocksToRemove: BlockToRemove[] = [];
 
     for (const block of powerPiece.blocks) {
       const { row: pieceBlockRow, col: pieceBlockCol }: PieceBlockPosition = block.position;
 
-      for (const dir of DIRECTIONS) {
-        const adjRow: number = pieceBlockRow + dir.row;
-        const adjCol: number = pieceBlockCol + dir.col;
+      for (const direction of MATCH_DIRECTIONS) {
+        const adjRow: number = pieceBlockRow + direction.row;
+        const adjCol: number = pieceBlockCol + direction.col;
 
         if (this.isWithinBoardBounds(adjRow, adjCol)) {
           const currentBlock: BoardBlock = this.grid[adjRow][adjCol];
@@ -202,97 +197,104 @@ export class Board {
   public async processLandedPiece(
     waitForClientToFade: (board: Board, blocks: BlockToRemove[]) => Promise<void>,
   ): Promise<void> {
-    if (this.hoosFallsCount > 0) {
-      this.hoosFallsCount--;
-    }
-
-    if (this.hoosFallsCount === 0) {
-      this.isHooDetected = false;
-    }
-
-    const shouldTagRemovedByOrigin: boolean = this.shouldApplyRemovedByOriginNextCycle;
-    this.shouldApplyRemovedByOriginNextCycle = false;
+    const hooActiveThisLanding: boolean = this.hoosFallsCount > 0;
+    if (hooActiveThisLanding) this.isHooDetected = true;
 
     let isKeepLooping: boolean = true;
 
     while (isKeepLooping) {
       isKeepLooping = false;
 
-      // Hoos detection
-      this.checkForHoos();
+      const isExplodeAnimationForHoos: boolean = hooActiveThisLanding;
+
+      // ---- HOO detection ----
+      this.hoos = this.hooDetector.detect(this.grid, (row: number, col: number) => this.isWithinBoardBounds(row, col));
 
       if (this.hoos.length > 0) {
         this.isHooDetected = true;
-        this.shouldApplyRemovedByOriginNextCycle = true;
 
         const sumOfFalls: number = this.hoos.reduce((sum: number, hoo: Hoo) => sum + hoo.hoosFallsCount, 0);
-        const totalFalls: number = sumOfFalls + (sumOfFalls - 1);
+        const extraFalls: number = Math.max(0, this.hoos.length - 1);
+        this.hoosFallsCount += sumOfFalls + extraFalls;
 
-        this.hoosFallsCount += totalFalls;
-
-        const hoosBlocksToRemove: BlockToRemove[] = this.getHoosBlocksToRemove(shouldTagRemovedByOrigin);
+        const hoosBlocksToRemove: BlockToRemove[] = this.getHoosBlocksToRemove(isExplodeAnimationForHoos);
 
         if (hoosBlocksToRemove.length > 0) {
+          if (isExplodeAnimationForHoos) {
+            const blocksToSend: TowersPieceBlock[] = this.setBlocksToBeSentToOpponents(this.grid, hoosBlocksToRemove);
+            this.removedBlocksFromHoo.push(...blocksToSend);
+          }
+
           await waitForClientToFade(this, hoosBlocksToRemove);
           this.breakBlocks(hoosBlocksToRemove);
-
-          const newBlocks: TowersPieceBlock[] = this.setBlocksToBeSentToOpponents(
-            hoosBlocksToRemove,
-            shouldTagRemovedByOrigin,
-          );
-          this.removedBlocksFromHoo.push(...newBlocks);
 
           this.hoos = [];
           isKeepLooping = true;
         }
       }
 
-      // Color matching detection
+      // ---- MATCH detection ----
       this.checkForMatchingBlockColors();
 
-      // Process THIS board's matches
+      const isExplodeAnimationForMatches: boolean = this.isHooDetected;
+
       if (this.matchingBlockColors.length > 0) {
         const matchingBlocksToRemove: BlockToRemove[] = this.getMatchingBlocksToRemove(
+          this.grid,
           this.matchingBlockColors,
-          shouldTagRemovedByOrigin,
+          isExplodeAnimationForMatches,
         );
 
         if (matchingBlocksToRemove.length > 0) {
+          if (isExplodeAnimationForMatches) {
+            const blocksToSend: TowersPieceBlock[] = this.setBlocksToBeSentToOpponents(
+              this.grid,
+              matchingBlocksToRemove,
+            );
+            this.removedBlocksFromHoo.push(...blocksToSend);
+          }
+
           await waitForClientToFade(this, matchingBlocksToRemove);
           this.breakBlocks(matchingBlocksToRemove);
-
-          const newBlocks: TowersPieceBlock[] = this.setBlocksToBeSentToOpponents(
-            matchingBlocksToRemove,
-            shouldTagRemovedByOrigin,
-          );
-          this.removedBlocksFromHoo.push(...newBlocks);
 
           this.matchingBlockColors = [];
           isKeepLooping = true;
         }
       }
 
-      // Also process PARTNER board's matches if they exist
       if (this.partnerBoard && this.partnerBoard.matchingBlockColors.length > 0) {
         const partnerMatchingBlocksToRemove: BlockToRemove[] = this.getMatchingBlocksToRemove(
+          this.partnerBoard.grid,
           this.partnerBoard.matchingBlockColors,
-          shouldTagRemovedByOrigin,
+          isExplodeAnimationForMatches,
         );
 
         if (partnerMatchingBlocksToRemove.length > 0) {
+          if (isExplodeAnimationForMatches) {
+            const blocksToSend: TowersPieceBlock[] = this.setBlocksToBeSentToOpponents(
+              this.partnerBoard.grid,
+              partnerMatchingBlocksToRemove,
+            );
+            this.partnerBoard.removedBlocksFromHoo.push(...blocksToSend);
+          }
+
           await waitForClientToFade(this.partnerBoard, partnerMatchingBlocksToRemove);
           this.partnerBoard.breakBlocks(partnerMatchingBlocksToRemove);
-
-          const newBlocks: TowersPieceBlock[] = this.setBlocksToBeSentToOpponents(
-            partnerMatchingBlocksToRemove,
-            shouldTagRemovedByOrigin,
-          );
-          this.partnerBoard.removedBlocksFromHoo.push(...newBlocks);
 
           this.partnerBoard.matchingBlockColors = [];
           isKeepLooping = true;
         }
       }
+    }
+
+    if (hooActiveThisLanding && this.hoosFallsCount > 0) {
+      this.hoosFallsCount--;
+    }
+
+    if (this.hoosFallsCount === 0) {
+      this.isHooDetected = false;
+    } else {
+      this.isHooDetected = true;
     }
   }
 
@@ -335,13 +337,16 @@ export class Board {
    * @returns An array of blocks with row/col and optional removedByOrigin.
    */
   private getMatchingBlocksToRemove(
+    grid: BoardGrid,
     matchingBlockColors: PieceBlockPosition[],
     shouldTagRemovedByOrigin: boolean,
   ): BlockToRemove[] {
+    if (matchingBlockColors.length === 0) return [];
     const origin: PieceBlockPosition = matchingBlockColors[0];
+
     return matchingBlockColors
       .map((position: PieceBlockPosition) => {
-        const block: BoardBlock = this.grid[position.row][position.col];
+        const block: BoardBlock = grid[position.row][position.col];
         if (!isTowersPieceBlock(block) || block.isToBeRemoved) return null;
         block.isToBeRemoved = true;
 
@@ -350,7 +355,7 @@ export class Board {
           ...(shouldTagRemovedByOrigin ? { removedByOrigin: origin } : {}),
         };
       })
-      .filter((b: BlockToRemove | null): b is BlockToRemove => b !== null);
+      .filter((block: BlockToRemove | null): block is BlockToRemove => block !== null);
   }
 
   /**
@@ -358,118 +363,18 @@ export class Board {
    * to be sent to the opponent. This is only done if `shouldTagRemovedByOrigin` is true,
    * which indicates that blocks are part of a special removal event (like hoos).
    *
+   * @param grid - The blocks that will be removed.
    * @param blocksToRemove - The blocks that will be removed.
-   * @param shouldTagRemovedByOrigin - Whether to send blocks to opponent.
    * @returns An array of TowersPieceBlock to send, or an empty array.
    */
-  private setBlocksToBeSentToOpponents(
-    blocksToRemove: BlockToRemove[],
-    shouldTagRemovedByOrigin?: boolean,
-  ): TowersPieceBlock[] {
-    if (shouldTagRemovedByOrigin) {
-      const newBlocks: TowersPieceBlock[] = blocksToRemove
-        .map(({ row, col }: BlockToRemove) => {
-          const block: BoardBlock = this.grid[row][col];
-          if (!isTowersPieceBlock(block)) return null;
-          return new TowersPieceBlock(block.letter as TowersBlockLetter, { row, col });
-        })
-        .filter((block: TowersPieceBlock | null): block is TowersPieceBlock => !!block);
-
-      return newBlocks;
-    }
-
-    return [];
-  }
-
-  /**
-   * Checks the board for the word "YOUPI!" in all four possible directions (horizontal, vertical, and both diagonals).
-   * When a hoo is detected, it sets `isHooDetected` to `true` and calculates the number of falls based on the hoo type.
-   * Multiple hoos can be detected at the same time, and the number of falls is accumulated.
-   */
-  private checkForHoos(): void {
-    const directions: PieceBlockPosition[] = [
-      { row: 0, col: 1 }, // Horizontal
-      { row: 1, col: 0 }, // Vertical
-      { row: 1, col: 1 }, // Diagonal (top-left to bottom-right)
-      { row: 1, col: -1 }, // Diagonal (bottom-left to top-right)
-    ];
-
-    // Iterate through the board to find "YOUPI!" sequences
-    for (let row = 0; row < BOARD_ROWS; row++) {
-      for (let col = 0; col < BOARD_COLS; col++) {
-        const block: BoardBlock = this.grid[row][col];
-
-        if (!isTowersPieceBlock(block)) continue;
-
-        if (block.letter === HOO_SEQUENCE[0]) {
-          for (const possibleHooDirection of directions) {
-            const sequence: PieceBlockPosition[] = this.findHooSequenceInDirection(row, col, possibleHooDirection);
-
-            if (sequence.length > 0) {
-              const hoosFallsCount: number = this.getNumFallsForHooType(possibleHooDirection);
-              this.hoos.push({ positions: sequence, hoosFallsCount });
-            }
-          }
-        }
-      }
-    }
-  }
-
-  /**
-   * Checks for the "YOUPI!" sequence on the board.
-   *
-   * @param startRow - The starting row position.
-   * @param startCol - The starting column position.
-   * @param possibleHooDirection - Possible hoo direction.
-   * @returns An array of positions of blocks forming the "YOUPI!" sequence.
-   */
-  private findHooSequenceInDirection(
-    startRow: number,
-    startCol: number,
-    possibleHooDirection: PieceBlockPosition,
-  ): PieceBlockPosition[] {
-    const matchedSequence: PieceBlockPosition[] = [];
-    let row: number = startRow;
-    let col: number = startCol;
-    let matchedSequenceLetters: string = "";
-
-    while (this.isWithinBoardBounds(row, col) && matchedSequenceLetters.length < HOO_SEQUENCE.length) {
-      const block: BoardBlock = this.grid[row][col];
-
-      if (!isTowersPieceBlock(block) || block.letter !== HOO_SEQUENCE.charAt(matchedSequenceLetters.length)) {
-        break;
-      }
-
-      matchedSequence.push({ row, col });
-      matchedSequenceLetters += block.letter;
-
-      // Move to the next position
-      row += possibleHooDirection.row;
-      col += possibleHooDirection.col;
-    }
-
-    return matchedSequenceLetters === HOO_SEQUENCE ? matchedSequence : [];
-  }
-
-  /**
-   * Calculates the number of falls based on the hoo type.
-   *
-   * @param possibleHooDirection - Possible hoo direction.
-   * @returns The number of falls for the hoo type.
-   */
-  private getNumFallsForHooType(possibleHooDirection: PieceBlockPosition): number {
-    if (possibleHooDirection.row === 0 && possibleHooDirection.col === 1) {
-      return 1; // Horizontal hoo
-    } else if (
-      (possibleHooDirection.row === 1 && possibleHooDirection.col === 1) ||
-      (possibleHooDirection.row === 1 && possibleHooDirection.col === -1)
-    ) {
-      return 2; // Diagonal hoo
-    } else if (possibleHooDirection.row === 1 && possibleHooDirection.col === 0) {
-      return 3; // Vertical hoo
-    }
-
-    return 0;
+  private setBlocksToBeSentToOpponents(grid: BoardGrid, blocksToRemove: BlockToRemove[]): TowersPieceBlock[] {
+    return blocksToRemove
+      .map(({ row, col }: BlockToRemove) => {
+        const block: BoardBlock = grid[row][col];
+        if (!isTowersPieceBlock(block)) return null;
+        return new TowersPieceBlock(block.letter as TowersBlockLetter, { row, col });
+      })
+      .filter((block: TowersPieceBlock | null): block is TowersPieceBlock => !!block);
   }
 
   /**
@@ -483,6 +388,9 @@ export class Board {
    * Detected matching blocks are added to `matchingBlockColors` on the respective board.
    */
   private checkForMatchingBlockColors(): void {
+    this.matchingBlockColors = [];
+    if (this.partnerBoard) this.partnerBoard.matchingBlockColors = [];
+
     let mergedGrid: BoardBlock[][] = [];
     let totalCols: number;
 
@@ -500,57 +408,19 @@ export class Board {
       totalCols = BOARD_COLS;
     }
 
-    const allChains: PieceBlockPosition[] = [];
+    const matches: PieceBlockPosition[] = this.matchDetector.detect(mergedGrid, totalCols);
 
-    for (let row = 0; row < BOARD_ROWS; row++) {
-      for (let col = 0; col < totalCols; col++) {
-        const block: BoardBlock = mergedGrid[row][col];
-        if (!isTowersPieceBlock(block)) continue;
-
-        for (const dir of DIRECTIONS) {
-          const chain: PieceBlockPosition[] = [];
-          let r: number = row;
-          let c: number = col;
-
-          while (
-            r >= 0 &&
-            r < BOARD_ROWS &&
-            c >= 0 &&
-            c < totalCols &&
-            isTowersPieceBlock(mergedGrid[r][c]) &&
-            (mergedGrid[r][c] as TowersPieceBlock).letter === block.letter
-          ) {
-            chain.push({ row: r, col: c });
-            r += dir.row;
-            c += dir.col;
-          }
-
-          if (chain.length >= MIN_MATCHING_BLOCKS) {
-            allChains.push(...chain);
-          }
-        }
-      }
-    }
-
-    const unique: Map<string, PieceBlockPosition> = new Map<string, PieceBlockPosition>();
-
-    for (const pos of allChains) {
-      const key: string = `${pos.row},${pos.col}`;
-      unique.set(key, pos);
-    }
-
-    for (const pos of unique.values()) {
+    for (const position of matches) {
       if (this.partnerBoard) {
-        if (pos.col < BOARD_COLS) {
+        if (position.col < BOARD_COLS) {
           const leftBoard: Board = this.partnerSide === "right" ? this : this.partnerBoard!;
-          leftBoard.matchingBlockColors.push({ row: pos.row, col: pos.col });
+          leftBoard.matchingBlockColors.push({ row: position.row, col: position.col });
         } else {
-          const cc: number = pos.col - BOARD_COLS;
           const rightBoard: Board = this.partnerSide === "right" ? this.partnerBoard! : this;
-          rightBoard.matchingBlockColors.push({ row: pos.row, col: cc });
+          rightBoard.matchingBlockColors.push({ row: position.row, col: position.col - BOARD_COLS });
         }
       } else {
-        this.matchingBlockColors.push({ row: pos.row, col: pos.col });
+        this.matchingBlockColors.push(position);
       }
     }
   }
@@ -562,22 +432,7 @@ export class Board {
    * @param isShiftDownBlocks - Whether to shift blocks down after removal (default: true).
    */
   private breakBlocks(blocksToRemove: BlockToRemove[], isShiftDownBlocks: boolean = true): void {
-    this.removeBlocks(blocksToRemove);
-
-    if (isShiftDownBlocks) {
-      this.shiftDownBlocks();
-    }
-  }
-
-  /**
-   * Removes blocks from the board and updates the score.
-   *
-   * @param blockPositions - List of block positions to remove
-   */
-  private removeBlocks(blockPositions: PieceBlockPosition[]): void {
-    if (blockPositions.length === 0) return;
-
-    for (const { row, col } of blockPositions) {
+    for (const { row, col } of blocksToRemove) {
       if (this.isWithinBoardBounds(row, col)) {
         const block: Block = this.grid[row][col];
 
@@ -605,6 +460,10 @@ export class Board {
 
         this.grid[row][col] = EMPTY_CELL;
       }
+    }
+
+    if (isShiftDownBlocks) {
+      this.shiftDownBlocks();
     }
   }
 
@@ -712,10 +571,12 @@ export class Board {
 
     // Check if any existing block has reached row 2, 1 or 0
     for (let col = 0; col < BOARD_COLS; col++) {
-      if (!isEmptyCell(this.grid[0][col]) || !isEmptyCell(this.grid[1][col]) || !isEmptyCell(this.grid[2][col])) {
-        this.isGameOver = true;
-        logger.debug("Game Over for user: No more space to place pieces.");
-        return true;
+      for (let row = 0; row < HIDDEN_ROWS_COUNT; row++) {
+        if (!isEmptyCell(this.grid[row][col])) {
+          this.isGameOver = true;
+          logger.debug("Game Over for user: No more space to place pieces.");
+          return true;
+        }
       }
     }
 

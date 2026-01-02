@@ -1,5 +1,5 @@
 import { EMPTY_CELL } from "@/constants/game";
-import { BoardBlockPlainObject } from "@/server/towers/game/Board";
+import { BoardBlockPlainObject } from "@/server/towers/game/board/Board";
 import { PieceBlockPlainObject, PowerPieceBlockPlainObject } from "@/server/towers/game/PieceBlock";
 import { PowerBarPlainObject } from "@/server/towers/game/PowerBar";
 import { SpecialDiamondPlainObject } from "@/server/towers/game/SpecialDiamond";

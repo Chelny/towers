@@ -40,7 +40,7 @@ export const BLOCK_BREAK_ANIMATION_DURATION_MS = 190;
 export const HERO_CODE_ELIGIBILITY_TIME = 2 * 60 * 60 * 1000; // 2 hours
 export const HERO_CODE_REQUIRED_WINS = 25;
 
-export const DIRECTIONS = [
+export const MATCH_DIRECTIONS = [
   { row: -1, col: 0 }, // Up
   { row: 1, col: 0 }, // Down
   { row: 0, col: -1 }, // Left
@@ -49,6 +49,13 @@ export const DIRECTIONS = [
   { row: -1, col: 1 }, // Top-right
   { row: 1, col: -1 }, // Bottom-left
   { row: 1, col: 1 }, // Bottom-right
+];
+
+export const HOO_DIRECTIONS = [
+  { row: 0, col: 1 }, // →
+  { row: 1, col: 0 }, // ↓
+  { row: 1, col: 1 }, // ↘
+  { row: -1, col: 1 }, // ↗
 ];
 
 /**************************************************
